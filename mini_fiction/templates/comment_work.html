@@ -1,0 +1,19 @@
+{% extends "common.html" %}
+{% block content %}
+<div class="row">
+    <div class="span8">
+    <ul class="breadcrumb">
+      <li><a href="{{ url_for('index.index') }}">{{ SITE_NAME }}</a> <span class="divider">/</span></li>
+      <li><a href="{{ url_for('story.view', pk=story.id) }}">{{ story.title }}</a> <span class="divider">/</span></li>
+      <li class="active">{{ page_title }}</li>
+    </ul>
+    <h1>{{ page_title }}</h1>
+    {% include 'includes/comment_form.html' %}
+    <ul class="breadcrumb">
+      <li><a href="{{ url_for('index.index') }}">{{ SITE_NAME }}</a> <span class="divider">/</span></li>
+      <li><a href="{{ url_for('story.view', pk=story.id) }}">{{ story.title }}</a> <span class="divider">/</span></li>
+      <li class="active">{{ page_title }}</li>
+    </ul>
+    </div>
+</div>
+{% endblock %}

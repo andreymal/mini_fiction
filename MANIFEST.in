@@ -1,0 +1,11 @@
+include LICENSE.txt
+include Makefile
+include *.md
+include *requirements.txt
+recursive-exclude * __pycache__
+recursive-exclude * *.py[co]
+recursive-include mini_fiction/filters *
+recursive-include mini_fiction/fixtures *
+recursive-include mini_fiction/static *
+recursive-include mini_fiction/templates *
+recursive-include mini_fiction/translations *

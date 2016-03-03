@@ -1,0 +1,90 @@
+{% extends "common.html" %}
+{% block content %}
+<div class="row">
+    <div class="span12">
+        <ul class="breadcrumb">
+            <li><a href="{{ url_for('index.index') }}">{{ SITE_NAME }}</a> <span class="divider">/</span></li>
+            <li><a href="{{ url_for('author.info') }}">Кабинет автора</a> <span class="divider">/</span></li>
+            {% if story %}
+                <li><a href="{{ url_for('story.edit', pk=story.id) }}">Редактирование «{{ story.title }}»</a> <span class="divider">/</span></li>
+                <li class="active">Добавление новой главы</li>
+            {% else %}
+                <li><a href="{{ url_for('story.edit', pk=chapter.story.id) }}">Редактирование «{{ chapter.story.title }}»</a> <span class="divider">/</span></li>
+                <li class="active">Редактирование главы «{{ chapter.title }}»</li>
+            {% endif %}
+        </ul>
+    </div>
+    <div class="span12">
+        {% if story %}
+{{ html_block('chapter_add') }}
+        {% else %}
+            <h1>Редактирование главы «{{ chapter.title }}»</h1>
+        {% endif %}
+        <form method="POST" enctype="multipart/form-data" name="search" id="searchform" class="form-horizontal">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+            <fieldset>
+                <!-- Название -->
+                <div class="control-group{% if form.title.errors %} error{% endif %}">
+                    <label class="control-label">{{ form.title.label }}</label>
+                    <div class="controls">{{ form.title }}
+                        {% if form.title.errors %}
+                            {% for error in form.title.errors %}
+                            <span class="help-inline">{{ error }}</span>
+                            {% endfor %}
+                        {% else %}
+                            <span class="help-inline small">{{ form.title.description }}</span>
+                        {% endif %}
+                      </div>
+                </div>
+                <!-- Заметки к главе -->
+                <div class="control-group{% if form.notes.errors %} error{% endif %}">
+                    <label class="control-label">{{ form.notes.label }}</label>
+                    <div class="controls">{{ form.notes }}
+                        {% if form.notes.errors %}
+                            {% for error in form.notes.errors %}
+                            <span class="help-inline">{{ error }}</span>
+                            {% endfor %}
+                        {% else %}
+                            <span class="help-inline small">{{ form.notes.description }}</span>
+                        {% endif %}
+                      </div>
+                </div>
+                <!-- Текст главы -->
+                <div class="control-group{% if form.text.errors %} error{% endif %}">
+                    <label class="control-label">{{ form.text.label }}</label>
+                    <div class="controls">{{ form.text }}
+                        {% if form.text.errors %}
+                            {% for error in form.text.errors %}
+                            <span class="help-inline">{{ error }}</span>
+                            {% endfor %}
+                        {% else %}
+                            <!--<span class="help-inline small">-->{{ form.text.description }}<!--</span>-->
+                        {% endif %}
+                      </div>
+                </div>
+                <div class="form-actions notop">
+                    {{ form.button_submit }}
+                </div>
+            </fieldset>
+        </form>
+    </div>
+
+    {% if chapter %}
+        {% with story=chapter.story %}{% include "includes/chapter_single.html" %}{% endwith %}
+    {% endif %}
+
+    <div class="span12">
+        <ul class="breadcrumb">
+            <li><a href="{{ url_for('index.index') }}">{{ SITE_NAME }}</a> <span class="divider">/</span></li>
+            <li><a href="{{ url_for('author.info') }}">Кабинет автора</a> <span class="divider">/</span></li>
+            {% if story %}
+                <li><a href="{{ url_for('story.edit', pk=story.id) }}">Редактирование «{{ story.title }}»</a> <span class="divider">/</span></li>
+                <li class="active">Добавление новой главы</li>
+            {% else %}
+                <li><a href="{{ url_for('story.edit', pk=chapter.story.id) }}">Редактирование «{{ chapter.story.title }}»</a> <span class="divider">/</span></li>
+                <li class="active">Редактирование главы «{{ chapter.title }}»</li>
+            {% endif %}
+        </ul>
+    </div>
+</div>
+{% endblock %}

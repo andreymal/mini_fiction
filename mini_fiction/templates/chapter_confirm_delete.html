@@ -1,0 +1,33 @@
+{% extends "common.html" %}
+{% block content %}
+<div class="row">
+    <div class="span8">
+    <ul class="breadcrumb">
+      <li><a href="{{ url_for('index.index') }}">{{ SITE_NAME }}</a> <span class="divider">/</span></li>
+      <li><a href="{{ url_for('story.view', pk=story.id) }}">{{ story.title }}</a> <span class="divider">/</span></li>
+      <li class="active">{{ page_title }}</li>
+    </ul>
+    <h1>{{ page_title }}</h1>
+
+    <div class="story-item">
+        <p>Вы действительно хотите удалить главу <strong>«{{ chapter.title }}»</strong> из рассказа <strong>«{{ story.title }}»</strong>?</p>
+        <p>Вся связанная статистика, оценки и комментарии также будут безвозвратно удалены!</p>
+    </div>
+
+    <form method="POST" enctype="multipart/form-data">
+          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+          <div class="control-group">
+            <div class="controls">
+                <a href="{{ url_for('story.edit', pk=story.id) }}" class="btn">Отменить</a>
+                <input type="submit" class="btn btn-danger" value="Удалить">
+            </div>
+        </div>
+    </form>
+    <ul class="breadcrumb">
+      <li><a href="{{ url_for('index.index') }}">{{ SITE_NAME }}</a> <span class="divider">/</span></li>
+      <li><a href="{{ url_for('story.view', pk=story.id) }}">{{ story.title }}</a> <span class="divider">/</span></li>
+      <li class="active">{{ page_title }}</li>
+    </ul>
+    </div>
+</div>
+{% endblock %}

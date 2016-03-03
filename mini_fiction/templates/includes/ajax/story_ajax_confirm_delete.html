@@ -1,0 +1,14 @@
+<div class="modal-header">
+    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+    <h3>{{ page_title }}</h3>
+</div>
+<div class="modal-body">
+    <div class="story-item">
+        <p>Вы действительно хотите удалить рассказ <strong>«{{ story.title }}»</strong>?</p>
+        <p>Вся связанная статистика, главы, оценки и комментарии также будут безвозвратно удалены!</p>
+    </div>
+</div>
+<div class="modal-footer">
+    <button class="btn" data-dismiss="modal" aria-hidden="true">Отменить</button>
+    <a href="{{ url_for('story.delete', pk=story.id) }}" class="btn btn-danger ajax_story_delete">Удалить рассказ</a>
+</div>

@@ -1,0 +1,7 @@
+{% filter safe %}{{ story.title|upper }}
+
+{{ chapter.title }}
+
+
+{{ chapter.text|striptags }}
+{% endfilter %}

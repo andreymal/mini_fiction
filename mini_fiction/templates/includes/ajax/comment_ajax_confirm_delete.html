@@ -1,0 +1,20 @@
+<div class="modal-header">
+    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+    <h3>{{ page_title }}</h3>
+</div>
+<div class="modal-body">
+    <div class="story-item">
+        <p class="comment">
+            {{- comment.text_as_html|safe -}}
+        </p>
+        <p class="meta">
+            <a class="authorlink" href="{{ url_for('author.info', pk=comment.author.id) }}">{{ comment.author.username }}</a>
+            {{ comment.date|timedeltaformat }} назад {% if not story %} о <a href="{{ url_for('story.view', pk=story.id) }}"><b>{{ comment.story.title }}</b></a>{% endif %}
+        </p>
+    </div>
+    <p>Вы действительно хотите удалить этот комментарий?</p>
+</div>
+<div class="modal-footer">
+    <button class="btn" data-dismiss="modal" aria-hidden="true">Отменить</button>
+    <a href="{{ url_for('comment.delete', story_id=comment.story.id, pk=comment.id) }}" class="btn btn-danger ajax_comment_delete">Удалить комментарий</a>
+</div>

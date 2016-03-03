@@ -1,0 +1,82 @@
+{% extends "common.html" %}
+{% block content %}
+
+<div class="row">
+    <div class="span12">
+        <ul class="breadcrumb">
+            <li><a href="{{ url_for('index.index') }}">{{ SITE_NAME }}</a> <span class="divider">/</span></li>
+            <li class="active">{% if author.stories.count() > 0 %}Автор{% else %}Читатель{% endif %}: {{ author.username }}</li>
+        </ul>
+    </div>
+    <div class="span8">
+        <h1 id="author-name">
+            <img src="{{ author.bl.get_avatar_url() }}" width="42" title="{{ author.username }}" alt="{{ author.username }}" class="userpic"/>
+            {{ author.username }}
+            {% if current_user.is_staff %}
+                {# <a href="{% url 'author_approve' author.id %}" id="author_approve" class="btn btn-small{% if author.approved %} btn-primary{% endif %}">{% if author.approved %}Проверен{% else %}Не проверен{% endif %}</a> #}
+                <form style="margin: 0; display: inline-block;" method="POST" action="{{ url_for('author.ban', user_id=author.id) }}" id="author_ban">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+                    <input type="submit" class="btn btn-small{% if not author.is_active %} btn-danger {% endif %}" value="{% if author.is_active %}Не забанен{% else %}Забанен{% endif %}" />
+                </form>
+            {% else %}
+                {% if not author.is_active %}
+                    <sup id="banned">Read-only</sup>
+                {% endif %}
+            {% endif %}
+            {% if current_user.is_authenticated and current_user.id == author.id %}
+                <sup><a class="edit-link" href="{{ url_for('author.edit') }}">Редактировать профиль</a></sup>
+            {% endif %}
+        </h1>
+        <p>
+            {% if stories|length > 0 %}
+                Написал <b>{{ ngettext("%(num)d story", "%(num)d stories", stories|length) }}</b>
+            {% else %}
+                Пока ничего не написал
+            {% endif %}
+             и
+            {% if comments_count > 0 %}
+                оставил <b>{{ ngettext("%(num)d comment", "%(num)d comments", comments_count) }}</b>.
+            {% else %}
+                ничего не комментировал.
+            {% endif %}
+            {% if author.favorites|length > 0 %}
+                Занес в избранное <a href="{{ url_for('object_lists.favorites', user_id=author.id) }}">{{ ngettext("%(num)d story", "%(num)d stories", author.favorites|length) }}</a>.
+            {% endif %}
+        </p>
+        <p class="author-description">{{ author.bio_as_html }}</p>
+        <p class="contact-links">
+            {% if author.jabber %}<a href="xmpp:{{ author.jabber }}" class="jabberlink">{{ author.jabber }}</a><br/>{% endif %}
+            {% if author.skype %}<a href="skype:{{ author.skype }}" class="skypelink">{{ author.skype }}</a><br/>{% endif %}
+            {% if author.tabun %}<a href="https://tabun.everypony.ru/profile/{{ author.tabun }}/" class="tabunlink">{{ author.tabun }}</a><br/>{% endif %}
+            {% if author.forum %}<a href="{{ author.forum }}" class="forumlink">{{ author.username }}</a><br/>{% endif %}
+            {% if author.vk %}<a href="https://vk.com/{{ author.vk }}" class="vkontaktlink">{{ author.vk }}</a><br/>{% endif %}
+        </p>
+    </div>
+    <div class="span8">
+        {% if series %}
+            <h2>Сборники автора ({{ series|length }})</h2>
+            {% include "includes/series.html" %}
+        {% endif %}
+
+        <h2>Рассказы автора</h2>
+        {% include "includes/stories.html" %}
+    </div>
+
+    <div class="span4">
+        {% if comments_count > 0 %}
+            <h2>Комментарии автора ({{ comments_count }})</h2>
+            <div id="comments-list">
+            {% include "includes/comments.html" %}
+            </div>
+            {% include "includes/comments_pagination_author_overview.html" %}
+        {% endif %}
+    </div>
+
+      <div class="span12">
+        <ul class="breadcrumb">
+              <li><a href="{{ url_for('index.index') }}">{{ SITE_NAME }}</a> <span class="divider">/</span></li>
+              <li class="active">Автор: {{ author.username }}</li>
+        </ul>
+      </div>
+</div>
+{% endblock %}

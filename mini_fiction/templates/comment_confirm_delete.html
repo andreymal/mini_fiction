@@ -1,0 +1,38 @@
+{% extends "common.html" %}
+{% block content %}
+<div class="row">
+    <div class="span8">
+    <ul class="breadcrumb">
+      <li><a href="{{ url_for('index.index') }}">{{ SITE_NAME }}</a> <span class="divider">/</span></li>
+      <li><a href="{{ url_for('story.view', pk=story.id) }}">{{ story.title }}</a> <span class="divider">/</span></li>
+      <li class="active">{{ page_title }}</li>
+    </ul>
+    <h1>{{ page_title }}</h1>
+
+    <div class="story-item">
+        <p class="comment">
+            {{- comment.text_as_html|safe -}}
+        </p>
+        <p class="meta">
+            <a class="authorlink" href="{{ url_for('author.info', pk=comment.author.id) }}">{{ comment.author.username }}</a>
+            {{ comment.date|timedeltaformat }} назад {% if not story %} о <a href="{{ url_for('story.view', pk=story.id) }}"><b>{{ comment.story.title }}</b></a>{% endif %}
+        </p>
+    </div>
+
+    <form method="POST" enctype="multipart/form-data">
+          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+          <div class="control-group">
+            <div class="controls">
+                <a href="{{ url_for('story.view', pk=story.id) }}" class="btn">Отменить</a>
+                <input type="submit" class="btn btn-danger" value="Удалить комментарий">
+            </div>
+        </div>
+    </form>
+    <ul class="breadcrumb">
+      <li><a href="{{ url_for('index.index') }}">{{ SITE_NAME }}</a> <span class="divider">/</span></li>
+      <li><a href="{{ url_for('story.view', pk=story.id) }}">{{ story.title }}</a> <span class="divider">/</span></li>
+      <li class="active">{{ page_title }}</li>
+    </ul>
+    </div>
+</div>
+{% endblock %}

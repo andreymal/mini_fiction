@@ -1,0 +1,8 @@
+{% if num_pages != 1 %}
+    <div id="pagination" class="center">
+        <a href="{{ url_for('story.view', pk=story.id, comments_page=page_obj.number - 1) }}" id="ajax_prev_comment" class="btn{% if not page_obj.has_previous() %} hidden{% endif %}">← Старые</a>
+        <span id="ajax_pages_comment" class="btn btn-primary">{{ page_obj.number }} / {{ page_obj.num_pages }}</span>
+        <a href="{{ url_for('story.view', pk=story.id, comments_page=page_obj.number + 1) }}" id="ajax_next_comment" class="btn{% if not page_obj.has_next() %} hidden{% endif %}">Новые →</a>
+        <input type="hidden" id="num_pages" value="{{ page_obj.num_pages }}">
+    </div>
+{% endif %}

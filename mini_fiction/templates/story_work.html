@@ -1,0 +1,200 @@
+{% extends "common.html" %}
+
+{% block content %}
+<div class="row">
+    <div class="span12">
+        <ul class="breadcrumb">
+            <li><a href="{{ url_for('index.index') }}">{{ SITE_NAME }}</a> <span class="divider">/</span></li>
+            <li><a href="{{ url_for('author.info') }}">Кабинет автора</a> <span class="divider">/</span></li>
+            <li class="active">{{ page_title }}</li>
+        </ul>
+    </div>
+
+    <div class="span12">
+        <h1>
+            {{ page_title }}
+            {% include 'includes/story_control_buttons.html' %}
+        </h1>
+        {% if story_add %}
+{{ html_block('story_add') }}
+        {% endif %}
+        {% if saved %}<div class="alert-mini green">Изменения сохранены</div>{% endif %}
+
+        <form method="POST" enctype="multipart/form-data" class="form-horizontal">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+            <fieldset>
+                <legend>Параметры рассказа</legend>
+
+                <!-- Название -->
+                <div class="control-group{% if form.title.errors %} error{% endif %}">
+                    <label class="control-label">{{ form.title.label }}</label>
+                    <div class="controls">{{ form.title }}
+                        {% if form.title.errors %}
+                            {% for error in form.title.errors %}
+                        <span class="help-inline">{{ error }}</span>
+                            {% endfor %}
+                        {% else %}
+                            <span class="help-inline small">{{ form.title.description }}</span>
+                        {% endif %}
+                      </div>
+                </div>
+                <!-- Жанры -->
+                <div class="control-group{% if form.categories.errors %} error{% endif %}">
+                    <label class="control-label">{{ form.categories.label }}</label>
+                    <div class="controls genres-select">
+                        {% if form.categories.errors %}
+                            {% for error in form.categories.errors %}
+                            <span class="help-block">{{ error }}</span>
+                            {% endfor %}
+                        {% else %}
+                            <span class="help-block small">{{ form.categories.description }}</span>
+                        {% endif %}
+                          {{ form.categories }}
+                     </div>
+                </div>
+                <!-- Персонажи -->
+                <div class="control-group{% if form.characters.errors %} error{% endif %}">
+                    <label class="control-label">{{ form.characters.label }}</label>
+                    <div class="controls characters-select">
+                        {% if form.characters.errors %}
+                            {% for error in form.characters.errors %}
+                        <span class="help-block">{{ error }}</span>
+                            {% endfor %}
+                        {% else %}
+                            <span class="help-block small">{{ form.characters.description }}</span>
+                        {% endif %}
+                          {{ form.characters }}
+                      </div>
+                </div>
+                <!-- Общее описание -->
+                <div class="control-group{% if form.summary.errors %} error{% endif %}">
+                    <label class="control-label">{{ form.summary.label }}</label>
+                    <div class="controls">{{ form.summary }}
+                        {% if form.summary.errors %}
+                            {% for error in form.summary.errors %}
+                            <span class="help-inline">{{ error }}</span>
+                            {% endfor %}
+                        {% else %}
+                            <span class="help-inline small">{{ form.summary.description }}</span>
+                        {% endif %}
+                      </div>
+                </div>
+                <!-- Заметки к рассказу -->
+                <div class="control-group{% if form.notes.errors %} error{% endif %}">
+                    <label class="control-label">{{ form.notes.label }}</label>
+                    <div class="controls">{{ form.notes }}
+                        {% if form.notes.errors %}
+                            {% for error in form.notes.errors %}
+                                <span class="help-inline">{{ error }}</span>
+                            {% endfor %}
+                        {% else %}
+                            <span class="help-inline small">{{ form.notes.description }}</span>
+                        {% endif %}
+                      </div>
+                </div>
+                <!-- Рейтинг -->
+                <div class="control-group{% if form.rating.errors %} error{% endif %}">
+                    <label class="control-label">{{ form.rating.label }}</label>
+                    <div class="controls bootstrap radio">{{ form.rating }}
+                        {% if form.rating.errors %}
+                            {% for error in form.rating.errors %}
+                                <span class="help-inline">{{ error }}</span>
+                            {% endfor %}
+                        {% else %}
+                            <span class="help-inline small">{{ form.rating.description }}</span>
+                        {% endif %}
+                      </div>
+                </div>
+                <!-- Оригинал/перевод -->
+                <div class="control-group{% if form.original.errors %} error{% endif %}">
+                    <label class="control-label">{{ form.original.label }}</label>
+                    <div class="controls bootstrap radio">{{ form.original }}
+                        {% if form.original.errors %}
+                            {% for error in form.original.errors %}
+                                <span class="help-inline">{{ error }}</span>
+                            {% endfor %}
+                        {% else %}
+                            <span class="help-inline small">{{ form.original.description }}</span>
+                        {% endif %}
+                      </div>
+                </div>
+                <!-- Заморожен/активен -->
+                <div class="control-group{% if form.freezed.errors %} error{% endif %}">
+                    <label class="control-label">{{ form.freezed.label }}</label>
+                    <div class="controls bootstrap radio">{{ form.freezed }}
+                        {% if form.freezed.errors %}
+                            {% for error in form.freezed.errors %}
+                                <span class="help-inline">{{ error }}</span>
+                            {% endfor %}
+                        {% else %}
+                            <span class="help-inline small">{{ form.freezed.description }}</span>
+                        {% endif %}
+                      </div>
+                </div>
+                <!-- Закончен/не закончен -->
+                <div class="control-group{% if form.finished.errors %} error{% endif %}">
+                    <label class="control-label">{{ form.finished.label }}</label>
+                    <div class="controls bootstrap radio">{{ form.finished }}
+                        {% if form.finished.errors %}
+                            {% for error in form.finished.errors %}
+                                <span class="help-inline">{{ error }}</span>
+                            {% endfor %}
+                        {% else %}
+                            <span class="help-inline small">{{ form.finished.description }}</span>
+                        {% endif %}
+                      </div>
+                </div>
+                <!-- Категории -->
+                <div class="control-group{% if form.classifications.errors %} error{% endif %}">
+                    <label class="control-label">{{ form.classifications.label }}</label>
+                    <div class="controls events">
+                        {% if form.classifications.errors %}
+                            {% for error in form.classifications.errors %}
+                            <span class="help-block">{{ error }}</span>
+                            {% endfor %}
+                        {% else %}
+                            <span class="help-block small">{{ form.classifications.description }}</span>
+                        {% endif %}
+                          {{ form.classifications }}
+                      </div>
+                </div>
+                <!-- Действия -->
+                  <div class="form-actions">
+                {% if story_edit %}
+                    <input type="submit" class="btn btn-primary" value="Сохранить" />
+                {% else %}
+                    <input type="submit" class="btn btn-primary" value="Добавить рассказ" />
+                {% endif %}
+                  </div>
+                  {% if story_edit %}
+                      <legend>Главы</legend>
+                      <div class="control-group">
+                        <div class="controls events">
+                            <ul id="sortable_chapters" class="chapters-control" data-story="{{ story.id }}">
+                                {% for chapter in chapters %}
+                                      <li id="chapter_{{ chapter.id }}" class="btn btn-large">
+                                        {{ chapter.title }}
+                                        <div class="btn-group">
+                                            <a class="btn btn-warning btn-mini" href="{{ url_for('chapter.edit', pk=chapter.id) }}">править</a>
+                                            <a class="btn btn-danger btn-mini chapter_delete" href="{{ url_for('chapter.delete', pk=chapter.id) }}">удалить</a>
+                                        </div>
+                                    </li>
+                                {% endfor %}
+                            </ul>
+                            <a href="{{ url_for('chapter.add', story_id=story.id) }}" class="btn btn-success">Добавить главу</a>
+                        </div>
+                    </div>
+                  {% endif %}
+              </fieldset>
+        </form>
+      </div>
+
+    <div class="span12">
+        <ul class="breadcrumb">
+              <li><a href="{{ url_for('index.index') }}">{{ SITE_NAME }}</a> <span class="divider">/</span></li>
+              <li><a href="{{ url_for('author.info') }}">Кабинет автора</a> <span class="divider">/</span></li>
+              <li class="active">{{ page_title }}</li>
+        </ul>
+      </div>
+</div>
+{% endblock %}

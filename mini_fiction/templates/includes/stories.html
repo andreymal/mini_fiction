@@ -1,0 +1,68 @@
+{% for story in stories %}
+    <!-- Вывод рассказа: начало -->
+    {%- set story_chapters_count = chapters_count_cache.get(story.id, 0) if chapters_count_cache is defined else story.chapters.count() %}
+    <div class="story-item" id="story_{{ story.id }}">
+        <h3>
+            <a href="{{ url_for('story.view', pk=story.id) }}">{{ story.title }}</a>
+            {% include 'includes/story_header_info.html' with context %}
+            {% if not story.original %} <sup class="translation">Перевод</sup>{% endif %}
+            {%if not story.finished %}
+                <sup class="incomplete">Не закончен</sup>
+            {% else %}
+                <sup class="complete">Закончен</sup>
+            {% endif%}
+            {% if story.freezed %}<sup class="suspended">Заморожен</sup>{% endif %}
+            {% include 'includes/story_control_buttons.html' with context %}
+        </h3>
+        <p class="meta">
+            {% include 'includes/story_reader_buttons.html' with context %}
+                <span class="category-list">
+                    {%- for category in story.categories|sort(attribute='id') -%}
+                        <a class="gen" style="background-color: {{ category.color }}" href="{{ url_for('search.simple', search_type='category', search_id=category.id) }}">{{ category.name }}</a>
+                    {%- endfor -%}
+                </span>
+                {{ ngettext("%(num)d word", "%(num)d words", story.words) }} от {% include 'includes/story_authors_list.html' %}
+                {% if current_user.is_authenticated and current_user.detail_view %}
+                    <br/>
+                    <span>
+                    {% if story_chapters_count == 1 %}
+                        {{- ngettext("%(num)d view", "%(num)d views", story.chapters.select().first().views) -}}
+                    , {% endif %}
+                    {{- ngettext("%(num)d comment", "%(num)d comments", comments_count_cache.get(story.id, 0) if comments_count_cache is defined else story.comments.count()) }}
+                    </span>
+                    {% set delta = 0 if activities is defined and not activities.get(story.id) else story_comments_delta(story, current_user, activity=activities and activities.get(story.id)) %}
+                    {% if delta > 0 %}
+                    (<span class="green">+{{ delta }}</span>)
+                    {% endif %}
+                {% endif %}
+        </p>
+        <p>{{ story.summary_as_html|striptags }}</p>
+        {% if current_user.detail_view and story_chapters_count > 1 %}
+            <button class="btn btn-collapse btn-small" data-toggle="collapse" data-target="#story-{{ story.id }}">{{ ngettext("Show %(num)d chapter", "Show %(num)d chapters", story_chapters_count) }}</button>
+            <div id="story-{{ story.id }}" class="collapse">
+                <ul class="chapters-list">
+                    {% for chapter in story.chapters.select()|sort(attribute='order') %}
+                        <li>
+                            <a class="chapter-title" href="{{ url_for('chapter.view', story_id=story.id, chapter_order=chapter.order) }}">{{ chapter.title }}</a>
+                            {% if story.editable_by(current_user) %}
+                                <sup><a class="edit-link" href="{{ url_for('chapter.edit', pk=chapter.id) }}">Редактировать</a></sup>
+                            {% endif %}
+                            <br/>
+                            {{ ngettext("%(num)d word", "%(num)d words", chapter.words) }}, {{ ngettext("%(num)d view", "%(num)d views", chapter.views) }}
+                        </li>
+                    {% endfor %}
+                </ul>
+            </div>
+        {% endif %}
+        <p class="meta">
+                <span class="character-list">
+                    {%- for character in story.characters|sort(attribute='id') -%}
+                        <a href="{{ url_for('search.simple', search_type='character', search_id=character.id) }}"><img src="{{ character.thumb }}" alt="{{ character.name }}" title="{{ character.name }}"/></a>
+                    {%- endfor -%}
+                </span>
+        </p>
+    </div>
+    <!-- Вывод рассказа: конец -->
+{% else %}
+    <h3>Здесь пока ничего нет</h3>
+{% endfor %}

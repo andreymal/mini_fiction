@@ -1,0 +1,296 @@
+[
+    {
+    "model": "Classifier",
+    "pk": 1,
+    "fields": {
+      "name": "OC - пони"
+    }
+  },
+  {
+    "model": "Classifier",
+    "pk": 2,
+    "fields": {
+      "name": "POV"
+    }
+  },
+  {
+    "model": "Classifier",
+    "pk": 3,
+    "fields": {
+      "name": "RPS (реальные персонажи)"
+    }
+  },
+  {
+    "model": "Classifier",
+    "pk": 4,
+    "fields": {
+      "name": "Альтернативная вселенная"
+    }
+  },
+  {
+    "model": "Classifier",
+    "pk": 5,
+    "fields": {
+      "name": "Альтернативный эпизод"
+    }
+  },
+  {
+    "model": "Classifier",
+    "pk": 6,
+    "fields": {
+      "name": "Будущее"
+    }
+  },
+  {
+    "model": "Classifier",
+    "pk": 7,
+    "fields": {
+      "name": "Виртуальная Эквестрия"
+    }
+  },
+  {
+    "model": "Classifier",
+    "pk": 8,
+    "fields": {
+      "name": "Военные действия"
+    }
+  },
+  {
+    "model": "Classifier",
+    "pk": 9,
+    "fields": {
+      "name": "Второстепенные персонажи"
+    }
+  },
+  {
+    "model": "Classifier",
+    "pk": 10,
+    "fields": {
+      "name": "Грифоны"
+    }
+  },
+  {
+    "model": "Classifier",
+    "pk": 11,
+    "fields": {
+      "name": "Дети главных героев"
+    }
+  },
+  {
+    "model": "Classifier",
+    "pk": 12,
+    "fields": {
+      "name": "Детство"
+    }
+  },
+  {
+    "model": "Classifier",
+    "pk": 13,
+    "fields": {
+      "name": "Детство главных героев"
+    }
+  },
+  {
+    "model": "Classifier",
+    "pk": 14,
+    "fields": {
+      "name": "Дискорд победил"
+    }
+  },
+  {
+    "model": "Classifier",
+    "pk": 15,
+    "fields": {
+      "name": "Драконы"
+    }
+  },
+  {
+    "model": "Classifier",
+    "pk": 16,
+    "fields": {
+      "name": "Другие Элементы Гармонии"
+    }
+  },
+  {
+    "model": "Classifier",
+    "pk": 17,
+    "fields": {
+      "name": "Зарисовки из жизни"
+    }
+  },
+  {
+    "model": "Classifier",
+    "pk": 18,
+    "fields": {
+      "name": "Люди в Эквестрии"
+    }
+  },
+  {
+    "model": "Classifier",
+    "pk": 19,
+    "fields": {
+      "name": "Метконосцы"
+    }
+  },
+  {
+    "model": "Classifier",
+    "pk": 20,
+    "fields": {
+      "name": "Найтмер победила"
+    }
+  },
+  {
+    "model": "Classifier",
+    "pk": 21,
+    "fields": {
+      "name": "Обмен телами"
+    }
+  },
+  {
+    "model": "Classifier",
+    "pk": 22,
+    "fields": {
+      "name": "Особо жестокие сцены"
+    }
+  },
+  {
+    "model": "Classifier",
+    "pk": 23,
+    "fields": {
+      "name": "Паралельные миры"
+    }
+  },
+  {
+    "model": "Classifier",
+    "pk": 24,
+    "fields": {
+      "name": "Пони в мире Земли"
+    }
+  },
+  {
+    "model": "Classifier",
+    "pk": 25,
+    "fields": {
+      "name": "Постапокалипсис"
+    }
+  },
+  {
+    "model": "Classifier",
+    "pk": 26,
+    "fields": {
+      "name": "Потеря памяти"
+    }
+  },
+  {
+    "model": "Classifier",
+    "pk": 27,
+    "fields": {
+      "name": "Придворные интриги"
+    }
+  },
+  {
+    "model": "Classifier",
+    "pk": 28,
+    "fields": {
+      "name": "Прошлое"
+    }
+  },
+  {
+    "model": "Classifier",
+    "pk": 29,
+    "fields": {
+      "name": "Путешествия во времени"
+    }
+  },
+  {
+    "model": "Classifier",
+    "pk": 30,
+    "fields": {
+      "name": "Раскаявшиеся злодеи"
+    }
+  },
+  {
+    "model": "Classifier",
+    "pk": 31,
+    "fields": {
+      "name": "Свадьба"
+    }
+  },
+  {
+    "model": "Classifier",
+    "pk": 32,
+    "fields": {
+      "name": "Смена пола"
+    }
+  },
+  {
+    "model": "Classifier",
+    "pk": 33,
+    "fields": {
+      "name": "Смена расы"
+    }
+  },
+  {
+    "model": "Classifier",
+    "pk": 34,
+    "fields": {
+      "name": "Смерть персонажей"
+    }
+  },
+  {
+    "model": "Classifier",
+    "pk": 35,
+    "fields": {
+      "name": "Сокрытие магических способностей"
+    }
+  },
+  {
+    "model": "Classifier",
+    "pk": 36,
+    "fields": {
+      "name": "Старая Эквестрия"
+    }
+  },
+  {
+    "model": "Classifier",
+    "pk": 37,
+    "fields": {
+      "name": "Стихийные бедствия"
+    }
+  },
+  {
+    "model": "Classifier",
+    "pk": 38,
+    "fields": {
+      "name": "Технологии"
+    }
+  },
+  {
+    "model": "Classifier",
+    "pk": 39,
+    "fields": {
+      "name": "Утрата магических способностей"
+    }
+  },
+  {
+    "model": "Classifier",
+    "pk": 40,
+    "fields": {
+      "name": "Шиппинг"
+    }
+  },
+  {
+    "model": "Classifier",
+    "pk": 41,
+    "fields": {
+      "name": "Школьные истории"
+    }
+  },
+  {
+    "model": "Classifier",
+    "pk": 42,
+    "fields": {
+      "name": "Эротические сцены"
+    }
+  }
+]

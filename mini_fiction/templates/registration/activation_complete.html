@@ -1,0 +1,25 @@
+{% extends "common.html" %}
+
+{% block content %}
+<div class="row">
+    <div class="span12">
+      <ul class="breadcrumb">
+            <li><a href="{{ url_for('index.index') }}">{{ SITE_NAME }}</a> <span class="divider">/</span></li>
+            <li class="active">{{ page_title }}</li>
+        </ul>
+    </div>
+
+    <div class="span12 reg-complete">
+    <h1>Учетная запись активирована</h1>
+    <p>Приветствуем!</p>
+    <p>Ваша учетная запись активирована.{% if not current_user.is_authenticated %}<a href="{{ url_for('auth.login') }}">Заходите</a> на сайт.</p>{% endif %}
+  </div>
+
+    <div class="span12">
+      <ul class="breadcrumb">
+            <li><a href="{{ url_for('index.index') }}">{{ SITE_NAME }}</a> <span class="divider">/</span></li>
+            <li class="active">{{ page_title }}</li>
+        </ul>
+    </div>
+</div>
+{% endblock %}

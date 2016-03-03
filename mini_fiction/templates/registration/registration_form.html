@@ -1,0 +1,53 @@
+{% extends "common.html" %}
+{% block content %}
+
+<div class="row">
+    <div class="span12">
+      <ul class="breadcrumb">
+            <li><a href="{{ url_for('index.index') }}">{{ SITE_NAME }}</a> <span class="divider">/</span></li>
+            <li class="active">{{ page_title }}</li>
+        </ul>
+    </div>
+
+    <div class="span12">
+        <h1>{{ page_title }}</h1>
+            <form action="" method="POST" enctype="multipart/form-data" class="form-horizontal registration-form">
+                <fieldset>
+                {% for field in form %}
+                    {% if field.widget.input_type == 'hidden' %}{{ field }}{% else %}
+                    <div class="control-group{% if field.errors %} error{% endif %}">
+                        <label class="control-label">{{ field.label.text }}</label>
+                        <div class="controls">
+                            {{ field }}
+                            {% if field.errors %}
+                                <span class="help-inline">
+                                {% for error in field.errors %}
+                                    {{ error }}
+                                {% endfor %}
+                                </span>
+                            {% else %}
+                                <span class="help-inline small">{{ field.description }}</span>
+                            {% endif %}
+                        </div>
+                    </div>
+                {% endif %}{% endfor %}
+                {% with messages = get_flashed_messages() %}
+                    {% for message in messages %}
+                        <div class="control-group error"><span class="help-inline">{{ message }}</span></div>
+                    {% endfor %}
+                {% endwith %}
+                <div class="form-actions">
+                    <button class="btn btn-primary" type="submit">Зарегистрироваться</button>
+                </div>
+            </fieldset>
+        </form>
+    </div>
+
+    <div class="span12">
+    <ul class="breadcrumb">
+      <li><a href="{{ url_for('index.index') }}">{{ SITE_NAME }}</a> <span class="divider">/</span></li>
+      <li class="active">{{ page_title }}</li>
+        </ul>
+    </div>
+</div>
+{% endblock %}

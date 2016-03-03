@@ -1,0 +1,701 @@
+[
+  {
+    "model": "CharacterGroup",
+    "pk": 2,
+    "fields": {
+      "name": "Mane 6"
+    }
+  },
+
+  {
+    "model": "CharacterGroup",
+    "pk": 3,
+    "fields": {
+      "name": "Принцессы"
+    }
+  },
+
+  {
+    "model": "CharacterGroup",
+    "pk": 4,
+    "fields": {
+      "name": "СМС"
+    }
+  },
+
+  {
+    "model": "CharacterGroup",
+    "pk": 5,
+    "fields": {
+      "name": "Неопределенные"
+    }
+  },
+
+  {
+    "model": "CharacterGroup",
+    "pk": 6,
+    "fields": {
+      "name": "Звезды первого сезона"
+    }
+  },
+
+  {
+    "model": "CharacterGroup",
+    "pk": 7,
+    "fields": {
+      "name": "Звезды второго сезона"
+    }
+  },
+
+  {
+    "model": "CharacterGroup",
+    "pk": 8,
+    "fields": {
+      "name": "Звезды 3, 4, 5, 6 сезонов"
+    }
+  },
+
+  {
+    "model": "CharacterGroup",
+    "pk": 10,
+    "fields": {
+      "name": "Эппл-родственники"
+    }
+  },
+
+  {
+    "model": "CharacterGroup",
+    "pk": 11,
+    "fields": {
+      "name": "Жеребята"
+    }
+  },
+
+  {
+    "model": "CharacterGroup",
+    "pk": 12,
+    "fields": {
+      "name": "Животные, упячка"
+    }
+  },
+
+  {
+    "model": "CharacterGroup",
+    "pk": 13,
+    "fields": {
+      "name": "Бэкграунд-пони"
+    }
+  },
+
+
+  {
+    "model": "Character",
+    "pk": 1,
+    "fields": {
+      "name": "Рэйнбоу Дэш",
+      "group": 2
+    }
+  },
+  {
+    "model": "Character",
+    "pk": 2,
+    "fields": {
+      "name": "Флаттершай",
+      "group": 2
+    }
+  },
+  {
+    "model": "Character",
+    "pk": 3,
+    "fields": {
+      "name": "Твайлайт Спаркл",
+      "group": 2
+    }
+  },
+  {
+    "model": "Character",
+    "pk": 4,
+    "fields": {
+      "name": "Рэрити",
+      "group": 2
+    }
+  },
+  {
+    "model": "Character",
+    "pk": 5,
+    "fields": {
+      "name": "Пинки Пай",
+      "group": 2
+    }
+  },
+  {
+    "model": "Character",
+    "pk": 6,
+    "fields": {
+      "name": "Эплджек",
+      "group": 2
+    }
+  },
+  {
+    "model": "Character",
+    "pk": 10,
+    "fields": {
+      "name": "Спайк",
+      "group": 2
+    }
+  },
+
+  {
+    "model": "Character",
+    "pk": 11,
+    "fields": {
+      "name": "Принцесса Селестия",
+      "group": 3
+    }
+  },
+  {
+    "model": "Character",
+    "pk": 12,
+    "fields": {
+      "name": "Принцесса Луна",
+      "group": 3
+    }
+  },
+
+  {
+    "model": "Character",
+    "pk": 7,
+    "fields": {
+      "name": "Эплблум",
+      "group": 4
+    }
+  },
+  {
+    "model": "Character",
+    "pk": 8,
+    "fields": {
+      "name": "Скуталу",
+      "group": 4
+    }
+  },
+  {
+    "model": "Character",
+    "pk": 9,
+    "fields": {
+      "name": "Свити Белл",
+      "group": 4
+    }
+  },
+  {
+    "model": "Character",
+    "pk": 66,
+    "fields": {
+      "name": "Бабс Сид",
+      "group": 4
+    }
+  },
+
+  {
+    "model": "Character",
+    "pk": 43,
+    "fields": {
+      "name": "Другие пони",
+      "group": 5
+    }
+  },
+  {
+    "model": "Character",
+    "pk": 44,
+    "fields": {
+      "name": "ОС - пони",
+      "group": 5
+    }
+  },
+  {
+    "model": "Character",
+    "pk": 65,
+    "fields": {
+      "name": "Человеки",
+      "group": 5
+    }
+  },
+
+  {
+    "model": "Character",
+    "pk": 13,
+    "fields": {
+      "name": "Гильда",
+      "group": 6
+    }
+  },
+  {
+    "model": "Character",
+    "pk": 14,
+    "fields": {
+      "name": "Зекора",
+      "group": 6
+    }
+  },
+  {
+    "model": "Character",
+    "pk": 15,
+    "fields": {
+      "name": "Трикси, Великая и Могучая",
+      "group": 6
+    }
+  },
+  {
+    "model": "Character",
+    "pk": 24,
+    "fields": {
+      "name": "Черили",
+      "group": 6
+    }
+  },
+  {
+    "model": "Character",
+    "pk": 26,
+    "fields": {
+      "name": "Хойти Тойти",
+      "group": 6
+    }
+  },
+  {
+    "model": "Character",
+    "pk": 27,
+    "fields": {
+      "name": "Фото Финиш",
+      "group": 6
+    }
+  },
+  {
+    "model": "Character",
+    "pk": 28,
+    "fields": {
+      "name": "Сапфир Шорз",
+      "group": 6
+    }
+  },
+  {
+    "model": "Character",
+    "pk": 29,
+    "fields": {
+      "name": "Спитфайр",
+      "group": 6
+    }
+  },
+  {
+    "model": "Character",
+    "pk": 30,
+    "fields": {
+      "name": "Сорен",
+      "group": 6
+    }
+  },
+  {
+    "model": "Character",
+    "pk": 31,
+    "fields": {
+      "name": "Принц Блюблад",
+      "group": 6
+    }
+  },
+  {
+    "model": "Character",
+    "pk": 32,
+    "fields": {
+      "name": "Литл Стронгхарт",
+      "group": 6
+    }
+  },
+  {
+    "model": "Character",
+    "pk": 49,
+    "fields": {
+      "name": "Найтмэр Мун",
+      "group": 6
+    }
+  },
+
+  {
+    "model": "Character",
+    "pk": 48,
+    "fields": {
+      "name": "Дискорд",
+      "group": 7
+    }
+  },
+  {
+    "model": "Character",
+    "pk": 55,
+    "fields": {
+      "name": "Крэнки Дудль",
+      "group": 7
+    }
+  },
+  {
+    "model": "Character",
+    "pk": 57,
+    "fields": {
+      "name": "Дэринг Ду",
+      "group": 7
+    }
+  },
+  {
+    "model": "Character",
+    "pk": 59,
+    "fields": {
+      "name": "Флим",
+      "group": 7
+    }
+  },
+  {
+    "model": "Character",
+    "pk": 60,
+    "fields": {
+      "name": "Флэм",
+      "group": 7
+    }
+  },
+  {
+    "model": "Character",
+    "pk": 61,
+    "fields": {
+      "name": "Матильда",
+      "group": 7
+    }
+  },
+  {
+    "model": "Character",
+    "pk": 62,
+    "fields": {
+      "name": "Мистер Кейк",
+      "group": 7
+    }
+  },
+  {
+    "model": "Character",
+    "pk": 63,
+    "fields": {
+      "name": "Миссис Кейк",
+      "group": 7
+    }
+  },
+  {
+    "model": "Character",
+    "pk": 64,
+    "fields": {
+      "name": "Айрон Вилл",
+      "group": 7
+    }
+  },
+  {
+    "model": "Character",
+    "pk": 68,
+    "fields": {
+      "name": "Кризалис",
+      "group": 7
+    }
+  },
+  {
+    "model": "Character",
+    "pk": 70,
+    "fields": {
+      "name": "Принцесса Миаморе Каденца",
+      "group": 7
+    }
+  },
+  {
+    "model": "Character",
+    "pk": 71,
+    "fields": {
+      "name": "Шайнинг Армор",
+      "group": 7
+    }
+  },
+
+  {
+    "model": "Character",
+    "pk": 69,
+    "fields": {
+      "name": "Король Сомбра",
+      "group": 8
+    }
+  },
+  {
+    "model": "Character",
+    "pk": 74,
+    "fields": {
+      "name": "Лайтнин Даст",
+      "group": 8
+    }
+  },
+
+  {
+    "model": "Character",
+    "pk": 16,
+    "fields": {
+      "name": "Биг Макинтош",
+      "group": 10
+    }
+  },
+  {
+    "model": "Character",
+    "pk": 17,
+    "fields": {
+      "name": "Грэнни Смит",
+      "group": 10
+    }
+  },
+  {
+    "model": "Character",
+    "pk": 18,
+    "fields": {
+      "name": "Брейберн",
+      "group": 10
+    }
+  },
+
+  {
+    "model": "Character",
+    "pk": 19,
+    "fields": {
+      "name": "Диамонд Тиара",
+      "group": 11
+    }
+  },
+  {
+    "model": "Character",
+    "pk": 20,
+    "fields": {
+      "name": "Сильвер Спун",
+      "group": 11
+    }
+  },
+  {
+    "model": "Character",
+    "pk": 21,
+    "fields": {
+      "name": "Твист",
+      "group": 11
+    }
+  },
+  {
+    "model": "Character",
+    "pk": 22,
+    "fields": {
+      "name": "Снипс",
+      "group": 11
+    }
+  },
+  {
+    "model": "Character",
+    "pk": 23,
+    "fields": {
+      "name": "Снейлз",
+      "group": 11
+    }
+  },
+  {
+    "model": "Character",
+    "pk": 50,
+    "fields": {
+      "name": "Пипсквик",
+      "group": 11
+    }
+  },
+
+  {
+    "model": "Character",
+    "pk": 33,
+    "fields": {
+      "name": "Энджел",
+      "group": 12
+    }
+  },
+  {
+    "model": "Character",
+    "pk": 34,
+    "fields": {
+      "name": "Вайнона",
+      "group": 12
+    }
+  },
+  {
+    "model": "Character",
+    "pk": 35,
+    "fields": {
+      "name": "Опалесенс",
+      "group": 12
+    }
+  },
+  {
+    "model": "Character",
+    "pk": 36,
+    "fields": {
+      "name": "Гамми",
+      "group": 12
+    }
+  },
+  {
+    "model": "Character",
+    "pk": 37,
+    "fields": {
+      "name": "Совелий",
+      "group": 12
+    }
+  },
+  {
+    "model": "Character",
+    "pk": 38,
+    "fields": {
+      "name": "Филомина",
+      "group": 12
+    }
+  },
+  {
+    "model": "Character",
+    "pk": 53,
+    "fields": {
+      "name": "Танк",
+      "group": 12
+    }
+  },
+
+  {
+    "model": "Character",
+    "pk": 25,
+    "fields": {
+      "name": "Мэр",
+      "group": 13
+    }
+  },
+  {
+    "model": "Character",
+    "pk": 39,
+    "fields": {
+      "name": "Дерпи Хувз",
+      "group": 13
+    }
+  },
+  {
+    "model": "Character",
+    "pk": 40,
+    "fields": {
+      "name": "Лира",
+      "group": 13
+    }
+  },
+  {
+    "model": "Character",
+    "pk": 41,
+    "fields": {
+      "name": "Бон-Бон",
+      "group": 13
+    }
+  },
+  {
+    "model": "Character",
+    "pk": 42,
+    "fields": {
+      "name": "DJ PON-3",
+      "group": 13
+    }
+  },
+  {
+    "model": "Character",
+    "pk": 45,
+    "fields": {
+      "name": "Карамель",
+      "group": 13
+    }
+  },
+  {
+    "model": "Character",
+    "pk": 46,
+    "fields": {
+      "name": "Доктор Хувз",
+      "group": 13
+    }
+  },
+  {
+    "model": "Character",
+    "pk": 47,
+    "fields": {
+      "name": "Октавия",
+      "group": 13
+    }
+  },
+  {
+    "model": "Character",
+    "pk": 51,
+    "fields": {
+      "name": "Бэрри Пунш",
+      "group": 13
+    }
+  },
+  {
+    "model": "Character",
+    "pk": 52,
+    "fields": {
+      "name": "Кэррот Топ",
+      "group": 13
+    }
+  },
+  {
+    "model": "Character",
+    "pk": 54,
+    "fields": {
+      "name": "Фэнси Пэнтс",
+      "group": 13
+    }
+  },
+  {
+    "model": "Character",
+    "pk": 56,
+    "fields": {
+      "name": "Флёр де Лис",
+      "group": 13
+    }
+  },
+  {
+    "model": "Character",
+    "pk": 58,
+    "fields": {
+      "name": "Колгейт",
+      "group": 13
+    }
+  },
+  {
+    "model": "Character",
+    "pk": 67,
+    "fields": {
+      "name": "Вандерболты",
+      "group": 13
+    }
+  },
+  {
+    "model": "Character",
+    "pk": 72,
+    "fields": {
+      "name": "Стража Дворца",
+      "group": 13
+    }
+  },
+  {
+    "model": "Character",
+    "pk": 73,
+    "fields": {
+      "name": "Сестра Рэдхарт",
+      "group": 13
+    }
+  },
+  {
+    "model": "Character",
+    "pk": 75,
+    "fields": {
+      "name": "Мод Пай",
+      "group": 13
+    }
+  }
+]

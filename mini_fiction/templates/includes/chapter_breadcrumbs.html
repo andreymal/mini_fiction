@@ -1,0 +1,13 @@
+<div class="span12">
+    <ul class="breadcrumb">
+        <li><a href="{{ url_for('index.index') }}">{{ SITE_NAME }}</a> <span class="divider">/</span></li>
+        <li><a href="{{ url_for('story.view', pk=story.id) }}">{{ story.title }}</a> <span class="divider">/</span></li>
+        <li class="active">
+            {% if not allchapters %}
+                {{ chapter.title }}
+            {% else %}
+                Все главы
+            {% endif %}
+        </li>
+    </ul>
+</div>

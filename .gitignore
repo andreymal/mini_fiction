@@ -1,0 +1,35 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+
+# virtualenv
+/env/
+
+# Distribution / packaging
+.Python
+build/
+dist/
+eggs/
+.eggs/
+lib/
+lib64/
+sdist/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# Fabric script
+/fabfile.py
+
+# gettext binary files
+*.mo
+
+### mini_fiction stuff
+/local_settings.py
+/local/
+/media/
+/sphinx/
+/static/
+/sphinxroot.txt
+/local_sphinx.conf
+*.sqlite3

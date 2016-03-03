@@ -1,0 +1,208 @@
+# Russian translations for mini_fiction.
+# Copyright (C) 2016 andreymal
+# This file is distributed under the same license as the mini_fiction project.
+# andreymal <andriyano-31@mail.ru>, 2016.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version:  0.0.1\n"
+"Report-Msgid-Bugs-To: andriyano-31@mail.ru\n"
+"POT-Creation-Date: 2016-03-04 02:35+0300\n"
+"Last-Translator: andreymal <andriyano-31@mail.ru>\n"
+"Language: ru\n"
+"Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && "
+"n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2)\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.2.0\n"
+
+#: mini_fiction/ajax/views/comment.py:32 mini_fiction/views/comment.py:29
+msgid "Add new comment"
+msgstr "Добавить новый комментарий"
+
+#: mini_fiction/ajax/views/comment.py:56 mini_fiction/views/comment.py:53
+msgid "Edit comment"
+msgstr "Редактировать комментарий"
+
+#: mini_fiction/ajax/views/comment.py:81 mini_fiction/views/comment.py:77
+msgid "Confirm delete comment"
+msgstr "Подтверждение удаления комментария"
+
+#: mini_fiction/forms/author.py:159 mini_fiction/forms/register.py:41
+#: mini_fiction/forms/register.py:79
+msgid "Passwords do not match"
+msgstr "Пароли не совпадают"
+
+#: mini_fiction/forms/login.py:10
+msgid "Username"
+msgstr "Имя пользователя"
+
+#: mini_fiction/forms/login.py:11
+msgid "Password"
+msgstr "Пароль"
+
+#: mini_fiction/templates/author_dashboard.html:22
+#: mini_fiction/templates/author_overview.html:32
+#: mini_fiction/templates/author_overview.html:43
+#: mini_fiction/templates/includes/series.html:14
+#, python-format
+msgid "%(num)d story"
+msgid_plural "%(num)d stories"
+msgstr[0] "%(num)d рассказ"
+msgstr[1] "%(num)d рассказа"
+msgstr[2] "%(num)d рассказов"
+
+#: mini_fiction/templates/author_dashboard.html:26
+#, python-format
+msgid "%(num)d time"
+msgid_plural "%(num)d times"
+msgstr[0] "%(num)d раз"
+msgstr[1] "%(num)d раза"
+msgstr[2] "%(num)d раз"
+
+#: mini_fiction/templates/author_dashboard.html:31
+#: mini_fiction/templates/author_overview.html:38
+#: mini_fiction/templates/includes/series.html:27
+#: mini_fiction/templates/includes/stories.html:31
+#, python-format
+msgid "%(num)d comment"
+msgid_plural "%(num)d comments"
+msgstr[0] "%(num)d комментарий"
+msgstr[1] "%(num)d комментария"
+msgstr[2] "%(num)d комментариев"
+
+#: mini_fiction/templates/search.html:94
+#, python-format
+msgid "Found %(num)d story"
+msgid_plural "Found %(num)d stories"
+msgstr[0] "Всего нашли %(num)d рассказ"
+msgstr[1] "Всего нашли %(num)d рассказа"
+msgstr[2] "Всего нашли %(num)d рассказов"
+
+#: mini_fiction/templates/search.html:101
+#, python-format
+msgid "Found %(num)d chapter"
+msgid_plural "Found %(num)d chapters"
+msgstr[0] "Всего нашли %(num)d главу"
+msgstr[1] "Всего нашли %(num)d главы"
+msgstr[2] "Всего нашли %(num)d глав"
+
+#: mini_fiction/templates/story_view.html:61
+#: mini_fiction/templates/story_view.html:77
+#: mini_fiction/templates/includes/stories.html:24
+#: mini_fiction/templates/includes/stories.html:51
+#: mini_fiction/templates/includes/ajax/story_ajax_publish_warning.html:9
+#, python-format
+msgid "%(num)d word"
+msgid_plural "%(num)d words"
+msgstr[0] "%(num)d слово"
+msgstr[1] "%(num)d слова"
+msgstr[2] "%(num)d слов"
+
+#: mini_fiction/templates/story_view.html:61
+#: mini_fiction/templates/story_view.html:77
+#: mini_fiction/templates/includes/series.html:15
+#: mini_fiction/templates/includes/series.html:26
+#: mini_fiction/templates/includes/stories.html:29
+#: mini_fiction/templates/includes/stories.html:51
+#, python-format
+msgid "%(num)d view"
+msgid_plural "%(num)d views"
+msgstr[0] "%(num)d просмотр"
+msgstr[1] "%(num)d просмотра"
+msgstr[2] "%(num)d просмотров"
+
+#: mini_fiction/templates/includes/series.html:24
+#, python-format
+msgid "%(num)d chapter"
+msgid_plural "%(num)d chapters"
+msgstr[0] "%(num)d глава"
+msgstr[1] "%(num)d главы"
+msgstr[2] "%(num)d глав"
+
+#: mini_fiction/templates/includes/stories.html:41
+#, python-format
+msgid "Show %(num)d chapter"
+msgid_plural "Show %(num)d chapters"
+msgstr[0] "Показать %(num)d главу"
+msgstr[1] "Показать %(num)d главы"
+msgstr[2] "Показать %(num)d глав"
+
+#: mini_fiction/utils/debugtoolbar.py:96
+msgid "Pony ORM"
+msgstr "Pony ORM"
+
+#: mini_fiction/utils/debugtoolbar.py:107
+msgid "Pony ORM queries"
+msgstr "Запросы Pony ORM"
+
+#: mini_fiction/views/auth.py:20
+msgid "Authorization"
+msgstr "Авторизация"
+
+#: mini_fiction/views/auth.py:31
+msgid "Account is disabled"
+msgstr "Аккаунт отключен"
+
+#: mini_fiction/views/auth.py:31
+msgid "Cannot login"
+msgstr "Не получилось войти"
+
+#: mini_fiction/views/auth.py:33
+msgid ""
+"Please enter a correct username and password. Note that both fields may "
+"be case-sensitive."
+msgstr ""
+"Пожалуйста, введите правильные имя пользователя и пароль. Оба поля могут "
+"быть чувствительны к регистру."
+
+#: mini_fiction/views/auth.py:41
+msgid "Registration is closed"
+msgstr "Регистрация закрыта"
+
+#: mini_fiction/views/auth.py:43
+msgid "Registration in library"
+msgstr "Регистрация в библиотеке"
+
+#: mini_fiction/views/auth.py:110 mini_fiction/views/author.py:93
+msgid "Password is too bad, please change it"
+msgstr "Пароль слишком плохой, поменяйте его"
+
+#: mini_fiction/views/author.py:32
+msgid "My cabinet"
+msgstr "Мой кабинет"
+
+#: mini_fiction/views/author.py:39
+msgid "Author: {author}"
+msgstr "Автор: {author}"
+
+#: mini_fiction/views/author.py:76
+msgid "Profile settings"
+msgstr "Настройки профиля"
+
+#: mini_fiction/views/author.py:91
+msgid "Old password is incorrect"
+msgstr "Старый пароль неверный"
+
+#: mini_fiction/views/author.py:109
+msgid "Password is incorrect"
+msgstr "Неверный пароль"
+
+#: mini_fiction/views/index.py:17
+msgid "Index"
+msgstr "Главная"
+
+#: mini_fiction/views/search.py:21 mini_fiction/views/search.py:29
+#: mini_fiction/views/search.py:37 mini_fiction/views/search.py:75
+#: mini_fiction/views/search.py:88 mini_fiction/views/search.py:106
+msgid "Search of stories"
+msgstr "Поиск рассказов"
+
+#: mini_fiction/views/search.py:50
+msgid "Search results"
+msgstr "Результаты поиска"
+
+#: mini_fiction/views/story.py:132
+msgid "New story"
+msgstr "Новый рассказ"

@@ -1,0 +1,23 @@
+{% extends "common.html" %}
+{% block title %}404 — книга не найдена{% endblock %}
+{% block content %}
+<div class="row page-404">
+    <div class="span12">
+        <ul class="breadcrumb">
+            <li><a href="{{ url_for('index.index') }}">{{ SITE_NAME }}</a> <span class="divider">/</span></li>
+            <li class="active">404 — книга не найдена</li>
+        </ul>
+    </div>
+    <div class="span12 message-404">
+        <h1>404 — книга не найдена</h1>
+        <p>Кажется, такого рассказа нет. Яростно удалён или ещё не написан. А может, у вас неправильная ссылка?</p>
+        <p>Попробуйте поискать нужный специально обученным <a href="{{ url_for('search.main') }}">поиском</a> или вернуться на <a href="{{ url_for('index.index') }}">главную</a>.</p>
+    </div>
+    <div class="span12">
+        <ul class="breadcrumb">
+            <li><a href="{{ url_for('index.index') }}">{{ SITE_NAME }}</a> <span class="divider">/</span></li>
+            <li class="active">404 — книга не найдена</li>
+        </ul>
+    </div>
+</div>
+{% endblock %}

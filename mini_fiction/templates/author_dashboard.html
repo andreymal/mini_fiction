@@ -1,0 +1,71 @@
+{% extends "common.html" %}
+{% block content %}
+
+<div class="row">
+    <div class="span12">
+        <ul class="breadcrumb">
+            <li><a href="{{ url_for('index.index') }}">{{ SITE_NAME }}</a> <span class="divider">/</span></li>
+            <li class="active">{% if author.stories.count() > 0 %}Кабинет автора{% else %}Кабинет потенциального автора{% endif %} {{ author.username }}</li>
+        </ul>
+    </div>
+    <!-- Вывод шапки -->
+    <div class="span8">
+        <h1 id="author-name">
+            <img src="{{ author.bl.get_avatar_url() }}" width="42" title="{{ author.username }}" alt="{{ author.username }}"/>
+            {{ author.username }}
+            {#{% if author.stories.count() > 0 %}Кабинет автора{% else %}Кабинет потенциального автора{% endif %}#}
+            {% if not author.is_active %}
+                <sup id="banned">Read-only</sup>
+            {% endif %}
+        </h1>
+        <p>
+            {% if author.stories.count() > 0 %} Вы уже написали <b>{{ ngettext("%(num)d story", "%(num)d stories", author.stories.count()) }}</b>{% else %}Вы пока ничего не написали{% endif %}.
+            <br/>
+            Читатели
+            {% if all_views > 0 %}
+                просмотрели ваши рассказы {{ ngettext("%(num)d time", "%(num)d times", all_views) }},
+            {% else %}
+                пока не интересовались вашими рассказами,
+            {% endif %}
+            {% if comments_count > 0 %}
+                 и оставили {{ ngettext("%(num)d comment", "%(num)d comments", comments_count) }}.
+            {% else %}
+                 не откомментировав их.
+            {% endif %}
+        </p>
+    </div>
+    <div class="span8 top-list">
+        <!-- Сборники -->
+        <div class="series-block">
+            <!-- Начало вывода сборников, если они есть -->
+            {% if series %}
+                <h2>Мои сборники</h2>
+                {% include "includes/series.html" %}
+            {% endif %}
+            <!-- Конец вывода сборников -->
+        </div>
+
+        <h2>
+            Мои рассказы <a class="btn btn-success btn-small" href="{{ url_for('story.add') }}">Добавить рассказ</a>
+        </h2>
+        {% include "includes/stories.html" %}
+    </div>
+
+    <div class="span4 top-list sidelist">
+        {% if comments_count > 0 %}
+            <h2>Комментарии читателей ({{ comments_count }})</h2>
+            <div id="comments-list">
+            {% include "includes/comments.html" %}
+            </div>
+            {% include "includes/comments_pagination_author_dashboard.html" %}
+        {% endif %}
+    </div>
+
+    <div class="span12">
+        <ul class="breadcrumb">
+            <li><a href="{{ url_for('index.index') }}">{{ SITE_NAME }}</a> <span class="divider">/</span></li>
+            <li class="active">{% if author.stories.count() > 0 %}Кабинет автора{% else %}Читательский билет{% endif %} {{ author.username }}</li>
+        </ul>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,24 @@
+{% extends "common.html" %}
+{% block title %}{{ page_title }}{% endblock %}
+{% block content %}
+<div class="row">
+    <div class="span12">
+      <ul class="breadcrumb">
+            <li><a href="{{ url_for('index.index') }}">{{ SITE_NAME }}</a> <span class="divider">/</span></li>
+            <li class="active">{{ page_title }}</li>
+        </ul>
+    </div>
+
+    <div class="span6 offset3 reg-complete">
+        <h1>{{ page_title }}</h1>
+        <p>Объявлено осадное положение.</p>
+  </div>
+
+    <div class="span12">
+      <ul class="breadcrumb">
+            <li><a href="{{ url_for('index.index') }}">{{ SITE_NAME }}</a> <span class="divider">/</span></li>
+            <li class="active">{{ page_title }}</li>
+        </ul>
+    </div>
+</div>
+{% endblock %}

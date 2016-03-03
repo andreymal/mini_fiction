@@ -1,0 +1,12 @@
+<div class="chapter-text">
+    <h1 id="chapter{{ chapter.id }}">{{ chapter.title }}</h1>
+    {% if chapter.notes %}
+        <blockquote>{{ chapter.notes_as_html }}</blockquote>
+    {% endif %}
+    {{ chapter.text_as_html }}
+    {% if next_chapter %}
+        <p><a href="{{ url_for('chapter.view', story_id=story.id, chapter_order=next_chapter.order) }}">Читать дальше</a></p>
+    {% elif not story.finished and not story.freezed and not allchapters %}
+        <p><strong>Продолжение следует...</strong></p>
+    {% endif %}
+</div>

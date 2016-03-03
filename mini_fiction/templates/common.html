@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+        <title>{% block title %}{{ page_title }}{% endblock %} &mdash; {{ SITE_NAME }}</title>
+         <meta name="viewport" content="width=device-width, initial-scale=1.0">
+         <link rel="shortcut icon" type="image/x-icon" href="{{ url_for('static', filename='i/favicon.ico') }}" />
+        <meta name="csrf-token" content="{{ csrf_token() }}" />
+        <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/bootstrap.css') }}" />
+        <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/main.css') }}" />
+        <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/markitup.main.css') }}" />
+        <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/markitup.set.css') }}" />
+        <script type="text/javascript" src="{{ url_for('static', filename='js/jquery-1.11.3.min.js') }}"></script>
+        <script type="text/javascript" src="{{ url_for('static', filename='js/jquery-ui-1.9.2.custom.min.js') }}"></script>
+        <script type="text/javascript" src="{{ url_for('static', filename='js/jquery.cookie.js') }}"></script>
+        <script type="text/javascript" src="{{ url_for('static', filename='js/jquery.markitup.js') }}"></script>
+        <script type="text/javascript" src="{{ url_for('static', filename='js/jquery.form.js') }}"></script>
+        <script type="text/javascript" src="{{ url_for('static', filename='js/jquery.slides.min.js') }}"></script>
+        <script type="text/javascript" src="{{ url_for('static', filename='js/bootstrap.min.js') }}"></script>
+        <script type="text/javascript" src="{{ url_for('static', filename='js/markitup.set.js') }}"></script>
+        <script type="text/javascript" src="{{ url_for('static', filename='js/main.js') }}"></script>
+
+         <!--[if lt IE 9]> <script src="https://cdnjs.cloudflare.com/ajax/libs/html5shiv/3.7.3/html5shiv-printshiv.min.js"></script> <![endif]-->
+    </head>
+<body>
+{% include "includes/header_top.html" %}
+<!-- Content start -->
+<div id="content">
+{% block content %}{% endblock %}
+</div>
+<!-- Content end -->
+{% include "includes/footer.html" %}

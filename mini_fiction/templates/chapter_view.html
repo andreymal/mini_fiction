@@ -1,0 +1,21 @@
+{% extends "common.html" %}
+{% block content %}
+<div class="row">
+    {% include "includes/chapter_breadcrumbs.html" %}
+    {% if allchapters %}
+        <div class="span12 story-chapter-page">
+            {% include "includes/story_panel.html" %}
+            <h1>{{ story.title }}</h1>
+            {% for chapter in chapters %}
+                {% include "includes/chapter_single.html" %}
+            {% endfor %}
+        </div>
+    {% else %}
+        <div class="span12 story-chapter-page">
+            {% include "includes/story_panel.html" %}
+            {% include "includes/chapter_single.html" %}
+        </div>
+    {% endif %}
+    {% include "includes/chapter_breadcrumbs.html" %}
+</div>
+{% endblock %}

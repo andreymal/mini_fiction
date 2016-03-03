@@ -1,0 +1,10 @@
+{% for coauthor in story.coauthors|sort(attribute='id') %}
+    {%- set author = coauthor.author -%}
+    {% if loop.first %}
+           <a class="authorlink" href="{{ url_for('author.info', user_id=author.id) }}">{{author.username}}</a>
+           {% if loop.length > 1 %}(в соавторстве с{% endif %}
+       {% endif %}
+    {% if not loop.first %}
+        <a class="authorlink" href="{{ url_for('author.info', user_id=author.id) }}">{{author.username}}</a>{% if loop.revindex0 == 1 %} и {% endif %}{% if loop.revindex0 > 1 %}, {% endif %}{% if loop.last and loop.length > 1 %}){% endif %}
+    {% endif %}
+{% endfor %}

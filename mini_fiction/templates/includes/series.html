@@ -1,0 +1,33 @@
+{% for sr in series %}
+    <div class="series-item">
+        <h2>
+            <a href="#">{{ sr.title }}</a>
+            {%if not sr.finished %}
+                <sup class="incomplete">Не закончена</sup>
+            {% else %}
+                <sup class="complete">Закончена</sup>
+            {% endif%}
+            {% if sr.freezed %}<sup class="suspended">Заморожен</sup>{% endif %}
+            <!-- <sup><a class="edit-link" href="#">Редактировать серию</a></sup> -->
+        </h2>
+        <p>
+            {{ ngettext("%(num)d story", "%(num)d stories", sr.stories.count()) }},
+            {{ ngettext("%(num)d view", "%(num)d views", sr.views) }}
+        </p>
+        <!-- Вывод рассказов в сборнике: начало -->
+        <ul>
+            {% for story in sr.stories %}
+                <li>
+                    <a href="{{ url_for('story.view', pk=story.id) }}">{{ story.title }}</a>
+                    {% if story.freezed %}<sup class="suspended">Заморожен</sup>{% endif %}<br/>
+                    {% if story.chapters.count() > 1 %}
+                        {{ ngettext("%(num)d chapter", "%(num)d chapters", story.chapters.count()) }},
+                    {% endif %}
+                    {{ ngettext("%(num)d view", "%(num)d views", story.views) }},
+                    {{ ngettext("%(num)d comment", "%(num)d comments", story.comments.count()) }}
+                </li>
+            {% endfor %}
+        </ul>
+        <!-- Вывод рассказов в сборнике: конец -->
+    </div>
+{% endfor %}

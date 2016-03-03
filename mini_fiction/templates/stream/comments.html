@@ -1,0 +1,34 @@
+{% extends "common.html" %}
+{% block content %}
+<div class="row">
+    <div class="span8">
+        <ul class="breadcrumb">
+            <li><a href="{{ url_for('index.index') }}">{{ SITE_NAME }}</a> <span class="divider">/</span></li>
+            <li class="active">{{ page_title }}</li>
+        </ul>
+        <h1>{{ page_title }}</h1>
+        <div id="comments-list">
+            {% include "includes/comments.html" %}
+        </div>
+        {% if comments %}
+            <!-- Пагинация: начало вывода -->
+                  <div id="pagination" class="center">
+                      {% if page_obj.has_previous() %}
+                          <a class="btn" href="{{ url_for(endpoint, page=page_obj.number - 1, **view_args) }}">← Назад</a>
+                      {% endif %}
+                      <span class="btn btn-primary">
+                          {{ page_obj.number }} / {{ page_obj.num_pages }}
+                      </span>
+                      {% if page_obj.has_next() %}
+                          <a class="btn" href="{{ url_for(endpoint, page=page_obj.number + 1, **view_args) }}">Вперед →</a>
+                      {% endif %}
+                    </div>
+               <!-- Пагинация: конец вывода -->
+        {% endif %}
+        <ul class="breadcrumb">
+              <li><a href="{{ url_for('index.index') }}">{{ SITE_NAME }}</a> <span class="divider">/</span></li>
+              <li class="active">{{ page_title }}</li>
+        </ul>
+    </div>
+</div>
+{% endblock %}

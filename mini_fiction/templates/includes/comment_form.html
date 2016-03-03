@@ -1,0 +1,17 @@
+<form method="POST" enctype="multipart/form-data" action="{% if edit %}{{ url_for('comment.edit', story_id=story.id, pk=comment.id) }}{% else %}{{ url_for('comment.add', story_id=story.id) }}{% endif %}">
+          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+      <div class="control-group{% if form.text.errors %} error{% endif %}">
+        <div class="controls">
+            {{ form.text }}
+        </div>
+        {% if form.text.errors %}
+            {% for error in form.text.errors %}
+                <span class="help-inline">{{ error }}</span>
+            {% endfor %}
+        {% endif %}
+    </div>
+    <div class="control-group">
+        <a data-dismiss="modal" href="{{ url_for('story.view', pk=story.id) }}" class="btn">Отменить</a>
+        <input class="btn btn-primary comment_submit" type="submit" value="Отправить"/>
+    </div>
+</form>

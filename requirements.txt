@@ -1,0 +1,12 @@
+Flask-WTF
+Flask-Login
+Flask-Script
+Flask-Babel
+Flask
+unidecode
+python3-memcached
+scrypt
+redis
+celery
+pony
+lxml

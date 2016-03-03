@@ -1,0 +1,6 @@
+{% for chapter, story in chapters %}
+    <div class="story-item">
+        <h3><a href="{{ url_for('chapter.view', story_id=story.id, chapter_order=chapter.order) }}">{{ chapter.title }}</a></h3>
+          <p><a href="{{ url_for('story.view', pk=story.id) }}">{{ story.title }}</a> от <a class="authorlink" href="{{ url_for('author.info', pk=story.authors.first().id) }}">{{ story.authors.first().username }}</a> {{ chapter.date|timedeltaformat }} назад</p>
+    </div>
+{% endfor %}

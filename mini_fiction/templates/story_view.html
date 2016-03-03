@@ -1,0 +1,108 @@
+{% extends "common.html" %}
+
+{% block content %}
+
+<div class="row">
+    <div class="span12 story-page">
+        <ul class="breadcrumb">
+            <li><a href="{{ url_for('index.index') }}">{{ SITE_NAME }}</a> <span class="divider">/</span></li>
+            <li class="active">{{ page_title }}</li>
+        </ul>
+
+        <h1 id="story_title">{{ story.title }}
+        <div id="stars" style="display: inline">{% include 'includes/story_header_info.html' %}</div>
+
+        {% if not story.original %} <sup class="translation">перевод</sup>{% endif %}
+            {% if story.finished %} <sup class="complete">завершен</sup>{% endif %}{% if story.freezed %} <sup class="suspended">заморожен</sup>{% endif %}
+              {% include 'includes/story_control_buttons.html' %}
+          </h1>
+        <div class="vote-area">
+            Ваша оценка:
+            <span class="starblock">
+            {% if vote %}
+                {%- for i in range(1, 6) -%}
+                    <a href="{{ url_for('story.vote', pk=story.id, value=i) }}" class="starvote star-button star-{% if vote.vote_value >= i %}5{% else %}0{% endif %}" title="{{ i }}"></a>
+                {%- endfor -%}
+            {% else %}
+                {%- for i in range(1, 6) -%}
+                    <a href="{{ url_for('story.vote', pk=story.id, value=i) }}" class="starvote star-button star-0" title="{{ i }}"></a>
+                {%- endfor -%}
+            {% endif %}
+            </span>
+            <span id="vote-msg"></span>
+        </div>
+            <p>
+                {%- include 'includes/story_reader_buttons.html' -%}
+            </p>
+            <p class="story-genres">
+                {%- for category in story.categories.order_by('c.id') -%}
+                    <a class="gen" style="background-color: {{ category.color }}" href="{{ url_for('search.simple', search_type='category', search_id=category.id) }}">{{ category.name }}</a>
+                {%- endfor -%}
+            </p>
+            <p class="story-thumbnails">
+                {%- for character in story.characters.order_by('c.id') -%}
+                    <a href="{{ url_for('search.simple', search_type='character', search_id=character.id) }}"><img src="{{ character.thumb }}" alt="{{ character.name }}" title="{{ character.name }}"/></a>
+                {%- endfor -%}
+            </p>
+
+        <p>Написал: {% include 'includes/story_authors_list.html' %}</p>
+
+        <p class="story-description">{{ story.summary_as_html|striptags }}</p>
+
+        {% if story.notes %}
+            <p>Заметки к рассказу: {{ story.notes_as_html }}</p>
+        {% endif %}
+
+        <blockquote class="more-info">
+            <p><strong>Подробности и статистика</strong></p>
+            <p>
+                Рейтинг — <a href="{{ url_for('search.simple', search_type='rating', search_id=story.rating.id) }}">{{ story.rating.name }}</a><br/>
+              События: {% for classifier in story.classifications.order_by('c.id') %}<a href="{{ url_for('search.simple', search_type='classifier', search_id=classifier.id) }}">{{ classifier.name }}</a>{% if not loop.last %}, {% endif %}{% endfor %}<br/>
+              {{ ngettext("%(num)d word", "%(num)d words", story.words) }}, {{ ngettext("%(num)d view", "%(num)d views", story.views) }}<br/>
+              Опубликован: <time datetime="{{ story.date.strftime('%Y-%m-%dT%H:%M:%SZ') }}">
+                {{- story.date|datetimeformat('d.MM.Y') -}}
+              </time>, последнее изменение – <time datetime="{{ story.updated.strftime('%Y-%m-%dT%H:%M:%SZ') }}">
+                {{- story.updated|timedeltaformat -}}
+              </time> назад
+          </p>
+      </blockquote>
+
+        <div class="story-chapters">
+            {% if chapters|length > 1 %}
+                <h2>Содержание</h2>
+            {% include "includes/story_panel.html" %}
+                <ul id="story_chapters">
+                {% for chapter in chapters %}
+                    <li><h4><a href="{{ url_for('chapter.view', story_id=story.id, chapter_order=chapter.order) }}">{{ chapter.title }}</a></h4>
+                      {{ ngettext("%(num)d word", "%(num)d words", chapter.words) }}, {{ ngettext("%(num)d view", "%(num)d views", chapter.views) }}<li>
+                {% endfor %}
+                </ul>
+            {% elif chapters|length > 0 %}
+              {% with chapter=chapters[0] %}
+                {% include "includes/story_panel.html" %}
+                {% include "includes/chapter_single.html" %}
+              {% endwith %}
+        {% endif %}
+        </div>
+        <!-- Вывод комментариев: начало -->
+        {% if comments_count > 0 %}
+        <div id="comments">
+            <h3>Комментарии ({{ comments_count }})</h3>
+            <div id="comments-list">
+                {% include 'includes/comments.html' %}
+            </div>
+            {% include 'includes/comments_pagination_story.html' %}
+        </div>
+        {% endif %}
+
+        {% if current_user.is_active %}
+        <a href="{{ url_for('comment.add', story_id=story.id) }}" class="btn btn-primary comment_add">Добавить комментарий</a>
+        {% elif current_user.is_authenticated %}
+        <h3 id="banned">К сожалению, Вы не можете добавлять комментарии</h3>
+        {% else %}
+        <a href="{{ url_for('auth.login', next=url_for('story.view', pk=story.id)) }}">Авторизуйтесь</a> для отправки комментария.
+        {% endif %}
+        <!-- Вывод комментариев: конец -->
+    </div>
+</div>
+{% endblock %}

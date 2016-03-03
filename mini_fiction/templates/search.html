@@ -1,0 +1,132 @@
+{% extends "common.html" %}
+
+{% block content %}
+
+<div class="row search-page">
+    <!-- Навигация -->
+    <div class="span12">
+        <ul class="breadcrumb">
+            <li><a href="{{ url_for('index.index') }}">{{ SITE_NAME }}</a> <span class="divider">/</span></li>
+            <li class="active">{{ page_title }}</li>
+        </ul>
+    <!-- Поиск -->
+        <h1>Поиск рассказов</h1>
+        <div>
+        <form action="{{ url_for('search.main') }}" method="GET" enctype="multipart/form-data" name="search" id="searchform" class="form-horizontal">
+            <fieldset>
+                <div class="padded">
+                    <!-- Поле поиска -->
+                    {{ form.q }}
+                    <!-- Тип поиска -->
+                    <span class="bootstrap radio">{{ form.type }}</span>
+                </div>
+                <!-- Сортировка результатов поиска -->
+                {{ form.button_sort }}
+                <!-- Фильтры поиска -->
+                {{ form.button_filters }}
+                <!-- Тонкая настройка поиска -->
+                {{ form.button_advanced }}
+                <!--Начало спойлера -->
+                <div id="more-sort" class="collapse">
+                    <h4>Сортировать</h4>
+                    <!-- Тип сортировки -->
+                    <span class="padded bootstrap radio">{{ form.sort }}</span>
+                </div>
+                <!-- Конец спойлера -->
+
+                <!--Начало спойлера -->
+                <div id="more-filters" class="collapse">
+                    <h3>Фильтры поиска</h3>
+                    <h4>Жанры</h4>
+                    <p class="genres-select">{{ form.genre }}</p>
+                    <h4>Персонажи</h4>
+                    <div class="characters-select" >{{ form.char }}</div>
+                </div>
+                <!-- Конец спойлера -->
+
+                <!--Начало спойлера -->
+                <div id="more-info" class="collapse">
+                    <h3>Дополнительные настройки поиска:</h3>
+                    <div class="padded bootstrap checkbox">
+                        <h4>Происхождение</h4>
+                        {{ form.original }}
+                    </div>
+                    <div class="padded bootstrap checkbox">
+                        <h4>Статус рассказа</h4>
+                        {{ form.finished }}
+                    </div>
+                    <div class="padded bootstrap checkbox">
+                        <h4>Активность</h4>
+                        {{ form.freezed }}
+                    </div>
+                    <div class="padded bootstrap checkbox">
+                        <h4>Рейтинг</h4>
+                        {{ form.rating }}
+                    </div>
+                    <div class="padded medium-input">
+                        <h4>Размер рассказа</h4>
+                        {{ form.min_words }}—{{ form.max_words }}
+                    </div>
+                    <div class="control-group">
+                        <div class="padded medium-input">
+                            <h4>События</h4>
+                        </div>
+                        <div class="controls events">
+                            {{ form.cls }}
+                        </div>
+                    </div>
+                </div>
+                <!-- Конец спойлера -->
+
+                <!-- Отправка формы -->
+                <p class="form-sumbit">
+                    <input type="submit" class="btn btn-primary" value="Искать!" />
+                    {{ form.button_reset }}
+                </p>
+            </fieldset>
+        </form>
+        </div>
+    </div>
+    <!-- Результаты: начало вывода -->
+    <div class="span9 search-results tab-content">
+        {% if search_type == 0 %}
+            <!-- Рассказы: начало вывода -->
+            {% if result %}<div class="story-item"><h3>{{ ngettext("Found %(num)d story", "Found %(num)d stories", total) }}</h3></div>{% endif %}
+            {% with stories=result %}
+                {% include "includes/stories.html" %}
+            {% endwith %}
+            <!-- Рассказы: конец вывода -->
+        {% else %}
+            <!-- Главы: начало вывода -->
+            {% if result %}<div class="story-item"><h3>{{ ngettext("Found %(num)d chapter", "Found %(num)d chapters", total) }}</h3></div>{%elif error %}<h3>{{ error }}</h3>{% else %}<h3>Здесь пока ничего нет</h3>{% endif %}
+            {% for chapter, excerpt in result %}
+                <div class="story-item">
+                    <h3><a href="{{ url_for('chapter.view', story_id=chapter.story.id, chapter_order=chapter.order) }}">{{ chapter.title }}</a></h3>
+                    <p>{{ excerpt|safe }}</p>
+                      <p class="meta">Глава из рассказа <b><a href="{{ url_for('story.view', pk=chapter.story.id) }}">{{ chapter.story.title }}</a></b> от <a class="authorlink" href="{{ url_for('author.info', user_id=chapter.story.authors.first().id) }}">{{ chapter.story.authors.first().username }}</a></p>
+                </div>
+            {% endfor %}
+            <!-- Главы: конец вывода -->
+        {% endif %}
+        {% if result %}
+                <!-- Пагинация: начало вывода -->
+                    <div id="pagination" class="center">
+                        {% for page_id in pagination.iter_pages() %}
+                            <input form="searchform" type="submit" class="btn{% if page_id == pagination.number %} btn-primary{% endif %}" name="page" value="{{ page_id }}" >
+                        {% endfor %}
+                      </div>
+                  <!-- Пагинация: конец вывода -->
+        {% endif %}
+    </div>
+    <!-- Результаты: конец вывода -->
+
+    <!-- Навигация: начало вывода -->
+    <div class="span12">
+        <ul class="breadcrumb">
+            <li><a href="{{ url_for('index.index') }}">{{ SITE_NAME }}</a> <span class="divider">/</span></li>
+            <li class="active">{{ page_title }}</li>
+        </ul>
+    </div>
+    <!-- Навигация: конец вывода -->
+</div>
+{% endblock %}

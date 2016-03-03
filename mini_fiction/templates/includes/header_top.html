@@ -1,0 +1,44 @@
+<!-- Container start -->
+<div class="container">
+{{ html_block('header') }}
+
+    <!-- Logo image and carousel start -->
+    <div class="logopic">
+        <div id="slides" class="carousel">
+                {{ random_stories() }}
+        </div>
+    </div>
+    <!-- Logo image and carousel end -->
+
+    <!-- Menu start -->
+    <ul class="nav nav-pills nav-main">
+        <li id="nav_index"><a href="{{ url_for('index.index') }}">Главная</a></li>
+        <li id="nav_search"><a href="{{ url_for('search.main') }}">Поиск</a></li>
+          <li id="nav_help"><a href="{{ url_for('staticpages.index', name='help') }}">Справка</a></li>
+          {% if current_user.is_authenticated %}
+            <li id="nav_favorites"><a href="{{ url_for('object_lists.favorites', user_id=current_user.id) }}">Избранное</a></li>
+            <li id="nav_bookmarks"><a href="{{ url_for('object_lists.bookmarks') }}">Закладки</a></li>
+            <li class="right"><a href="{{ url_for('auth.logout') }}">Выход</a></li>
+            <li id="nav_author_overview" class="right"><a href="{{ url_for('author.info', user_id=current_user.id) }}">Профиль</a></li>
+            {{ hook('nav') }}
+            <li id="nav_author_dashboard" class="right"><a class="active" href="{{ url_for('author.info') }}">Кабинет автора</a></li>
+            <li id="nav_story_add" class="right"><a href="{{ url_for('story.add') }}">Добавить рассказ</a></li>
+            {% if current_user.is_staff %}
+            <li id="nav_submitted" class="right"><a href="{{ url_for('object_lists.submitted') }}">Новые ({{ submitted_stories_count() }})</a></li>
+            {% endif %}
+          {% else %}
+        {% if config.REGISTRATION_OPEN %}<li id="nav_registration" ><a href="{{ url_for('auth.registration') }}">Регистрация</a></li>{% endif %}
+        {{ hook('nav') }}
+        <li class="right">
+            <form class="login-form form-inline" action="{{ url_for('auth.login') }}" method="POST" enctype="multipart/form-data">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+                  <input id="id_username" type="text" name="username" placeholder="Логин" class="input-small" maxlength="30">
+                  <input type="password" name="password" id="id_password" placeholder="Пароль" class="input-small">
+                  <button class="btn" type="submit">Войти</button>
+                  <a href="{{ url_for('auth.password_reset') }}">Забыл<br/> пароль</a>
+            </form>
+        </li>
+          {% endif %}
+    </ul>
+    <!-- Menu end -->
+{{ html_block('notice') }}

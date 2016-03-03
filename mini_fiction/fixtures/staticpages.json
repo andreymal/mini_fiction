@@ -1,0 +1,20 @@
+[
+    {
+        "pk": 1,
+        "model": "StaticPage",
+        "fields": {
+            "name": "help",
+            "title": "Справка",
+            "content": "<div class=\"span12 text-help\">Отредактируйте эту страницу через администрирование.</div>"
+        }
+    },
+    {
+        "pk": 2,
+        "model": "StaticPage",
+        "fields": {
+            "name": "terms",
+            "title": "Правила",
+            "content": "<div class=\"span12 text-terms\">Отредактируйте эту страницу через администрирование.</div>"
+        }
+    }
+]

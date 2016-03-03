@@ -1,0 +1,98 @@
+[
+  {
+    "model": "Category",
+    "pk": 1,
+    "fields": {
+      "name": "Приключения",
+      "color": "#3F74CE"
+    }
+  },
+  {
+    "model": "Category",
+    "pk": 2,
+    "fields": {
+      "name": "Кроссовер",
+      "color": "#EDA21F"
+    }
+  },
+  {
+    "model": "Category",
+    "pk": 3,
+    "fields": {
+      "name": "Романтика",
+      "color": "#CEC12A"
+    }
+  },
+  {
+    "model": "Category",
+    "pk": 4,
+    "fields": {
+      "name": "Драма",
+      "color": "#45C950"
+    }
+  },
+  {
+    "model": "Category",
+    "pk": 5,
+    "fields": {
+      "name": "Ангст",
+      "color": "#45C9AB"
+    }
+  },
+  {
+    "model": "Category",
+    "pk": 6,
+    "fields": {
+      "name": "Флафф",
+      "color": "#CA6565"
+    }
+  },
+  {
+    "model": "Category",
+    "pk": 7,
+    "fields": {
+      "name": "Юмор",
+      "color": "#D84A9D"
+    }
+  },
+  {
+    "model": "Category",
+    "pk": 8,
+    "fields": {
+      "name": "Зарисовка",
+      "color": "#8738D8"
+    }
+  },
+  {
+    "model": "Category",
+    "pk": 9,
+    "fields": {
+      "name": "Экшн",
+      "color": "#B5835A"
+    }
+  },
+  {
+    "model": "Category",
+    "pk": 10,
+    "fields": {
+      "name": "Ужасы",
+      "color": "#808080"
+    }
+  },
+  {
+    "model": "Category",
+    "pk": 11,
+    "fields": {
+      "name": "Эротика",
+      "color": "#CA0707"
+    }
+  },
+  {
+    "model": "Category",
+    "pk": 12,
+    "fields": {
+      "name": "Повседневность",
+      "color": "#8760B0"
+    }
+  }
+]

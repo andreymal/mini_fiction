@@ -1,0 +1,15 @@
+{% extends "common.html" %}
+{% block content %}
+<div class="row search-page">
+    <!-- Навигация -->
+    <div class="span12">
+        <ul class="breadcrumb">
+            <li><a href="{{ url_for('index.index') }}">{{ SITE_NAME }}</a> <span class="divider">/</span></li>
+            <li class="active">{{ page_title }}</li>
+        </ul>
+    <!-- Поиск -->
+        <h1>{{ page_title }}</h1>
+        <h3>Отключен</h3>
+    </div>
+</div>
+{% endblock %}

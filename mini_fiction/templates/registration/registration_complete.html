@@ -1,11 +1,9 @@
 {% extends "common.html" %}
+{% from 'macro.html' import breadcrumbs with context %}
 {% block content %}
 <div class="row">
     <div class="span12">
-      <ul class="breadcrumb">
-            <li><a href="{{ url_for('index.index') }}">{{ SITE_NAME }}</a> <span class="divider">/</span></li>
-            <li class="active">{{ page_title }}</li>
-        </ul>
+        {{- breadcrumbs() }}
     </div>
 
     <div class="span12 reg-complete">
@@ -14,10 +12,7 @@
   </div>
 
     <div class="span12">
-      <ul class="breadcrumb">
-            <li><a href="{{ url_for('index.index') }}">{{ SITE_NAME }}</a> <span class="divider">/</span></li>
-            <li class="active">{{ page_title }}</li>
-        </ul>
+        {{- breadcrumbs() }}
     </div>
 </div>
 {% endblock %}

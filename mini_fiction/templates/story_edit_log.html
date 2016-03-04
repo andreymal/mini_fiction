@@ -1,14 +1,11 @@
 {% extends "common.html" %}
+{% from 'macro.html' import breadcrumbs with context %}
 
 {% block content %}
 
 <div class="row">
     <div class="span12 story-page">
-        <ul class="breadcrumb">
-            <li><a href="{{ url_for('index.index') }}">{{ SITE_NAME }}</a> <span class="divider">/</span></li>
-            {% if story %}<li><a href="{{ url_for('story.view', pk=story.id) }}">{{ story.title }}</a> <span class="divider">/</span></li>{% endif %}
-            <li>{{ page_title }}</li>
-        </ul>
+        {{- breadcrumbs() }}
 
         {% for item in edit_log %}
             <p>

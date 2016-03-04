@@ -1,13 +1,10 @@
 {% extends "common.html" %}
+{% from 'macro.html' import breadcrumbs with context %}
 {% block content %}
 
 <div class="row">
     <div class="span12">
-        <ul class="breadcrumb">
-            <li><a href="{{ url_for('index.index') }}">{{ SITE_NAME }}</a> <span class="divider">/</span></li>
-            <li><a href="{{ url_for('author.info', user_id=user.id) }}">Мой профиль</a> <span class="divider">/</span></li>
-            <li class="active">{{ page_title }}</li>
-        </ul>
+        {{- breadcrumbs([[url_for('author.info', user_id=user.id), 'Мой профиль']]) }}
     </div>
 
     <div class="span12">
@@ -143,11 +140,7 @@
     </div>
 
     <div class="span12">
-        <ul class="breadcrumb">
-            <li><a href="{{ url_for('index.index') }}">{{ SITE_NAME }}</a> <span class="divider">/</span></li>
-            <li><a href="{{ url_for('author.info', user_id=user.id) }}">Мой профиль</a> <span class="divider">/</span></li>
-            <li class="active">{{ page_title }}</li>
-        </ul>
+        {{- breadcrumbs([[url_for('author.info', user_id=user.id), 'Мой профиль']]) }}
     </div>
 </div>
 {% endblock %}

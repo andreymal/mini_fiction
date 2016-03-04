@@ -73,7 +73,7 @@ def add(story_id):
         return redirect(url_for('chapter.edit', pk=chapter.id))
 
     data = {
-        'page_title': 'Добавить новую главу',
+        'page_title': 'Добавление новой главы',
         'story': story,
         'form': form
     }
@@ -108,7 +108,7 @@ def edit(pk):
         return redirect(url_for('chapter.edit', pk=chapter.id))
 
     data = {
-        'page_title': 'Редактирование «%s»' % chapter.title,
+        'page_title': 'Редактирование главы «%s»' % chapter.title,
         'chapter': chapter,
         'form': form
     }

@@ -1,23 +1,18 @@
 {% extends "common.html" %}
+{% from 'macro.html' import breadcrumbs with context %}
 {% block title %}500 — внутренняя ошибка сервера{% endblock %}
 {% block content %}
 
 <div class="row page-500">
     <div class="span12">
-        <ul class="breadcrumb">
-            <li><a href="{{ url_for('index.index') }}">{{ SITE_NAME }}</a> <span class="divider">/</span></li>
-            <li class="active">500 — внутренняя ошибка сервера</li>
-        </ul>
+        {{- breadcrumbs(current='500 — внутренняя ошибка сервера') }}
     </div>
     <div class="span12 message-500">
         <h1>500 — внутренняя ошибка сервера</h1>
         <p>Пегасы с отвертками что-то напортачили в тонкой душе сервера. Если хотите помочь, <a href="{{ config['SITE_FEEDBACK'] }}">напишите</a>, как вам удалось добиться этой ошибки.</p>
     </div>
     <div class="span12">
-        <ul class="breadcrumb">
-            <li><a href="{{ url_for('index.index') }}">{{ SITE_NAME }}</a> <span class="divider">/</span></li>
-            <li class="active">500 — внутренняя ошибка сервера</li>
-        </ul>
+        {{- breadcrumbs(current='500 — внутренняя ошибка сервера') }}
     </div>
 </div>
 {% endblock %}

@@ -1,7 +1,13 @@
 {% extends "common.html" %}
+{% from 'macro.html' import breadcrumbs with context %}
 {% block content %}
 <div class="row">
-    {% include "includes/chapter_breadcrumbs.html" %}
+    <div class="span12">
+    {{- breadcrumbs(
+        [[url_for('story.view', pk=story.id), story.title]],
+        current='Все главы' if allchapters else chapter.title
+    ) }}
+    </div>
     {% if allchapters %}
         <div class="span12 story-chapter-page">
             {% include "includes/story_panel.html" %}
@@ -16,6 +22,11 @@
             {% include "includes/chapter_single.html" %}
         </div>
     {% endif %}
-    {% include "includes/chapter_breadcrumbs.html" %}
+    <div class="span12">
+    {{- breadcrumbs(
+        [[url_for('story.view', pk=story.id), story.title]],
+        current='Все главы' if allchapters else chapter.title
+    ) }}
+    </div>
 </div>
 {% endblock %}

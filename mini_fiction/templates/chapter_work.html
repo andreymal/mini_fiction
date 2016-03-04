@@ -1,18 +1,12 @@
 {% extends "common.html" %}
+{% from 'macro.html' import breadcrumbs with context %}
 {% block content %}
 <div class="row">
     <div class="span12">
-        <ul class="breadcrumb">
-            <li><a href="{{ url_for('index.index') }}">{{ SITE_NAME }}</a> <span class="divider">/</span></li>
-            <li><a href="{{ url_for('author.info') }}">Кабинет автора</a> <span class="divider">/</span></li>
-            {% if story %}
-                <li><a href="{{ url_for('story.edit', pk=story.id) }}">Редактирование «{{ story.title }}»</a> <span class="divider">/</span></li>
-                <li class="active">Добавление новой главы</li>
-            {% else %}
-                <li><a href="{{ url_for('story.edit', pk=chapter.story.id) }}">Редактирование «{{ chapter.story.title }}»</a> <span class="divider">/</span></li>
-                <li class="active">Редактирование главы «{{ chapter.title }}»</li>
-            {% endif %}
-        </ul>
+        {{- breadcrumbs([
+            [url_for('author.info'), 'Кабинет автора'],
+            [url_for('story.edit', pk=(story or chapter.story).id), 'Редактирование «{}»'.format((story or chapter.story).title)]
+        ]) }}
     </div>
     <div class="span12">
         {% if story %}
@@ -74,17 +68,10 @@
     {% endif %}
 
     <div class="span12">
-        <ul class="breadcrumb">
-            <li><a href="{{ url_for('index.index') }}">{{ SITE_NAME }}</a> <span class="divider">/</span></li>
-            <li><a href="{{ url_for('author.info') }}">Кабинет автора</a> <span class="divider">/</span></li>
-            {% if story %}
-                <li><a href="{{ url_for('story.edit', pk=story.id) }}">Редактирование «{{ story.title }}»</a> <span class="divider">/</span></li>
-                <li class="active">Добавление новой главы</li>
-            {% else %}
-                <li><a href="{{ url_for('story.edit', pk=chapter.story.id) }}">Редактирование «{{ chapter.story.title }}»</a> <span class="divider">/</span></li>
-                <li class="active">Редактирование главы «{{ chapter.title }}»</li>
-            {% endif %}
-        </ul>
+        {{- breadcrumbs([
+            [url_for('author.info'), 'Кабинет автора'],
+            [url_for('story.edit', pk=(story or chapter.story).id), 'Редактирование «{}»'.format((story or chapter.story).title)]
+        ]) }}
     </div>
 </div>
 {% endblock %}

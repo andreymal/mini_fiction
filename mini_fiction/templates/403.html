@@ -1,22 +1,17 @@
 {% extends "common.html" %}
+{% from 'macro.html' import breadcrumbs with context %}
 {% block title %}403 — доступ запрещён{% endblock %}
 {% block content %}
 <div class="row page-403">
     <div class="span12">
-        <ul class="breadcrumb">
-            <li><a href="{{ url_for('index.index') }}">{{ SITE_NAME }}</a> <span class="divider">/</span></li>
-            <li class="active">403 — доступ запрещён</li>
-        </ul>
+        {{- breadcrumbs(current='403 — доступ запрещён') }}
     </div>
     <div class="span12 message-403">
         <h1>403 — доступ запрещён</h1>
         <p>Возможно, вы пытаетесь влезть в файл на сервере, в который лазать нельзя. От того и не получается.</p>
     </div>
     <div class="span12">
-        <ul class="breadcrumb">
-            <li><a href="{{ url_for('index.index') }}">{{ SITE_NAME }}</a> <span class="divider">/</span></li>
-            <li class="active">403 — доступ запрещён</li>
-        </ul>
+        {{- breadcrumbs(current='403 — доступ запрещён') }}
     </div>
 </div>
 {% endblock %}

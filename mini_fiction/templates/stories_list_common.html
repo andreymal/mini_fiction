@@ -1,21 +1,16 @@
 {% extends "common.html" %}
+{% from 'macro.html' import breadcrumbs with context %}
 {% block content %}
 <div class="row">
     <div class="span8">
-    <ul class="breadcrumb">
-      <li><a href="{{ url_for('index.index') }}">{{ SITE_NAME }}</a> <span class="divider">/</span></li>
-      <li class="active">{{ page_title }}</li>
-    </ul>
+        {{- breadcrumbs() }}
         <h2>{{ page_title }}</h2>
         {% block before_list %}{% endblock %}
         <div id="stories-list">
             {% include "includes/stories.html" %}
         </div>
         {% block after_list %}{% endblock %}
-    <ul class="breadcrumb">
-      <li><a href="{{ url_for('index.index') }}">{{ SITE_NAME }}</a> <span class="divider">/</span></li>
-      <li class="active">{{ page_title }}</li>
-    </ul>
+        {{- breadcrumbs() }}
     </div>
 </div>
 {% endblock %}

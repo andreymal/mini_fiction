@@ -1,12 +1,10 @@
 {% extends "common.html" %}
+{% from 'macro.html' import breadcrumbs with context %}
 {% block content %}
 
 <div class="row">
     <div class="span12">
-        <ul class="breadcrumb">
-            <li><a href="{{ url_for('index.index') }}">{{ SITE_NAME }}</a> <span class="divider">/</span></li>
-            <li class="active">{% if author.stories.count() > 0 %}Кабинет автора{% else %}Кабинет потенциального автора{% endif %} {{ author.username }}</li>
-        </ul>
+        {{- breadcrumbs(current=('Кабинет автора ' if author.stories.count() > 0 else 'Кабинет потенциального автора ') + author.username) }}
     </div>
     <!-- Вывод шапки -->
     <div class="span8">
@@ -62,10 +60,7 @@
     </div>
 
     <div class="span12">
-        <ul class="breadcrumb">
-            <li><a href="{{ url_for('index.index') }}">{{ SITE_NAME }}</a> <span class="divider">/</span></li>
-            <li class="active">{% if author.stories.count() > 0 %}Кабинет автора{% else %}Читательский билет{% endif %} {{ author.username }}</li>
-        </ul>
+        {{- breadcrumbs(current=('Кабинет автора ' if author.stories.count() > 0 else 'Читательский билет ') + author.username) }}
     </div>
 </div>
 {% endblock %}

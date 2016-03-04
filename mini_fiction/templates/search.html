@@ -1,15 +1,11 @@
 {% extends "common.html" %}
-
+{% from 'macro.html' import breadcrumbs with context %}
 {% block content %}
 
 <div class="row search-page">
     <!-- Навигация -->
     <div class="span12">
-        <ul class="breadcrumb">
-            <li><a href="{{ url_for('index.index') }}">{{ SITE_NAME }}</a> <span class="divider">/</span></li>
-            <li class="active">{{ page_title }}</li>
-        </ul>
-    <!-- Поиск -->
+        {{- breadcrumbs() }}
         <h1>Поиск рассказов</h1>
         <div>
         <form action="{{ url_for('search.main') }}" method="GET" enctype="multipart/form-data" name="search" id="searchform" class="form-horizontal">
@@ -122,10 +118,7 @@
 
     <!-- Навигация: начало вывода -->
     <div class="span12">
-        <ul class="breadcrumb">
-            <li><a href="{{ url_for('index.index') }}">{{ SITE_NAME }}</a> <span class="divider">/</span></li>
-            <li class="active">{{ page_title }}</li>
-        </ul>
+        {{- breadcrumbs() }}
     </div>
     <!-- Навигация: конец вывода -->
 </div>

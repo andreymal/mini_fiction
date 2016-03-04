@@ -1,12 +1,9 @@
 {% extends "common.html" %}
-
+{% from 'macro.html' import breadcrumbs with context %}
 {% block content %}
 <div class="row login-page">
     <div class="span12">
-        <ul class="breadcrumb">
-            <li><a href="{{ url_for('index.index') }}">{{ SITE_NAME }}</a> <span class="divider">/</span></li>
-            <li class="active">{{ page_title }}</li>
-        </ul>
+        {{- breadcrumbs() }}
     </div>
 
     {% if current_user.is_authenticated %}
@@ -52,10 +49,7 @@
     </div>
     {% endif %}
     <div class="span12">
-        <ul class="breadcrumb">
-            <li><a href="{{ url_for('index.index') }}">{{ SITE_NAME }}</a> <span class="divider">/</span></li>
-            <li class="active">{{ page_title }}</li>
-        </ul>
+        {{- breadcrumbs() }}
     </div>
 </div>
 {% endblock %}

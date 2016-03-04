@@ -1,12 +1,10 @@
 {% extends "common.html" %}
+{% from 'macro.html' import breadcrumbs with context %}
 {% block content %}
 
 <div class="row">
     <div class="span12">
-        <ul class="breadcrumb">
-            <li><a href="{{ url_for('index.index') }}">{{ SITE_NAME }}</a> <span class="divider">/</span></li>
-            <li class="active">{% if author.stories.count() > 0 %}Автор{% else %}Читатель{% endif %}: {{ author.username }}</li>
-        </ul>
+        {{- breadcrumbs(current=('Автор: ' if author.stories.count() > 0 else 'Читатель: ') + author.username) }}
     </div>
     <div class="span8">
         <h1 id="author-name">
@@ -73,10 +71,7 @@
     </div>
 
       <div class="span12">
-        <ul class="breadcrumb">
-              <li><a href="{{ url_for('index.index') }}">{{ SITE_NAME }}</a> <span class="divider">/</span></li>
-              <li class="active">Автор: {{ author.username }}</li>
-        </ul>
+        {{- breadcrumbs(current=('Автор: ' if author.stories.count() > 0 else 'Читатель: ') + author.username) }}
       </div>
 </div>
 {% endblock %}

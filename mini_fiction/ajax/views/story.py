@@ -23,19 +23,18 @@ def publish(pk):
         abort(404)
 
     user = current_user._get_current_object()
-    if user.is_staff or story.editable_by(user):
-        if story.publishable or (not story.draft and not story.publishable):
-            story.bl.update(user, {'draft': not story.draft})
-            return str(pk)
-        else:
-            data = {
-                'page_title': 'Неудачная попытка публикации',
-                'story': story,
-                'need_words': current_app.config['PUBLISH_SIZE_LIMIT']
-            }
-            return render_template('includes/ajax/story_ajax_publish_warning.html', **data)
-    else:
+    if not user.is_staff and not story.editable_by(user):
         abort(403)
+
+    if story.bl.publish(user, story.draft):  # draft == not published
+        return str(pk)
+    else:
+        data = {
+            'page_title': 'Неудачная попытка публикации',
+            'story': story,
+            'need_words': current_app.config['PUBLISH_SIZE_LIMIT']
+        }
+        return render_template('includes/ajax/story_ajax_publish_warning.html', **data)
 
 
 @bp.route('/<int:pk>/approve/', methods=('POST',))
@@ -43,14 +42,13 @@ def publish(pk):
 @ajax_login_required
 def approve(pk):
     user = current_user._get_current_object()
-    if user.is_staff:
-        story = Story.get(id=pk)
-        if not story:
-            abort(404)
-        story.bl.update(user, {'approved': not story.approved})
-        return str(pk)
-    else:
-        abort(403)
+    if not user.is_staff:
+        abort(403)  # TODO: refactor exceptions and move to bl
+    story = Story.get(id=pk)
+    if not story:
+        abort(404)
+    story.bl.approve(user, not story.approved)
+    return jsonify({'success': True, 'story_id': story.id, 'approved': story.approved})
 
 
 @bp.route('/<int:pk>/bookmark/', methods=('POST',))

@@ -62,7 +62,7 @@ class StoryBL(BaseBL):
         story = self.model
         old_published = story.published  # for chapters in search
 
-        for key in ('title', 'summary', 'notes', 'original', 'finished', 'freezed', 'draft', 'approved'):
+        for key in ('title', 'summary', 'notes', 'original', 'finished', 'freezed'):
             if key in data:
                 setattr(story, key, data[key])
 
@@ -96,10 +96,31 @@ class StoryBL(BaseBL):
                 sl.data = data
             sl.flush()
         later(current_app.tasks['sphinx_update_story'].delay, story.id, ())
+        return story
+
+    def approve(self, user, approved):
+        story = self.model
+        old_published = story.published
+
+        story.approved = bool(approved)
         if old_published != story.published:
+            later(current_app.tasks['sphinx_update_story'].delay, story.id, ('approved',))
             for c in story.chapters:
                 later(current_app.tasks['sphinx_update_chapter'].delay, c.id)
-        return story
+
+    def publish(self, user, published):
+        story = self.model
+        old_published = story.published
+
+        if story.publishable or (not story.draft and not story.publishable):
+            story.draft = not published
+            if old_published != story.published:
+                later(current_app.tasks['sphinx_update_story'].delay, story.id, ('draft',))
+                for c in story.chapters:
+                    later(current_app.tasks['sphinx_update_chapter'].delay, c.id)
+            return True
+
+        return False
 
     def delete(self):
         story = self.model

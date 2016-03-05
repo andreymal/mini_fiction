@@ -740,20 +740,6 @@ var stuff = {
             }
         }
     },
-    // Ротатор шапок
-    logo : function() {
-        var len = 8
-        if ($.cookie('stories_gr') == null) {
-            var stories_gr = Math.floor(Math.random() * len) + 1;
-            $.cookie('stories_gr', stories_gr, {
-                expires : 1
-            });
-        } else {
-            var stories_gr = $.cookie('stories_gr');
-        }
-        var new_image = "url(/static/i/logopics/logopic-" + stories_gr + ".jpg)";
-        $('.logopic').css('background-image', new_image);
-    },
     // Плавающая панелька
     panel : function() {
         if(!$("#story_panel").length) return;
@@ -876,7 +862,6 @@ var stuff = {
 }
 // При загрузке страницы
 $(function() {
-    stuff.logo();
     stuff.ajaxsetup();
     stuff.carousel();
     $('.bootstrap').each(stuff.bootstrap);

@@ -171,6 +171,11 @@ class Config(object):
     RECAPTCHA_OPTIONS = {'hl': 'ru'}
     NOCAPTCHA = False
 
+    RANDOM_LOGOS = [
+        {'endpoint': 'static', 'filename': 'i/logopics/logopic-{}.jpg'.format(i)}
+        for i in range(1, 9)
+    ]
+
 
 class Development(Config):
     DEBUG = True

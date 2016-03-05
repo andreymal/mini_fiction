@@ -152,7 +152,7 @@ def configure_errorpages(app):
 
 
 def configure_templatetags(app):
-    from mini_fiction.templatetags import random_stories, submitted_stories_count
+    from mini_fiction.templatetags import random_stories, random_logo, submitted_stories_count
     from mini_fiction.templatetags import story_comments_delta, html_block, hook
     from mini_fiction.templatetags import registry
     app.templatetags = dict(registry.tags)

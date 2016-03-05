@@ -3,7 +3,7 @@
 {{ html_block('header') }}
 
     <!-- Logo image and carousel start -->
-    <div class="logopic">
+    <div class="logopic" style="background-image: url('{{ random_logo() }}')">
         <div id="slides" class="carousel">
                 {{ random_stories() }}
         </div>

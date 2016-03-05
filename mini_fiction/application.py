@@ -125,6 +125,12 @@ def configure_views(app):
     app.register_blueprint(feeds.bp, url_prefix='/feeds')
     app.register_blueprint(staticpages.bp, url_prefix='/page')
 
+    # Static invalidation
+    @app.url_defaults
+    def static_postfix(endpoint, values):
+        if endpoint == 'static' and 'v' not in values and 'STATIC_V' in app.config:
+            values['v'] = app.config['STATIC_V']
+
 
 def configure_ajax_views(app):
     from mini_fiction.ajax.views import story, chapter, comment

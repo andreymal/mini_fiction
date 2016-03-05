@@ -14,8 +14,9 @@ manager = Manager(application.create_app())
 def shell():
     import code
     import mini_fiction
+    from mini_fiction import models
     with db_session:
-        code.interact(local={'mini_fiction': mini_fiction, 'app': manager.app})
+        code.interact(local={'mini_fiction': mini_fiction, 'app': manager.app, 'm': models})
 
 
 @manager.command

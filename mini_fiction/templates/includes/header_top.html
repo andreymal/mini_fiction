@@ -1,3 +1,5 @@
+{%- from 'macro.html' import nav_item -%}
+
 <!-- Container start -->
 <div class="container">
 {{ html_block('header') }}
@@ -5,39 +7,64 @@
     <!-- Logo image and carousel start -->
     <div class="logopic" style="background-image: url('{{ random_logo() }}')">
         <div id="slides" class="carousel">
-                {{ random_stories() }}
+            {{ random_stories() }}
         </div>
     </div>
     <!-- Logo image and carousel end -->
 
     <!-- Menu start -->
     <ul class="nav nav-pills nav-main">
-        <li id="nav_index"><a href="{{ url_for('index.index') }}">Главная</a></li>
-        <li id="nav_search"><a href="{{ url_for('search.main') }}">Поиск</a></li>
-          <li id="nav_help"><a href="{{ url_for('staticpages.index', name='help') }}">Справка</a></li>
-          {% if current_user.is_authenticated %}
-            <li id="nav_favorites"><a href="{{ url_for('object_lists.favorites', user_id=current_user.id) }}">Избранное</a></li>
-            <li id="nav_bookmarks"><a href="{{ url_for('object_lists.bookmarks') }}">Закладки</a></li>
-            <li class="right"><a href="{{ url_for('auth.logout') }}">Выход</a></li>
-            <li id="nav_author_overview" class="right"><a href="{{ url_for('author.info', user_id=current_user.id) }}">Профиль</a></li>
-            {{ hook('nav') }}
-            <li id="nav_author_dashboard" class="right"><a class="active" href="{{ url_for('author.info') }}">Кабинет автора</a></li>
-            <li id="nav_story_add" class="right"><a href="{{ url_for('story.add') }}">Добавить рассказ</a></li>
+        {{ nav_item('Главная', url_for('index.index'), 'index.index') }}
+        {{ nav_item('Поиск', url_for('search.main'), 'search.') }}
+        {{ nav_item(
+            'Справка',
+            url_for('staticpages.index', name='help'),
+            matched=is_current_endpoint('staticpages.index', name='help')
+        ) }}
+
+        {%- if current_user.is_authenticated %}
+            {{ nav_item(
+                'Избранное',
+                url_for('object_lists.favorites', user_id=current_user.id),
+                matched=is_current_endpoint('object_lists.favorites', user_id=current_user.id)
+            ) }}
+            {{ nav_item('Закладки', url_for('object_lists.bookmarks'), 'object_lists.bookmarks') }}
+            {{ nav_item('Выход', url_for('auth.logout'), right=True) }}
+            {{ nav_item(
+                'Профиль',
+                url_for('author.info', user_id=current_user.id),
+                matched=is_current_endpoint('author.info', user_id=current_user.id),
+                right=True
+            ) }}
+            {{ nav_item(
+                'Кабинет автора',
+                url_for('author.info'),
+                matched=is_current_endpoint('author.info', user_id=None),
+                right=True
+            ) }}
+            {{ nav_item('Добавить рассказ', url_for('story.add'), 'story.add', right=True) }}
+
             {% if current_user.is_staff %}
-            <li id="nav_submitted" class="right"><a href="{{ url_for('object_lists.submitted') }}">Новые ({{ submitted_stories_count() }})</a></li>
+                {{ nav_item('Новые ({})'.format(submitted_stories_count()), url_for('object_lists.submitted'), 'object_lists.submitted', right=True) }}
             {% endif %}
-          {% else %}
-        {% if config.REGISTRATION_OPEN %}<li id="nav_registration" ><a href="{{ url_for('auth.registration') }}">Регистрация</a></li>{% endif %}
-        {{ hook('nav') }}
-        <li class="right">
-            <form class="login-form form-inline" action="{{ url_for('auth.login') }}" method="POST" enctype="multipart/form-data">
-                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
-                  <input id="id_username" type="text" name="username" placeholder="Логин" class="input-small" maxlength="30">
-                  <input type="password" name="password" id="id_password" placeholder="Пароль" class="input-small">
-                  <button class="btn" type="submit">Войти</button>
-                  <a href="{{ url_for('auth.password_reset') }}">Забыл<br/> пароль</a>
-            </form>
-        </li>
+
+            {{ hook('nav') }}
+        {%- else %}
+            {%- if config.REGISTRATION_OPEN %}
+                {{ nav_item('Регистрация', url_for('auth.registration'), 'auth.registration') }}
+            {% endif %}
+
+            {{ hook('nav') }}
+
+            <li class="right">
+                <form class="login-form form-inline" action="{{ url_for('auth.login') }}" method="POST" enctype="multipart/form-data">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+                        <input id="id_username" type="text" name="username" placeholder="Логин" class="input-small" maxlength="30">
+                        <input type="password" name="password" id="id_password" placeholder="Пароль" class="input-small">
+                        <button class="btn" type="submit">Войти</button>
+                        <a href="{{ url_for('auth.password_reset') }}">Забыл<br/> пароль</a>
+                </form>
+            </li>
           {% endif %}
     </ul>
     <!-- Menu end -->

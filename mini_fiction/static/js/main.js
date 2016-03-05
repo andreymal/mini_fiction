@@ -562,7 +562,6 @@ var pages = {
     index : {
         regex : new RegExp('^/$'),
         action : function() {
-            $('#nav_index').addClass('active');
             for ( var listener in listeners.story) {
                 listeners.story[listener]();
             }
@@ -587,7 +586,6 @@ var pages = {
     story_add : {
         regex : new RegExp('^/story/add/$'),
         action : function() {
-            $('#nav_story_add').addClass('active');
             $('#id_text').markItUp(mySettings);
             $('#id_notes').markItUp(mySettings);
             listeners.misc.characters();
@@ -648,7 +646,6 @@ var pages = {
     author_overview : {
         regex : new RegExp('^/accounts/[0-9]+/(?:comments/page/[0-9]+/)?$'),
         action : function() {
-            $('#nav_author_overview').addClass('active');
             listeners.author.approve();
             listeners.comment.pagination();
             for ( var listener in listeners.story) {
@@ -659,7 +656,6 @@ var pages = {
     author_dashboard : {
         regex : new RegExp('^/accounts/profile/(?:comments/page/[0-9]+/)?$'),
         action : function() {
-            $('#nav_author_dashboard').addClass('active');
             listeners.author.approve();
             listeners.comment.pagination();
             for ( var listener in listeners.story) {
@@ -669,14 +665,11 @@ var pages = {
     },
     registration : {
         regex : new RegExp('^/accounts/register/(.+)?'),
-        action : function() {
-            $('#nav_registration').addClass('active');
-        }
+        action : function() {}
     },
     search : {
         regex : new RegExp('^/search/(.+)?'),
         action : function() {
-            $('#nav_search').addClass('active');
             listeners.misc.characters();
             listeners.misc.search();
             for ( var listener in listeners.story) {
@@ -687,7 +680,6 @@ var pages = {
     favorites : {
         regex : new RegExp('^/accounts/[0-9]+/favorites/(.+)?'),
         action : function() {
-            $('#nav_favorites').addClass('active');
             for ( var listener in listeners.story) {
                 listeners.story[listener]();
             }
@@ -696,7 +688,6 @@ var pages = {
     bookmarks : {
         regex : new RegExp('^/bookmarks/(.+)?'),
         action : function() {
-            $('#nav_bookmarks').addClass('active');
             for ( var listener in listeners.story) {
                 listeners.story[listener]();
             }
@@ -705,7 +696,6 @@ var pages = {
     submitted : {
         regex : new RegExp('^/submitted/(.+)?'),
         action : function() {
-            $('#nav_submitted').addClass('active');
             for ( var listener in listeners.story) {
                 listeners.story[listener]();
             }
@@ -714,7 +704,6 @@ var pages = {
     help : {
         regex : new RegExp('^/page/help/$'),
         action : function() {
-            $('#nav_help').addClass('active');
             $('a.tab_inline[data-toggle="tab"]').click(function() {
                 var href = $($(this)['context']).attr('href');
                 $('.nav-simple li').removeClass('active');
@@ -725,9 +714,7 @@ var pages = {
     },
     terms : {
         regex : new RegExp('^/page/terms/$'),
-        action : function() {
-            $('#nav_terms').addClass('active');
-        }
+        action : function() {}
     },
 }
 

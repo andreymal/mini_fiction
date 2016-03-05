@@ -13,6 +13,7 @@ from mini_fiction.forms.story import StoryForm
 from mini_fiction.forms.comment import CommentForm
 from mini_fiction.models import Story, Chapter, Rating, StoryEditLogItem, Comment
 from mini_fiction.utils.misc import Paginator
+from mini_fiction.validation import ValidationError
 
 bp = Blueprint('story', __name__)
 
@@ -126,8 +127,12 @@ def add():
     rating = Rating.select().order_by(Rating.id.desc()).first().id
     form = StoryForm(request.form, data={'finished': 0, 'freezed': 0, 'original': 1, 'rating': rating})
     if form.validate_on_submit():
-        story = Story.bl.create(authors=[(user, True)], **form.data)
-        return redirect(url_for('story.edit', pk=story.id))
+        try:
+            story = Story.bl.create([(user, True)], form.data)
+        except ValidationError as exc:
+            form.set_errors(exc.errors)
+        else:
+            return redirect(url_for('story.edit', pk=story.id))
     data = {
         'page_title': gettext('New story'),
         'form': form,
@@ -165,8 +170,12 @@ def edit(pk):
 
     form = StoryForm(request.form, data=story_data)
     if form.validate_on_submit():
-        story = story.bl.update(editor=user, **form.data)
-        data['saved'] = True
+        try:
+            story = story.bl.update(user, form.data)
+        except ValidationError as exc:
+            form.set_errors(exc.errors)
+        else:
+            data['saved'] = True
 
     data['form'] = form
     data['page_title'] = 'Редактирование «{}»'.format(story.title)

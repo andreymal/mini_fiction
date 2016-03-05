@@ -25,7 +25,7 @@ def publish(pk):
     user = current_user._get_current_object()
     if user.is_staff or story.editable_by(user):
         if story.publishable or (not story.draft and not story.publishable):
-            story.bl.update(editor=user, draft=not story.draft)
+            story.bl.update(user, {'draft': not story.draft})
             return str(pk)
         else:
             data = {
@@ -47,7 +47,7 @@ def approve(pk):
         story = Story.get(id=pk)
         if not story:
             abort(404)
-        story.bl.update(editor=user, approved=not story.approved)
+        story.bl.update(user, {'approved': not story.approved})
         return str(pk)
     else:
         abort(403)

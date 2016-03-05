@@ -12,6 +12,8 @@ from flask import Markup, current_app
 
 from mini_fiction.bl.utils import BaseBL
 from mini_fiction.utils.misc import call_after_request as later
+from mini_fiction.validation import Validator
+from mini_fiction.validation.stories import STORY
 
 
 class StoryBL(BaseBL):
@@ -23,22 +25,24 @@ class StoryBL(BaseBL):
         4: "comments DESC"
     }
 
-    def create(self, authors, title, categories, characters, summary, rating, original, freezed, finished, notes=None, classifications=None):
+    def create(self, authors, data):
         from mini_fiction.models import Category, Character, Classifier, Author, CoAuthorsStory
 
+        data = Validator(STORY).validated(data)
+
         story = self.model(
-            title=title,
-            summary=summary,
-            rating=rating,
-            original=original,
-            freezed=freezed,
-            finished=finished,
-            notes=notes or '',
+            title=data['title'],
+            summary=data['summary'],
+            rating=data['rating'],
+            original=data['original'],
+            freezed=data['freezed'],
+            finished=data['finished'],
+            notes=data['notes'],
         )
         story.flush()
-        story.categories.add(Category.select(lambda x: x.id in categories)[:])
-        story.characters.add(Character.select(lambda x: x.id in characters)[:])
-        story.classifications.add(Classifier.select(lambda x: x.id in classifications)[:])
+        story.categories.add(Category.select(lambda x: x.id in data['categories'])[:])
+        story.characters.add(Character.select(lambda x: x.id in data['characters'])[:])
+        story.classifications.add(Classifier.select(lambda x: x.id in data['classifications'])[:])
         for author, approved in authors:
             author = author
             CoAuthorsStory(
@@ -50,8 +54,10 @@ class StoryBL(BaseBL):
         later(current_app.tasks['sphinx_update_story'].delay, story.id, ())
         return story
 
-    def update(self, editor, **data):
+    def update(self, editor, data):
         from mini_fiction.models import StoryEditLogItem, Category, Character, Classifier, Rating
+
+        data = Validator(STORY).validated(data, update=True)
 
         story = self.model
         old_published = story.published  # for chapters in search

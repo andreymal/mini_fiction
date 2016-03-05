@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version:  0.0.1\n"
 "Report-Msgid-Bugs-To: andriyano-31@mail.ru\n"
-"POT-Creation-Date: 2016-03-04 02:35+0300\n"
+"POT-Creation-Date: 2016-03-05 21:24+0300\n"
 "Last-Translator: andreymal <andriyano-31@mail.ru>\n"
 "Language: ru\n"
 "Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && "
@@ -29,22 +29,51 @@ msgstr "Редактировать комментарий"
 msgid "Confirm delete comment"
 msgstr "Подтверждение удаления комментария"
 
-#: mini_fiction/forms/author.py:159 mini_fiction/forms/register.py:41
-#: mini_fiction/forms/register.py:79
+#: mini_fiction/bl/authors.py:34
+msgid "Please set username and password"
+msgstr "Укажите имя пользователя и пароль"
+
+#: mini_fiction/bl/authors.py:38
+msgid "User already exists"
+msgstr "Пользователь уже существует"
+
+#: mini_fiction/bl/authors.py:40 mini_fiction/views/auth.py:110
+#: mini_fiction/views/author.py:93
+msgid "Password is too bad, please change it"
+msgstr "Пароль слишком плохой, поменяйте его"
+
+#: mini_fiction/bl/authors.py:42
+msgid "Email address is already in use"
+msgstr "Электропочта уже используется"
+
+#: mini_fiction/bl/authors.py:198
+msgid ""
+"Please enter a correct username and password. Note that both fields may "
+"be case-sensitive."
+msgstr ""
+"Пожалуйста, введите правильные имя пользователя и пароль. Оба поля могут "
+"быть чувствительны к регистру."
+
+#: mini_fiction/bl/authors.py:200
+msgid "Account is disabled"
+msgstr "Аккаунт отключен"
+
+#: mini_fiction/forms/author.py:159 mini_fiction/forms/register.py:28
+#: mini_fiction/forms/register.py:65
 msgid "Passwords do not match"
 msgstr "Пароли не совпадают"
 
-#: mini_fiction/forms/login.py:10
+#: mini_fiction/forms/login.py:11
 msgid "Username"
 msgstr "Имя пользователя"
 
-#: mini_fiction/forms/login.py:11
+#: mini_fiction/forms/login.py:12
 msgid "Password"
 msgstr "Пароль"
 
-#: mini_fiction/templates/author_dashboard.html:22
-#: mini_fiction/templates/author_overview.html:32
-#: mini_fiction/templates/author_overview.html:43
+#: mini_fiction/templates/author_dashboard.html:20
+#: mini_fiction/templates/author_overview.html:30
+#: mini_fiction/templates/author_overview.html:41
 #: mini_fiction/templates/includes/series.html:14
 #, python-format
 msgid "%(num)d story"
@@ -53,7 +82,7 @@ msgstr[0] "%(num)d рассказ"
 msgstr[1] "%(num)d рассказа"
 msgstr[2] "%(num)d рассказов"
 
-#: mini_fiction/templates/author_dashboard.html:26
+#: mini_fiction/templates/author_dashboard.html:24
 #, python-format
 msgid "%(num)d time"
 msgid_plural "%(num)d times"
@@ -61,8 +90,8 @@ msgstr[0] "%(num)d раз"
 msgstr[1] "%(num)d раза"
 msgstr[2] "%(num)d раз"
 
-#: mini_fiction/templates/author_dashboard.html:31
-#: mini_fiction/templates/author_overview.html:38
+#: mini_fiction/templates/author_dashboard.html:29
+#: mini_fiction/templates/author_overview.html:36
 #: mini_fiction/templates/includes/series.html:27
 #: mini_fiction/templates/includes/stories.html:31
 #, python-format
@@ -72,7 +101,7 @@ msgstr[0] "%(num)d комментарий"
 msgstr[1] "%(num)d комментария"
 msgstr[2] "%(num)d комментариев"
 
-#: mini_fiction/templates/search.html:94
+#: mini_fiction/templates/search.html:90
 #, python-format
 msgid "Found %(num)d story"
 msgid_plural "Found %(num)d stories"
@@ -80,7 +109,7 @@ msgstr[0] "Всего нашли %(num)d рассказ"
 msgstr[1] "Всего нашли %(num)d рассказа"
 msgstr[2] "Всего нашли %(num)d рассказов"
 
-#: mini_fiction/templates/search.html:101
+#: mini_fiction/templates/search.html:97
 #, python-format
 msgid "Found %(num)d chapter"
 msgid_plural "Found %(num)d chapters"
@@ -88,8 +117,8 @@ msgstr[0] "Всего нашли %(num)d главу"
 msgstr[1] "Всего нашли %(num)d главы"
 msgstr[2] "Всего нашли %(num)d глав"
 
-#: mini_fiction/templates/story_view.html:61
-#: mini_fiction/templates/story_view.html:77
+#: mini_fiction/templates/story_view.html:58
+#: mini_fiction/templates/story_view.html:74
 #: mini_fiction/templates/includes/stories.html:24
 #: mini_fiction/templates/includes/stories.html:51
 #: mini_fiction/templates/includes/ajax/story_ajax_publish_warning.html:9
@@ -100,8 +129,8 @@ msgstr[0] "%(num)d слово"
 msgstr[1] "%(num)d слова"
 msgstr[2] "%(num)d слов"
 
-#: mini_fiction/templates/story_view.html:61
-#: mini_fiction/templates/story_view.html:77
+#: mini_fiction/templates/story_view.html:58
+#: mini_fiction/templates/story_view.html:74
 #: mini_fiction/templates/includes/series.html:15
 #: mini_fiction/templates/includes/series.html:26
 #: mini_fiction/templates/includes/stories.html:29
@@ -137,37 +166,138 @@ msgstr "Pony ORM"
 msgid "Pony ORM queries"
 msgstr "Запросы Pony ORM"
 
-#: mini_fiction/views/auth.py:20
+#: mini_fiction/validation/__init__.py:31
+msgid "Required field"
+msgstr "Обязательное поле"
+
+#: mini_fiction/validation/__init__.py:32
+msgid "Unknown field"
+msgstr "Неизвестное поле"
+
+#: mini_fiction/validation/__init__.py:33
+msgid "Field '{0}' is required"
+msgstr "Обязательное поле {0}"
+
+#: mini_fiction/validation/__init__.py:34
+msgid "Depends on these values: {constraint}"
+msgstr ""
+
+#: mini_fiction/validation/__init__.py:35
+msgid "{0} must not be present with '{field}'"
+msgstr ""
+
+#: mini_fiction/validation/__init__.py:37
+msgid "'{0}' is not a document, must be a dict"
+msgstr "{0} не документ, должен быть словарь"
+
+#: mini_fiction/validation/__init__.py:38
+#: mini_fiction/validation/__init__.py:39
+msgid "Field should not be empty"
+msgstr "Поле не может быть пустым"
+
+#: mini_fiction/validation/__init__.py:40
+msgid "Must be of {constraint} type"
+msgstr "Должно иметь тип {constraint}"
+
+#: mini_fiction/validation/__init__.py:41
+msgid "Length of list should be {constraint}, it is {0}"
+msgstr "Длина списка должна быть {constraint}, а не {0}"
+
+#: mini_fiction/validation/__init__.py:42
+msgid "Min length is {constraint}"
+msgstr "Минимальная длина {constraint}"
+
+#: mini_fiction/validation/__init__.py:43
+msgid "Max length is {constraint}"
+msgstr "Максимальная длина {constraint}"
+
+#: mini_fiction/validation/__init__.py:45
+msgid "Value does not match regex '{constraint}'"
+msgstr "Значение не соответствует регулярному выражению {constraint}"
+
+#: mini_fiction/validation/__init__.py:46
+msgid "Min value is {constraint}"
+msgstr "Минимальное значение {constraint}"
+
+#: mini_fiction/validation/__init__.py:47
+msgid "Max value is {constraint}"
+msgstr "Максимальное значение {constraint}"
+
+#: mini_fiction/validation/__init__.py:48
+#: mini_fiction/validation/__init__.py:50
+#: mini_fiction/validation/__init__.py:151
+msgid "Unallowed value {value}"
+msgstr "Недопустимое значение {value}"
+
+#: mini_fiction/validation/__init__.py:49
+#: mini_fiction/validation/__init__.py:51
+msgid "Unallowed values {0}"
+msgstr "Недопустимые значения {0}"
+
+#: mini_fiction/validation/__init__.py:53
+msgid "Field '{field}' cannot be coerced"
+msgstr "Поле {field} не может быть преобразовано"
+
+#: mini_fiction/validation/__init__.py:54
+msgid "Field '{field}' cannot be renamed"
+msgstr "Поле {field} не может быть переименовано"
+
+#: mini_fiction/validation/__init__.py:55
+msgid "Field is read-only"
+msgstr "Поле доступно только для чтения"
+
+#: mini_fiction/validation/__init__.py:56
+msgid "Default value for '{field}' cannot be set: {0}"
+msgstr "Не получилось установить значение по умолчанию для поля {field}: {0}"
+
+#: mini_fiction/validation/__init__.py:58
+msgid "Mapping doesn't validate subschema: {0}"
+msgstr ""
+
+#: mini_fiction/validation/__init__.py:59
+#: mini_fiction/validation/__init__.py:62
+msgid "One or more sequence-items don't validate: {0}"
+msgstr ""
+
+#: mini_fiction/validation/__init__.py:60
+msgid "One or more properties of a mapping  don't validate: {0}"
+msgstr ""
+
+#: mini_fiction/validation/__init__.py:61
+msgid "One or more values in a mapping don't validate: {0}"
+msgstr ""
+
+#: mini_fiction/validation/__init__.py:64
+msgid "One or more definitions validate"
+msgstr ""
+
+#: mini_fiction/validation/__init__.py:65
+msgid "None or more than one rule validate"
+msgstr ""
+
+#: mini_fiction/validation/__init__.py:66
+msgid "No definitions validate"
+msgstr ""
+
+#: mini_fiction/validation/__init__.py:67
+msgid "One or more definitions don't validate"
+msgstr ""
+
+#: mini_fiction/views/auth.py:21
 msgid "Authorization"
 msgstr "Авторизация"
 
-#: mini_fiction/views/auth.py:31
-msgid "Account is disabled"
-msgstr "Аккаунт отключен"
-
-#: mini_fiction/views/auth.py:31
+#: mini_fiction/views/auth.py:28
 msgid "Cannot login"
 msgstr "Не получилось войти"
 
-#: mini_fiction/views/auth.py:33
-msgid ""
-"Please enter a correct username and password. Note that both fields may "
-"be case-sensitive."
-msgstr ""
-"Пожалуйста, введите правильные имя пользователя и пароль. Оба поля могут "
-"быть чувствительны к регистру."
-
-#: mini_fiction/views/auth.py:41
+#: mini_fiction/views/auth.py:44
 msgid "Registration is closed"
 msgstr "Регистрация закрыта"
 
-#: mini_fiction/views/auth.py:43
+#: mini_fiction/views/auth.py:46
 msgid "Registration in library"
 msgstr "Регистрация в библиотеке"
-
-#: mini_fiction/views/auth.py:110 mini_fiction/views/author.py:93
-msgid "Password is too bad, please change it"
-msgstr "Пароль слишком плохой, поменяйте его"
 
 #: mini_fiction/views/author.py:32
 msgid "My cabinet"
@@ -203,6 +333,6 @@ msgstr "Поиск рассказов"
 msgid "Search results"
 msgstr "Результаты поиска"
 
-#: mini_fiction/views/story.py:132
+#: mini_fiction/views/story.py:137
 msgid "New story"
 msgstr "Новый рассказ"

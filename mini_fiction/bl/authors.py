@@ -11,6 +11,7 @@ from base64 import b64decode, b64encode
 
 import scrypt
 from flask import current_app, url_for, render_template
+from flask_babel import lazy_gettext
 from werkzeug.security import safe_str_cmp
 
 try:
@@ -20,6 +21,8 @@ except ImportError:
 
 from mini_fiction.utils.misc import sendmail
 from mini_fiction.bl.utils import BaseBL
+from mini_fiction.validation import ValidationError, Validator
+from mini_fiction.validation.auth import REGISTRATION, LOGIN
 
 
 __all__ = ['AuthorBL']
@@ -28,16 +31,17 @@ __all__ = ['AuthorBL']
 class AuthorBL(BaseBL):
     def create(self, data):
         if 'username' not in data or 'password' not in data:
-            raise ValueError('Please set username and password')
+            raise ValidationError({'username': lazy_gettext('Please set username and password')})
 
+        errors = {}
         if self.model.select(lambda x: x.username == data['username']):
-            raise ValueError('User already exists')
-
+            errors['username'] = [lazy_gettext('User already exists')]
         if current_app.config['CHECK_PASSWORDS_SECURITY'] and not self.is_password_good(data['password'], extra=(data['username'],)):
-            raise ValueError('Password is too bad, please change it')
-
+            errors['password'] = [lazy_gettext('Password is too bad, please change it')]
         if data.get('email') and self.model.select(lambda x: x.email == data['email']).exists():
-            raise ValueError('Email address is already in use')
+            errors['email'] = [lazy_gettext('Email address is already in use')]
+        if errors:
+            raise ValidationError(errors)
 
         user = self._model()(
             username=data['username'],
@@ -61,14 +65,12 @@ class AuthorBL(BaseBL):
             if field in data:
                 setattr(user, field, bool(data[field]))
 
-    def register(self, username, password, email):
+    def register(self, data):
         from mini_fiction.models import RegistrationProfile
-        user = self.create({
-            'username': username,
-            'password': password,
-            'email': email,
-            'is_active': False,
-        })
+
+        data = Validator(REGISTRATION).validated(data)
+        data['is_active'] = False
+        user = self.create(data)
 
         rp = RegistrationProfile(
             user=user,
@@ -78,7 +80,7 @@ class AuthorBL(BaseBL):
         rp.flush()
 
         sendmail(
-            email,
+            data['email'],
             render_template('registration/activation_email_subject.txt'),
             render_template('registration/activation_email.txt', activation_key=rp.activation_key),
         )
@@ -187,10 +189,16 @@ class AuthorBL(BaseBL):
         else:
             raise NotImplementedError('Unknown algorithm')
 
-    def authenticate_by_username(self, username, password):
-        user = self._model().select(lambda x: x.username == username).first() if username else None
-        if user and user.bl.authenticate(password):
-            return user
+    def authenticate_by_username(self, data):
+        data = Validator(LOGIN).validated(data)
+        user = None
+        if data['username']:
+            user = self._model().select(lambda x: x.username == data['username']).first()
+        if not user or not user.bl.authenticate(data['password']):
+            raise ValidationError({'username': [lazy_gettext('Please enter a correct username and password. Note that both fields may be case-sensitive.')]})
+        if not user.is_active:
+            raise ValidationError({'username': [lazy_gettext('Account is disabled')]})
+        return user
 
     def set_password(self, password):
         user = self.model

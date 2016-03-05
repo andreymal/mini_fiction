@@ -7,6 +7,7 @@ from flask_login import login_user, logout_user
 from pony.orm import db_session
 
 from mini_fiction.models import Author
+from mini_fiction.validation import ValidationError
 from mini_fiction.forms.login import LoginForm
 from mini_fiction.forms.register import AuthorRegistrationForm, AuthorRegistrationCaptchaForm, AuthorPasswordResetForm, AuthorNewPasswordForm
 
@@ -21,16 +22,18 @@ def login():
 
     form = LoginForm()
     if form.validate_on_submit():
-        user = Author.bl.authenticate_by_username(form.username.data, form.password.data)
-        if user and login_user(user, remember=True):
+        try:
+            user = Author.bl.authenticate_by_username(form.data)
+            if not login_user(user, remember=True):
+                raise ValidationError({'username': [gettext('Cannot login')]})
+        except ValidationError as exc:
+            form.set_errors(exc.errors)
+        else:
             next_url = request.args.get('next')
             if not next_url or len(next_url) < 2 or next_url[0] != '/' or next_url.startswith('//'):
                 next_url = url_for('index.index')
             return redirect(next_url)
-        elif user:
-            flash(gettext('Account is disabled') if not user.is_active else gettext('Cannot login'))  # TODO: flask-login gettext
-        else:
-            flash(gettext('Please enter a correct username and password. Note that both fields may be case-sensitive.'))
+
     return render_template('registration/login.html', form=form, page_title=page_title)
 
 
@@ -45,15 +48,12 @@ def registration():
     form = AuthorRegistrationForm() if current_app.config['NOCAPTCHA'] else AuthorRegistrationCaptchaForm()
     if form.validate_on_submit():
         try:
-            Author.bl.register(
-                username=form.username.data,
-                password=form.password1.data,
-                email=form.email.data,
-            )
-        except ValueError as exc:  # TODO: custom validation exception
-            flash(gettext(str(exc)))
+            Author.bl.register(form.data)
+        except ValidationError as exc:
+            form.set_errors(exc.errors)
         else:
             return redirect(url_for('auth.registration_complete'))
+
     return render_template('registration/registration_form.html', form=form, page_title=page_title)
 
 

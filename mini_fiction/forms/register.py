@@ -2,44 +2,30 @@
 # -*- coding: utf-8 -*-
 
 from flask_babel import lazy_gettext
-from flask_wtf import Form, RecaptchaField
+from flask_wtf import RecaptchaField
 from wtforms import TextField, PasswordField, validators
+
+from mini_fiction.forms.form import Form
 
 
 attrs_dict = {'class': 'required input-xlarge'}
-username_field = TextField(
+
+
+class AuthorRegistrationForm(Form):
+    username = TextField(
         'Логин',
-        [
-            validators.Required(),
-            validators.Length(min=1, max=32),
-            validators.Regexp(
-                r'^[0-9a-zA-Z\u0430-\u044f\u0410-\u042f\u0451\u0401_@+-.. ]+$',
-                message='Пожалуйста, исправьте ошибку в логине - он может содержать только русские/латинские буквы, цифры, пробел, точку и символы _ @ + -',
-            )
-        ],
         render_kw=dict(attrs_dict, maxlength=32),
         description='Только русские/латинские буквы, цифры, пробел, точка и символы _ @ + -'
     )
 
-
-class AuthorRegistrationForm(Form):
-    username = username_field
     email = TextField(
         'Электропочта',
-        [
-            validators.Required(),
-            validators.Length(min=6, max=75),
-            validators.Email('Пожалуйста, исправьте ошибку в адресе e-mail: похоже, он неправильный')
-        ],
         render_kw=dict(attrs_dict, maxlength=75),
         description='Адрес электронной почты для активации аккаунта'
     )
-    password1 = PasswordField(
+    password = PasswordField(
         'Пароль',
-        [
-            validators.Required(),
-            validators.EqualTo('password2', message=lazy_gettext('Passwords do not match'))
-        ],
+        [validators.EqualTo('password2', message=lazy_gettext('Passwords do not match'))],
         render_kw=attrs_dict,
         description='Выбирайте сложный пароль'
     )

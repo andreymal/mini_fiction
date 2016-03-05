@@ -20,7 +20,7 @@
                             {% if field.errors %}
                                 <span class="help-inline">
                                 {% for error in field.errors %}
-                                    {{ error }}
+                                    {{- error }}{% if not loop.last %}; {% endif -%}
                                 {% endfor %}
                                 </span>
                             {% else %}

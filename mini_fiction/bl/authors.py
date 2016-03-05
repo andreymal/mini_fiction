@@ -30,11 +30,14 @@ class AuthorBL(BaseBL):
         if 'username' not in data or 'password' not in data:
             raise ValueError('Please set username and password')
 
-        if self._model().select(lambda x: x.username == data['username']):
+        if self.model.select(lambda x: x.username == data['username']):
             raise ValueError('User already exists')
 
         if current_app.config['CHECK_PASSWORDS_SECURITY'] and not self.is_password_good(data['password'], extra=(data['username'],)):
             raise ValueError('Password is too bad, please change it')
+
+        if data.get('email') and self.model.select(lambda x: x.email == data['email']).exists():
+            raise ValueError('Email address is already in use')
 
         user = self._model()(
             username=data['username'],

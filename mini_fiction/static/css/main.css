@@ -1312,6 +1312,12 @@ a.btn {
 	pointer-events: none;
 	transition: opacity 0.15s ease;
 	transition-delay: 0.15s;
+	z-index: 15;
+}
+
+.loader-hidden {
+	opacity: 0;
+	transition-delay: 0s;
 }
 
 /* notifications */
@@ -1323,6 +1329,7 @@ a.btn {
 	width: 16em;
 	max-width: 94%;
 	overflow: visible;
+	z-index: 15;
 }
 
 .notification {
@@ -1348,11 +1355,6 @@ a.btn {
 .notification.notice-error {
 	background-color: rgba(140, 0, 0, 0.9);
 	box-shadow: 0 0 0.2em rgba(70, 0, 0, 0.8);
-}
-
-.loader-hidden {
-	opacity: 0;
-	transition-delay: 0s;
 }
 
 /* === Adaptive overrides === */

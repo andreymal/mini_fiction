@@ -21,6 +21,7 @@ class AnonymousUser(AnonymousUserMixin):
     is_active = False
     is_staff = False
     is_superuser = False
+    nsfw = False
 
 
 class Author(db.Entity, UserMixin):

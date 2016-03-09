@@ -146,6 +146,7 @@ def configure_ajax(app):
             return response
         if response.data and response.data.startswith(b'{') and response.content_type == 'text/html; charset=utf-8':
             response.content_type = 'application/json'
+            response.headers['X-Request-URL'] = request.url  # for github-fetch polyfill
         elif response.status_code == 302:
             # Люблю разрабов js во всех смыслах
             response.data = flask_json.dumps({'page_content': {'redirect': response.headers.get('Location')}})

@@ -38,7 +38,7 @@ class AuthorBL(BaseBL):
             errors['username'] = [lazy_gettext('User already exists')]
         if current_app.config['CHECK_PASSWORDS_SECURITY'] and not self.is_password_good(data['password'], extra=(data['username'],)):
             errors['password'] = [lazy_gettext('Password is too bad, please change it')]
-        if data.get('email') and self.model.select(lambda x: x.email == data['email']).exists():
+        if data.get('email') and self.is_email_busy(data['email']):
             errors['email'] = [lazy_gettext('Email address is already in use')]
         if errors:
             raise ValidationError(errors)
@@ -68,7 +68,12 @@ class AuthorBL(BaseBL):
     def register(self, data):
         from mini_fiction.models import RegistrationProfile
 
-        data = Validator(REGISTRATION).validated(data)
+        try:
+            data = Validator(REGISTRATION).validated(data)
+        except ValidationError as exc:
+            if 'email' not in exc.errors and self.is_email_busy(data['email']):
+                exc.errors['email'] = [lazy_gettext('Email address is already in use')]
+            raise
         data['is_active'] = False
         user = self.create(data)
 
@@ -86,6 +91,9 @@ class AuthorBL(BaseBL):
         )
 
         return user
+
+    def is_email_busy(self, email):
+        return self.model.select(lambda x: x.email.lower() == email.lower()).exists()
 
     def reset_password_by_email(self):
         from mini_fiction.models import PasswordResetProfile

@@ -1,0 +1,21 @@
+{
+    "page_content": {
+        "v": {{ (config.get('STATIC_V') or '')|tojson_raw|safe }},
+        "csrftoken": {{ csrf_token()|tojson_raw|safe }},
+        "title": {% filter safe %}{% filter tojson_raw -%}
+            {%- block fulltitle -%}
+                {% block title %}{{ page_title }}{% endblock %} &mdash; {{ SITE_NAME }}
+            {%- endblock fulltitle -%}
+            {%- endfilter %}{% endfilter %},
+        "nav": {% filter safe %}{% filter tojson_raw -%}
+            {% include 'includes/nav.html' %}
+            {%- endfilter %}{% endfilter %},
+        "modal": false,
+        "content": {% filter safe %}{% filter tojson_raw -%}
+            {%- block content %}{% endblock %}
+            {%- endfilter %}{% endfilter %},
+        "modal_content": {% filter safe %}{% filter tojson_raw -%}
+            {%- block modal %}{% endblock %}
+            {%- endfilter %}{% endfilter %}
+    }
+}

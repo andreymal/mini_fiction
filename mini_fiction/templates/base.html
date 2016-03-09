@@ -1,4 +1,3 @@
-{%- if not g.is_ajax -%}
 <!DOCTYPE html>
 <html>
 <head>
@@ -71,16 +70,3 @@
     <script src="{{ url_for('static', filename='js/comment.js') }}"></script>
 </body>
 </html>
-{% else -%}
-{
-    "page_content": {
-        "v": {{ (config.get('STATIC_V') or '')|tojson_raw|safe }},
-        "csrftoken": {{ csrf_token()|tojson_raw|safe }},
-        "title": {{ (self.fulltitle())|tojson_raw|safe }},
-        "nav": {% filter safe %}{% filter tojson_raw %}{% include 'includes/nav.html' %}{% endfilter %}{% endfilter %},
-        "modal": false,
-        "content": {{ self.content()|tojson_raw|safe }},
-        "modal_content": {{ self.modal()|tojson_raw|safe }}
-    }
-}
-{% endif -%}

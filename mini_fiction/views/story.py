@@ -4,14 +4,14 @@
 import os
 from datetime import datetime
 
-from flask import Blueprint, Response, current_app, request, render_template, abort, redirect, url_for, send_file
+from flask import Blueprint, Response, current_app, request, render_template, abort, redirect, url_for, send_file, jsonify, g
 from flask_babel import gettext
 from flask_login import current_user, login_required
 from pony.orm import db_session
 
 from mini_fiction.forms.story import StoryForm
 from mini_fiction.forms.comment import CommentForm
-from mini_fiction.models import Story, Chapter, Rating, StoryEditLogItem, Comment
+from mini_fiction.models import Story, Chapter, Rating, StoryEditLogItem, Comment, Favorites, Bookmark
 from mini_fiction.utils.misc import Paginator
 from mini_fiction.validation import ValidationError
 
@@ -77,28 +77,108 @@ def view(pk, comments_page):
 
 
 @bp.route('/<int:pk>/approve/', methods=('POST',))
-def approve():
-    abort(403)
+@db_session
+@login_required
+def approve(pk):
+    user = current_user._get_current_object()
+    if not user.is_staff:
+        abort(403)  # TODO: refactor exceptions and move to bl
+    story = Story.get(id=pk)
+    if not story:
+        abort(404)
+    story.bl.approve(user, not story.approved)
+    if g.is_ajax:
+        return jsonify({'success': True, 'story_id': story.id, 'approved': story.approved})
+    else:
+        return redirect(url_for('story.view', pk=story.id))
 
 
 @bp.route('/<int:pk>/publish/', methods=('POST',))
-def publish():
-    abort(403)
+@db_session
+@login_required
+def publish(pk):
+    story = Story.get(id=pk)
+    if not story:
+        abort(404)
+
+    user = current_user._get_current_object()
+    if not user.is_staff and not story.editable_by(user):
+        abort(403)
+
+    if story.bl.publish(user, story.draft):  # draft == not published
+        if g.is_ajax:
+            return jsonify({'success': True, 'story_id': story.id, 'published': not story.draft})
+        else:
+            return redirect(url_for('story.view', pk=story.id))
+    else:
+        data = {
+            'page_title': 'Неудачная попытка публикации',
+            'story': story,
+            'need_words': current_app.config['PUBLISH_SIZE_LIMIT']
+        }
+        html = render_template('includes/ajax/story_ajax_publish_warning.html', **data)
+        if g.is_ajax:
+            return jsonify({'success': False, 'page_content': {'modal': True, 'content': html}})
+        else:
+            return redirect(url_for('story.view', pk=story.id))  # TODO: add warning here too
 
 
 @bp.route('/<int:pk>/favorite/', methods=('POST',))
-def favorite():
-    abort(403)
+@db_session
+@login_required
+def favorite(pk):
+    story = get_story(pk)
+    user = current_user._get_current_object()
+    f = story.favorites.select(lambda x: x.author == user).first()
+    if f:
+        f.delete()
+        f = None
+    else:
+        f = Favorites(author=user, story=story)
+    if g.is_ajax:
+        return jsonify({'success': True, 'story_id': story.id, 'favorited': f is not None})
+    else:
+        return redirect(url_for('story.view', pk=story.id))
 
 
 @bp.route('/<int:pk>/bookmark/', methods=('POST',))
-def bookmark():
-    abort(403)
+@db_session
+@login_required
+def bookmark(pk):
+    story = get_story(pk)
+    user = current_user._get_current_object()
+    b = story.bookmarks.select(lambda x: x.author == user).first()
+    if b:
+        b.delete()
+        b = None
+    else:
+        b = Bookmark(author=user, story=story)
+    if g.is_ajax:
+        return jsonify({'success': True, 'story_id': story.id, 'bookmarked': b is not None})
+    else:
+        return redirect(url_for('story.view', pk=story.id))
 
 
 @bp.route('/<int:pk>/vote/<int:value>/', methods=('POST',))
+@db_session
+@login_required
 def vote(pk, value):
-    abort(403)
+    story = get_story(pk)
+    user = current_user._get_current_object()
+
+    try:
+        story.bl.vote(user, value, ip=request.remote_addr)
+    except ValueError as exc:  # TODO: refactor exceptions
+        if g.is_ajax:
+            return jsonify({'error': str(exc), 'success': False, 'story_id': story.id}), 403
+        else:
+            abort(403)
+
+    if g.is_ajax:
+        html = render_template('includes/story_header_info.html', story=story)
+        return jsonify({'success': True, 'story_id': story.id, 'value': value, 'html': html})
+    else:
+        return redirect(url_for('story.view', pk=story.id))
 
 
 @bp.route('/<int:pk>/editlog/')
@@ -197,12 +277,17 @@ def delete(pk):
         story.bl.delete()
         return redirect(url_for('index.index'))
 
+    page_title = 'Подтверждение удаления рассказа'
     data = {
-        'page_title': 'Подтверждение удаления рассказа',
+        'page_title': page_title,
         'story': story,
     }
 
-    return render_template('story_confirm_delete.html', **data)
+    if g.is_ajax:
+        html = render_template('includes/ajax/story_ajax_confirm_delete.html', page_title=page_title, story=story)
+        return jsonify({'page_content': {'modal': True, 'title': page_title, 'content': html}})
+    else:
+        return render_template('story_confirm_delete.html', **data)
 
 
 @bp.route('/<int:story_id>/download/<filename>', methods=('GET',))

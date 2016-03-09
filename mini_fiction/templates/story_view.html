@@ -3,7 +3,7 @@
 {% block content %}
 
 <div class="row">
-    <div class="span12 story-page">
+    <div class="span12 story-page" id="story_{{ story.id }}">
         {{- breadcrumbs() }}
 
         <h1 id="story_title">{{ story.title }}
@@ -13,6 +13,7 @@
             {% if story.finished %} <sup class="complete">завершен</sup>{% endif %}{% if story.freezed %} <sup class="suspended">заморожен</sup>{% endif %}
               {% include 'includes/story_control_buttons.html' %}
           </h1>
+        {% if current_user.is_authenticated %}
         <div class="vote-area">
             Ваша оценка:
             <span class="starblock">
@@ -26,8 +27,8 @@
                 {%- endfor -%}
             {% endif %}
             </span>
-            <span id="vote-msg"></span>
         </div>
+        {% endif %}
             <p>
                 {%- include 'includes/story_reader_buttons.html' -%}
             </p>
@@ -93,7 +94,8 @@
         {% endif %}
 
         {% if current_user.is_active %}
-        <a href="{{ url_for('comment.add', story_id=story.id) }}" class="btn btn-primary comment_add">Добавить комментарий</a>
+            <h2>Добавить новый комментарий</h2>
+            {% with form = comment_form %}{%- include 'includes/comment_form.html' %}{% endwith %}
         {% elif current_user.is_authenticated %}
         <h3 id="banned">К сожалению, Вы не можете добавлять комментарии</h3>
         {% else %}
@@ -103,3 +105,9 @@
     </div>
 </div>
 {% endblock %}
+
+{%- block modal -%}
+    {%- if story.nsfw and not current_user.nsfw -%}
+        {%- include 'includes/nsfw_modal.html' -%}
+    {%- endif -%}
+{%- endblock -%}

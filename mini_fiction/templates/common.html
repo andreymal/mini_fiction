@@ -1,32 +1,86 @@
+{%- if not g.is_ajax -%}
 <!DOCTYPE html>
 <html>
-    <head>
-        <meta http-equiv="content-type" content="text/html; charset=UTF-8">
-        <title>{% block title %}{{ page_title }}{% endblock %} &mdash; {{ SITE_NAME }}</title>
-         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-         <link rel="shortcut icon" type="image/x-icon" href="{{ url_for('static', filename='i/favicon.ico') }}" />
-        <meta name="csrf-token" content="{{ csrf_token() }}" />
-        <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/bootstrap.css') }}" />
-        <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/main.css') }}" />
-        <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/markitup.main.css') }}" />
-        <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/markitup.set.css') }}" />
-        <script type="text/javascript" src="{{ url_for('static', filename='js/jquery-1.11.3.min.js') }}"></script>
-        <script type="text/javascript" src="{{ url_for('static', filename='js/jquery-ui-1.9.2.custom.min.js') }}"></script>
-        <script type="text/javascript" src="{{ url_for('static', filename='js/jquery.cookie.js') }}"></script>
-        <script type="text/javascript" src="{{ url_for('static', filename='js/jquery.markitup.js') }}"></script>
-        <script type="text/javascript" src="{{ url_for('static', filename='js/jquery.form.js') }}"></script>
-        <script type="text/javascript" src="{{ url_for('static', filename='js/jquery.slides.min.js') }}"></script>
-        <script type="text/javascript" src="{{ url_for('static', filename='js/bootstrap.min.js') }}"></script>
-        <script type="text/javascript" src="{{ url_for('static', filename='js/markitup.set.js') }}"></script>
-        <script type="text/javascript" src="{{ url_for('static', filename='js/main.js') }}"></script>
+<head>
+    <meta charset="utf-8">
+    <title>
+        {%- block fulltitle -%}
+            {% block title %}{{ page_title }}{% endblock %} &mdash; {{ SITE_NAME }}
+        {%- endblock fulltitle -%}
+    </title>
 
-         <!--[if lt IE 9]> <script src="https://cdnjs.cloudflare.com/ajax/libs/html5shiv/3.7.3/html5shiv-printshiv.min.js"></script> <![endif]-->
-    </head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="shortcut icon" type="image/x-icon" href="{{ url_for('static', filename='i/favicon.ico') }}" />
+    <meta name="csrf-token" content="{{ csrf_token() }}" />
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/bootstrap.css') }}" />
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}" />
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/markitup.main.css') }}" />
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/markitup.set.css') }}" />
+
+    <!-- compatibility scripts and polyfills -->
+    <!--[if lt IE 9]> <script src="https://cdnjs.cloudflare.com/ajax/libs/html5shiv/3.7.3/html5shiv-printshiv.min.js"></script> <![endif]-->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/es6-promise/3.2.1/es6-promise.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/fetch/0.11.0/fetch.min.js"></script>
+
+    <script src="{{ url_for('static', filename='js/jquery-1.11.3.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/jquery-ui-1.9.2.custom.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/jquery.markitup.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/jquery.slides.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/bootstrap.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/markitup.set.js') }}"></script>
+</head>
+
 <body>
-{% include "includes/header_top.html" %}
-<!-- Content start -->
-<div id="content">
-{% block content %}{% endblock %}
-</div>
-<!-- Content end -->
-{% include "includes/footer.html" %}
+    <!-- Container start -->
+    <div class="container">
+    {{ html_block('header') }}
+
+    <!-- Logo image and carousel start -->
+    <div class="logopic" style="background-image: url('{{ random_logo() }}')">
+        <div id="slides" class="carousel">
+            {{ random_stories() }}
+        </div>
+    </div>
+    <!-- Logo image and carousel end -->
+    <!-- Menu start -->
+    <ul class="nav nav-pills nav-main" id="nav-main">
+    {% include 'includes/nav.html' %}
+    </ul>
+    <!-- Menu end -->
+    {{ html_block('notice') }}
+    <!-- Content start -->
+    <div id="content">
+
+    {%- block content %}{% endblock -%}
+
+    </div>
+    <!-- Content end -->
+    {{ html_block('footer') }}
+    </div>
+    <!-- Container end -->
+
+    <div class="modal-backdrop hide fade" id="modal-bg"></div>
+    <div class="modal hide fade" id="modal">{% block modal %}{% endblock %}</div>
+    <img id="loading-icon" src="{{ url_for('static', filename='i/loading.gif') }}" alt="..." class="loader loader-hidden" />
+
+    <div id="notifications"></div>
+
+    <script src="{{ url_for('static', filename='js/core.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/common.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/story.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/comment.js') }}"></script>
+</body>
+</html>
+{% else -%}
+{
+    "page_content": {
+        "v": {{ (config.get('STATIC_V') or '')|tojson_raw|safe }},
+        "csrftoken": {{ csrf_token()|tojson_raw|safe }},
+        "title": {{ (self.fulltitle())|tojson_raw|safe }},
+        "nav": {% filter safe %}{% filter tojson_raw %}{% include 'includes/nav.html' %}{% endfilter %}{% endfilter %},
+        "modal": false,
+        "content": {{ self.content()|tojson_raw|safe }},
+        "modal_content": {{ self.modal()|tojson_raw|safe }}
+    }
+}
+{% endif -%}

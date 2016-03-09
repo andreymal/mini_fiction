@@ -6,7 +6,7 @@
         {{- breadcrumbs([[url_for('author.info'), 'Кабинет автора']]) }}
     </div>
 
-    <div class="span12">
+    <div class="span12"{% if not story_add %} id="story_{{ story.id }}"{% endif %}>
         <h1>
             {{ page_title }}
             {% include 'includes/story_control_buttons.html' %}
@@ -168,7 +168,7 @@
                         <div class="controls events">
                             <ul id="sortable_chapters" class="chapters-control" data-story="{{ story.id }}">
                                 {% for chapter in chapters %}
-                                      <li id="chapter_{{ chapter.id }}" class="btn btn-large">
+                                      <li id="chapter_{{ chapter.id }}" data-chapter="{{ chapter.id }}" class="btn btn-large">
                                         {{ chapter.title }}
                                         <div class="btn-group">
                                             <a class="btn btn-warning btn-mini" href="{{ url_for('chapter.edit', pk=chapter.id) }}">править</a>

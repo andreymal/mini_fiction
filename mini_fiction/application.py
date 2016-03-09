@@ -4,13 +4,15 @@
 # pylint: disable=unused-variable
 
 import os
-import importlib
 import logging
+import importlib
 from logging.handlers import SMTPHandler
 
 from celery import Celery
 from werkzeug.contrib import cache
+from werkzeug.exceptions import HTTPException
 from flask import Flask, current_app, request, g
+from flask import json as flask_json
 import flask_babel
 from flask_login import LoginManager
 from flask_wtf.csrf import CsrfProtect
@@ -36,9 +38,9 @@ def create_app():
     configure_users(app)
     configure_error_handlers(app)
     configure_views(app)
-    configure_ajax_views(app)
+    configure_ajax(app)
     configure_errorpages(app)
-    configure_templatetags(app)
+    configure_templates(app)
     if not app.config['SPHINX_DISABLED']:
         configure_search(app)
     configure_celery(app)
@@ -132,11 +134,23 @@ def configure_views(app):
             values['v'] = app.config['STATIC_V']
 
 
-def configure_ajax_views(app):
-    from mini_fiction.ajax.views import story, chapter, comment
-    app.register_blueprint(story.bp, url_prefix='/ajax/story')
-    app.register_blueprint(chapter.bp, url_prefix='/ajax')
-    app.register_blueprint(comment.bp, url_prefix='/ajax')
+def configure_ajax(app):
+    @app.before_request
+    def is_request_ajax():
+        g.is_ajax = request.headers.get('X-AJAX') == '1' or request.args.get('isajax') == '1'
+
+    @app.after_request
+    def ajax_template_response(response):
+        if not g.is_ajax:
+            return response
+        if response.data and response.data.startswith(b'{') and response.content_type == 'text/html; charset=utf-8':
+            response.content_type = 'application/json'
+        elif response.status_code == 302:
+            # Люблю разрабов js во всех смыслах
+            response.data = flask_json.dumps({'page_content': {'redirect': response.headers.get('Location')}})
+            response.content_type = 'application/json'
+            response.status_code = 200
+        return response
 
 
 def configure_errorpages(app):
@@ -152,16 +166,24 @@ def configure_errorpages(app):
     def _page500(e):
         return render_template('500.html'), 404
 
+    def _pageall(e):
+        return render_template('error.html', error=e), e.code or 500
+
     app.errorhandler(403)(db_session(_page403))
     app.errorhandler(404)(db_session(_page404))
     app.errorhandler(500)(db_session(_page500))
 
+    # Здесь должно было быть HTTPException, но https://github.com/mitsuhiko/flask/issues/941
+    app.errorhandler(405)(db_session(_pageall))
 
-def configure_templatetags(app):
+
+def configure_templates(app):
     from mini_fiction.templatetags import random_stories, random_logo, submitted_stories_count
     from mini_fiction.templatetags import story_comments_delta, html_block, hook, misc
     from mini_fiction.templatetags import registry
     app.templatetags = dict(registry.tags)
+
+    app.jinja_env.filters['tojson_raw'] = flask_json.dumps  # not escapes &, < and >
 
 
 def configure_search(app):
@@ -189,7 +211,9 @@ def configure_celery(app):
 
 def configure_misc(app):
     @app.after_request
-    def call_callbacks(response):
+    def after_request(response):
+        response.cache_control.max_age = 0
+
         for f, args, kwargs in getattr(g, 'after_request_callbacks', ()):
             f(*args, **kwargs)
         return response

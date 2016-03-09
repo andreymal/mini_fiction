@@ -1,7 +1,7 @@
 {% extends "common.html" %}
 {% from 'macro.html' import breadcrumbs with context %}
 {% block content %}
-<div class="row">
+<div class="row" id="story_{{ story.id }}">
     <div class="span12">
     {{- breadcrumbs(
         [[url_for('story.view', pk=story.id), story.title]],
@@ -30,3 +30,9 @@
     </div>
 </div>
 {% endblock %}
+
+{%- block modal -%}
+    {%- if story.nsfw and not current_user.nsfw -%}
+        {%- include 'includes/nsfw_modal.html' -%}
+    {%- endif -%}
+{%- endblock -%}

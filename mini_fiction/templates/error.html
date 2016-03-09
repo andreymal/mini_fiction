@@ -1,0 +1,18 @@
+{% extends "common.html" %}
+{% from 'macro.html' import breadcrumbs with context %}
+{% block title %}{{ error.code }} — {{ error.name }}{% endblock %}
+{% block content %}
+
+<div class="row">
+    <div class="span12">
+        {{- breadcrumbs(current='{} — {}'.format(error.code, error.name)) }}
+    </div>
+    <div class="span12">
+        <h1>{{ error.code }} — {{ error.name }}</h1>
+        {{ error.get_description()|safe }}
+    </div>
+    <div class="span12">
+        {{- breadcrumbs(current='{} — {}'.format(error.code, error.name)) }}
+    </div>
+</div>
+{% endblock %}

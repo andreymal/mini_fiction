@@ -7,7 +7,7 @@ from wtforms import TextAreaField, ValidationError, validators
 
 
 class CommentForm(Form):
-    attrs_dict = {'class': 'span4'}
+    attrs_dict = {'class': 'span4 with-markitup'}
 
     text = TextAreaField(
         'Название',

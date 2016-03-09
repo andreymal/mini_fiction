@@ -203,17 +203,6 @@ class SearchForm(Form):
         render_kw=radio_attrs,
     )
 
-    button_reset = BooleanField(
-        '',
-        [],
-        widget=Input('reset'),
-        render_kw={
-            'class': 'btn',
-            'id': 'reset_search',
-            'value': 'Очистить',
-        }
-    )
-
     # Тип поиска
     type = SelectField(
         '',

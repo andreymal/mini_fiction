@@ -16,14 +16,14 @@
         <p class="more">
             <a href="{{ url_for('stream.stories') }}">Лента добавлений</a>
             | <a href="{{ url_for('object_lists.top') }}">Топ</a>
-            | <a href="{{ url_for('feeds.stories') }}">RSS</a>
+            | <a href="{{ url_for('feeds.stories') }}" data-noajax="1">RSS</a>
             {% if current_user.is_staff %}| <a href="{{ url_for('stream.edit_log') }}">Лог модерации</a>{% endif %}
         </p>
     </div>
     <div class="span4 sidelist top-list">
         <h2>Обновившиеся рассказы</h2>
         {% include "includes/chapters_short.html" %}
-        <p class="more"><a href="{{ url_for('stream.chapters') }}">Лента обновлений</a> | <a href="{{ url_for('feeds.chapters') }}">RSS</a></p>
+        <p class="more"><a href="{{ url_for('stream.chapters') }}">Лента обновлений</a> | <a href="{{ url_for('feeds.chapters') }}" data-noajax="1">RSS</a></p>
         <h2>Последние комментарии</h2>
         {% with short=True %}{% include "includes/comments.html" %}{% endwith %}
         <p class="more"><a href="{{ url_for('stream.comments') }}">Лента комментариев</a></p>

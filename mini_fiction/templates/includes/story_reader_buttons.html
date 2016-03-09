@@ -4,9 +4,9 @@
     {%- set bookmarked = (story.id in bookmarked_ids) if bookmarked_ids is defined else story.bookmarked(current_user.id) %}
     <a title="В избранное" href="{{ url_for('story.favorite', pk=story.id) }}" class="story_favorite scon favorite{% if favorited %} favorited{% endif %}"></a><a title="Отложить на потом" href="{{ url_for('story.bookmark', pk=story.id) }}" class="story_bookmark scon bookmark{% if bookmarked %} bookmarked{% endif %}"></a>
 {%- endif -%}
-<a title="Подписаться на новые главы по RSS" href="{{ url_for('feeds.story', story_id=story.id) }}" class="scon feed"></a>
+<a title="Подписаться на новые главы по RSS" href="{{ url_for('feeds.story', story_id=story.id) }}" class="scon feed" data-noajax="1"></a>
 {%- for d in story.list_downloads() -%}
-    <a title="Скачать в {{ d.format.name }}" href="{{ d.url }}" class="get {{ d.format.name|lower }}"></a>
+    <a title="Скачать в {{ d.format.name }}" href="{{ d.url }}" class="get {{ d.format.name|lower }}" data-noajax="1"></a>
 {%- endfor -%}
 <span class="story_bookmark_msg"></span>
 <span class="story_favorite_msg"></span>

@@ -9,7 +9,7 @@ from mini_fiction.widgets import ServiceButtonWidget
 
 class ChapterForm(Form):
     """ Форма добавления новой главы к рассказу """
-    textarea_dict = {'class': 'input-xxlarge chapter-textarea'}
+    textarea_dict = {'class': 'input-xxlarge chapter-textarea with-markitup'}
     attrs_dict = {'class': 'input-xxlarge'}
 
     title = TextField(

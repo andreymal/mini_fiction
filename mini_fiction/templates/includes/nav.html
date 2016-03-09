@@ -1,0 +1,53 @@
+{%- from 'macro.html' import nav_item -%}
+{{ nav_item('Главная', url_for('index.index'), 'index.index') }}
+{{ nav_item('Поиск', url_for('search.main'), 'search.') }}
+{{ nav_item(
+    'Справка',
+    url_for('staticpages.index', name='help'),
+    matched=is_current_endpoint('staticpages.index', name='help')
+) }}
+
+{%- if current_user.is_authenticated %}
+    {{ nav_item(
+        'Избранное',
+        url_for('object_lists.favorites', user_id=current_user.id),
+        matched=is_current_endpoint('object_lists.favorites', user_id=current_user.id)
+    ) }}
+    {{ nav_item('Закладки', url_for('object_lists.bookmarks'), 'object_lists.bookmarks') }}
+    {{ nav_item('Выход', url_for('auth.logout'), right=True) }}
+    {{ nav_item(
+        'Профиль',
+        url_for('author.info', user_id=current_user.id),
+        matched=is_current_endpoint('author.info', user_id=current_user.id),
+        right=True
+    ) }}
+    {{ nav_item(
+        'Кабинет автора',
+        url_for('author.info'),
+        matched=is_current_endpoint('author.info', user_id=None),
+        right=True
+    ) }}
+    {{ nav_item('Добавить рассказ', url_for('story.add'), 'story.add', right=True) }}
+
+    {% if current_user.is_staff %}
+        {{ nav_item('Новые ({})'.format(submitted_stories_count()), url_for('object_lists.submitted'), 'object_lists.submitted', right=True) }}
+    {% endif %}
+
+    {{ hook('nav') }}
+{%- else %}
+    {%- if config.REGISTRATION_OPEN %}
+        {{ nav_item('Регистрация', url_for('auth.registration'), 'auth.registration') }}
+    {% endif %}
+
+    {{ hook('nav') }}
+
+    <li class="right">
+        <form class="login-form form-inline" action="{{ url_for('auth.login') }}" method="POST" enctype="multipart/form-data">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+                <input id="id_username" type="text" name="username" placeholder="Логин" class="input-small" maxlength="30">
+                <input type="password" name="password" id="id_password" placeholder="Пароль" class="input-small">
+                <button class="btn" type="submit">Войти</button>
+                <a href="{{ url_for('auth.password_reset') }}">Забыл<br/> пароль</a>
+        </form>
+    </li>
+{% endif %}

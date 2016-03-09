@@ -1303,6 +1303,58 @@ a.btn {
 	margin: 6px 0 0 12px;
 }
 
+/* ajax loading icon */
+.loader {
+	position: fixed;
+	top: 0;
+	left: 0;
+	opacity: 1;
+	pointer-events: none;
+	transition: opacity 0.15s ease;
+	transition-delay: 0.15s;
+}
+
+/* notifications */
+
+#notifications {
+	position: fixed;
+	top: 3%;
+	right: 3%;
+	width: 16em;
+	max-width: 94%;
+	overflow: visible;
+}
+
+.notification {
+	background-color: rgba(0, 140, 0, 0.9);
+	margin-bottom: 1em;
+	padding: 0.5em;
+	color: white;
+	font-size: 0.8em;
+	cursor: pointer;
+	border-radius: 0.35em;
+	box-shadow: 0 0 0.2em rgba(0, 70, 0, 0.8);
+	transition: ease 0.3s;
+	transition-property: transform, opacity;
+	position: relative;
+	opacity: 1.0;
+}
+
+.notification.notice-hidden {
+	transform: translateY(-1em);
+	opacity: 0.0;
+}
+
+.notification.notice-error {
+	background-color: rgba(140, 0, 0, 0.9);
+	box-shadow: 0 0 0.2em rgba(70, 0, 0, 0.8);
+}
+
+.loader-hidden {
+	opacity: 0;
+	transition-delay: 0s;
+}
+
 /* === Adaptive overrides === */
 /* Tablets */
 @media ( min-width : 768px) and (max-width: 979px) {

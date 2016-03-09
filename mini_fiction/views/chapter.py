@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-from flask import Blueprint, request, render_template, abort, url_for, redirect
-from flask_login import current_user
+from flask import Blueprint, request, render_template, abort, url_for, redirect, g, jsonify
+from flask_login import current_user, login_required
 from pony.orm import db_session
 
 from mini_fiction.forms.chapter import ChapterForm
@@ -54,6 +54,7 @@ def view(story_id, chapter_order=None):
 
 @bp.route('/story/<int:story_id>/chapter/add/', methods=('GET', 'POST'))
 @db_session
+@login_required
 def add(story_id):
     story = Story.get(id=story_id)
     if not story:
@@ -83,6 +84,7 @@ def add(story_id):
 
 @bp.route('/chapter/<int:pk>/edit/', methods=('GET', 'POST'))
 @db_session
+@login_required
 def edit(pk):
     chapter = Chapter.get(id=pk)
     if not chapter:
@@ -118,6 +120,7 @@ def edit(pk):
 
 @bp.route('/chapter/<int:pk>/delete/', methods=('GET', 'POST'))
 @db_session
+@login_required
 def delete(pk):
     chapter = Chapter.get(id=pk)
     if not chapter:
@@ -132,10 +135,42 @@ def delete(pk):
         chapter.bl.delete()
         return redirect(url_for('story.edit', pk=story.id))
 
+    page_title = 'Подтверждение удаления главы'
     data = {
-        'page_title': 'Подтверждение удаления главы',
+        'page_title': page_title,
         'story': story,
         'chapter': chapter,
     }
 
-    return render_template('chapter_confirm_delete.html', **data)
+    if g.is_ajax:
+        html = render_template('includes/ajax/chapter_ajax_confirm_delete.html', page_title=page_title, story=story, chapter=chapter)
+        return jsonify({'page_content': {'modal': True, 'title': page_title, 'content': html}})
+    else:
+        return render_template('chapter_confirm_delete.html', **data)
+
+
+@bp.route('/story/<int:story_id>/sort/', methods=('POST',))
+@db_session
+@login_required
+def sort(story_id):
+    story = Story.get(id=story_id)
+    if not story:
+        abort(404)
+    if not story.editable_by(current_user._get_current_object()):
+        abort(403)
+
+    if not request.json or not request.json.get('chapters'):
+        return jsonify({'success': False, 'error': 'Invalid request'})
+
+    try:
+        new_order = [int(x) for x in request.json['chapters']]
+    except:
+        return jsonify({'success': False, 'error': 'Invalid request'})
+
+    chapters = {c.id: c for c in story.chapters}
+    if not new_order or set(chapters) != set(new_order):
+        return jsonify({'success': False, 'error': 'Bad request: incorrect list'})
+    else:
+        for new_order_id, chapter_id in enumerate(new_order):
+            chapters[chapter_id].order = new_order_id + 1
+        return jsonify({'success': True})

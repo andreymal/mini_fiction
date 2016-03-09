@@ -40,6 +40,7 @@ class Config(object):
     BABEL_DEFAULT_TIMEZONE = 'Europe/Moscow'
 
     DEBUG_TB_ENABLED = False
+    DEBUG_TB_INTERCEPT_REDIRECTS = False
     DEBUG_TB_PANELS = [
         'flask_debugtoolbar.panels.versions.VersionDebugPanel',
         'flask_debugtoolbar.panels.timer.TimerDebugPanel',

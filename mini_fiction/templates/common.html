@@ -18,9 +18,9 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='css/markitup.set.css') }}" />
 
     <!-- compatibility scripts and polyfills -->
-    <!--[if lt IE 9]> <script src="https://cdnjs.cloudflare.com/ajax/libs/html5shiv/3.7.3/html5shiv-printshiv.min.js"></script> <![endif]-->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/es6-promise/3.2.1/es6-promise.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/fetch/0.11.0/fetch.min.js"></script>
+    <!--[if lt IE 9]> <script src="{{ url_for('static', filename='js/html5shiv-printshiv.min.js') }}"></script> <![endif]-->
+    <script src="{{ url_for('static', filename='js/es6-promise.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/fetch.min.js') }}"></script>
 
     <script src="{{ url_for('static', filename='js/jquery-1.11.3.min.js') }}"></script>
     <script src="{{ url_for('static', filename='js/jquery-ui-1.9.2.custom.min.js') }}"></script>

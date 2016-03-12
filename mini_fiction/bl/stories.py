@@ -11,12 +11,13 @@ from pony import orm
 from flask import Markup, current_app
 
 from mini_fiction.bl.utils import BaseBL
+from mini_fiction.bl.commentable import Commentable
 from mini_fiction.utils.misc import call_after_request as later
 from mini_fiction.validation import Validator
 from mini_fiction.validation.stories import STORY
 
 
-class StoryBL(BaseBL):
+class StoryBL(BaseBL, Commentable):
     sort_types = {
         0: "weight() DESC, id DESC",
         1: "id DESC",
@@ -107,6 +108,8 @@ class StoryBL(BaseBL):
             later(current_app.tasks['sphinx_update_story'].delay, story.id, ('approved',))
             for c in story.chapters:
                 later(current_app.tasks['sphinx_update_chapter'].delay, c.id)
+            for c in story.comments:  # TODO: update StoryComment where story = story.id
+                c.story_published = story.published
 
     def publish(self, user, published):
         story = self.model
@@ -118,6 +121,8 @@ class StoryBL(BaseBL):
                 later(current_app.tasks['sphinx_update_story'].delay, story.id, ('draft',))
                 for c in story.chapters:
                     later(current_app.tasks['sphinx_update_chapter'].delay, c.id)
+                for c in story.comments:
+                    c.story_published = story.published
             return True
 
         return False
@@ -136,7 +141,7 @@ class StoryBL(BaseBL):
         story = self.model
         data = {
             'last_views': story.views,
-            'last_comments': story.comments.count(),
+            'last_comments': story.comments_count,
             'last_vote_average': story.vote_average,
             'last_vote_stddev': story.vote_stddev,
         }
@@ -217,6 +222,30 @@ class StoryBL(BaseBL):
 
         return stars
 
+    # access control
+
+    def is_author(self, author):
+        return (
+            author and author.is_authenticated and
+            author.id in [x.author.id for x in self.model.coauthors]
+        )
+
+    def editable_by(self, author):
+        return author and (author.is_staff or self.is_author(author))
+
+    def deletable_by(self, author):
+        return self.is_author(author)
+
+    def has_access(self, user=None):
+        story = self.model
+        if user and user.is_staff:
+            return True
+        if story.published or self.is_author(user):
+            return True
+        return False
+
+    # search
+
     def add_stories_to_search(self, stories):
         if current_app.config['SPHINX_DISABLED']:
             return
@@ -227,7 +256,7 @@ class StoryBL(BaseBL):
             'notes': story.notes,
             'rating_id': story.rating.id,
             'size': story.words,
-            'comments': story.comments.count(),
+            'comments': story.comments_count,
             'finished': story.finished,
             'original': story.original,
             'freezed': story.freezed,
@@ -269,7 +298,7 @@ class StoryBL(BaseBL):
                 sphinx.update('stories', fields={'size': int(story.words)}, id=story.id)
         elif f == {'comments'}:
             with current_app.sphinx as sphinx:
-                sphinx.update('stories', fields={'comments': int(story.comments.count())}, id=story.id)
+                sphinx.update('stories', fields={'comments': int(story.comments_count)}, id=story.id)
         else:
             with current_app.sphinx as sphinx:
                 self.add_stories_to_search((story,))
@@ -323,6 +352,8 @@ class StoryBL(BaseBL):
 
         return raw_result, result
 
+    # misc
+
     def get_random(self, count=10):
         # это быстрее, чем RAND() в MySQL
         from mini_fiction.models import Story, Character, Category
@@ -337,6 +368,22 @@ class StoryBL(BaseBL):
         stories = Story.select(lambda x: x.id in ids).prefetch(Story.characters, Story.categories)[:]
         random.shuffle(stories)
         return stories
+
+    def can_comment_by(self, author=None):
+        from mini_fiction.models import StoryComment
+        return StoryComment.bl.can_comment_by(self.model, author)
+
+    def get_comments_list(self, maxdepth=None, root_offset=None, root_count=None):
+        from mini_fiction.models import StoryComment
+
+        result = StoryComment.select(lambda x: x.story == self.model)
+        if maxdepth is not None:
+            result = result.filter(lambda x: x.tree_depth <= maxdepth)
+        if root_offset is not None and root_count is not None:
+            offset_to = root_offset + root_count
+            result = result.filter(lambda x: x.root_order >= root_offset and x.root_order < offset_to)
+        result = result.order_by(StoryComment.id)
+        return result[:]
 
 
 class ChapterBL(BaseBL):

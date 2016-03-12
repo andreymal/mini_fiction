@@ -7,4 +7,4 @@ def init_bl():
     registry.register('bl.author', authors.AuthorBL)
     registry.register('bl.story', stories.StoryBL)
     registry.register('bl.chapter', stories.ChapterBL)
-    registry.register('bl.comment', comments.CommentBL)
+    registry.register('bl.story_comment', comments.StoryCommentBL)

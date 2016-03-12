@@ -86,16 +86,26 @@
         {% if comments_count > 0 %}
         <div id="comments">
             <h3>Комментарии ({{ comments_count }})</h3>
-            <div id="comments-list">
-                {% include 'includes/comments.html' %}
+            <div id="comments-tree" class="comments-tree">
+                {% include 'includes/comments_tree.html' %}
             </div>
             {% include 'includes/comments_pagination_story.html' %}
         </div>
         {% endif %}
 
-        {% if current_user.is_active %}
+        {% if story.bl.can_comment_by(current_user) %}
             <h2>Добавить новый комментарий</h2>
-            {% with form = comment_form %}{%- include 'includes/comment_form.html' %}{% endwith %}
+
+            <form class="comment-form" method="POST" enctype="multipart/form-data" action="
+                {%- if edit -%}
+                    {{- url_for('comment.edit', story_id=story.id, pk=comment_id) -}}
+                {%- else -%}
+                    {{- url_for('story_comment.add', story_id=story.id) -}}
+                {%- endif -%}
+            ">
+            {% from 'macro.html' import comment_form_content %}
+            {{ comment_form_content(comment_form, 'story', story.id) }}
+            </form>
         {% elif current_user.is_authenticated %}
         <h3 id="banned">К сожалению, Вы не можете добавлять комментарии</h3>
         {% else %}

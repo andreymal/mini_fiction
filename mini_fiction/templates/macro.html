@@ -14,3 +14,80 @@
     {%- endif -%}
     <li class="{{ 'active ' if matched else '' }}{{ 'right ' if right else '' }}"><a href="{{ link }}">{{ title }}</a></li>
 {%- endmacro %}
+
+
+{% macro comment_form_content(form, objtype, objid, edit=False, comment_id=None) %}
+    {{ form.csrf_token() }}
+    <input type="hidden" name="{{ objtype }}" value="{{ objid }}" />
+    {% if edit -%}
+        <input type="hidden" name="{{ 'comment_id' if edit else 'parent' }}" value="{{ comment_id or '' }}" />
+    {% endif -%}
+    <div class="control-group{% if form.text.errors %} error{% endif %}">
+        <div class="controls">
+            {{ form.text }}
+        </div>
+        {% if form.text.errors %}
+            {% for error in form.text.errors %}
+                <span class="help-inline">{{ error }}</span>
+            {% endfor %}
+        {% endif %}
+    </div>
+    {% if form.non_field_errors %}
+    {% for message in form.non_field_errors %}
+        <div class="control-group error"><span class="help-inline">{{ message }}</span></div>
+    {% endfor %}
+    {% endif %}
+    <div class="control-group">
+        <input class="btn btn-primary comment_submit" type="submit" value="Отправить" />
+    </div>
+{% endmacro %}
+
+
+{% macro comment_html(comment) %}
+    {%- if comment.deleted and not current_user.is_staff -%}
+        <div class="comment comment-deleted">
+            Комментарий был отправлен на Луну
+        </div>
+    {%- else -%}
+        <div class="comment{{ ' comment-short' if comments_short else '' }}">
+            {%- if not comments_short %}{{ comment.text_as_html|safe }}{% else %}{{ comment.brief_text_as_html|safe }}{% endif -%}
+        </div>
+        {% if comment.deleted -%}
+        <div class="comment comment-deleted">
+            Комментарий был отправлен на Луну
+        </div>
+        {%- endif %}
+
+        <div class="comment-meta">
+            <span class="comment-author">
+            {%- if comment.author -%}
+                {% with user=comment.author %}
+                    {% include 'includes/userlink.html' %}
+                {% endwith %}
+            {%- else %}
+                <span class="userlink-guest">{{ comment.author_username or 'Гость' }}</span>
+            {%- endif %}
+            </span>
+
+            <time class="comment-time" datetime="{{ comment.date.strftime('%Y-%m-%dT%H:%M:%SZ') }}">
+                {{ comment.date|timedeltaformat }} назад
+            </time>
+
+            {% if not comments_short %}
+            <a class="comment-link" href="{{ comment.bl.get_permalink() }}">#{{ comment.local_id }}</a>
+
+            {%- if comment.parent %}
+            <a class="comment-parent-link" href="{{ comment.parent.bl.get_permalink() }}" title="Ответ на комментарий #{{ comment.parent.local_id }} от {{ comment.parent.author.username if comment.parent.author else (comment.parent.author_username or 'гостя') }}">↑</a>
+            {%- endif %}
+
+            {%- if comment.bl.can_answer_by(current_user) %}
+            <a class="comment-answer-link" data-parent="{{ comment.local_id }}" href="{{ comment.bl.get_answer_link() }}">Ответить</a>
+            {{ caller() if caller else '' }}
+            {%- endif %}
+            {% else %}
+            {{ caller() if caller else '' }}
+            <a class="comment-link" href="{{ comment.bl.get_permalink() }}">#</a>
+            {% endif %}
+        </div>
+    {%- endif -%}
+{% endmacro %}

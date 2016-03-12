@@ -7,11 +7,12 @@ from datetime import datetime
 from flask import Blueprint, Response, current_app, request, render_template, abort, redirect, url_for, send_file, jsonify, g
 from flask_babel import gettext
 from flask_login import current_user, login_required
+from pony import orm
 from pony.orm import db_session
 
 from mini_fiction.forms.story import StoryForm
 from mini_fiction.forms.comment import CommentForm
-from mini_fiction.models import Story, Chapter, Rating, StoryEditLogItem, Comment, Favorites, Bookmark
+from mini_fiction.models import Story, Chapter, Rating, StoryEditLogItem, StoryComment, Favorites, Bookmark
 from mini_fiction.utils.misc import Paginator
 from mini_fiction.validation import ValidationError
 
@@ -35,15 +36,20 @@ def get_story(pk):
 def view(pk, comments_page):
     story = get_story(pk)
     chapters = story.chapters.select().order_by(Chapter.order, Chapter.id)[:]
-    comments_list = story.comments.select().order_by(Comment.id)
-    comments_count = comments_list.count()
+    per_page = current_app.config['COMMENTS_COUNT']['page']
+    comments_count = story.comments.select().count()
+    if comments_count > 0:
+        root_comments_total = orm.select(orm.max(x.root_order) for x in StoryComment if x.story == story).first() + 1
+    else:
+        root_comments_total = comments_count
     paged = Paginator(
         number=comments_page,
-        total=comments_count,
-        per_page=current_app.config['COMMENTS_COUNT']['page'],
+        total=root_comments_total,
+        per_page=per_page,
     )  # TODO: restore orphans?
-    comments = paged.slice(comments_list)
-    if not comments and paged.number != 1:
+    maxdepth = None if request.args.get('fulltree') == '1' else 1
+    comments_tree_list = story.bl.get_comments_tree_list(maxdepth, root_offset=per_page * (paged.number - 1), root_count=per_page)
+    if not comments_tree_list and paged.number != 1:
         abort(404)
     num_pages = paged.num_pages
     page_title = story.title
@@ -61,7 +67,7 @@ def view(pk, comments_page):
     data = {
        'story': story,
        'vote': user_vote,
-       'comments': comments,
+       'comments_tree_list': comments_tree_list,
        'comments_count': comments_count,
        'chapters': chapters,
        'num_pages': num_pages,

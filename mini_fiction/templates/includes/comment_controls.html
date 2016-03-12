@@ -1,0 +1,12 @@
+<span class="story-control-btn">
+    {% if comment.bl.can_update_by(current_user) %}
+        <a class="btn btn-warning btn-mini comment_edit" href="{{ comment.bl.get_update_link() }}">Редактировать</a>
+    {% endif %}
+    {% if comment.bl.can_delete_or_restore_by(current_user) -%}
+        {%- if comment.deleted -%}
+            <a class="btn btn-danger btn-mini comment_delete" href="{{ comment.bl.get_restore_link() }}">Восстановить</a>
+        {%- else -%}
+            <a class="btn btn-danger btn-mini comment_delete" href="{{ comment.bl.get_delete_link() }}">Удалить</a>
+        {%- endif %}
+    {%- endif %}
+</span>

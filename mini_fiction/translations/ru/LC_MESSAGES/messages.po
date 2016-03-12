@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version:  0.0.1\n"
 "Report-Msgid-Bugs-To: andriyano-31@mail.ru\n"
-"POT-Creation-Date: 2016-03-05 21:24+0300\n"
+"POT-Creation-Date: 2016-03-13 01:23+0300\n"
 "Last-Translator: andreymal <andriyano-31@mail.ru>\n"
 "Language: ru\n"
 "Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && "
@@ -16,18 +16,6 @@ msgstr ""
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 2.2.0\n"
-
-#: mini_fiction/ajax/views/comment.py:32 mini_fiction/views/comment.py:29
-msgid "Add new comment"
-msgstr "Добавить новый комментарий"
-
-#: mini_fiction/ajax/views/comment.py:56 mini_fiction/views/comment.py:53
-msgid "Edit comment"
-msgstr "Редактировать комментарий"
-
-#: mini_fiction/ajax/views/comment.py:81 mini_fiction/views/comment.py:77
-msgid "Confirm delete comment"
-msgstr "Подтверждение удаления комментария"
 
 #: mini_fiction/bl/authors.py:34
 msgid "Please set username and password"
@@ -38,15 +26,15 @@ msgid "User already exists"
 msgstr "Пользователь уже существует"
 
 #: mini_fiction/bl/authors.py:40 mini_fiction/views/auth.py:110
-#: mini_fiction/views/author.py:93
+#: mini_fiction/views/author.py:96
 msgid "Password is too bad, please change it"
 msgstr "Пароль слишком плохой, поменяйте его"
 
-#: mini_fiction/bl/authors.py:42
+#: mini_fiction/bl/authors.py:42 mini_fiction/bl/authors.py:75
 msgid "Email address is already in use"
 msgstr "Электропочта уже используется"
 
-#: mini_fiction/bl/authors.py:198
+#: mini_fiction/bl/authors.py:206
 msgid ""
 "Please enter a correct username and password. Note that both fields may "
 "be case-sensitive."
@@ -54,9 +42,13 @@ msgstr ""
 "Пожалуйста, введите правильные имя пользователя и пароль. Оба поля могут "
 "быть чувствительны к регистру."
 
-#: mini_fiction/bl/authors.py:200
+#: mini_fiction/bl/authors.py:208
 msgid "Account is disabled"
 msgstr "Аккаунт отключен"
+
+#: mini_fiction/bl/comments.py:55
+msgid "Parent comment not found"
+msgstr "Родительский комментарий не найден"
 
 #: mini_fiction/forms/author.py:159 mini_fiction/forms/register.py:28
 #: mini_fiction/forms/register.py:65
@@ -101,7 +93,7 @@ msgstr[0] "%(num)d комментарий"
 msgstr[1] "%(num)d комментария"
 msgstr[2] "%(num)d комментариев"
 
-#: mini_fiction/templates/search.html:90
+#: mini_fiction/templates/search.html:89
 #, python-format
 msgid "Found %(num)d story"
 msgid_plural "Found %(num)d stories"
@@ -109,7 +101,7 @@ msgstr[0] "Всего нашли %(num)d рассказ"
 msgstr[1] "Всего нашли %(num)d рассказа"
 msgstr[2] "Всего нашли %(num)d рассказов"
 
-#: mini_fiction/templates/search.html:97
+#: mini_fiction/templates/search.html:96
 #, python-format
 msgid "Found %(num)d chapter"
 msgid_plural "Found %(num)d chapters"
@@ -117,8 +109,8 @@ msgstr[0] "Всего нашли %(num)d главу"
 msgstr[1] "Всего нашли %(num)d главы"
 msgstr[2] "Всего нашли %(num)d глав"
 
-#: mini_fiction/templates/story_view.html:58
-#: mini_fiction/templates/story_view.html:74
+#: mini_fiction/templates/story_view.html:59
+#: mini_fiction/templates/story_view.html:75
 #: mini_fiction/templates/includes/stories.html:24
 #: mini_fiction/templates/includes/stories.html:51
 #: mini_fiction/templates/includes/ajax/story_ajax_publish_warning.html:9
@@ -129,8 +121,8 @@ msgstr[0] "%(num)d слово"
 msgstr[1] "%(num)d слова"
 msgstr[2] "%(num)d слов"
 
-#: mini_fiction/templates/story_view.html:58
-#: mini_fiction/templates/story_view.html:74
+#: mini_fiction/templates/story_view.html:59
+#: mini_fiction/templates/story_view.html:75
 #: mini_fiction/templates/includes/series.html:15
 #: mini_fiction/templates/includes/series.html:26
 #: mini_fiction/templates/includes/stories.html:29
@@ -180,15 +172,15 @@ msgstr "Обязательное поле {0}"
 
 #: mini_fiction/validation/__init__.py:34
 msgid "Depends on these values: {constraint}"
-msgstr ""
+msgstr "Зависит от следующих значений: {constraint}"
 
 #: mini_fiction/validation/__init__.py:35
 msgid "{0} must not be present with '{field}'"
-msgstr ""
+msgstr "'{0}' не должно быть вместе с '{field}'"
 
 #: mini_fiction/validation/__init__.py:37
 msgid "'{0}' is not a document, must be a dict"
-msgstr "{0} не документ, должен быть словарь"
+msgstr "'{0}' не документ, должен быть словарь"
 
 #: mini_fiction/validation/__init__.py:38
 #: mini_fiction/validation/__init__.py:39
@@ -299,23 +291,23 @@ msgstr "Регистрация закрыта"
 msgid "Registration in library"
 msgstr "Регистрация в библиотеке"
 
-#: mini_fiction/views/author.py:32
+#: mini_fiction/views/author.py:33
 msgid "My cabinet"
 msgstr "Мой кабинет"
 
-#: mini_fiction/views/author.py:39
+#: mini_fiction/views/author.py:41
 msgid "Author: {author}"
 msgstr "Автор: {author}"
 
-#: mini_fiction/views/author.py:76
+#: mini_fiction/views/author.py:79
 msgid "Profile settings"
 msgstr "Настройки профиля"
 
-#: mini_fiction/views/author.py:91
+#: mini_fiction/views/author.py:94
 msgid "Old password is incorrect"
 msgstr "Старый пароль неверный"
 
-#: mini_fiction/views/author.py:109
+#: mini_fiction/views/author.py:112
 msgid "Password is incorrect"
 msgstr "Неверный пароль"
 
@@ -333,6 +325,22 @@ msgstr "Поиск рассказов"
 msgid "Search results"
 msgstr "Результаты поиска"
 
-#: mini_fiction/views/story.py:137
+#: mini_fiction/views/story.py:223
 msgid "New story"
 msgstr "Новый рассказ"
+
+#: mini_fiction/views/story_comment.py:48
+msgid "Add new comment"
+msgstr "Добавить новый комментарий"
+
+#: mini_fiction/views/story_comment.py:78
+msgid "Edit comment"
+msgstr "Редактировать комментарий"
+
+#: mini_fiction/views/story_comment.py:102
+msgid "Confirm delete comment"
+msgstr "Подтверждение удаления комментария"
+
+#: mini_fiction/views/story_comment.py:124
+msgid "Confirm restore comment"
+msgstr "Подтверждение восстановления комментария"

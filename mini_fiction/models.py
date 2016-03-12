@@ -60,7 +60,9 @@ class Author(db.Entity, UserMixin):
     views = orm.Set('StoryView')
     activity = orm.Set('Activity')
     votes = orm.Set('Vote')
-    comments = orm.Set('Comment')
+    story_comments = orm.Set('StoryComment')
+    story_comment_votes = orm.Set('StoryCommentVote')
+    story_comment_edits = orm.Set('StoryCommentEdit')
 
     bl = Resource('bl.author')
 
@@ -210,6 +212,7 @@ class Story(db.Entity):
     vote_average = orm.Required(float, default=3)
     vote_average_index = orm.Required(int, size=16, unsigned=True, default=300)  # float can't be used with composite_index
     vote_stddev = orm.Required(float, default=0)
+    comments_count = orm.Required(int, size=16, unsigned=True, default=0)
 
     in_series_permissions = orm.Set(InSeriesPermissions)
     chapters = orm.Set('Chapter')
@@ -217,7 +220,7 @@ class Story(db.Entity):
     story_views_set = orm.Set('StoryView')
     activity = orm.Set('Activity')
     votes = orm.Set('Vote')
-    comments = orm.Set('Comment')
+    comments = orm.Set('StoryComment')
     beta_reading = orm.Set('BetaReading')
 
     orm.composite_index(approved, draft)
@@ -290,13 +293,16 @@ class Story(db.Entity):
 
     # Проверка авторства
     def editable_by(self, author):
-        return author.is_staff or self.is_author(author)
+        # TODO: remove
+        return self.bl.editable_by(author)
 
     def deletable_by(self, user):
-        return self.is_author(user)
+        # TODO: remove
+        return self.bl.deletable_by(user)
 
     def is_author(self, author):
-        return author.is_authenticated and author.id in [x.author.id for x in self.coauthors]
+        # TODO: remove
+        return self.bl.is_author(author)
 
     # Проверка возможности публикации
     @property
@@ -411,20 +417,42 @@ class BetaReading(db.Entity):
     checked = orm.Required(bool, default=False)
 
 
-class Comment(db.Entity):
-    """ Модель комментария """
+class StoryComment(db.Entity):
+    """ Модель комментария к рассказу """
 
-    author = orm.Optional(Author)
+    id = orm.PrimaryKey(int, auto=True)
+    local_id = orm.Required(int)
+    parent = orm.Optional('StoryComment', reverse='answers', nullable=True, default=None)
+    author = orm.Optional(Author, nullable=True, default=None)
+    author_username = orm.Optional(str, 64)  # На случай, если учётную запись автора удалят
     date = orm.Required(datetime, 6, default=datetime.utcnow)
-    story = orm.Optional(Story)
-    text = orm.Required(orm.LongStr, lazy=False)
     updated = orm.Required(datetime, 6, default=datetime.utcnow)
+    deleted = orm.Required(bool, default=False)
+    last_deleted_at = orm.Optional(datetime, 6)
+    story = orm.Required(Story)
+    text = orm.Required(orm.LongStr, lazy=False)
     ip = orm.Required(str, 50, default=ipaddress.ip_address('::1').exploded)
+    vote_count = orm.Required(int, size=16, unsigned=True, default=0)
+    vote_total = orm.Required(int, default=0)
 
-    bl = Resource('bl.comment')
+    # Optimizations
+    tree_depth = orm.Required(int, size=16, unsigned=True, default=0)
+    answers_count = orm.Required(int, size=16, unsigned=True, default=0)
+    edits_count = orm.Required(int, size=16, unsigned=True, default=0)
+    root_order = orm.Required(int, size=16, unsigned=True)  # for pagination
+    story_published = orm.Required(bool)
+    last_edited_at = orm.Optional(datetime, 6)  # only for text updates
 
-    def editable_by(self, author):
-        return author.is_staff
+    votes = orm.Set('StoryCommentVote')
+    edits = orm.Set('StoryCommentEdit')
+    answers = orm.Set('StoryComment', reverse='parent')
+
+    bl = Resource('bl.story_comment')
+
+    orm.composite_key(story, local_id)
+    orm.composite_index(deleted, story_published)
+    orm.composite_index(author, deleted, story_published)
+    orm.composite_index(story, root_order, tree_depth)
 
     @property
     def brief_text(self):
@@ -436,11 +464,28 @@ class Comment(db.Entity):
     text_as_html = filtered_html_property('text', filter_html)
     brief_text_as_html = filtered_html_property('brief_text', filter_html)
 
-    def get_absolute_url(self):
-        return '%s#%s' % (self.story.url, self.get_html_id())
+    def before_update(self):
+        self.updated = datetime.utcnow()
 
-    def get_html_id(self):
-        return 'comment_%s' % self.id
+
+class StoryCommentEdit(db.Entity):
+    """ Модель с информацией о редактировании комментария к рассказу """
+
+    comment = orm.Required(StoryComment)
+    editor = orm.Optional(Author)
+    date = orm.Required(datetime, 6, default=datetime.utcnow)
+    old_text = orm.Optional(orm.LongStr, lazy=False)
+    new_text = orm.Optional(orm.LongStr, lazy=False)
+    ip = orm.Required(str, 50, default=ipaddress.ip_address('::1').exploded)
+
+
+class StoryCommentVote(db.Entity):
+    """ Модель голосования за комментарий к рассказу """
+
+    comment = orm.Required(StoryComment)
+    author = orm.Optional(Author)
+    date = orm.Required(datetime, 6, default=datetime.utcnow)
+    vote_value = orm.Required(int, default=0)
 
 
 class Vote(db.Entity):

@@ -25,7 +25,7 @@
         {% include "includes/chapters_short.html" %}
         <p class="more"><a href="{{ url_for('stream.chapters') }}">Лента обновлений</a> | <a href="{{ url_for('feeds.chapters') }}" data-noajax="1">RSS</a></p>
         <h2>Последние комментарии</h2>
-        {% with short=True %}{% include "includes/comments.html" %}{% endwith %}
+        {% include "includes/story_comments_list.html" %}
         <p class="more"><a href="{{ url_for('stream.comments') }}">Лента комментариев</a></p>
     </div>
 </div>

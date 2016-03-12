@@ -114,7 +114,7 @@ def configure_error_handlers(app):
 
 
 def configure_views(app):
-    from mini_fiction.views import index, auth, story, chapter, search, author, stream, object_lists, comment, feeds, staticpages
+    from mini_fiction.views import index, auth, story, chapter, search, author, stream, object_lists, story_comment, feeds, staticpages
     app.register_blueprint(index.bp)
     app.register_blueprint(auth.bp, url_prefix='/accounts')
     app.register_blueprint(story.bp, url_prefix='/story')
@@ -124,7 +124,7 @@ def configure_views(app):
     app.register_blueprint(author.bp, url_prefix='/accounts')
     app.register_blueprint(stream.bp, url_prefix='/stream')
     app.register_blueprint(object_lists.bp)
-    app.register_blueprint(comment.bp)
+    app.register_blueprint(story_comment.bp)
     app.register_blueprint(feeds.bp, url_prefix='/feeds')
     app.register_blueprint(staticpages.bp, url_prefix='/page')
 

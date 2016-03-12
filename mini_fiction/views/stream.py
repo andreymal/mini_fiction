@@ -5,7 +5,7 @@ from pony import orm
 from pony.orm import db_session
 from flask import Blueprint, current_app
 
-from mini_fiction.models import Story, Chapter, CoAuthorsStory, StoryEditLogItem, Comment
+from mini_fiction.models import Story, Chapter, CoAuthorsStory, StoryEditLogItem, StoryComment
 from mini_fiction.utils.views import paginate_view, cached_lists
 
 
@@ -54,7 +54,7 @@ def chapters(page):
 @bp.route('/comments/page/<int:page>/')
 @db_session
 def comments(page):
-    objects = Comment.select(lambda x: x.story.approved and not x.story.draft).order_by(Comment.id.desc())
+    objects = StoryComment.select(lambda x: x.story_published and not x.deleted).order_by(StoryComment.id.desc())
 
     return paginate_view(
         'stream/comments.html',
@@ -63,6 +63,7 @@ def comments(page):
         page_title='Лента комментариев',
         objlistname='comments',
         per_page=current_app.config['COMMENTS_COUNT']['stream'],
+        extra_context=lambda comments_list, _: {'comments_short': True}
     )
 
 

@@ -64,7 +64,7 @@
         {% if comments_count > 0 %}
             <h2>Комментарии автора ({{ comments_count }})</h2>
             <div id="comments-list">
-            {% include "includes/comments.html" %}
+            {% include "includes/story_comments_list.html" %}
             </div>
             {% include "includes/comments_pagination_author_overview.html" %}
         {% endif %}

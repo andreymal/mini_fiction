@@ -6,7 +6,7 @@ from flask_babel import gettext
 from flask_login import current_user, login_required, logout_user
 from pony.orm import select, db_session
 
-from mini_fiction.models import Author, Story, CoAuthorsStory, Comment, StoryView
+from mini_fiction.models import Author, Story, CoAuthorsStory, StoryComment, StoryView
 from mini_fiction.utils.misc import Paginator
 from mini_fiction.utils.views import cached_lists
 from mini_fiction.forms.author import AuthorEditEmailForm, AuthorEditPasswordForm, AuthorEditProfileForm, AuthorEditPrefsForm
@@ -26,7 +26,8 @@ def info(user_id=None, comments_page=1):
         if not current_user.is_authenticated:
             abort(403)
         author = current_user._get_current_object()
-        comments_list = Comment.select(lambda x: x.story in select(x.story for x in CoAuthorsStory if x.author == author)).order_by(Comment.id.desc())
+        comments_list = StoryComment.select(lambda x: not x.deleted and x.story in select(x.story for x in CoAuthorsStory if x.author == author))
+        comments_list = comments_list.order_by(StoryComment.id.desc())
         stories = author.stories.order_by(Story.date.desc(), Story.id.desc())
         data['all_views'] = StoryView.select(lambda x: x.story in stories).count()  # TODO: optimize it
         data['page_title'] = gettext('My cabinet')
@@ -35,7 +36,8 @@ def info(user_id=None, comments_page=1):
         author = Author.get(id=user_id)
         if not author:
             abort(404)
-        comments_list = Comment.select(lambda x: x.author == author and x.story.approved and not x.story.draft).order_by(Comment.id.desc())
+        comments_list = StoryComment.select(lambda x: x.author == author and not x.deleted and x.story_published)
+        comments_list = comments_list.order_by(StoryComment.id.desc())
         data['page_title'] = gettext('Author: {author}').format(author=author.username)
         stories = Story.accessible(current_user).filter(lambda x: x in select(y.story for y in CoAuthorsStory if y.author == author))
         stories = stories.order_by(Story.date.desc(), Story.id.desc())
@@ -61,6 +63,7 @@ def info(user_id=None, comments_page=1):
         'page_current': comments_page,
         'num_pages': num_pages,
         'comments_count': comments_count,
+        'comments_short': True,
         'page_obj': paged,
     })
     data.update(cached_lists([x.id for x in stories]))

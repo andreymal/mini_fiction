@@ -1,0 +1,17 @@
+{% from 'macro.html' import comment_html with context %}
+{% for comment, has_next_tree in comments_tree_list %}
+    <div id="{{ comment.local_id }}" data-global-id="{{ comment.id }}" data-parent="{{ comment.parent.local_id if comment.parent else '' }}" class="comment-item" data-depth="{{ comment.tree_depth }}" style="margin-left: {{ comment.tree_depth }}%">
+        {% include 'includes/comment_controls.html' %}
+        {{ comment_html(comment) }}
+    </div><!-- /{{ comment.local_id }} -->
+
+    {% if comment.answers_count > 0 and not has_next_tree %}
+        <div class="comment-tree-loader" id="comment_tree_{{ comment.local_id }}" style="margin-left: {{ comment.tree_depth + 1 }}%">
+            <a href="?fulltree=1#{{ comment.local_id }}" data-for="{{ comment.local_id }}" class="comment-tree-loader-link">Загрузить ветку</a>
+        </div>
+    {% endif %}
+{% else %}
+    <div class="comment">
+        <h3>Здесь пока ничего нет</h3>
+    </div>
+{% endfor %}

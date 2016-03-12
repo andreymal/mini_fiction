@@ -5,7 +5,7 @@ from flask import Blueprint, current_app, render_template
 from flask_babel import gettext
 from pony.orm import select, db_session
 
-from mini_fiction.models import Story, Category, Chapter, Comment
+from mini_fiction.models import Story, Category, Chapter, StoryComment
 from mini_fiction.utils.views import cached_lists
 
 bp = Blueprint('index', __name__)
@@ -39,21 +39,15 @@ def index():
     chapters_stories = {x.id: x for x in chapters_stories}
     chapters = [(x, chapters_stories[x.story.id]) for x in chapters]
 
-    comments = Comment.select(lambda x: x.story.approved and not x.story.draft).order_by(Comment.id.desc())
-    # MySQL query optimization
-    # TODO: cacheops alternative?
-    opt_comment_id = current_app.cache.get('index_opt_comment_id')
-    if opt_comment_id is not None:
-        comments = comments.filter(lambda x: x.id >= opt_comment_id)
+    comments = StoryComment.select(lambda x: x.story_published and not x.deleted).order_by(StoryComment.id.desc())
     comments = comments[:current_app.config['COMMENTS_COUNT']['main']]
-    if len(comments) == current_app.config['COMMENTS_COUNT']['main']:
-        current_app.cache.set('index_opt_comment_id', comments[-1].id - 100, timeout=1200)
 
     data = {
         'categories': categories,
         'stories': stories,
         'chapters': chapters,
         'comments': comments,
+        'comments_short': True,
         'page_title': page_title,
     }
     data.update(cached_lists([x.id for x in stories]))

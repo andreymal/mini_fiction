@@ -373,16 +373,24 @@ var core = {
             this.nav.innerHTML = data.nav;
             this.content.innerHTML = data.content;
         }
+        var state = {modal: data.modal, title: data.title};
         if (link !== undefined && !options.nopushstate) {
-            history.pushState({modal: data.modal, title: data.title}, '', link);
+            history.pushState(state, '', link);
+        } else {
+            // state сохранить в любом случае надо
+            history.replaceState(state, '', location.toString());
         }
         if (!options.noscroll && !data.modal && window.scrollY > 400) {
             window.scrollTo(0, 0);
         }
         if (options.hash) {
-            // FIXME: это добавляет лишнюю запись в историю, переделать бы
-            // (просто pushState нельзя, тогда прокрутка к элементу ломается)
-            location.hash = options.hash;
+            // FIXME: может, как-то можно вызвать родное поведение браузера?
+            // (location.hash будет мусорить историю при options.nopushstate == true)
+            history.replaceState(state, '', '#' + options.hash);
+            var helem = document.getElementById(options.hash);
+            if (helem) {
+                helem.scrollIntoView();
+            }
         }
         this.state.modal = data.modal;
 
@@ -503,7 +511,7 @@ var core = {
         var href = target.href;
         var host = (location.origin || (location.protocol + '//' + location.host));
 
-        // Если ссылка различается только якорем, то просто меняем его
+        // Если ссылка различается только якорем, то просто меняем его (браузер прокрутит всё сам)
         var h = href.indexOf('#');
         if (h > 0) {
             var currentPage = location.toString();
@@ -512,7 +520,7 @@ var core = {
             }
             var hrefPage = href.substring(0, h);
             if (currentPage == hrefPage) {
-                location.hash = href.substring(h + 1);
+                history.pushState(history.state, '', href.substring(h));
                 return;
             }
         }

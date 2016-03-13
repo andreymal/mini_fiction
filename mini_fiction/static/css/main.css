@@ -222,12 +222,6 @@ h4 {
 	color: #999;
 }
 
-.sidelist .story-item div.comment {
-	color: #333;
-	font-size: 12px;
-	font-style: italic;
-}
-
 a.authorlink,a.edit-link {
 	color: #999;
 }
@@ -1066,14 +1060,22 @@ a.btn {
 
 .comment-item {
 	padding: 8px 12px 8px;
+	line-height: 22px;
+	border-left: 0.2em solid #ddd;
 }
 
-.comment-item .comment {
+/* index page */
+.sidelist .comment-item {
+	margin-left: -12px;
+	border-left: 0;
+}
+
+.comment-text {
 	font-size: 12px;
 	margin-bottom: 4px;
 }
 
-.comment-item .comment-deleted {
+.comment-text-deleted {
 	color: #888;
 	font-size: 0.8em;
 	font-style: italic;
@@ -1085,11 +1087,6 @@ a.btn {
 	margin: 0 0 4px;
 }
 
-#comments-list .comment-item {
-	margin: 6px 0 6px -12px;
-	line-height: 22px;
-}
-
 .comments-tree {
 	margin: 6px 0 6px -12px;
 	line-height: 22px;
@@ -1098,7 +1095,6 @@ a.btn {
 .comments-tree .comment-item {
 	width: 70%;
 	box-sizing: border-box;
-	border-left: 0.2em solid #ddd;
 }
 
 .comment-tree-loader {
@@ -1131,6 +1127,39 @@ a.btn {
 	text-decoration-style: dotted;
 	display: inline-block;
 	margin-left: 0.3em;
+}
+
+.comment-add-link {
+	font-size: 22px;
+	line-height: 32px;
+	margin-bottom: 6px;
+	text-decoration: underline;
+	text-decoration-style: dotted;
+	font-family: 'Trebuchet MS', Arial, sans-serif;
+	display: inline-block;
+}
+
+#comment-add-link + .comment-form { /* only for non-answer comment form */
+	background: transparent url('../i/pageart/comments.png') no-repeat 90% 100%;
+	min-height: 250px;
+}
+
+.comment-form-content {
+	background-color: white;
+	width: 70%;
+	border-left: 0.2em solid #ddd;
+	padding: 8px 12px 8px;
+	box-sizing: border-box;
+}
+
+/* Костыли */
+.comment-form-content #markItUpId_text {
+	margin-top: 0;
+	padding-top: 5px;
+}
+
+.comment-form .markItUp textarea {
+	height: 9em;
 }
 
 /* Pagination */
@@ -1223,11 +1252,6 @@ a.btn {
 
 .login-page {
 	background: transparent url('../i/pageart/login.png') no-repeat 90% 100%;
-}
-
-.comment-form {
-	background: transparent url('../i/pageart/comments.png') no-repeat 90%
-		100%;
 }
 
 .page-faq h2,.page-terms h2,.page-help h2 {
@@ -1439,9 +1463,6 @@ a.btn {
 	.chapter-text {
 		width: 96%;
 	}
-	#comments {
-		width: 100%;
-	}
 }
 
 @media ( min-width : 768px) {
@@ -1500,9 +1521,6 @@ a.btn {
 	.chapter-text {
 		width: 100% !important;
 	}
-	#comments {
-		width: 100%;
-	}
 	.controls textarea {
 		max-width: 400px;
 		max-height: 200px;
@@ -1523,6 +1541,13 @@ a.btn {
 	}
 	.markItUpHeader ul li:nth-child(20n) {
 		clear: both;
+	}
+	.comments-tree .comment-item {
+		width: 90%;
+	}
+	#comment-add-link + .comment-form {
+		background-image: none;
+		min-height: auto;
 	}
 }
 

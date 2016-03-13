@@ -1,10 +1,10 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-from flask import Blueprint, current_app, request, render_template, abort, redirect, url_for, jsonify
+from flask import Blueprint, current_app, request, render_template, abort, redirect, url_for, g, jsonify
 from flask_babel import gettext
-from flask_login import current_user, login_required
-from pony.orm import db_session, select
+from flask_login import current_user
+from pony.orm import db_session
 
 from mini_fiction.forms.comment import CommentForm
 from mini_fiction.models import Story, StoryComment, CoAuthorsStory
@@ -37,8 +37,8 @@ def add(story_id):
     form = CommentForm(request.form)
     if form.validate_on_submit():
         data = dict(form.data)
-        if request.args.get('parent'):
-            data['parent'] = request.args['parent']
+        if request.form.get('parent'):
+            data['parent'] = request.form['parent']
         try:
             comment = StoryComment.bl.create(story, user, request.remote_addr, data)
         except ValidationError as exc:

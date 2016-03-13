@@ -16,12 +16,11 @@
 {%- endmacro %}
 
 
-{% macro comment_form_content(form, objtype, objid, edit=False, comment_id=None) %}
+{% macro comment_form_content(form, objtype, objid, parent=None) %}
+    <div class="comment-form-content">
     {{ form.csrf_token() }}
     <input type="hidden" name="{{ objtype }}" value="{{ objid }}" />
-    {% if edit -%}
-        <input type="hidden" name="{{ 'comment_id' if edit else 'parent' }}" value="{{ comment_id or '' }}" />
-    {% endif -%}
+    <input type="hidden" name="parent" value="{{ parent or '0' }}" />
     <div class="control-group{% if form.text.errors %} error{% endif %}">
         <div class="controls">
             {{ form.text }}
@@ -40,20 +39,21 @@
     <div class="control-group">
         <input class="btn btn-primary comment_submit" type="submit" value="Отправить" />
     </div>
+    </div>
 {% endmacro %}
 
 
 {% macro comment_html(comment) %}
     {%- if comment.deleted and not current_user.is_staff -%}
-        <div class="comment comment-deleted">
+        <div class="comment-text comment-text-deleted">
             Комментарий был отправлен на Луну
         </div>
     {%- else -%}
-        <div class="comment{{ ' comment-short' if comments_short else '' }}">
+        <div class="comment-text{{ ' comment-text-short' if comments_short else '' }}">
             {%- if not comments_short %}{{ comment.text_as_html|safe }}{% else %}{{ comment.brief_text_as_html|safe }}{% endif -%}
         </div>
         {% if comment.deleted -%}
-        <div class="comment comment-deleted">
+        <div class="comment-text comment-text-deleted">
             Комментарий был отправлен на Луну
         </div>
         {%- endif %}

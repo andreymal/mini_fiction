@@ -94,9 +94,9 @@
         {% endif %}
 
         {% if story.bl.can_comment_by(current_user) %}
-            <h2>Добавить новый комментарий</h2>
+            <a href="#" id="comment-add-link" class="comment-add-link">Добавить новый комментарий</a>
 
-            <form class="comment-form" method="POST" enctype="multipart/form-data" action="
+            <form id="comment-form" class="comment-form" method="POST" enctype="multipart/form-data" action="
                 {%- if edit -%}
                     {{- url_for('comment.edit', story_id=story.id, pk=comment_id) -}}
                 {%- else -%}

@@ -44,7 +44,15 @@ def add(story_id):
         except ValidationError as exc:
             form.set_errors(exc.errors)
         else:
-            return redirect(comment.bl.get_permalink())
+            if g.is_ajax:
+                return jsonify({'success': True, 'story': story.id, 'comment': comment.local_id, 'link': comment.bl.get_permalink()})
+            else:
+                return redirect(comment.bl.get_permalink())
+
+    if g.is_ajax and (form.errors or form.non_field_errors):
+        errors = sum(form.errors.values(), []) + form.non_field_errors
+        errors = '; '.join(str(x) for x in errors)
+        return jsonify({'success': False, 'error': errors})
 
     data = {
         'page_title': gettext('Add new comment'),
@@ -97,13 +105,27 @@ def delete(story_id, local_id):
 
     if request.method == 'POST':
         comment.bl.delete(user)
-        return redirect(comment.bl.get_permalink())
+        if g.is_ajax:
+            return jsonify({
+                'success': True,
+                'story': story_id,
+                'comment': local_id,
+                'deleted': comment.deleted,
+                'html': render_template('includes/comment_single.html', comment=comment),
+            })
+        else:
+            return redirect(comment.bl.get_permalink())
+
     data = {
         'page_title': gettext('Confirm delete comment'),
         'story': comment.story,
         'comment': comment,
     }
-    return render_template('story_comment_delete.html', **data)
+    if g.is_ajax:
+        html = render_template('includes/ajax/story_comment_delete.html', **data)
+        return jsonify({'page_content': {'modal': True, 'content': html}})
+    else:
+        return render_template('story_comment_delete.html', **data)
 
 
 @bp.route('/story/<int:story_id>/comment/<int:local_id>/restore/', methods=('GET', 'POST'))
@@ -118,10 +140,24 @@ def restore(story_id, local_id):
 
     if request.method == 'POST':
         comment.bl.restore(user)
-        return redirect(comment.bl.get_permalink())
+        if g.is_ajax:
+            return jsonify({
+                'success': True,
+                'story': story_id,
+                'comment': local_id,
+                'deleted': comment.deleted,
+                'html': render_template('includes/comment_single.html', comment=comment),
+            })
+        else:
+            return redirect(comment.bl.get_permalink())
+
     data = {
         'page_title': gettext('Confirm restore comment'),
         'story': comment.story,
         'comment': comment,
     }
-    return render_template('story_comment_restore.html', **data)
+    if g.is_ajax:
+        html = render_template('includes/ajax/story_comment_restore.html', **data)
+        return jsonify({'page_content': {'modal': True, 'content': html}})
+    else:
+        return render_template('story_comment_restore.html', **data)

@@ -19,7 +19,6 @@
 {% macro comment_form_content(form, objtype, objid, parent=None) %}
     <div class="comment-form-content">
     {{ form.csrf_token() }}
-    <input type="hidden" name="{{ objtype }}" value="{{ objid }}" />
     <input type="hidden" name="parent" value="{{ parent or '0' }}" />
     <div class="control-group{% if form.text.errors %} error{% endif %}">
         <div class="controls">

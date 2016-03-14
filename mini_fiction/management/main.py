@@ -51,6 +51,14 @@ def createsuperuser():
         cmd()
 
 
+@manager.command
+def checkstorycomments():
+    from mini_fiction.management.commands.checkcomments import checkstorycomments as cmd
+    orm.sql_debug(False)
+    with db_session:
+        cmd()
+
+
 @manager.option('-h', '--host', dest='host', help='Server host (default 127.0.0.1)')
 @manager.option('-p', '--port', dest='port', help='Server port (default 5000)', type=int)
 @manager.option('-t', '--threaded', dest='threaded', help='Threaded mode', action='store_true')

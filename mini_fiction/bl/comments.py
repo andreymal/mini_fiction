@@ -128,6 +128,7 @@ class BaseCommentBL(BaseBL):
         old_text = comment.text
         new_text = data['text']
         comment.text = new_text
+        comment.edits_count += 1
         comment.last_edited_at = datetime.utcnow()
         comment.flush()
 
@@ -159,6 +160,7 @@ class BaseCommentBL(BaseBL):
         if not self.can_delete_or_restore_by(author):
             raise ValueError('Permission denied')
         self.model.deleted = True
+        self.model.last_deleted_at = datetime.utcnow()
 
     def restore(self, author):
         if not self.can_delete_or_restore_by(author):

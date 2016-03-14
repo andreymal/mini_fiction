@@ -286,8 +286,10 @@ core.define('story', {
             return;
         }
         panel = panel;
+        var comments = $('#comments');
         this.panel = {
             positionY: panel.position().top,
+            maxPositionY: comments.length ? (comments.position().top - panel.outerHeight()) : null,
             panelWidth: panel.width(),
             isFixed: false,
             event: function() {
@@ -349,11 +351,16 @@ core.define('story', {
     },
 
     _panelEvent: function(panel) {
-        if (this.pageYOffset > (panel.positionY)) {
-            panel.isFixed = true;
-            $("#story_panel").css('position', 'fixed').css('top', 0).css('z-index', 10).css('width', panel.panelWidth).css('border-top-right-radius', 0).css('border-top-left-radius', 0);
-            $("#wrapper").css('height', $("#story_panel").height() + 30);
-        } else {
+        if (
+            this.pageYOffset > (panel.positionY) &&
+            (!panel.maxPositionY || this.pageYOffset < panel.maxPositionY)
+        ) {
+            if (!panel.isFixed) {
+                panel.isFixed = true;
+                $("#story_panel").css('position', 'fixed').css('top', 0).css('z-index', 10).css('width', panel.panelWidth).css('border-top-right-radius', 0).css('border-top-left-radius', 0);
+                $("#wrapper").css('height', $("#story_panel").outerHeight() + 10); // margin-bottom: 10px
+            }
+        } else if (panel.isFixed) {
             panel.isFixed = false;
             $("#story_panel").css('position', 'static').css('top', 0).css('z-index', 10).css('width', panel.panelWidth).css('border-top-right-radius', 10).css('border-top-left-radius', 10);
             $("#wrapper").css('height', 0);

@@ -142,7 +142,7 @@ def configure_ajax(app):
 
     @app.after_request
     def ajax_template_response(response):
-        if not g.is_ajax:
+        if not getattr(g, 'is_ajax', False):
             return response
         if response.data and response.data.startswith(b'{') and response.content_type == 'text/html; charset=utf-8':
             response.content_type = 'application/json'

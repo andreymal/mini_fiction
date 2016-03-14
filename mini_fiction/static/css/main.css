@@ -1079,6 +1079,62 @@ a.btn {
 	border-left: 0;
 }
 
+.comment-vote-area {
+	float: right;
+	padding-left: 0.5em;
+	line-height: 22px;
+	font-weight: bold;
+}
+
+.comment-vote-area.voting {
+	opacity: 0.4;
+}
+
+.comment-vote-area .vote-total {
+	color: #888;
+	display: inline-block;
+	vertical-align: top;
+	font-size: 12px;
+}
+
+.comment-vote-area .vote-total.voted-positive {
+	color: #51983c;
+}
+
+.comment-vote-area .vote-total.voted-negative {
+	color: #da4242;
+}
+
+.comment-vote-area .vote-up, .comment-vote-area .vote-down {
+	width: 16px;
+	height: 16px;
+	display: inline-block;
+	cursor: pointer;
+	opacity: 0.5;
+	vertical-align: middle;
+}
+
+.comment-vote-area .vote-up:hover, .comment-vote-area .vote-down:hover {
+	opacity: 0.9;
+}
+
+.comment-vote-area .vote-up.vote-disabled, .comment-vote-area .vote-down.vote-disabled {
+	opacity: 0.1;
+	cursor: default;
+}
+
+.comment-vote-area .vote-up.voted, .comment-vote-area .vote-down.voted {
+	opacity: 1;
+}
+
+.comment-vote-area .vote-up {
+	background: url('../i/upvote.png') center center no-repeat;
+}
+
+.comment-vote-area .vote-down {
+	background: url('../i/downvote.png') center center no-repeat;
+}
+
 .comment-text {
 	font-size: 12px;
 	margin-bottom: 4px;

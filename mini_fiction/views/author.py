@@ -55,6 +55,7 @@ def info(user_id=None, comments_page=1):
         abort(404)
     num_pages = paged.num_pages
 
+    comment_spoiler_threshold = current_app.config['COMMENT_SPOILER_THRESHOLD']
     data.update({
         'author': author,
         'stories': stories,
@@ -63,6 +64,7 @@ def info(user_id=None, comments_page=1):
         'page_current': comments_page,
         'num_pages': num_pages,
         'comments_count': comments_count,
+        'comment_spoiler_threshold': comment_spoiler_threshold,
         'comments_short': True,
         'page_obj': paged,
     })

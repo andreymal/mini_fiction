@@ -13,12 +13,18 @@ core.define('comment', {
             this.loadCommentsContent();
         }
 
+        var list = document.getElementById('comments-list');
+        if (list) {
+            this.bindLinksFor(list);
+        }
+
         this.loadPagination();
     },
 
     loadCommentsContent: function() {
         var tree = document.getElementById('comments-tree');
         if (tree) {
+            this.bindTreeLinksFor(tree);
             this.bindLinksFor(tree);
             this.treeAutoload();
         }
@@ -40,7 +46,7 @@ core.define('comment', {
         }, linkBlock);
     },
 
-    bindLinksFor: function(element) {
+    bindTreeLinksFor: function(element) {
         var links, i;
         links = Array.prototype.slice.call(element.querySelectorAll('.comment-answer-link'));
         for (i = 0; i < links.length; i++) {
@@ -50,6 +56,14 @@ core.define('comment', {
         links = Array.prototype.slice.call(element.querySelectorAll('.comment-tree-loader-link'));
         for (i = 0; i < links.length; i++) {
             links[i].addEventListener('click', this._treeLinkEvent);
+        }
+    },
+
+    bindLinksFor: function(element) {
+        var links, i;
+        links = Array.prototype.slice.call(element.querySelectorAll('.vote-up, .vote-down'));
+        for (i = 0; i < links.length; i++) {
+            links[i].addEventListener('click', this._voteEvent);
         }
     },
 
@@ -142,6 +156,7 @@ core.define('comment', {
             var d = document.createElement('div');
             d.id = data.comment;
             d.innerHTML = data.html;
+            this.bindTreeLinksFor(d.firstElementChild);
             this.bindLinksFor(d.firstElementChild);
 
             if (parentComment) {
@@ -268,10 +283,45 @@ core.define('comment', {
     _treeLoadedEvent: function(linkBlock, data) {
         var d = document.createElement('div');
         d.innerHTML = data.comments_tree;
+        this.bindTreeLinksFor(d);
         this.bindLinksFor(d);
         while (d.firstChild) {
             linkBlock.parentNode.insertBefore(d.firstChild, linkBlock);
         }
         linkBlock.parentNode.removeChild(linkBlock);
+    },
+
+    _voteEvent: function(event) {
+        event.preventDefault();
+        if (this.classList.contains('vote-disabled')) {
+            return false;
+        }
+        core.comment.vote(this.parentNode, this.classList.contains('vote-down') ? -1 : 1);
+        return false;
+    },
+
+    vote: function(voteArea, value) {
+        if (!voteArea) {
+            return false;
+        }
+
+        var formData = new FormData();
+        formData.append('value', value);
+
+        var href = voteArea.dataset.href;
+        voteArea.classList.add('voting');
+        core.ajax.post(href, formData)
+            .then(function(response) {
+                return response.json();
+            }).then(function(data) {
+                if (core.handleResponse(data, href)) {
+                    return;
+                }
+                voteArea.innerHTML = data.html;
+                core.notify('Ваш голос учтён');
+            }).catch(core.handleError).then(function() {
+                voteArea.classList.remove('voting');
+            });
+        return true;
     }
 });

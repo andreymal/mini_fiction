@@ -2,7 +2,7 @@
 {% for comment in comments %}
     <div id="comment_{{ comment.story.id }}_{{ comment.local_id }}" data-global-id="{{ comment.id }}" class="comment-item">
        {% call comment_html(comment, short=comments_short, with_controls=not comments_short and not without_comment_controls, with_vote=not comments_short) %}
-       {% if comments_short %}
+       {% if comments_short or with_story_link %}
             <span class="comment-story-link">
             к рассказу
             <a href="{{ url_for('story.view', pk=comment.story.id) }}"><b>{{ comment.story.title }}</b></a>

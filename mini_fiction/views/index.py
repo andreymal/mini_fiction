@@ -41,6 +41,7 @@ def index():
 
     comments = StoryComment.select(lambda x: x.story_published and not x.deleted).order_by(StoryComment.id.desc())
     comments = comments[:current_app.config['COMMENTS_COUNT']['main']]
+    comment_spoiler_threshold = current_app.config['COMMENT_SPOILER_THRESHOLD']
 
     data = {
         'categories': categories,
@@ -48,6 +49,7 @@ def index():
         'chapters': chapters,
         'comments': comments,
         'comments_short': True,
+        'comment_spoiler_threshold': comment_spoiler_threshold,
         'page_title': page_title,
     }
     data.update(cached_lists([x.id for x in stories]))

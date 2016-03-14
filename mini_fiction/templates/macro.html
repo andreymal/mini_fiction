@@ -48,12 +48,26 @@
             Комментарий был отправлен на Луну
         </div>
     {%- else -%}
+        {% if with_vote %}
+        <div class="comment-vote-area" data-href="{{ comment.bl.get_vote_link() }}">
+            {% include 'includes/comment_vote.html' %}
+        </div>
+        {% endif %}
         {% if with_controls %}
             {% include 'includes/comment_controls.html' %}
         {% endif %}
+
+        {% if comment_spoiler_threshold is defined and comment.vote_total <= comment_spoiler_threshold %}
+        <button class="btn btn-collapse btn-small" data-toggle="collapse" data-target="#comment_text_{{ comment.id }}">Показать скрытый комментарий</button>
+        <div id="comment_text_{{ comment.id }}" class="collapse comment-text{{ ' comment-text-short' if short else '' }}">
+            {%- if not short %}{{ comment.text_as_html|safe }}{% else %}{{ comment.brief_text_as_html|safe }}{% endif -%}
+        </div>
+        {% else %}
         <div class="comment-text{{ ' comment-text-short' if short else '' }}">
             {%- if not short %}{{ comment.text_as_html|safe }}{% else %}{{ comment.brief_text_as_html|safe }}{% endif -%}
         </div>
+        {% endif %}
+
         {% if comment.deleted -%}
         <div class="comment-text comment-text-deleted">
             Комментарий был отправлен на Луну

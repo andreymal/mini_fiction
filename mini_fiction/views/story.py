@@ -51,11 +51,13 @@ def view(pk, comments_page):
     else:
         user_vote = None
 
+    comment_spoiler_threshold = current_app.config['COMMENT_SPOILER_THRESHOLD']
     data = {
         'story': story,
         'vote': user_vote,
         'comments_tree_list': comments_tree_list,
         'comments_count': comments_count,
+        'comment_spoiler_threshold': comment_spoiler_threshold,
         'last_viewed_comment': last_viewed_comment,
         'chapters': chapters,
         'num_pages': paged.num_pages,

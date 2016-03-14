@@ -40,6 +40,9 @@ class BaseCommentBL(BaseBL):
     def get_restore_link(self):
         raise NotImplementedError
 
+    def get_vote_link(self):
+        raise NotImplementedError
+
     def can_comment_by(self, target, author=None):
         raise NotImplementedError
 
@@ -47,6 +50,20 @@ class BaseCommentBL(BaseBL):
         c = self.model
         target = getattr(c, self.target_attr)
         return not c.deleted and type(c).bl.can_comment_by(target, author)
+
+    def can_vote_by(self, author=None):
+        if not self.can_vote or not author or not author.is_authenticated:
+            return False
+        c = self.model
+        if c.deleted or c.author and c.author.id == author.id:
+            return False
+        return self.get_user_vote(author) == 0
+
+    def get_user_vote(self, author=None):
+        if not self.can_vote or not author or not author.is_authenticated:
+            return 0
+        vote = self.model.votes.select(lambda x: x.author.id == author.id).first()
+        return vote.vote_value if vote else 0
 
     def create(self, target, author, ip, data):
         if self.schema is None:
@@ -157,6 +174,27 @@ class BaseCommentBL(BaseBL):
     def can_delete_or_restore_by(self, author=None):
         return author and author.is_staff
 
+    def vote(self, author, value):
+        if not author or not author.is_authenticated:
+            raise ValidationError({'author': [lazy_gettext("Please log in to vote")]})
+
+        if self.can_vote:
+            vote = self.model.votes.select(lambda x: x.author.id == author.id).first()
+            if vote is not None:
+                raise ValidationError({'author': [lazy_gettext("You already voted")]})
+
+        if not self.can_vote or not self.can_vote_by(author):
+            raise ValidationError({'author': [lazy_gettext("You can't vote")]})
+
+        if value not in (-1, 1):
+            raise ValidationError({'value': [lazy_gettext('Invalid value')]})
+
+        vote = self.model.votes.create(author=author, vote_value=value)
+        vote.flush()
+        self.model.vote_total += value
+        self.model.vote_count += 1
+        return vote
+
 
 class StoryCommentBL(BaseCommentBL):
     target_attr = 'story'
@@ -191,6 +229,9 @@ class StoryCommentBL(BaseCommentBL):
 
     def get_restore_link(self):
         return url_for('story_comment.restore', story_id=self.model.story.id, local_id=self.model.local_id)
+
+    def get_vote_link(self):
+        return url_for('story_comment.vote', story_id=self.model.story.id, local_id=self.model.local_id)
 
     def _attributes_for(self, data):
         return {'story_published': data['story'].published}

@@ -55,6 +55,7 @@ def chapters(page):
 @db_session
 def comments(page):
     objects = StoryComment.select(lambda x: x.story_published and not x.deleted).order_by(StoryComment.id.desc())
+    comment_spoiler_threshold = current_app.config['COMMENT_SPOILER_THRESHOLD']
 
     return paginate_view(
         'stream/comments.html',
@@ -63,7 +64,7 @@ def comments(page):
         page_title='Лента комментариев',
         objlistname='comments',
         per_page=current_app.config['COMMENTS_COUNT']['stream'],
-        extra_context=lambda comments_list, _: {'comments_short': True}
+        extra_context=lambda comments_list, _: {'with_story_link': True, 'comment_spoiler_threshold': comment_spoiler_threshold}
     )
 
 

@@ -174,6 +174,32 @@ def restore(story_id, local_id):
         return render_template('story_comment_restore.html', **data)
 
 
+@bp.route('/story/<int:story_id>/comment/<int:local_id>/vote/', methods=('POST',))
+@db_session
+def vote(story_id, local_id):
+    user = current_user._get_current_object()
+    comment = StoryComment.get(story=story_id, local_id=local_id, deleted=False)
+    if not comment:
+        abort(404)
+
+    try:
+        value = int(request.form.get('value', 0))
+    except ValueError:
+        value = 0
+
+    try:
+        comment.bl.vote(user, value)
+    except ValidationError as exc:
+        errors = sum(exc.errors.values(), [])
+        return jsonify({'success': False, 'error': '; '.join(str(x) for x in errors)})
+    return jsonify({
+        'success': True,
+        'vote_total': comment.vote_total,
+        'vote_count': comment.vote_count,
+        'html': render_template('includes/comment_vote.html', comment=comment)
+    })
+
+
 @bp.route('/ajax/story/<int:story_id>/comments/page/<int:page>/')
 @db_session
 def ajax(story_id, page):
@@ -194,6 +220,7 @@ def ajax(story_id, page):
     else:
         last_viewed_comment = story.bl.last_viewed_comment_by(current_user)
 
+    comment_spoiler_threshold = current_app.config['COMMENT_SPOILER_THRESHOLD']
     data = {
         'story': story,
         'comments_tree_list': comments_tree_list,
@@ -201,6 +228,7 @@ def ajax(story_id, page):
         'num_pages': paged.num_pages,
         'page_current': page,
         'page_obj': paged,
+        'comment_spoiler_threshold': comment_spoiler_threshold,
     }
 
     return jsonify({
@@ -258,10 +286,12 @@ def ajax_tree(story_id, local_id):
     else:
         last_viewed_comment = story.bl.last_viewed_comment_by(current_user)
 
+    comment_spoiler_threshold = current_app.config['COMMENT_SPOILER_THRESHOLD']
     data = {
         'story': story,
         'comments_tree_list': tree,
         'last_viewed_comment': last_viewed_comment,
+        'comment_spoiler_threshold': comment_spoiler_threshold,
     }
 
     return jsonify({

@@ -4,7 +4,6 @@
 import ipaddress
 from datetime import datetime, timedelta
 
-from pony import orm
 from flask import current_app, url_for
 from flask_babel import lazy_gettext
 
@@ -19,8 +18,6 @@ class BaseCommentBL(BaseBL):
     can_update = False
     can_vote = False
     schema = None
-    edit_model = None
-    vote_model = None
 
     def get_permalink(self):
         raise NotImplementedError
@@ -119,7 +116,7 @@ class BaseCommentBL(BaseBL):
         if not self.can_update:
             raise ValueError('Not available')
 
-        if self.schema is None or not self.edit_model:
+        if self.schema is None or not hasattr(self.model, 'edits'):
             raise NotImplementedError
         if not self.can_update_by(author):
             raise ValueError('Permission denied')  # TODO: refactor exceptions
@@ -134,10 +131,7 @@ class BaseCommentBL(BaseBL):
         comment.last_edited_at = datetime.utcnow()
         comment.flush()
 
-        from mini_fiction import models
-        CommentEdit = getattr(models, self.edit_model)
-        editlog = CommentEdit(
-            comment=comment,
+        editlog = comment.edits.create(
             editor=author,
             date=comment.last_edited_at,
             old_text=old_text,
@@ -149,7 +143,7 @@ class BaseCommentBL(BaseBL):
 
     def can_update_by(self, author=None):
         c = self.model
-        if c.deleted or not author or not author.is_authenticated:
+        if c.deleted or not self.can_update or not author or not author.is_authenticated:
             return False
         if author.is_staff:
             return True
@@ -179,6 +173,8 @@ class BaseCommentBL(BaseBL):
             raise ValidationError({'author': [lazy_gettext("Please log in to vote")]})
 
         if self.can_vote:
+            if not hasattr(self.model, 'votes'):
+                raise NotImplementedError
             vote = self.model.votes.select(lambda x: x.author.id == author.id).first()
             if vote is not None:
                 raise ValidationError({'author': [lazy_gettext("You already voted")]})
@@ -201,8 +197,6 @@ class StoryCommentBL(BaseCommentBL):
     can_update = True
     can_vote = True
     schema = STORY_COMMENT
-    edit_model = 'StoryCommentEdit'
-    vote_model = 'StoryCommentVote'
 
     def can_comment_by(self, target, author=None):
         if (not author or not author.is_authenticated) and not current_app.config['STORY_COMMENTS_BY_GUEST']:

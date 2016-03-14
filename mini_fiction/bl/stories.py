@@ -373,17 +373,10 @@ class StoryBL(BaseBL, Commentable):
         from mini_fiction.models import StoryComment
         return StoryComment.bl.can_comment_by(self.model, author)
 
-    def get_comments_list(self, maxdepth=None, root_offset=None, root_count=None):
+    def select_comments(self):
         from mini_fiction.models import StoryComment
 
-        result = StoryComment.select(lambda x: x.story == self.model)
-        if maxdepth is not None:
-            result = result.filter(lambda x: x.tree_depth <= maxdepth)
-        if root_offset is not None and root_count is not None:
-            offset_to = root_offset + root_count
-            result = result.filter(lambda x: x.root_order >= root_offset and x.root_order < offset_to)
-        result = result.order_by(StoryComment.id)
-        return result[:]
+        return orm.select(c for c in StoryComment if c.story == self.model)
 
 
 class ChapterBL(BaseBL):

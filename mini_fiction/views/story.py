@@ -7,13 +7,11 @@ from datetime import datetime
 from flask import Blueprint, Response, current_app, request, render_template, abort, redirect, url_for, send_file, jsonify, g
 from flask_babel import gettext
 from flask_login import current_user, login_required
-from pony import orm
 from pony.orm import db_session
 
 from mini_fiction.forms.story import StoryForm
 from mini_fiction.forms.comment import CommentForm
-from mini_fiction.models import Story, Chapter, Rating, StoryEditLogItem, StoryComment, Favorites, Bookmark
-from mini_fiction.utils.misc import Paginator
+from mini_fiction.models import Story, Chapter, Rating, StoryEditLogItem, Favorites, Bookmark
 from mini_fiction.validation import ValidationError
 
 bp = Blueprint('story', __name__)
@@ -35,25 +33,15 @@ def get_story(pk):
 @db_session
 def view(pk, comments_page):
     story = get_story(pk)
-    chapters = story.chapters.select().order_by(Chapter.order, Chapter.id)[:]
+
     per_page = current_app.config['COMMENTS_COUNT']['page']
-    comments_count = story.comments.select().count()
-    if comments_count > 0:
-        root_comments_total = orm.select(orm.max(x.root_order) for x in StoryComment if x.story == story).first() + 1
-    else:
-        root_comments_total = comments_count
-    paged = Paginator(
-        number=comments_page,
-        total=root_comments_total,
-        per_page=per_page,
-    )  # TODO: restore orphans?
-    maxdepth = None if request.args.get('fulltree') == '1' else 1
-    comments_tree_list = story.bl.get_comments_tree_list(maxdepth, root_offset=per_page * (paged.number - 1), root_count=per_page)
+    maxdepth = None if request.args.get('fulltree') == '1' else 2
+
+    comments_count, paged, comments_tree_list = story.bl.paginate_comments(comments_page, per_page, maxdepth)
     if not comments_tree_list and paged.number != 1:
         abort(404)
-    num_pages = paged.num_pages
-    page_title = story.title
-    comment_form = CommentForm()
+
+    chapters = story.chapters.select().order_by(Chapter.order, Chapter.id)[:]
 
     user = current_user._get_current_object()
     if user.is_authenticated:
@@ -70,10 +58,10 @@ def view(pk, comments_page):
        'comments_tree_list': comments_tree_list,
        'comments_count': comments_count,
        'chapters': chapters,
-       'num_pages': num_pages,
+       'num_pages': paged.num_pages,
        'page_current': comments_page,
-       'page_title': page_title,
-       'comment_form': comment_form,
+       'page_title': story.title,
+       'comment_form': CommentForm(),
        'page_obj': paged,
     }
     return render_template('story_view.html', **data)

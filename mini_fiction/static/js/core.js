@@ -10,6 +10,7 @@ var core = {
     content: null,
 
     modalShow: false,
+    modalClosing: false,
     modalElement: null,
     modalBackgr: null,
     loadingIcon: null,
@@ -67,10 +68,7 @@ var core = {
             }
 
             // Сохраняем заголовок в стеке истории
-            history.replaceState({
-                modal: false,
-                title: document.head.getElementsByTagName('title')[0].innerHTML,
-            }, '', location.toString());
+            history.replaceState(this.buildHistoryState(), '', location.toString());
         }
 
         for (var i = 0; i < this.modulesList.length; i++) {
@@ -253,6 +251,7 @@ var core = {
 
         this.bind('#modal [data-dismiss="modal"]', 'click', this._modalHideEvent.bind(this));
         this.modalShow = true;
+        this.modalClosing = false;
         return true;
     },
 
@@ -264,9 +263,14 @@ var core = {
         if (!this.modalShow) {
             return false;
         }
+        this.modalClosing = true;
         this.modalElement.classList.remove('in');
         this.modalBackgr.classList.remove('in');
         setTimeout(function() {
+            if (!this.modalClosing) {
+                // Кто-то открыл модальное окно с force
+                return;
+            }
             this.modalBackgr.classList.add('hide');
             this.modalElement.classList.add('hide');
             this.modalElement.innerHTML = '';
@@ -290,6 +294,16 @@ var core = {
         }
         this.modalHide();
         return false;
+    },
+
+    /*
+     * Сбор информации для пихания в history pushState/replaceState
+     */
+    buildHistoryState: function() {
+        return {
+            modal: this.state.modal,
+            title: document.head.getElementsByTagName('title')[0].innerHTML
+        };
     },
 
     /*
@@ -368,12 +382,18 @@ var core = {
             document.head.getElementsByTagName('title')[0].innerHTML = data.title;
         }
         if (data.modal) {
+            if (!this.state.modal) {
+                this.state.modal = true;
+            }
             this.modal(data.content, true);
         } else {
+            this.state.modal = false;
             this.nav.innerHTML = data.nav;
             this.content.innerHTML = data.content;
         }
-        var state = {modal: data.modal, title: data.title};
+
+        // Шаманим с адресной строкой
+        var state = this.buildHistoryState();
         if (link !== undefined && !options.nopushstate) {
             history.pushState(state, '', link);
         } else {
@@ -392,7 +412,6 @@ var core = {
                 helem.scrollIntoView();
             }
         }
-        this.state.modal = data.modal;
 
         if (data.modal_content) {
             // На момент написания loadModal и unloadModal решено здесь не вызывать
@@ -601,9 +620,11 @@ var core = {
             if (event.state && event.state.title) {
                 document.head.getElementsByTagName('title')[0].innerHTML = event.state.title;
             }
+            // FIXME: при нажатии «Вперёд» при модальном окне контент не совпадает с ссылкой,
+            // но без сохранения старого location не починить
             return;
-        } else {
-            // Но окошко прятать в любом случае надо (NSFW-предупреждение, например)
+        } else if (!this.state.modal) {
+            // Но прятать окна, не являющиеся страницами, в любом случае надо (NSFW-предупреждение, например)
             this.modalHide();
         }
         // Здесь в принципе можно организовать кэширование, но нужно ли?

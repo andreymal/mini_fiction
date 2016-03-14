@@ -190,6 +190,8 @@ core.define('comment', {
                 var comment = document.getElementById(data.comment.toString());
                 if (comment) {
                     comment.innerHTML = data.html;
+                    core.comment.bindTreeLinksFor(comment);
+                    core.comment.bindLinksFor(comment);
                 }
                 history.back();
             })

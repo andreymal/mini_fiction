@@ -166,7 +166,7 @@ def configure_errorpages(app):
         return render_template('404.html'), 404
 
     def _page500(e):
-        return render_template('500.html'), 404
+        return render_template('500.html'), 500
 
     def _pageall(e):
         return render_template('error.html', error=e), e.code or 500

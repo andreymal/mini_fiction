@@ -2,7 +2,7 @@
 {% block after_list %}
     {% if stories %}
         <!-- Пагинация: начало вывода -->
-            <div id="pagination" class="center">
+            <div id="favorites-pagination" class="pagination center">
                 {% if page_obj.has_previous() %}
                     <a class="btn" href="{{ url_for(endpoint, page=page_obj.number - 1, **view_args) }}">← Назад</a>
                 {% endif %}

@@ -26,7 +26,7 @@
         {% endfor %}
 
         {% if page_obj %}
-            <div id="pagination" class="center">
+            <div id="stories-pagination" class="pagination center">
                 {% if page_obj.has_previous() %}
                     <a class="btn" href="{{ url_for(endpoint, page=page_obj.number - 1, **view_args) }}">← Назад</a>
                 {% endif %}

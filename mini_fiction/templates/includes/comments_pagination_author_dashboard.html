@@ -1,5 +1,5 @@
 {% if page_obj.num_pages != 1 %}
-    <div id="pagination" class="center">
+    <div id="comments-pagination" class="pagination center">
         <a href="{{ url_for('author.info', comments_page=page_obj.number - 1) }}" id="disabled_ajax_prev_comment" class="btn{% if not page_obj.has_previous() %} hidden{% endif %}">← Новые</a>
         <span id="disabled_ajax_pages_comment" class="btn btn-primary">{{ page_obj.number }} / {{ page_obj.num_pages }}</span>
         <a href="{{ url_for('author.info', comments_page=page_obj.number + 1) }}" id="disabled_ajax_next_comment" class="btn{% if not page_obj.has_next() %} hidden{% endif %}">Старые →</a>

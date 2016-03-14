@@ -105,7 +105,7 @@
         {% endif %}
         {% if result %}
                 <!-- Пагинация: начало вывода -->
-                    <div id="pagination" class="center">
+                    <div id="search-pagination" class="pagination center">
                         {% for page_id in pagination.iter_pages() %}
                             <input form="searchform" type="submit" class="btn{% if page_id == pagination.number %} btn-primary{% endif %}" name="page" value="{{ page_id }}" >
                         {% endfor %}

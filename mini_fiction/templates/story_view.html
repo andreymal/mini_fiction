@@ -85,11 +85,13 @@
         <!-- Вывод комментариев: начало -->
         {% if comments_count > 0 %}
         <div id="comments">
-            <h3>Комментарии ({{ comments_count }})</h3>
+            <h3>Комментарии (<span id="comments-count">{{ comments_count }}</span>)</h3>
             <div id="comments-tree" class="comments-tree">
                 {% include 'includes/comments_tree.html' %}
             </div>
-            {% include 'includes/comments_pagination_story.html' %}
+            <div id="comments-pagination" class="pagination" class="center">
+                {%- include 'includes/comments_pagination_story.html' -%}
+            </div>
         </div>
         {% endif %}
 

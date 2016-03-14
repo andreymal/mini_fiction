@@ -18,13 +18,11 @@ bp = Blueprint('story', __name__)
 
 
 def get_story(pk):
-    story = Story.accessible(current_user).filter(lambda x: x.id == pk).first()
+    story = Story.get(id=pk)
     if not story:
-        story = Story.get(id=pk)
-        if not story:
-            abort(404)
-        if not story.editable_by(current_user):
-            abort(403)
+        abort(404)
+    if not story.bl.has_access(current_user._get_current_object()):
+        abort(403)
     return story
 
 
@@ -41,12 +39,7 @@ def view(pk, comments_page):
     comments_count, paged, comments_tree_list = story.bl.paginate_comments(comments_page, per_page, maxdepth)
     if not comments_tree_list and paged.number != 1:
         abort(404)
-
-    if user.is_authenticated:
-        last_viewed_comment = story.activity.select(lambda x: x.author == user).first()
-        last_viewed_comment = last_viewed_comment.last_comment_id if last_viewed_comment else None
-    else:
-        last_viewed_comment = None
+    last_viewed_comment = story.bl.last_viewed_comment_by(user)
 
     chapters = story.chapters.select().order_by(Chapter.order, Chapter.id)[:]
 
@@ -59,17 +52,17 @@ def view(pk, comments_page):
         user_vote = None
 
     data = {
-       'story': story,
-       'vote': user_vote,
-       'comments_tree_list': comments_tree_list,
-       'comments_count': comments_count,
-       'last_viewed_comment': last_viewed_comment,
-       'chapters': chapters,
-       'num_pages': paged.num_pages,
-       'page_current': comments_page,
-       'page_title': story.title,
-       'comment_form': CommentForm(),
-       'page_obj': paged,
+        'story': story,
+        'vote': user_vote,
+        'comments_tree_list': comments_tree_list,
+        'comments_count': comments_count,
+        'last_viewed_comment': last_viewed_comment,
+        'chapters': chapters,
+        'num_pages': paged.num_pages,
+        'page_current': comments_page,
+        'page_title': story.title,
+        'comment_form': CommentForm(),
+        'page_obj': paged,
     }
     return render_template('story_view.html', **data)
 

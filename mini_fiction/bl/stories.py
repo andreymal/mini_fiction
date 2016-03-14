@@ -242,7 +242,7 @@ class StoryBL(BaseBL, Commentable):
         story = self.model
         if user and user.is_staff:
             return True
-        if story.published or self.is_author(user):
+        if story.published or self.is_author(user) or self.editable_by(user):
             return True
         return False
 
@@ -379,6 +379,13 @@ class StoryBL(BaseBL, Commentable):
         from mini_fiction.models import StoryComment
 
         return orm.select(c for c in StoryComment if c.story == self.model)
+
+    def last_viewed_comment_by(self, author):
+        if author and author.is_authenticated:
+            act = self.model.activity.select(lambda x: x.author.id == author.id).first()
+            return act.last_comment_id if act else None
+        else:
+            return None
 
 
 class ChapterBL(BaseBL):

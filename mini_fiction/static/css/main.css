@@ -1172,14 +1172,18 @@ a.btn {
 }
 
 /* Pagination */
-#pagination {
+#pagination, .pagination {
 	margin: 10px 0;
 }
 
-#pagination .input-xlarge {
+#pagination .input-xlarge, .pagination .input-xlarge {
 	margin-bottom: -1px;
 	width: 50px;
 	text-align: center;
+}
+
+.pagination-loading {
+	opacity: 0.5;
 }
 
 /* Footer */

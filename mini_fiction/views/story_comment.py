@@ -161,3 +161,41 @@ def restore(story_id, local_id):
         return jsonify({'page_content': {'modal': True, 'content': html}})
     else:
         return render_template('story_comment_restore.html', **data)
+
+
+@bp.route('/ajax/story/<int:story_id>/comments/page/<int:page>/')
+@db_session
+def ajax(story_id, page):
+    story = Story.get(id=story_id)
+    if not story:
+        abort(404)
+    if not story.bl.has_access(current_user):
+        abort(403)
+
+    per_page = current_app.config['COMMENTS_COUNT']['page']
+    maxdepth = None if request.args.get('fulltree') == '1' else 2
+
+    comments_count, paged, comments_tree_list = story.bl.paginate_comments(page, per_page, maxdepth)
+    if not comments_tree_list and paged.number != 1:
+        abort(404)
+    if request.args.get('last_comment') and request.args['last_comment'].isdigit():
+        last_viewed_comment = int(request.args['last_comment'])
+    else:
+        last_viewed_comment = story.bl.last_viewed_comment_by(current_user)
+
+    data = {
+        'story': story,
+        'comments_tree_list': comments_tree_list,
+        'last_viewed_comment': last_viewed_comment,
+        'num_pages': paged.num_pages,
+        'page_current': page,
+        'page_obj': paged,
+    }
+
+    return jsonify({
+        'success': True,
+        'link': url_for('story.view', pk=story.id, comments_page=page),
+        'comments_count': comments_count,
+        'comments_tree': render_template('includes/comments_tree.html', **data),
+        'pagination': render_template('includes/comments_pagination_story.html', **data),
+    })

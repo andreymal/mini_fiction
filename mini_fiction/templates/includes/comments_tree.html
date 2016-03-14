@@ -1,6 +1,6 @@
 {% from 'macro.html' import comment_html with context %}
 {% for comment, has_next_tree in comments_tree_list %}
-    <div id="{{ comment.local_id }}" data-global-id="{{ comment.id }}" data-parent="{{ comment.parent.local_id if comment.parent else '' }}" class="comment-item" data-depth="{{ comment.tree_depth }}" style="margin-left: {{ comment.tree_depth }}%">
+    <div id="{{ comment.local_id }}" data-global-id="{{ comment.id }}" data-parent="{{ comment.parent.local_id if comment.parent else '' }}" class="comment-item{{ ' comment-new' if last_viewed_comment and last_viewed_comment < comment.id else '' }}" data-depth="{{ comment.tree_depth }}" style="margin-left: {{ comment.tree_depth }}%">
         {% include 'includes/comment_single.html' %}
     </div><!-- /{{ comment.local_id }} -->
 

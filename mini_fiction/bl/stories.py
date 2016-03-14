@@ -139,11 +139,13 @@ class StoryBL(BaseBL, Commentable):
         from mini_fiction.models import Activity
 
         story = self.model
+        last_comment = self.select_comments().order_by('-c.id').first()
         data = {
             'last_views': story.views,
             'last_comments': story.comments_count,
             'last_vote_average': story.vote_average,
             'last_vote_stddev': story.vote_stddev,
+            'last_comment_id': last_comment.id if last_comment else 0,
         }
         act = Activity.get(story=story, author=user)
         if not act:

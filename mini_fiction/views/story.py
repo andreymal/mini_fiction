@@ -32,6 +32,7 @@ def get_story(pk):
 @bp.route('/<int:pk>/comments/page/<int:comments_page>/')
 @db_session
 def view(pk, comments_page):
+    user = current_user._get_current_object()
     story = get_story(pk)
 
     per_page = current_app.config['COMMENTS_COUNT']['page']
@@ -41,9 +42,14 @@ def view(pk, comments_page):
     if not comments_tree_list and paged.number != 1:
         abort(404)
 
+    if user.is_authenticated:
+        last_viewed_comment = story.activity.select(lambda x: x.author == user).first()
+        last_viewed_comment = last_viewed_comment.last_comment_id if last_viewed_comment else None
+    else:
+        last_viewed_comment = None
+
     chapters = story.chapters.select().order_by(Chapter.order, Chapter.id)[:]
 
-    user = current_user._get_current_object()
     if user.is_authenticated:
         story.bl.viewed(user)
         if len(chapters) == 1:
@@ -57,6 +63,7 @@ def view(pk, comments_page):
        'vote': user_vote,
        'comments_tree_list': comments_tree_list,
        'comments_count': comments_count,
+       'last_viewed_comment': last_viewed_comment,
        'chapters': chapters,
        'num_pages': paged.num_pages,
        'page_current': comments_page,

@@ -1064,6 +1064,15 @@ a.btn {
 	border-left: 0.2em solid #ddd;
 }
 
+.comment-item.comment-new {
+	border-left: 0.2em solid #9e9;
+	background-color: rgba(180, 255, 180, 0.3);
+}
+
+.comment-item.comment-new:nth-child(2n+1) {
+	background-color: rgba(192, 255, 192, 0.7);
+}
+
 /* index page */
 .sidelist .comment-item {
 	margin-left: -12px;

@@ -535,6 +535,7 @@ class Activity(db.Entity):
     last_comments = orm.Required(int, default=0)
     last_vote_average = orm.Required(float, default=3)
     last_vote_stddev = orm.Required(float, default=0)
+    last_comment_id = orm.Required(int, default=0)
 
 
 class StoryEditLogItem(db.Entity):

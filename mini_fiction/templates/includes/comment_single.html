@@ -1,3 +1,2 @@
 {%- from 'macro.html' import comment_html with context -%}
-{% if not without_comment_controls %}{% include 'includes/comment_controls.html' %}{% endif %}
-{{ comment_html(comment) }}
+{{ comment_html(comment, short=comments_short, with_controls=not comments_short and not without_comment_controls, with_vote=not comments_short) }}

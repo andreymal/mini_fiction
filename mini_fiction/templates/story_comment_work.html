@@ -10,11 +10,11 @@
 
     {% if edit -%}
         <div class="comment-item" id="{{ comment.local_id }}">
-        {{ comment_html(comment) }}
+        {{ comment_html(comment, with_controls=False, with_vote=False) }}
         </div>
     {%- elif parent_comment -%}
         <div class="comment-item" id="{{ parent_comment.local_id }}">
-        {{ comment_html(parent_comment) }}
+        {{ comment_html(parent_comment, with_controls=False, with_vote=False) }}
         </div>
     {%- endif %}
 

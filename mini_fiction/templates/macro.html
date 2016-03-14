@@ -42,14 +42,17 @@
 {% endmacro %}
 
 
-{% macro comment_html(comment) %}
+{% macro comment_html(comment, short=False, with_controls=True, with_vote=True) %}
     {%- if comment.deleted and not current_user.is_staff -%}
         <div class="comment-text comment-text-deleted">
             Комментарий был отправлен на Луну
         </div>
     {%- else -%}
-        <div class="comment-text{{ ' comment-text-short' if comments_short else '' }}">
-            {%- if not comments_short %}{{ comment.text_as_html|safe }}{% else %}{{ comment.brief_text_as_html|safe }}{% endif -%}
+        {% if with_controls %}
+            {% include 'includes/comment_controls.html' %}
+        {% endif %}
+        <div class="comment-text{{ ' comment-text-short' if short else '' }}">
+            {%- if not short %}{{ comment.text_as_html|safe }}{% else %}{{ comment.brief_text_as_html|safe }}{% endif -%}
         </div>
         {% if comment.deleted -%}
         <div class="comment-text comment-text-deleted">
@@ -72,7 +75,7 @@
                 {{ comment.date|timedeltaformat }} назад
             </time>
 
-            {% if not comments_short %}
+            {% if not short %}
             <a class="comment-link" href="{{ comment.bl.get_permalink() }}">#{{ comment.local_id }}</a>
 
             {%- if comment.parent %}

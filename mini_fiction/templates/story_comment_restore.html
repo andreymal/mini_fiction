@@ -9,7 +9,7 @@
 
 
     <div class="comment-item" id="{{ comment.local_id }}">
-    {{ comment_html(comment) }}
+    {{ comment_html(comment, with_controls=False, with_vote=False) }}
     </div>
 
     <form method="POST" enctype="multipart/form-data">

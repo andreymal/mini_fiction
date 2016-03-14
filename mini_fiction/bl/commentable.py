@@ -46,7 +46,7 @@ class Commentable(object):
 
         comments_count = target.comments.select().count()
         if comments_count > 0:
-            root_comments_total = self.select_comments().order_by('-c.root_order').first().root_order
+            root_comments_total = self.select_comments().order_by('-c.root_order').first().root_order + 1
         else:
             root_comments_total = comments_count
 

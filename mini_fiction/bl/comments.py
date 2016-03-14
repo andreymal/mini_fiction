@@ -25,6 +25,9 @@ class BaseCommentBL(BaseBL):
     def get_permalink(self):
         raise NotImplementedError
 
+    def get_tree_link(self):
+        raise NotImplementedError
+
     def get_answer_link(self):
         raise NotImplementedError
 
@@ -173,6 +176,9 @@ class StoryCommentBL(BaseCommentBL):
         # root_order starts from 0
         page = c.root_order // current_app.config['COMMENTS_COUNT']['page'] + 1
         return url_for('story.view', pk=c.story.id, comments_page=page) + '#' + str(c.local_id)
+
+    def get_tree_link(self):
+        return url_for('story_comment.ajax_tree', story_id=self.model.story.id, local_id=self.model.local_id)
 
     def get_answer_link(self):
         return url_for('story_comment.add', story_id=self.model.story.id, parent=self.model.local_id)

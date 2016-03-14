@@ -45,7 +45,18 @@ def add(story_id):
             form.set_errors(exc.errors)
         else:
             if g.is_ajax:
-                return jsonify({'success': True, 'story': story.id, 'comment': comment.local_id, 'link': comment.bl.get_permalink()})
+                return jsonify({
+                    'success': True,
+                    'story': story.id,
+                    'comment': comment.local_id,
+                    'global_id': comment.id,
+                    'link': comment.bl.get_permalink(),
+                    'html': render_template(
+                        'includes/comments_tree.html',
+                        story=story,
+                        comments_tree_list=[[comment, False]],
+                    )
+                })
             else:
                 return redirect(comment.bl.get_permalink())
 
@@ -198,4 +209,63 @@ def ajax(story_id, page):
         'comments_count': comments_count,
         'comments_tree': render_template('includes/comments_tree.html', **data),
         'pagination': render_template('includes/comments_pagination_story.html', **data),
+    })
+
+
+@bp.route('/ajax/story/<int:story_id>/comments/tree/<int:local_id>/')
+@db_session
+def ajax_tree(story_id, local_id):
+    story = Story.get(id=story_id)
+    if not story:
+        abort(404)
+    if not story.bl.has_access(current_user):
+        abort(403)
+
+    comment = story.comments.select(lambda x: x.local_id == local_id).first()
+    if not comment:
+        abort(404)
+
+    # Проще получить все комментарии и потом выбрать оттуда нужные
+    comments_tree_list = story.bl.get_comments_tree_list(
+        maxdepth=None,
+        root_offset=comment.root_order,
+        root_count=1,
+    )
+
+    # Ищем начало нужной ветки
+    start = None
+    for i, x in enumerate(comments_tree_list):
+        if x[0].local_id == comment.local_id:
+            start = i
+            break
+    if start is None:
+        abort(404)
+
+    tree = None
+    # Ищем конец ветки
+    for i, x in enumerate(comments_tree_list[start + 1:], start + 1):
+        if x[0].tree_depth == comment.tree_depth + 1:
+            assert x[0].parent.id == comment.id  # debug
+        if x[0].tree_depth <= comment.tree_depth:
+            tree = comments_tree_list[start + 1:i]
+            break
+    # Если ветка оказалось концом комментариев
+    if tree is None:
+        tree = comments_tree_list[start + 1:]
+
+    if request.args.get('last_comment') and request.args['last_comment'].isdigit():
+        last_viewed_comment = int(request.args['last_comment'])
+    else:
+        last_viewed_comment = story.bl.last_viewed_comment_by(current_user)
+
+    data = {
+        'story': story,
+        'comments_tree_list': tree,
+        'last_viewed_comment': last_viewed_comment,
+    }
+
+    return jsonify({
+        'success': True,
+        'tree_for': comment.local_id,
+        'comments_tree': render_template('includes/comments_tree.html', **data),
     })

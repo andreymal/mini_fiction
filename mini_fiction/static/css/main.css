@@ -1113,6 +1113,10 @@ a.btn {
 	border-left: 0.2em dotted #ddd;
 }
 
+.comment-tree-loading {
+	opacity: 0.3;
+}
+
 .authorlink {
 	font-weight: bold;
 }

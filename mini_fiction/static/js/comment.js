@@ -17,7 +17,40 @@ core.define('comment', {
     },
 
     loadCommentsContent: function() {
-        core.bind('#content .comment-answer-link', 'click', this._answerEvent);
+        var tree = document.getElementById('comments-tree');
+        if (tree) {
+            this.bindLinksFor(tree);
+            this.treeAutoload();
+        }
+    },
+
+    treeAutoload: function() {
+        var linkBlock = document.querySelector('#content .comment-tree-ajax-autoload');
+        if (!linkBlock) {
+            return;
+        }
+        this.loadTreeFor(null, function() {
+            if (location.hash.length > 1 && !isNaN(location.hash.substring(1))) {
+                var comment = document.getElementById(location.hash.substring(1));
+                if (comment) {
+                    comment.scrollIntoView();
+                }
+            }
+            core.comment.treeAutoload();
+        }, linkBlock);
+    },
+
+    bindLinksFor: function(element) {
+        var links, i;
+        links = Array.prototype.slice.call(element.querySelectorAll('.comment-answer-link'));
+        for (i = 0; i < links.length; i++) {
+            links[i].addEventListener('click', this._answerEvent);
+        }
+
+        links = Array.prototype.slice.call(element.querySelectorAll('.comment-tree-loader-link'));
+        for (i = 0; i < links.length; i++) {
+            links[i].addEventListener('click', this._treeLinkEvent);
+        }
     },
 
     loadPagination: function() {
@@ -78,20 +111,17 @@ core.define('comment', {
         }
 
         var form = this.form;
+        var parentComment = null;
+        if (form.parent.value && form.parent.value != '0') {
+            parentComment = document.getElementById(form.parent.value);
+        }
         core.ajax.post(form.action, new FormData(form))
             .then(function(response) {
                 return response.json();
             })
             .then(function(data) {
-                if (core.handleResponse(data, form.action)) {
-                    return;
-                }
-                form.text.value = '';
-                if (data.link) {
-                    core.goto('GET', data.link);
-                }
-            })
-            .catch(core.handleError)
+                core.comment._submittedFormEvent(data, parentComment);
+            }).catch(core.handleError)
             .then(function() {
                 form.text.disabled = false;
                 form.querySelector('input[type="submit"]').disabled = false;
@@ -99,6 +129,31 @@ core.define('comment', {
         form.text.disabled = true;
         form.querySelector('input[type="submit"]').disabled = true;
         return false;
+    },
+
+    _submittedFormEvent: function(data, parentComment) {
+        var form = this.form;
+        if (core.handleResponse(data, form.action)) {
+            return;
+        }
+        form.text.value = '';
+        this.setCommentForm(0);
+        if (data.html) {
+            var d = document.createElement('div');
+            d.id = data.comment;
+            d.innerHTML = data.html;
+            this.bindLinksFor(d.firstElementChild);
+
+            if (parentComment) {
+                parentComment.parentNode.insertBefore(d.firstElementChild, parentComment.nextElementSibling);
+            } else if (document.getElementById('comments-tree')) {
+                document.getElementById('comments-tree').appendChild(d.firstElementChild);
+            } else if (data.link) {
+                core.goto('GET', data.link);
+            }
+        } else if (data.link) {
+            core.goto('GET', data.link);
+        }
     },
 
     _answerEvent: function(event) {
@@ -170,5 +225,53 @@ core.define('comment', {
             this.loadCommentsContent();
             list.scrollIntoView();
         }
+    },
+
+    _treeLinkEvent: function(event) {
+        core.comment.loadTreeFor(this.dataset['for']);
+        event.preventDefault();
+        return false;
+    },
+
+    loadTreeFor: function(commentId, onend, linkBlock) {
+        if (!linkBlock) {
+            linkBlock = document.getElementById('comment_tree_' + commentId);
+        }
+        if (!linkBlock) {
+            return false;
+        }
+
+        var href = linkBlock.dataset.ajaxHref;
+        if (!href) {
+            return false;
+        }
+
+        linkBlock.classList.add('comment-tree-loading');
+        var p = core.ajax.fetch(href)
+            .then(function(response) {
+                return response.json();
+            }).then(function(data) {
+                if (core.handleResponse(data, href)) {
+                    return;
+                }
+                core.comment._treeLoadedEvent(linkBlock, data);
+            }).catch(core.handleError).then(function() {
+                linkBlock.classList.remove('comment-tree-loading');
+            });
+        if (onend) {
+            p = p.then(onend);
+        }
+
+        return true;
+    },
+
+    _treeLoadedEvent: function(linkBlock, data) {
+        var d = document.createElement('div');
+        d.innerHTML = data.comments_tree;
+        this.bindLinksFor(d);
+        while (d.firstChild) {
+            linkBlock.parentNode.insertBefore(d.firstChild, linkBlock);
+        }
+        linkBlock.parentNode.removeChild(linkBlock);
     }
 });

@@ -1,6 +1,8 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
+from functools import wraps
+
 from pony import orm
 from flask import request, render_template, abort
 from flask_login import current_user
@@ -57,3 +59,12 @@ def cached_lists(story_ids):
             'activities': {x.story.id: x for x in current_user.activity.select(lambda x: x.story.id in story_ids)},
         })
     return data
+
+
+def admin_required(f):
+    @wraps(f)
+    def wrapper(*args, **kwargs):
+        if not current_user.is_staff:
+            abort(403)
+        return f(*args, **kwargs)
+    return wrapper

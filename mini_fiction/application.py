@@ -38,6 +38,7 @@ def create_app():
     configure_users(app)
     configure_error_handlers(app)
     configure_views(app)
+    configure_admin_views(app)
     configure_ajax(app)
     configure_errorpages(app)
     configure_templates(app)
@@ -133,6 +134,12 @@ def configure_views(app):
     def static_postfix(endpoint, values):
         if endpoint == 'static' and 'v' not in values and 'STATIC_V' in app.config:
             values['v'] = app.config['STATIC_V']
+
+
+def configure_admin_views(app):
+    from mini_fiction.views.admin import index, htmlblocks
+    app.register_blueprint(index.bp, url_prefix='/admin')
+    app.register_blueprint(htmlblocks.bp, url_prefix='/admin/htmlblocks')
 
 
 def configure_ajax(app):

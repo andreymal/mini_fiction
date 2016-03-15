@@ -16,6 +16,31 @@
 {%- endmacro %}
 
 
+{% macro form_fields(form) %}
+    {% for field in form %}
+        {% if field.widget.input_type == 'hidden' %}{{ field }}{% else %}
+        <div class="control-group{% if field.errors %} error{% endif %}">
+            <label class="control-label">{{ field.label.text }}</label>
+            <div class="controls">
+                {{ field }}
+                {% if field.errors %}
+                    <p class="help-inline">
+                    {% for error in field.errors %}
+                        {{ error }}
+                    {% endfor %}
+                    </p>
+                {% else %}
+                    <p class="help-inline small">{{ field.description }}</p>
+                {% endif %}
+            </div>
+        </div>
+    {% endif %}{% endfor %}
+    {% for error in form.non_field_errors %}
+        <div class="control-group error"><p class="help-inline">{{ error }}</p></div>
+    {% endfor %}
+{% endmacro %}
+
+
 {% macro comment_form_content(form, objtype, objid, parent=None) %}
     <div class="comment-form-content">
     {{ form.csrf_token() }}

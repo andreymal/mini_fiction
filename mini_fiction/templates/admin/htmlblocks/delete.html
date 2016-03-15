@@ -1,0 +1,31 @@
+{% extends base %}
+{% from 'macro.html' import breadcrumbs with context %}
+{% block content %}
+<div class="row">
+    <div class="span12">
+        {% set block_title = '{} ({})'.format(htmlblock.name, htmlblock.lang) %}
+        {{- breadcrumbs([
+            [url_for('admin_index.index'), _('Administration')],
+            [url_for('admin_htmlblocks.index'), _('HTML Blocks')],
+            [url_for('admin_htmlblocks.update', pk=htmlblock.id), block_title]
+        ]) }}
+    <h1>{{ block_title }}</h1>
+
+    <p>{{ _('Delete this HTML Block?') }}</p>
+
+    <form method="POST" enctype="multipart/form-data">
+          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+          <div class="control-group">
+            <div class="controls">
+                <input type="submit" class="btn btn-danger" value="{{ _('Delete') }}">
+            </div>
+        </div>
+    </form>
+        {{- breadcrumbs([
+            [url_for('admin_index.index'), _('Administration')],
+            [url_for('admin_htmlblocks.index'), _('HTML Blocks')],
+            [url_for('admin_htmlblocks.update', pk=htmlblock.id), block_title]
+        ]) }}
+    </div>
+</div>
+{% endblock %}

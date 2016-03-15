@@ -622,5 +622,7 @@ class HtmlBlock(db.Entity):
 
     orm.composite_key(name, lang)
 
+    bl = Resource('bl.htmlblock')
+
     def before_update(self):
         self.updated = datetime.utcnow()

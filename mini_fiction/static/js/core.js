@@ -478,6 +478,11 @@ var core = {
         if (!data.page_content) {
             return false;
         }
+        if (data.page_content.full_link) {
+            // Сервер нас просит открыть страницу без ajax
+            window.location = data.page_content.full_link;
+            return true;
+        }
         if (data.page_content.redirect) {
             if (this.state.current) {
                 this.state.current.next = data.page_content.redirect;
@@ -561,6 +566,11 @@ var core = {
     _linkAjaxResponse: function(data) {
         if (!data.page_content) {
             throw new Error('Incorrect server response');
+        }
+        if (data.page_content.full_link) {
+            // Сервер нас просит открыть страницу без ajax
+            window.location = data.page_content.full_link;
+            return;
         }
         if (data.page_content.redirect) {
             this.state.current.next = data.page_content.redirect;

@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-from flask import Blueprint, Markup, Response, current_app, render_template, g, abort
+from flask import Blueprint, Markup, Response, request, current_app, render_template, g, abort, jsonify
 from pony.orm import db_session
 
 from mini_fiction.models import StaticPage
@@ -27,6 +27,8 @@ def index(name):
         content = page.content
 
     if page.is_full_page:
+        if g.is_ajax:
+            return jsonify({'page_content': {'full_link': request.url}})
         return Response(content, mimetype=page.bl.get_mimetype())
     else:
         return render_template('staticpage.html', content=Markup(content), page_name=page.name, page_title=page.title)

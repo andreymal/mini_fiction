@@ -16,5 +16,15 @@
             "title": "Правила",
             "content": "<div class=\"span12 text-terms\">Отредактируйте эту страницу через администрирование.</div>"
         }
+    },
+    {
+        "pk": 3,
+        "model": "StaticPage",
+        "fields": {
+            "name": "robots.txt",
+            "title": "",
+            "is_full_page": true,
+            "content": "User-agent: *\nDisallow: /admin/\n"
+        }
     }
 ]

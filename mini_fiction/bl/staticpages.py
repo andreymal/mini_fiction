@@ -58,7 +58,7 @@ class StaticPageBL(BaseBL):
 
     def delete(self, author):
         staticpage = self.model
-        if staticpage.name in ('help', 'terms') and not staticpage.lang:
+        if staticpage.name in ('help', 'terms', 'robots.txt') and not staticpage.lang:
             raise ValidationError({'is_template': [lazy_gettext('This is system page, you cannot delete it')]})
         if staticpage.is_template and not author.is_superuser:
             raise ValidationError({'is_template': [lazy_gettext('Access denied')]})
@@ -88,3 +88,9 @@ class StaticPageBL(BaseBL):
             raise ValidationError({'content': [
                 lazy_gettext('Cannot render staticpage "{0}" for you: {1}').format(name, str(exc))
             ]})
+
+    def get_mimetype(self):
+        if self.model.name == 'robots.txt':
+            return 'text/plain'
+        else:
+            return 'text/html'

@@ -127,7 +127,7 @@ def configure_views(app):
     app.register_blueprint(object_lists.bp)
     app.register_blueprint(story_comment.bp)
     app.register_blueprint(feeds.bp, url_prefix='/feeds')
-    app.register_blueprint(staticpages.bp, url_prefix='/page')
+    app.register_blueprint(staticpages.bp)
 
     # Static invalidation
     @app.url_defaults

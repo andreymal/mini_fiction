@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-from flask import Blueprint, Markup, current_app, render_template, g, abort
+from flask import Blueprint, Markup, Response, current_app, render_template, g, abort
 from pony.orm import db_session
 
 from mini_fiction.models import StaticPage
@@ -9,7 +9,8 @@ from mini_fiction.models import StaticPage
 bp = Blueprint('staticpages', __name__)
 
 
-@bp.route('/<path:name>/')
+@bp.route('/robots.txt', defaults={'name': 'robots.txt'})
+@bp.route('/page/<path:name>/')
 @db_session
 def index(name):
     page = StaticPage.get(name=name, lang=g.locale.language)
@@ -26,6 +27,6 @@ def index(name):
         content = page.content
 
     if page.is_full_page:
-        return Markup(content)
+        return Response(content, mimetype=page.bl.get_mimetype())
     else:
         return render_template('staticpage.html', content=Markup(content), page_name=page.name, page_title=page.title)

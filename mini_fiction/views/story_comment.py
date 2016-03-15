@@ -4,10 +4,10 @@
 from flask import Blueprint, current_app, request, render_template, abort, redirect, url_for, g, jsonify
 from flask_babel import gettext
 from flask_login import current_user
-from pony.orm import db_session
+from pony.orm import db_session, select
 
 from mini_fiction.forms.comment import CommentForm
-from mini_fiction.models import Story, StoryComment, CoAuthorsStory
+from mini_fiction.models import Story, StoryComment, CoAuthorsStory, Author
 from mini_fiction.utils.misc import Paginator
 from mini_fiction.validation import ValidationError
 
@@ -197,6 +197,84 @@ def vote(story_id, local_id):
         'vote_total': comment.vote_total,
         'vote_count': comment.vote_count,
         'html': render_template('includes/comment_vote.html', comment=comment)
+    })
+
+
+@bp.route('/ajax/accounts/profile/comments/page/<int:page>/')
+@db_session
+def ajax_author_dashboard(page):
+    if not current_user.is_authenticated:
+        abort(403)
+
+    comments_list = StoryComment.select(lambda x: not x.deleted and x.story in select(x.story for x in CoAuthorsStory if x.author.id == current_user.id))
+    comments_list = comments_list.order_by(StoryComment.id.desc())
+    comments_count = comments_list.count()
+
+    paged = Paginator(
+        number=page,
+        total=comments_count,
+        per_page=current_app.config['COMMENTS_COUNT']['author_page'],
+    )  # TODO: restore orphans?
+    comments = paged.slice(comments_list)
+    if not comments and page != 1:
+        abort(404)
+
+    comment_spoiler_threshold = current_app.config['COMMENT_SPOILER_THRESHOLD']
+    data = {
+        'comments': comments,
+        'num_pages': paged.num_pages,
+        'page_current': page,
+        'page_obj': paged,
+        'comment_spoiler_threshold': comment_spoiler_threshold,
+        'comments_short': True,
+    }
+
+    return jsonify({
+        'success': True,
+        'link': url_for('author.info', comments_page=page),
+        'comments_count': comments_count,
+        'comments_list': render_template('includes/story_comments_list.html', **data),
+        'pagination': render_template('includes/comments_pagination_author_dashboard.html', **data),
+    })
+
+
+@bp.route('/ajax/accounts/<int:user_id>/comments/page/<int:page>/')
+@db_session
+def ajax_author_overview(user_id, page):
+    author = Author.get(id=user_id)
+    if not author:
+        abort(404)
+
+    comments_list = StoryComment.select(lambda x: x.author == author and not x.deleted and x.story_published)
+    comments_list = comments_list.order_by(StoryComment.id.desc())
+    comments_count = comments_list.count()
+
+    paged = Paginator(
+        number=page,
+        total=comments_count,
+        per_page=current_app.config['COMMENTS_COUNT']['author_page'],
+    )  # TODO: restore orphans?
+    comments = paged.slice(comments_list)
+    if not comments and page != 1:
+        abort(404)
+
+    comment_spoiler_threshold = current_app.config['COMMENT_SPOILER_THRESHOLD']
+    data = {
+        'author': author,
+        'comments': comments,
+        'num_pages': paged.num_pages,
+        'page_current': page,
+        'page_obj': paged,
+        'comment_spoiler_threshold': comment_spoiler_threshold,
+        'comments_short': True,
+    }
+
+    return jsonify({
+        'success': True,
+        'link': url_for('author.info', user_id=author.id, comments_page=page),
+        'comments_count': comments_count,
+        'comments_list': render_template('includes/story_comments_list.html', **data),
+        'pagination': render_template('includes/comments_pagination_author_overview.html', **data),
     })
 
 

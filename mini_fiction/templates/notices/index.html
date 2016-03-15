@@ -1,0 +1,33 @@
+{% extends base %}
+{% from 'macro.html' import breadcrumbs with context %}
+{% block content %}
+<div class="row">
+    <div class="span8">
+        {{- breadcrumbs() }}
+        <h2>{{ page_title }}</h2>
+
+        <div class="notices-list">
+        {% for notice in notices %}
+        <div class="notice notice-item" id="notice_{{ notice.id }}">
+            <a href="{{ url_for('notices.show', name=notice.name) }}" class="notice-title-link">{{ notice.title }}</a>
+            {% if current_user.is_staff -%}
+                <a class="btn btn-warning btn-mini" href="{{ url_for('admin_notices.update', pk=notice.id) }}">{{ _('Edit') }}</a>
+            {%- endif %}
+            <br/>
+            <time datetime="{{ notice.date.strftime('%Y-%m-%dT%H:%M:%SZ') }}" class="notice-date">
+                {{- notice.date|datetimeformat('d.MM.Y') -}}
+            </time>
+        </div>
+        {% endfor %}
+        </div>
+
+        <div class="pagination center">
+            {% for page_id in page_obj.iter_pages() %}
+                <a href="{{ url_for('notices.index', page=page_id) }}" class="btn{% if page_id == page_obj.number %} btn-primary{% endif %}" name="page">{{ page_id }}</a>
+            {% endfor %}
+        </div>
+
+        {{- breadcrumbs() }}
+    </div>
+</div>
+{% endblock %}

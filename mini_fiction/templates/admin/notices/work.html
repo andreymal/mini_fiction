@@ -1,0 +1,36 @@
+{% extends base %}
+{% from 'macro.html' import breadcrumbs with context %}
+{% from 'macro.html' import form_fields with context %}
+{% block content %}
+
+<div class="row">
+    <div class="span12">
+        {{- breadcrumbs([
+            [url_for('admin_index.index'), _('Administration')],
+            [url_for('admin_notices.index'), _('Notices')]
+        ]) }}
+        <h1>{{ page_title }}</h1>
+
+        {% if edit %}<p><a href="{{ url_for('notices.show', name=notice.name) }}" target="_blank">{{ url_for('notices.show', name=notice.name, _external=True) }}</a></p>{% endif %}
+
+        {% if saved %}<div class="alert-mini green">{{ _('Saved!') }}</div>{% endif %}
+
+        <form class="form-horizontal" method="POST" enctype="multipart/form-data">
+        {{ form_fields(form) }}
+        <div class="controls">
+            {% if not edit or can_edit %}
+            <input type="submit" value="{{ _('Save') }}" class="btn btn-primary" />
+            {% if edit %}<a href="{{ url_for('admin_notices.delete', pk=notice.id) }}" class="btn">{{ _('Delete') }}</a>{% endif %}
+            {% else %}
+            {{ _("You don't have access to edit this Jinja2 template.") }}
+            {% endif %}
+        </div>
+        </form>
+
+        {{- breadcrumbs([
+            [url_for('admin_index.index'), _('Administration')],
+            [url_for('admin_notices.index'), _('Notices')]
+        ]) }}
+    </div>
+</div>
+{% endblock %}

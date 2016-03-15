@@ -1,6 +1,18 @@
 'use strict';
 
 core.define('common', {
+    init: function() {
+        // Кнопка закрытия объявления, если таковое присутствует
+        var btn = document.getElementById('close-shown-notice');
+        if (btn) {
+            btn.addEventListener('click', function() {
+                var expiration_date = new Date();
+                expiration_date.setFullYear(expiration_date.getFullYear() + 10);
+                document.cookie = 'last_notice=' + parseInt(btn.dataset.id) + '; path=/; expires=' + expiration_date.toGMTString();
+            });
+        }
+    },
+
     load: function(content) {
         this.markitupFor(content);
         this.buttonsFor(content);

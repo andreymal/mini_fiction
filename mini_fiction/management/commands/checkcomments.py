@@ -3,7 +3,7 @@
 
 from pony import orm
 
-from mini_fiction.models import Story
+from mini_fiction.models import Story, Notice
 
 
 def check_comments_tree(tree, depth=0, root_order=0, parent_id=None):
@@ -66,7 +66,7 @@ def check_comments_for(target, comments_list):
             print('comments_count: {} -> {}'.format(target.comments_count, comments_count))
             target.comments_count = comments_count
 
-    # Перерасчёт local_id и story_published
+    # Перерасчёт local_id
     for i, c in enumerate(comments_list, 1):
         if c.local_id != i:
             print(' -{}: #{} -> #{}'.format(c.id, c.local_id, i))
@@ -101,3 +101,16 @@ def checkstorycomments():
 
         # Всё остальное здесь
         check_comments_for(story, comments_list)
+
+
+def checknoticecomments():
+    first_notice = orm.select(orm.min(x.id) for x in Notice).first()
+    last_notice = orm.select(orm.max(x.id) for x in Notice).first()
+    for notice_id in range(first_notice, last_notice + 1):
+        notice = Notice.get(id=notice_id)
+        if not notice:
+            continue
+
+        print('Notice {} ({})'.format(notice.id, notice.name))
+        comments_list = notice.bl.select_comments().order_by('c.date, c.id')
+        check_comments_for(notice, comments_list)

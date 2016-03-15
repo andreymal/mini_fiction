@@ -10,7 +10,7 @@ from flask_babel import lazy_gettext
 from mini_fiction.bl.utils import BaseBL
 from mini_fiction.utils.misc import call_after_request as later
 from mini_fiction.validation import Validator, ValidationError
-from mini_fiction.validation.comments import STORY_COMMENT
+from mini_fiction.validation.comments import STORY_COMMENT, NOTICE_COMMENT
 
 
 class BaseCommentBL(BaseBL):
@@ -236,3 +236,39 @@ class StoryCommentBL(BaseCommentBL):
         comment = super().create(*args, **kwargs)
         later(current_app.tasks['sphinx_update_comments_count'].delay, comment.story.id)
         return comment
+
+
+class NoticeCommentBL(BaseCommentBL):
+    target_attr = 'notice'
+    can_update = True
+    can_vote = True
+    schema = NOTICE_COMMENT
+
+    def can_comment_by(self, target, author=None):
+        if (not author or not author.is_authenticated) and not current_app.config['NOTICE_COMMENTS_BY_GUEST']:
+            return False
+        return True
+
+    def get_permalink(self):
+        c = self.model
+        # root_order starts from 0
+        page = c.root_order // current_app.config['COMMENTS_COUNT']['page'] + 1
+        return url_for('notices.show', name=c.notice.name, comments_page=page) + '#' + str(c.local_id)
+
+    def get_tree_link(self):
+        return url_for('notice_comment.ajax_tree', notice_id=self.model.notice.id, local_id=self.model.local_id)
+
+    def get_answer_link(self):
+        return url_for('notice_comment.add', notice_id=self.model.notice.id, parent=self.model.local_id)
+
+    def get_update_link(self):
+        return url_for('notice_comment.edit', notice_id=self.model.notice.id, local_id=self.model.local_id)
+
+    def get_delete_link(self):
+        return url_for('notice_comment.delete', notice_id=self.model.notice.id, local_id=self.model.local_id)
+
+    def get_restore_link(self):
+        return url_for('notice_comment.restore', notice_id=self.model.notice.id, local_id=self.model.local_id)
+
+    def get_vote_link(self):
+        return url_for('notice_comment.vote', notice_id=self.model.notice.id, local_id=self.model.local_id)

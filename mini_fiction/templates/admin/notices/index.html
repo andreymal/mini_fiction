@@ -1,0 +1,29 @@
+{% extends base %}
+{% from 'macro.html' import breadcrumbs with context %}
+{% block content %}
+
+<div class="row">
+    <div class="span12">
+        {{- breadcrumbs([[url_for('admin_index.index'), _('Administration')]]) }}
+        <h1>{{ page_title }}</h1>
+
+        <ul>
+        {% for notice in notices %}
+            <li><a href="{{ url_for('admin_notices.update', pk=notice.id) }}">{{ notice.name }} — {{ notice.title or notice.name }}</a></li>
+        {% endfor %}
+        </ul>
+
+        <!-- Пагинация: начало вывода -->
+        <div class="pagination center">
+            {% for page_id in page_obj.iter_pages() %}
+                <a href="{{ url_for('admin_notices.index', page=page_id) }}" class="btn{% if page_id == page_obj.number %} btn-primary{% endif %}" name="page">{{ page_id }}</a>
+            {% endfor %}
+        </div>
+        <!-- Пагинация: конец вывода -->
+
+        <a href="{{ url_for('admin_notices.create') }}">{{ _('Create') }}</a>
+
+        {{- breadcrumbs([[url_for('admin_index.index'), _('Administration')]]) }}
+    </div>
+</div>
+{% endblock %}

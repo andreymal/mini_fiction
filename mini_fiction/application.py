@@ -115,7 +115,8 @@ def configure_error_handlers(app):
 
 
 def configure_views(app):
-    from mini_fiction.views import index, auth, story, chapter, search, author, stream, object_lists, story_comment, feeds, staticpages
+    from mini_fiction.views import index, auth, story, chapter, search, author, stream, object_lists
+    from mini_fiction.views import story_comment, feeds, staticpages, notices, notice_comment
     app.register_blueprint(index.bp)
     app.register_blueprint(auth.bp, url_prefix='/accounts')
     app.register_blueprint(story.bp, url_prefix='/story')
@@ -128,6 +129,8 @@ def configure_views(app):
     app.register_blueprint(story_comment.bp)
     app.register_blueprint(feeds.bp, url_prefix='/feeds')
     app.register_blueprint(staticpages.bp)
+    app.register_blueprint(notices.bp, url_prefix='/notice')
+    app.register_blueprint(notice_comment.bp)
 
     # Static invalidation
     @app.url_defaults
@@ -137,11 +140,12 @@ def configure_views(app):
 
 
 def configure_admin_views(app):
-    from mini_fiction.views.admin import index, htmlblocks, staticpages, authors
+    from mini_fiction.views.admin import index, htmlblocks, staticpages, authors, notices
     app.register_blueprint(index.bp, url_prefix='/admin')
     app.register_blueprint(htmlblocks.bp, url_prefix='/admin/htmlblocks')
     app.register_blueprint(staticpages.bp, url_prefix='/admin/staticpages')
     app.register_blueprint(authors.bp, url_prefix='/admin/authors')
+    app.register_blueprint(notices.bp, url_prefix='/admin/notices')
 
 
 def configure_ajax(app):
@@ -190,7 +194,7 @@ def configure_errorpages(app):
 
 def configure_templates(app):
     from mini_fiction.templatetags import random_stories, random_logo, submitted_stories_count
-    from mini_fiction.templatetags import story_comments_delta, html_block, hook, misc
+    from mini_fiction.templatetags import story_comments_delta, html_block, hook, shown_notice, misc
     from mini_fiction.templatetags import registry
     app.templatetags = dict(registry.tags)
 

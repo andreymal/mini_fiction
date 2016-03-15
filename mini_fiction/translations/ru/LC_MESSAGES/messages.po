@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version:  0.0.1\n"
 "Report-Msgid-Bugs-To: andriyano-31@mail.ru\n"
-"POT-Creation-Date: 2016-03-15 21:44+0300\n"
+"POT-Creation-Date: 2016-03-16 02:15+0300\n"
 "Last-Translator: andreymal <andriyano-31@mail.ru>\n"
 "Language: ru\n"
 "Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && "
@@ -67,7 +67,8 @@ msgid "Invalid value"
 msgstr "Недопустимое значение"
 
 #: mini_fiction/bl/htmlblocks.py:20 mini_fiction/bl/htmlblocks.py:42
-#: mini_fiction/bl/htmlblocks.py:68 mini_fiction/bl/staticpages.py:19
+#: mini_fiction/bl/htmlblocks.py:68 mini_fiction/bl/notices.py:21
+#: mini_fiction/bl/notices.py:42 mini_fiction/bl/staticpages.py:19
 #: mini_fiction/bl/staticpages.py:40 mini_fiction/bl/staticpages.py:64
 msgid "Access denied"
 msgstr "Нет доступа"
@@ -88,9 +89,22 @@ msgstr "Не удалось отрисовать блок «{0}» для ано�
 msgid "Cannot render htmlblock \"{0}\" for you: {1}"
 msgstr "Не удалось отрисовать блок «{0}» для вас: {1}"
 
+#: mini_fiction/bl/notices.py:28 mini_fiction/bl/notices.py:48
 #: mini_fiction/bl/staticpages.py:29 mini_fiction/bl/staticpages.py:49
 msgid "Page already exists"
 msgstr "Страница уже существует"
+
+#: mini_fiction/bl/notices.py:76
+msgid "Cannot parse notice \"{0}\": {1}"
+msgstr "Не удалось распарсить объявление «{0}»: {1}"
+
+#: mini_fiction/bl/notices.py:85
+msgid "Cannot render notice \"{0}\" for anonymous: {1}"
+msgstr "Не удалось отрисовать объявление «{0}» для анонимуса: {1}"
+
+#: mini_fiction/bl/notices.py:92
+msgid "Cannot render notice \"{0}\" for you: {1}"
+msgstr "Не удалось отрисовать объявление «{0}» для вас: {1}"
 
 #: mini_fiction/bl/staticpages.py:62
 msgid "This is system page, you cannot delete it"
@@ -150,6 +164,7 @@ msgid "Superuser can fully administer the site"
 msgstr "Суперпользователь может целиком администрировать сайт"
 
 #: mini_fiction/forms/admin/htmlblock.py:15
+#: mini_fiction/forms/admin/notice.py:15
 #: mini_fiction/forms/admin/staticpage.py:15
 msgid "Name"
 msgstr "Название"
@@ -159,11 +174,13 @@ msgid "Language (leave empty to make this block default)"
 msgstr "Язык (оставьте пустым, чтобы этот блок был по умолчанию)"
 
 #: mini_fiction/forms/admin/htmlblock.py:25
+#: mini_fiction/forms/admin/notice.py:25
 #: mini_fiction/forms/admin/staticpage.py:30
 msgid "Is Jinja2 template"
 msgstr "Шаблон Jinja2"
 
 #: mini_fiction/forms/admin/htmlblock.py:27
+#: mini_fiction/forms/admin/notice.py:27
 #: mini_fiction/forms/admin/staticpage.py:32
 msgid ""
 "Be careful when editing the template! Jinja2 is very powerful, and you "
@@ -173,17 +190,23 @@ msgstr ""
 "можете ненароком поломать что-нибудь или создать уязвимость."
 
 #: mini_fiction/forms/admin/htmlblock.py:34
+#: mini_fiction/forms/admin/notice.py:39
 #: mini_fiction/forms/admin/staticpage.py:45
 msgid "Content"
 msgstr "Содержимое"
 
-#: mini_fiction/forms/admin/staticpage.py:20
-msgid "Language (leave empty to make this page default)"
-msgstr "Язык (оставьте пустым, чтобы эта страница была по умолчанию)"
-
+#: mini_fiction/forms/admin/notice.py:20
 #: mini_fiction/forms/admin/staticpage.py:25
 msgid "Title"
 msgstr "Заголовок"
+
+#: mini_fiction/forms/admin/notice.py:34
+msgid "Show on all pages"
+msgstr "Показать на всех страницах"
+
+#: mini_fiction/forms/admin/staticpage.py:20
+msgid "Language (leave empty to make this page default)"
+msgstr "Язык (оставьте пустым, чтобы эта страница была по умолчанию)"
 
 #: mini_fiction/forms/admin/staticpage.py:39
 msgid "Is full page"
@@ -277,12 +300,23 @@ msgstr "HTML-блоки"
 #: mini_fiction/templates/admin/staticpages/delete.html:9
 #: mini_fiction/templates/admin/staticpages/delete.html:26
 #: mini_fiction/templates/admin/staticpages/work.html:10
-#: mini_fiction/templates/admin/staticpages/work.html:30
-#: mini_fiction/views/admin/staticpages.py:23
+#: mini_fiction/templates/admin/staticpages/work.html:32
+#: mini_fiction/views/admin/staticpages.py:30
 msgid "Static pages"
 msgstr "Статические страницы"
 
-#: mini_fiction/templates/admin/index.html:14
+#: mini_fiction/templates/admin/index.html:13
+#: mini_fiction/templates/admin/notices/delete.html:9
+#: mini_fiction/templates/admin/notices/delete.html:26
+#: mini_fiction/templates/admin/notices/work.html:10
+#: mini_fiction/templates/admin/notices/work.html:32
+#: mini_fiction/templates/notices/show.html:6
+#: mini_fiction/templates/notices/show.html:48 mini_fiction/views/notices.py:26
+#: mini_fiction/views/admin/notices.py:30
+msgid "Notices"
+msgstr "Объявления"
+
+#: mini_fiction/templates/admin/index.html:15
 #: mini_fiction/templates/admin/authors/update.html:10
 #: mini_fiction/templates/admin/authors/update.html:35
 #: mini_fiction/views/admin/authors.py:31
@@ -299,12 +333,18 @@ msgstr "Авторы"
 #: mini_fiction/templates/admin/htmlblocks/index.html:18
 #: mini_fiction/templates/admin/htmlblocks/work.html:9
 #: mini_fiction/templates/admin/htmlblocks/work.html:29
+#: mini_fiction/templates/admin/notices/delete.html:8
+#: mini_fiction/templates/admin/notices/delete.html:25
+#: mini_fiction/templates/admin/notices/index.html:7
+#: mini_fiction/templates/admin/notices/index.html:26
+#: mini_fiction/templates/admin/notices/work.html:9
+#: mini_fiction/templates/admin/notices/work.html:31
 #: mini_fiction/templates/admin/staticpages/delete.html:8
 #: mini_fiction/templates/admin/staticpages/delete.html:25
 #: mini_fiction/templates/admin/staticpages/index.html:7
-#: mini_fiction/templates/admin/staticpages/index.html:18
+#: mini_fiction/templates/admin/staticpages/index.html:26
 #: mini_fiction/templates/admin/staticpages/work.html:9
-#: mini_fiction/templates/admin/staticpages/work.html:29
+#: mini_fiction/templates/admin/staticpages/work.html:31
 #: mini_fiction/views/admin/index.py:17
 msgid "Administration"
 msgstr "Администрирование"
@@ -315,13 +355,15 @@ msgstr "(это вы)"
 
 #: mini_fiction/templates/admin/authors/update.html:15
 #: mini_fiction/templates/admin/htmlblocks/work.html:14
-#: mini_fiction/templates/admin/staticpages/work.html:14
+#: mini_fiction/templates/admin/notices/work.html:16
+#: mini_fiction/templates/admin/staticpages/work.html:16
 msgid "Saved!"
 msgstr "Сохранено!"
 
 #: mini_fiction/templates/admin/authors/update.html:20
 #: mini_fiction/templates/admin/htmlblocks/work.html:20
-#: mini_fiction/templates/admin/staticpages/work.html:20
+#: mini_fiction/templates/admin/notices/work.html:22
+#: mini_fiction/templates/admin/staticpages/work.html:22
 msgid "Save"
 msgstr "Сохранить"
 
@@ -335,24 +377,34 @@ msgstr "Удалить этот HTML-блок?"
 
 #: mini_fiction/templates/admin/htmlblocks/delete.html:20
 #: mini_fiction/templates/admin/htmlblocks/work.html:21
+#: mini_fiction/templates/admin/notices/delete.html:20
+#: mini_fiction/templates/admin/notices/work.html:23
 #: mini_fiction/templates/admin/staticpages/delete.html:20
-#: mini_fiction/templates/admin/staticpages/work.html:21
+#: mini_fiction/templates/admin/staticpages/work.html:23
 #: mini_fiction/views/admin/htmlblocks.py:116
-#: mini_fiction/views/admin/staticpages.py:118
+#: mini_fiction/views/admin/notices.py:125
+#: mini_fiction/views/admin/staticpages.py:126
 msgid "Delete"
 msgstr "Удалить"
 
 #: mini_fiction/templates/admin/htmlblocks/index.html:16
-#: mini_fiction/templates/admin/staticpages/index.html:16
+#: mini_fiction/templates/admin/notices/index.html:24
+#: mini_fiction/templates/admin/staticpages/index.html:24
 #: mini_fiction/views/admin/htmlblocks.py:47
-#: mini_fiction/views/admin/staticpages.py:47
+#: mini_fiction/views/admin/notices.py:55
+#: mini_fiction/views/admin/staticpages.py:55
 msgid "Create"
 msgstr "Создать"
 
 #: mini_fiction/templates/admin/htmlblocks/work.html:23
-#: mini_fiction/templates/admin/staticpages/work.html:23
+#: mini_fiction/templates/admin/notices/work.html:25
+#: mini_fiction/templates/admin/staticpages/work.html:25
 msgid "You don't have access to edit this Jinja2 template."
 msgstr "У вас нет доступа для редактирования этого шаблона Jinja2."
+
+#: mini_fiction/templates/admin/notices/delete.html:14
+msgid "Delete this notice?"
+msgstr "Удалить это объявление?"
 
 #: mini_fiction/templates/admin/staticpages/delete.html:14
 msgid "Delete this static page?"
@@ -373,6 +425,11 @@ msgid_plural "Show %(num)d chapters"
 msgstr[0] "Показать %(num)d главу"
 msgstr[1] "Показать %(num)d главы"
 msgstr[2] "Показать %(num)d глав"
+
+#: mini_fiction/templates/notices/index.html:14
+#: mini_fiction/templates/notices/show.html:11
+msgid "Edit"
+msgstr "Редактировать"
 
 #: mini_fiction/utils/debugtoolbar.py:96
 msgid "Pony ORM"
@@ -539,6 +596,26 @@ msgstr "Неверный пароль"
 msgid "Index"
 msgstr "Главная"
 
+#: mini_fiction/views/notice_comment.py:68
+#: mini_fiction/views/story_comment.py:69
+msgid "Add new comment"
+msgstr "Добавить новый комментарий"
+
+#: mini_fiction/views/notice_comment.py:97
+#: mini_fiction/views/story_comment.py:98
+msgid "Edit comment"
+msgstr "Редактировать комментарий"
+
+#: mini_fiction/views/notice_comment.py:130
+#: mini_fiction/views/story_comment.py:131
+msgid "Confirm delete comment"
+msgstr "Подтверждение удаления комментария"
+
+#: mini_fiction/views/notice_comment.py:165
+#: mini_fiction/views/story_comment.py:166
+msgid "Confirm restore comment"
+msgstr "Подтверждение восстановления комментария"
+
 #: mini_fiction/views/search.py:21 mini_fiction/views/search.py:29
 #: mini_fiction/views/search.py:37 mini_fiction/views/search.py:75
 #: mini_fiction/views/search.py:88 mini_fiction/views/search.py:106
@@ -552,19 +629,3 @@ msgstr "Результаты поиска"
 #: mini_fiction/views/story.py:213
 msgid "New story"
 msgstr "Новый рассказ"
-
-#: mini_fiction/views/story_comment.py:69
-msgid "Add new comment"
-msgstr "Добавить новый комментарий"
-
-#: mini_fiction/views/story_comment.py:98
-msgid "Edit comment"
-msgstr "Редактировать комментарий"
-
-#: mini_fiction/views/story_comment.py:131
-msgid "Confirm delete comment"
-msgstr "Подтверждение удаления комментария"
-
-#: mini_fiction/views/story_comment.py:166
-msgid "Confirm restore comment"
-msgstr "Подтверждение восстановления комментария"

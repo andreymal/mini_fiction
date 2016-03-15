@@ -100,6 +100,7 @@ class Config(object):
     COMMENT_EDIT_TIME = 15
     BRIEF_COMMENT_LENGTH = 100
     STORY_COMMENTS_BY_GUEST = False
+    NOTICE_COMMENTS_BY_GUEST = False
     COMMENT_SPOILER_THRESHOLD = -5
 
     RSS = {'stories': 20, 'chapters': 20, 'comments': 100}

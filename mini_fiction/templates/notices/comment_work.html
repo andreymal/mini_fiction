@@ -1,0 +1,29 @@
+{% extends base %}
+{% from 'macro.html' import breadcrumbs with context %}
+{% from 'macro.html' import comment_html with context %}
+{% block content %}
+<div class="row">
+    <div class="span12">
+    {{- breadcrumbs([[url_for('notices.show', name=notice.name), notice.title]]) }}
+
+    <h1>{{ page_title }}</h1>
+
+    {% if edit -%}
+        <div class="comment-item" id="{{ comment.local_id }}">
+        {{ comment_html(comment, with_controls=False, with_vote=False) }}
+        </div>
+    {%- elif parent_comment -%}
+        <div class="comment-item" id="{{ parent_comment.local_id }}">
+        {{ comment_html(parent_comment, with_controls=False, with_vote=False) }}
+        </div>
+    {%- endif %}
+
+    <form class="comment-form" method="POST" enctype="multipart/form-data" action="">
+    {% from 'macro.html' import comment_form_content %}
+    {{ comment_form_content(form, 'notice', notice.id, parent_comment.local_id if parent_comment else None) }}
+    </form>
+
+    {{- breadcrumbs([[url_for('notices.show', name=notice.name), notice.title]]) }}
+    </div>
+</div>
+{% endblock %}

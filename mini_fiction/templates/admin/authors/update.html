@@ -1,0 +1,39 @@
+{% extends base %}
+{% from 'macro.html' import breadcrumbs with context %}
+{% from 'macro.html' import form_fields with context %}
+{% block content %}
+
+<div class="row">
+    <div class="span12">
+        {{- breadcrumbs([
+            [url_for('admin_index.index'), _('Administration')],
+            [url_for('admin_authors.index'), _('Authors')]
+        ]) }}
+        <h1>{{ page_title }}</h1>
+        {% if author.id == current_user.id %}<h3>{{ _("(it's you)") }}</h3>{% endif %}
+
+        {% if saved %}<div class="alert-mini green">{{ _('Saved!') }}</div>{% endif %}
+
+        <form class="form-horizontal" method="POST" enctype="multipart/form-data">
+        {{ form_fields(form) }}
+        <div class="controls">
+            <input type="submit" value="{{ _('Save') }}" class="btn btn-primary" />
+        </div>
+        </form>
+
+        {% if author.is_active and author.id != current_user.id %}
+        <form action="{{ url_for('admin_authors.login', pk=author.id) }}" class="form-horizontal" method="POST" enctype="multipart/form-data">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+        <div class="controls">
+            <input type="submit" value="{{ _('Log in as this user') }}" class="btn btn-warning" />
+        </div>
+        </form>
+        {% endif %}
+
+        {{- breadcrumbs([
+            [url_for('admin_index.index'), _('Administration')],
+            [url_for('admin_authors.index'), _('Authors')]
+        ]) }}
+    </div>
+</div>
+{% endblock %}

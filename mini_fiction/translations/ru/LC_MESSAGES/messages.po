@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version:  0.0.1\n"
 "Report-Msgid-Bugs-To: andriyano-31@mail.ru\n"
-"POT-Creation-Date: 2016-03-15 19:26+0300\n"
+"POT-Creation-Date: 2016-03-15 21:07+0300\n"
 "Last-Translator: andreymal <andriyano-31@mail.ru>\n"
 "Language: ru\n"
 "Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && "
@@ -77,15 +77,15 @@ msgstr "Блок уже существует"
 
 #: mini_fiction/bl/htmlblocks.py:83
 msgid "Cannot parse htmlblock \"{0}\": {1}"
-msgstr "Не удалось распарсить блок \«{0}\»: {1}"
+msgstr "Не удалось распарсить блок «{0}»: {1}"
 
 #: mini_fiction/bl/htmlblocks.py:92
 msgid "Cannot render htmlblock \"{0}\" for anonymous: {1}"
-msgstr "Не удалось отрисовать блок \«{0}\» для анонимуса: {1}"
+msgstr "Не удалось отрисовать блок «{0}» для анонимуса: {1}"
 
 #: mini_fiction/bl/htmlblocks.py:99
 msgid "Cannot render htmlblock \"{0}\" for you: {1}"
-msgstr "Не удалось отрисовать блок \«{0}\» для вас: {1}"
+msgstr "Не удалось отрисовать блок «{0}» для вас: {1}"
 
 #: mini_fiction/forms/author.py:159 mini_fiction/forms/register.py:28
 #: mini_fiction/forms/register.py:65
@@ -99,6 +99,34 @@ msgstr "Имя пользователя"
 #: mini_fiction/forms/login.py:12
 msgid "Password"
 msgstr "Пароль"
+
+#: mini_fiction/forms/admin/authors.py:14
+msgid "Email"
+msgstr "Электропочта"
+
+#: mini_fiction/forms/admin/authors.py:19
+msgid "Is active"
+msgstr "Активен"
+
+#: mini_fiction/forms/admin/authors.py:21
+msgid "Inactive users can't log in"
+msgstr "Неактивные пользователи не могут войти"
+
+#: mini_fiction/forms/admin/authors.py:25
+msgid "Is staff"
+msgstr "Персонал"
+
+#: mini_fiction/forms/admin/authors.py:27
+msgid "Staff can approve stories and partially administer the site"
+msgstr "Персонал может подтверждать рассказы и частично администрировать сайт"
+
+#: mini_fiction/forms/admin/authors.py:31
+msgid "Is superuser"
+msgstr "Суперпользователь"
+
+#: mini_fiction/forms/admin/authors.py:33
+msgid "Superuser can fully administer the site"
+msgstr "Суперпользователь может целиком администрировать сайт"
 
 #: mini_fiction/forms/admin/htmlblock.py:15
 msgid "Name"
@@ -204,6 +232,17 @@ msgstr[2] "%(num)d просмотров"
 msgid "HTML Blocks"
 msgstr "HTML-блоки"
 
+#: mini_fiction/templates/admin/index.html:13
+#: mini_fiction/templates/admin/authors/update.html:10
+#: mini_fiction/templates/admin/authors/update.html:35
+#: mini_fiction/views/admin/authors.py:24
+msgid "Authors"
+msgstr "Авторы"
+
+#: mini_fiction/templates/admin/authors/index.html:7
+#: mini_fiction/templates/admin/authors/index.html:16
+#: mini_fiction/templates/admin/authors/update.html:9
+#: mini_fiction/templates/admin/authors/update.html:34
 #: mini_fiction/templates/admin/htmlblocks/delete.html:8
 #: mini_fiction/templates/admin/htmlblocks/delete.html:25
 #: mini_fiction/templates/admin/htmlblocks/index.html:7
@@ -213,6 +252,24 @@ msgstr "HTML-блоки"
 #: mini_fiction/views/admin/index.py:17
 msgid "Administration"
 msgstr "Администрирование"
+
+#: mini_fiction/templates/admin/authors/update.html:13
+msgid "(it's you)"
+msgstr "(это вы)"
+
+#: mini_fiction/templates/admin/authors/update.html:15
+#: mini_fiction/templates/admin/htmlblocks/work.html:14
+msgid "Saved!"
+msgstr "Сохранено!"
+
+#: mini_fiction/templates/admin/authors/update.html:20
+#: mini_fiction/templates/admin/htmlblocks/work.html:20
+msgid "Save"
+msgstr "Сохранить"
+
+#: mini_fiction/templates/admin/authors/update.html:28
+msgid "Log in as this user"
+msgstr "Войти как этот пользователь"
 
 #: mini_fiction/templates/admin/htmlblocks/delete.html:14
 msgid "Delete this HTML Block?"
@@ -228,14 +285,6 @@ msgstr "Удалить"
 #: mini_fiction/views/admin/htmlblocks.py:47
 msgid "Create"
 msgstr "Создать"
-
-#: mini_fiction/templates/admin/htmlblocks/work.html:14
-msgid "Saved!"
-msgstr "Сохранено!"
-
-#: mini_fiction/templates/admin/htmlblocks/work.html:20
-msgid "Save"
-msgstr "Сохранить"
 
 #: mini_fiction/templates/admin/htmlblocks/work.html:23
 msgid "You don't have access to edit this Jinja2 template."

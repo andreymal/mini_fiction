@@ -608,6 +608,8 @@ class StaticPage(db.Entity):
     date = orm.Required(datetime, 6, default=datetime.utcnow)
     updated = orm.Required(datetime, 6, default=datetime.utcnow)
 
+    bl = Resource('bl.staticpage')
+
     def before_update(self):
         self.updated = datetime.utcnow()
 

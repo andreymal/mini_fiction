@@ -2,10 +2,11 @@
 
 
 def init_bl():
-    from mini_fiction.bl import registry, authors, stories, comments, htmlblocks
+    from mini_fiction.bl import registry, authors, stories, comments, htmlblocks, staticpages
 
     registry.register('bl.author', authors.AuthorBL)
     registry.register('bl.story', stories.StoryBL)
     registry.register('bl.chapter', stories.ChapterBL)
     registry.register('bl.story_comment', comments.StoryCommentBL)
     registry.register('bl.htmlblock', htmlblocks.HtmlBlockBL)
+    registry.register('bl.staticpage', staticpages.StaticPageBL)

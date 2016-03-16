@@ -54,7 +54,8 @@ def add(target_attr, target, template, template_ajax=None, template_ajax_modal=F
     else:
         parent = None
 
-    # Проверки доступа (дублируются в Comment.bl.create, здесь просто для user-friendly)
+    # Проверки доступа (дублируются в Comment.bl.create, но здесь они тоже нужны,
+    # чтобы пользователь не получил содержимое parent, когда доступа не должно быть)
     if parent and not parent.bl.can_answer_by(user):
         abort(403)
     elif not target.bl.can_comment_by(user):
@@ -227,6 +228,9 @@ def vote(target_attr, comment):
 
 
 def ajax(target_attr, target, link, page, per_page, template_pagination, last_viewed_comment=None):
+    if not target.bl.has_comments_access(current_user._get_current_object()):
+        abort(403)
+
     maxdepth = None if request.args.get('fulltree') == '1' else 2
 
     comments_count, paged, comments_tree_list = target.bl.paginate_comments(page, per_page, maxdepth)
@@ -256,6 +260,8 @@ def ajax(target_attr, target, link, page, per_page, template_pagination, last_vi
 def ajax_tree(target_attr, comment, target=None, last_viewed_comment=None):
     if not target:
         target = getattr(comment, target_attr)
+    if not target.bl.has_comments_access(current_user._get_current_object()):
+        abort(403)
 
     # Проще получить все комментарии и потом выбрать оттуда нужные
     comments_tree_list = target.bl.get_comments_tree_list(

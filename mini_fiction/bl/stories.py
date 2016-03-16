@@ -371,6 +371,10 @@ class StoryBL(BaseBL, Commentable):
         random.shuffle(stories)
         return stories
 
+    def has_comments_access(self, author=None):
+        from mini_fiction.models import StoryComment
+        return StoryComment.bl.has_comments_access(self.model, author)
+
     def can_comment_by(self, author=None):
         from mini_fiction.models import StoryComment
         return StoryComment.bl.can_comment_by(self.model, author)

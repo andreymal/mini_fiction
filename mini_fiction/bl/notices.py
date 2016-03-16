@@ -92,6 +92,10 @@ class NoticeBL(BaseBL, Commentable):
                 lazy_gettext('Cannot render notice "{0}" for you: {1}').format(name, str(exc))
             ]})
 
+    def has_comments_access(self, author=None):
+        from mini_fiction.models import NoticeComment
+        return NoticeComment.bl.has_comments_access(self.model, author)
+
     def can_comment_by(self, author=None):
         from mini_fiction.models import NoticeComment
         return NoticeComment.bl.can_comment_by(self.model, author)

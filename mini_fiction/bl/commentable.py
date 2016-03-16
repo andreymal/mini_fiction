@@ -5,6 +5,10 @@ from mini_fiction.utils.misc import Paginator
 
 
 class Commentable(object):
+    def has_comments_access(self, author=None):
+        # it should be redirected to FooComment.bl.has_comments_access
+        raise NotImplementedError
+
     def can_comment_by(self, author=None):
         # it should be redirected to FooComment.bl.can_comment_by
         raise NotImplementedError

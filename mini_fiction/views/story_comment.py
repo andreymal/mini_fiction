@@ -89,8 +89,6 @@ def ajax(story_id, page):
     story = Story.get(id=story_id)
     if not story:
         abort(404)
-    if not story.bl.has_access(current_user):
-        abort(403)
 
     per_page = current_app.config['COMMENTS_COUNT']['page']
     link = url_for('story.view', pk=story.id, comments_page=page)
@@ -117,8 +115,6 @@ def ajax_tree(story_id, local_id):
     story = Story.get(id=story_id)
     if not story:
         abort(404)
-    if not story.bl.has_access(current_user):
-        abort(403)
 
     comment = story.comments.select(lambda x: x.local_id == local_id).first()
     if not comment:

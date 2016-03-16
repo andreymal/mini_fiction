@@ -40,18 +40,26 @@ class BaseCommentBL(BaseBL):
     def get_vote_link(self):
         raise NotImplementedError
 
+    def has_comments_access(self, target, author=None):
+        return True
+
     def can_comment_by(self, target, author=None):
-        raise NotImplementedError
+        return self.has_comments_access(target, author)
 
     def can_answer_by(self, author=None):
         c = self.model
         target = getattr(c, self.target_attr)
         return not c.deleted and type(c).bl.can_comment_by(target, author)
 
+    def can_delete_or_restore_by(self, author=None):
+        return author and author.is_staff
+
     def can_vote_by(self, author=None):
         if not self.can_vote or not author or not author.is_authenticated:
             return False
         c = self.model
+        if not self.has_comments_access(getattr(c, self.target_attr), author):
+            return False
         if c.deleted or c.author and c.author.id == author.id:
             return False
         return self.get_user_vote(author) == 0
@@ -167,9 +175,6 @@ class BaseCommentBL(BaseBL):
             raise ValueError('Permission denied')
         self.model.deleted = False
 
-    def can_delete_or_restore_by(self, author=None):
-        return author and author.is_staff
-
     def vote(self, author, value):
         if not author or not author.is_authenticated:
             raise ValidationError({'author': [lazy_gettext("Please log in to vote")]})
@@ -199,6 +204,9 @@ class StoryCommentBL(BaseCommentBL):
     can_update = True
     can_vote = True
     schema = STORY_COMMENT
+
+    def has_comments_access(self, target, author=None):
+        return target.bl.has_access(author)
 
     def can_comment_by(self, target, author=None):
         if (not author or not author.is_authenticated) and not current_app.config['STORY_COMMENTS_BY_GUEST']:

@@ -243,7 +243,6 @@ def ajax(target_attr, target, link, page, per_page, template_pagination, last_vi
         comment_votes_cache = target.bl.select_comment_votes(current_user._get_current_object(), comment_ids)
     else:
         comment_votes_cache = {i: 0 for i in comment_ids}
-    comment_spoiler_threshold = current_app.config['COMMENT_SPOILER_THRESHOLD']
     data = {
         target_attr: target,
         'comments_tree_list': comments_tree_list,
@@ -251,7 +250,6 @@ def ajax(target_attr, target, link, page, per_page, template_pagination, last_vi
         'num_pages': paged.num_pages,
         'page_current': page,
         'page_obj': paged,
-        'comment_spoiler_threshold': comment_spoiler_threshold,
         'comment_votes_cache': comment_votes_cache,
     }
 
@@ -304,12 +302,10 @@ def ajax_tree(target_attr, comment, target=None, last_viewed_comment=None):
     else:
         comment_votes_cache = {i: 0 for i in comment_ids}
 
-    comment_spoiler_threshold = current_app.config['COMMENT_SPOILER_THRESHOLD']
     data = {
         target_attr: target,
         'comments_tree_list': tree,
         'last_viewed_comment': last_viewed_comment,
-        'comment_spoiler_threshold': comment_spoiler_threshold,
         'comment_votes_cache': comment_votes_cache,
     }
 

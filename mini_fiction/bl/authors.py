@@ -69,6 +69,11 @@ class AuthorBL(BaseBL):
                 pass  # Если бралось значение из настроек проекта, то его и оставляем
             else:
                 user.comments_maxdepth = int(data['comments_maxdepth'])
+        if 'comment_spoiler_threshold' in data:
+            if user.comment_spoiler_threshold is None and data['comment_spoiler_threshold'] == current_app.config['COMMENT_SPOILER_THRESHOLD']:
+                pass  # Если бралось значение из настроек проекта, то его и оставляем
+            else:
+                user.comment_spoiler_threshold = int(data['comment_spoiler_threshold'])
 
     def register(self, data):
         from mini_fiction.models import RegistrationProfile

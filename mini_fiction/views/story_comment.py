@@ -155,13 +155,11 @@ def ajax_author_dashboard(page):
     if not comments and page != 1:
         abort(404)
 
-    comment_spoiler_threshold = current_app.config['COMMENT_SPOILER_THRESHOLD']
     data = {
         'comments': comments,
         'num_pages': paged.num_pages,
         'page_current': page,
         'page_obj': paged,
-        'comment_spoiler_threshold': comment_spoiler_threshold,
         'comments_short': True,
     }
 
@@ -194,14 +192,12 @@ def ajax_author_overview(user_id, page):
     if not comments and page != 1:
         abort(404)
 
-    comment_spoiler_threshold = current_app.config['COMMENT_SPOILER_THRESHOLD']
     data = {
         'author': author,
         'comments': comments,
         'num_pages': paged.num_pages,
         'page_current': page,
         'page_obj': paged,
-        'comment_spoiler_threshold': comment_spoiler_threshold,
         'comments_short': True,
     }
 

@@ -129,6 +129,10 @@
                                 <label>Скрывать ветки комментариев с данной глубиной (1 - скрывать все ветки, 0 - ничего не скрывать):</label>
                                 {{ prefs_form.comments_maxdepth }}
                             </div>
+                            <div class="padded">
+                                <label>Скрывать под спойлером комментарии с данным рейтингом и ниже:</label>
+                                {{ prefs_form.comment_spoiler_threshold }}
+                            </div>
                             {% if prefs_form_errors %}
                                 <div class="control-group error">
                                     {% for error in prefs_form_errors %}

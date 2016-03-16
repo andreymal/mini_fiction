@@ -125,6 +125,14 @@ class AuthorEditPrefsForm(Form):
         render_kw=dict(attrs_dict, type='number', min=0),
     )
 
+    comment_spoiler_threshold = IntegerField(
+        '',
+        [
+            validators.InputRequired(),
+        ],
+        render_kw=dict(attrs_dict, type='number'),
+    )
+
 
 class AuthorEditEmailForm(Form):
     attrs_dict = {'class': 'input-xlarge'}

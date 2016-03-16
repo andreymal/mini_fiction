@@ -153,3 +153,10 @@ def calc_maxdepth(user):
     if maxdepth < 0:
         maxdepth = None
     return maxdepth
+
+
+def calc_comment_threshold(user):
+    if user.is_authenticated and user.comment_spoiler_threshold is not None:
+        return user.comment_spoiler_threshold
+    else:
+        return current_app.config['COMMENT_SPOILER_THRESHOLD']

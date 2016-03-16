@@ -58,13 +58,11 @@ def view(pk, comments_page):
     else:
         comment_votes_cache = {i: 0 for i in comment_ids}
 
-    comment_spoiler_threshold = current_app.config['COMMENT_SPOILER_THRESHOLD']
     data = {
         'story': story,
         'vote': user_vote,
         'comments_tree_list': comments_tree_list,
         'comments_count': comments_count,
-        'comment_spoiler_threshold': comment_spoiler_threshold,
         'comment_votes_cache': comment_votes_cache,
         'last_viewed_comment': last_viewed_comment,
         'chapters': chapters,

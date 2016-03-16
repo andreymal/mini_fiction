@@ -47,7 +47,6 @@ def show(name, comments_page):
         content = notice.content
 
     per_page = current_app.config['COMMENTS_COUNT']['page']
-    comment_spoiler_threshold = current_app.config['COMMENT_SPOILER_THRESHOLD']
     maxdepth = None if request.args.get('fulltree') == '1' else calc_maxdepth(current_user)
 
     comments_count, paged, comments_tree_list = notice.bl.paginate_comments(comments_page, per_page, maxdepth)
@@ -66,7 +65,6 @@ def show(name, comments_page):
         'content': Markup(content),
         'comments_count': comments_count,
         'page_obj': paged,
-        'comment_spoiler_threshold': comment_spoiler_threshold,
         'comments_tree_list': comments_tree_list,
         'comment_form': CommentForm(),
         'comment_votes_cache': comment_votes_cache,

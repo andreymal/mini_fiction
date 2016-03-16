@@ -9,6 +9,7 @@ from pony.orm import db_session
 from mini_fiction.models import Notice
 from mini_fiction.forms.comment import CommentForm
 from mini_fiction.utils.views import paginate_view
+from mini_fiction.utils.misc import calc_maxdepth
 
 bp = Blueprint('notices', __name__)
 
@@ -47,7 +48,7 @@ def show(name, comments_page):
 
     per_page = current_app.config['COMMENTS_COUNT']['page']
     comment_spoiler_threshold = current_app.config['COMMENT_SPOILER_THRESHOLD']
-    maxdepth = None if request.args.get('fulltree') == '1' else 2
+    maxdepth = None if request.args.get('fulltree') == '1' else calc_maxdepth(current_user)
 
     comments_count, paged, comments_tree_list = notice.bl.paginate_comments(comments_page, per_page, maxdepth)
     if not comments_tree_list and paged.number != 1:

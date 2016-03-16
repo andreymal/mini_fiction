@@ -48,6 +48,7 @@ class Author(db.Entity, UserMixin):
     excluded_categories = orm.Optional(str, 200)  # TODO: use it on index page
     detail_view = orm.Required(bool, default=False)
     nsfw = orm.Required(bool, default=False)
+    comments_maxdepth = orm.Optional(int, size=16, unsigned=True, nullable=True, default=None)
 
     registration_profile = orm.Optional('RegistrationProfile')
     password_reset_profiles = orm.Set('PasswordResetProfile')

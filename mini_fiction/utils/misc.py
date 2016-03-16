@@ -143,3 +143,13 @@ def call_after_request(f, *args, **kwargs):
         g.after_request_callbacks = []
     g.after_request_callbacks.append((f, args, kwargs))
     return f
+
+
+def calc_maxdepth(user):
+    if user.is_authenticated and user.comments_maxdepth is not None:
+        maxdepth = user.comments_maxdepth - 1
+    else:
+        maxdepth = current_app.config['COMMENTS_TREE_MAXDEPTH'] - 1
+    if maxdepth < 0:
+        maxdepth = None
+    return maxdepth

@@ -64,6 +64,11 @@ class AuthorBL(BaseBL):
         for field in ('is_staff', 'is_active', 'is_superuser', 'detail_view', 'nsfw'):
             if field in data:
                 setattr(user, field, bool(data[field]))
+        if 'comments_maxdepth' in data:
+            if user.comments_maxdepth is None and data['comments_maxdepth'] == current_app.config['COMMENTS_TREE_MAXDEPTH']:
+                pass  # Если бралось значение из настроек проекта, то его и оставляем
+            else:
+                user.comments_maxdepth = int(data['comments_maxdepth'])
 
     def register(self, data):
         from mini_fiction.models import RegistrationProfile

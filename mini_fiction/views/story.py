@@ -13,6 +13,7 @@ from mini_fiction.forms.story import StoryForm
 from mini_fiction.forms.comment import CommentForm
 from mini_fiction.models import Story, Chapter, Rating, StoryEditLogItem, Favorites, Bookmark
 from mini_fiction.validation import ValidationError
+from mini_fiction.utils.misc import calc_maxdepth
 
 bp = Blueprint('story', __name__)
 
@@ -34,7 +35,7 @@ def view(pk, comments_page):
     story = get_story(pk)
 
     per_page = current_app.config['COMMENTS_COUNT']['page']
-    maxdepth = None if request.args.get('fulltree') == '1' else 2
+    maxdepth = None if request.args.get('fulltree') == '1' else calc_maxdepth(current_user)
 
     comments_count, paged, comments_tree_list = story.bl.paginate_comments(comments_page, per_page, maxdepth)
     if not comments_tree_list and paged.number != 1:

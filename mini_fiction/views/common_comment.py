@@ -7,6 +7,7 @@ from flask_babel import gettext
 
 from mini_fiction.forms.comment import CommentForm
 from mini_fiction.validation import ValidationError
+from mini_fiction.utils.misc import calc_maxdepth
 
 
 def build_comment_tree_response(comment, target_attr, target):
@@ -231,7 +232,7 @@ def ajax(target_attr, target, link, page, per_page, template_pagination, last_vi
     if not target.bl.has_comments_access(current_user._get_current_object()):
         abort(403)
 
-    maxdepth = None if request.args.get('fulltree') == '1' else 2
+    maxdepth = None if request.args.get('fulltree') == '1' else calc_maxdepth(current_user)
 
     comments_count, paged, comments_tree_list = target.bl.paginate_comments(page, per_page, maxdepth)
     if not comments_tree_list and paged.number != 1:

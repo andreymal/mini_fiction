@@ -4,7 +4,7 @@
 from pony import orm
 from flask_babel import lazy_gettext
 from flask_wtf import Form
-from wtforms import TextField, TextAreaField, PasswordField, SelectField, validators
+from wtforms import TextField, TextAreaField, PasswordField, SelectField, IntegerField, validators
 
 from mini_fiction.models import Category
 from mini_fiction.forms.fields import LazySelectMultipleField
@@ -76,6 +76,7 @@ class AuthorEditProfileForm(Form):
 
 
 class AuthorEditPrefsForm(Form):
+    attrs_dict = {'class': 'input-small'}
     checkbox_attrs = {
         'btn_attrs': {'type': 'button', 'class': 'btn'},
         'data_attrs': {'class': 'hidden'},
@@ -114,6 +115,14 @@ class AuthorEditPrefsForm(Form):
         coerce=int,
         widget=StoriesButtons(),
         render_kw=radio_attrs,
+    )
+
+    comments_maxdepth = IntegerField(
+        '',
+        [
+            validators.InputRequired(),
+        ],
+        render_kw=dict(attrs_dict, type='number', min=0),
     )
 
 

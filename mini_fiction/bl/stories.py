@@ -387,6 +387,15 @@ class StoryBL(BaseBL, Commentable):
         from mini_fiction.models import StoryComment
         return orm.select(c for c in StoryComment if c.story == self.model)
 
+    def select_comment_votes(self, author, comment_ids):
+        from mini_fiction.models import StoryCommentVote
+        votes = orm.select(
+            (v.comment.id, v.vote_value) for v in StoryCommentVote
+            if v.author.id == author.id and v.comment.id in comment_ids
+        )[:]
+        votes = dict(votes)
+        return {i: votes.get(i, 0) for i in comment_ids}
+
     def last_viewed_comment_by(self, author):
         if author and author.is_authenticated:
             act = self.model.activity.select(lambda x: x.author.id == author.id).first()

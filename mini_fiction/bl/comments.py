@@ -54,7 +54,7 @@ class BaseCommentBL(BaseBL):
     def can_delete_or_restore_by(self, author=None):
         return author and author.is_staff
 
-    def can_vote_by(self, author=None):
+    def can_vote_by(self, author=None, _value_cache=None):
         if not self.can_vote or not author or not author.is_authenticated:
             return False
         c = self.model
@@ -62,7 +62,7 @@ class BaseCommentBL(BaseBL):
             return False
         if c.deleted or c.author and c.author.id == author.id:
             return False
-        return self.get_user_vote(author) == 0
+        return (_value_cache == 0) if _value_cache is not None else (self.get_user_vote(author) == 0)
 
     def get_user_vote(self, author=None):
         if not self.can_vote or not author or not author.is_authenticated:

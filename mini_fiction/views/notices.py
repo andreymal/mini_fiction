@@ -3,6 +3,7 @@
 
 from flask import Blueprint, Markup, current_app, render_template, abort, request
 from flask_babel import gettext
+from flask_login import current_user
 from pony.orm import db_session
 
 from mini_fiction.models import Notice
@@ -52,6 +53,12 @@ def show(name, comments_page):
     if not comments_tree_list and paged.number != 1:
         abort(404)
 
+    comment_ids = [x[0].id for x in comments_tree_list]
+    if current_user.is_authenticated:
+        comment_votes_cache = notice.bl.select_comment_votes(current_user._get_current_object(), comment_ids)
+    else:
+        comment_votes_cache = {i: 0 for i in comment_ids}
+
     data = {
         'page_title': notice.title,
         'notice': notice,
@@ -61,6 +68,7 @@ def show(name, comments_page):
         'comment_spoiler_threshold': comment_spoiler_threshold,
         'comments_tree_list': comments_tree_list,
         'comment_form': CommentForm(),
+        'comment_votes_cache': comment_votes_cache,
     }
 
     return render_template('notices/show.html', **data)

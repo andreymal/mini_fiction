@@ -237,6 +237,11 @@ def ajax(target_attr, target, link, page, per_page, template_pagination, last_vi
     if not comments_tree_list and paged.number != 1:
         abort(404)
 
+    comment_ids = [x[0].id for x in comments_tree_list]
+    if current_user.is_authenticated:
+        comment_votes_cache = target.bl.select_comment_votes(current_user._get_current_object(), comment_ids)
+    else:
+        comment_votes_cache = {i: 0 for i in comment_ids}
     comment_spoiler_threshold = current_app.config['COMMENT_SPOILER_THRESHOLD']
     data = {
         target_attr: target,
@@ -246,6 +251,7 @@ def ajax(target_attr, target, link, page, per_page, template_pagination, last_vi
         'page_current': page,
         'page_obj': paged,
         'comment_spoiler_threshold': comment_spoiler_threshold,
+        'comment_votes_cache': comment_votes_cache,
     }
 
     return jsonify({
@@ -291,12 +297,19 @@ def ajax_tree(target_attr, comment, target=None, last_viewed_comment=None):
     if tree is None:
         tree = comments_tree_list[start + 1:]
 
+    comment_ids = [x[0].id for x in tree]
+    if current_user.is_authenticated:
+        comment_votes_cache = target.bl.select_comment_votes(current_user._get_current_object(), comment_ids)
+    else:
+        comment_votes_cache = {i: 0 for i in comment_ids}
+
     comment_spoiler_threshold = current_app.config['COMMENT_SPOILER_THRESHOLD']
     data = {
         target_attr: target,
         'comments_tree_list': tree,
         'last_viewed_comment': last_viewed_comment,
         'comment_spoiler_threshold': comment_spoiler_threshold,
+        'comment_votes_cache': comment_votes_cache,
     }
 
     return jsonify({

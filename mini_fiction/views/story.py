@@ -51,6 +51,12 @@ def view(pk, comments_page):
     else:
         user_vote = None
 
+    comment_ids = [x[0].id for x in comments_tree_list]
+    if user.is_authenticated:
+        comment_votes_cache = story.bl.select_comment_votes(user, comment_ids)
+    else:
+        comment_votes_cache = {i: 0 for i in comment_ids}
+
     comment_spoiler_threshold = current_app.config['COMMENT_SPOILER_THRESHOLD']
     data = {
         'story': story,
@@ -58,6 +64,7 @@ def view(pk, comments_page):
         'comments_tree_list': comments_tree_list,
         'comments_count': comments_count,
         'comment_spoiler_threshold': comment_spoiler_threshold,
+        'comment_votes_cache': comment_votes_cache,
         'last_viewed_comment': last_viewed_comment,
         'chapters': chapters,
         'num_pages': paged.num_pages,

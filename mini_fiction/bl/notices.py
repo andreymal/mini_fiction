@@ -107,3 +107,12 @@ class NoticeBL(BaseBL, Commentable):
     def select_comments(self):
         from mini_fiction.models import NoticeComment
         return orm.select(c for c in NoticeComment if c.notice == self.model)
+
+    def select_comment_votes(self, author, comment_ids):
+        from mini_fiction.models import NoticeCommentVote
+        votes = orm.select(
+            (v.comment.id, v.vote_value) for v in NoticeCommentVote
+            if v.author.id == author.id and v.comment.id in comment_ids
+        )[:]
+        votes = dict(votes)
+        return {i: votes.get(i, 0) for i in comment_ids}

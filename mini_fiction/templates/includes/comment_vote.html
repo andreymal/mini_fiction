@@ -1,5 +1,9 @@
-{%- set comment_vote = comment.bl.get_user_vote(current_user) -%}
-{%- set can_vote_comment = comment.bl.can_vote_by(current_user) -%}
+{% if comment_votes_cache and comment.id in comment_votes_cache -%}
+    {%- set comment_vote = comment_votes_cache[comment.id] -%}
+{%- else -%}
+    {%- set comment_vote = comment.bl.get_user_vote(current_user) -%}
+{%- endif -%}
+{%- set can_vote_comment = comment.bl.can_vote_by(current_user, _value_cache=comment_vote) -%}
 <div class="vote-up{{ ' vote-disabled' if not can_vote_comment else '' }}{{ ' voted' if comment_vote > 0 else '' }}" title="Голосовать за комментарий"></div>
 <div class="vote-total{{ ' voted-positive' if comment.vote_total > 0 else '' }}{{ ' voted-negative' if comment.vote_total < 0 else '' }}" title="Всего проголосовало: {{ comment.vote_count }}">{{ '+' if comment.vote_total > 0 else '' }}{{ comment.vote_total }}</div>
 <div class="vote-down{{ ' vote-disabled' if not can_vote_comment else '' }}{{ ' voted' if comment_vote < 0 else '' }}" title="Голосовать против комментария"></div>

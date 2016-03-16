@@ -22,7 +22,7 @@ def index():
     stories = stories.prefetch(Story.characters, Story.categories, Story.coauthors)
     stories = stories[:current_app.config['STORIES_COUNT']['main']]
 
-    chapters = select(c for c in Chapter if c.story.approved and not c.story.draft and c.order != 1)
+    chapters = select(c for c in Chapter if c.story_published and c.order != 1)
     # MySQL query optimization
     # TODO: cacheops alternative?
     # FIXME: good for comments, but not correct for chapters

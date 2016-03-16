@@ -35,7 +35,7 @@ def stories(page):
 @bp.route('/chapters/page/<int:page>/')
 @db_session
 def chapters(page):
-    objects = orm.select(c for c in Chapter if c.story.approved and not c.story.draft and c.order != 1)
+    objects = orm.select(c for c in Chapter if c.story_published and c.order != 1)
     objects = objects.prefetch(Chapter.story, Story.coauthors, CoAuthorsStory.author)
     objects = objects.order_by(Chapter.date.desc(), Chapter.id.desc())
 

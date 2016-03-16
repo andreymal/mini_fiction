@@ -343,6 +343,7 @@ class Chapter(db.Entity):
     text = orm.Optional(orm.LongStr)
     updated = orm.Required(datetime, 6, default=datetime.utcnow)
     words = orm.Required(int, default=0)
+    story_published = orm.Required(bool)  # optimization of stream pages
 
     bl = Resource('bl.chapter')
 

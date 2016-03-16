@@ -61,7 +61,7 @@ class StoryBL(BaseBL, Commentable):
         data = Validator(STORY).validated(data, update=True)
 
         story = self.model
-        old_published = story.published  # for chapters in search
+        old_published = story.published  # for chapters
 
         for key in ('title', 'summary', 'notes', 'original', 'finished', 'freezed'):
             if key in data:
@@ -96,6 +96,11 @@ class StoryBL(BaseBL, Commentable):
             if sl_action == StoryEditLogItem.Actions.Edit:
                 sl.data = data
             sl.flush()
+
+        if old_published != story.published:
+            for c in story.chapters:
+                c.story_published = story.published
+
         later(current_app.tasks['sphinx_update_story'].delay, story.id, ())
         return story
 
@@ -107,6 +112,7 @@ class StoryBL(BaseBL, Commentable):
         if old_published != story.published:
             later(current_app.tasks['sphinx_update_story'].delay, story.id, ('approved',))
             for c in story.chapters:
+                c.story_published = story.published  # TODO: update Chapter where story = story.id
                 later(current_app.tasks['sphinx_update_chapter'].delay, c.id)
             for c in story.comments:  # TODO: update StoryComment where story = story.id
                 c.story_published = story.published
@@ -120,6 +126,7 @@ class StoryBL(BaseBL, Commentable):
             if old_published != story.published:
                 later(current_app.tasks['sphinx_update_story'].delay, story.id, ('draft',))
                 for c in story.chapters:
+                    c.story_published = story.published
                     later(current_app.tasks['sphinx_update_chapter'].delay, c.id)
                 for c in story.comments:
                     c.story_published = story.published
@@ -415,6 +422,7 @@ class ChapterBL(BaseBL):
             title=title,
             notes=notes,
             text=text,
+            story_published=story.published,
         )
         chapter.order = (new_order or 0) + 1
         self._update_words_count(chapter)
@@ -483,7 +491,7 @@ class ChapterBL(BaseBL):
             'notes': chapter.notes,
             'text': chapter.text,
             'story_id': chapter.story.id,
-            'published': chapter.story.published
+            'published': chapter.story_published
         } for chapter in chapters]
 
         with current_app.sphinx as sphinx:

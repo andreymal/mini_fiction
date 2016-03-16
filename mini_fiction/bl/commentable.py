@@ -6,6 +6,11 @@ from mini_fiction.utils.misc import Paginator
 
 class Commentable(object):
     def can_comment_by(self, author=None):
+        # it should be redirected to FooComment.bl.can_comment_by
+        raise NotImplementedError
+
+    def create_comment(self, author, ip, data):
+        # it should be redirected to FooComment.bl.create
         raise NotImplementedError
 
     def select_comments(self):

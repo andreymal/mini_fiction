@@ -375,9 +375,12 @@ class StoryBL(BaseBL, Commentable):
         from mini_fiction.models import StoryComment
         return StoryComment.bl.can_comment_by(self.model, author)
 
+    def create_comment(self, author, ip, data):
+        from mini_fiction.models import StoryComment
+        return StoryComment.bl.create(self.model, author, ip, data)
+
     def select_comments(self):
         from mini_fiction.models import StoryComment
-
         return orm.select(c for c in StoryComment if c.story == self.model)
 
     def last_viewed_comment_by(self, author):

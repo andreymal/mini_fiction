@@ -96,7 +96,10 @@ class NoticeBL(BaseBL, Commentable):
         from mini_fiction.models import NoticeComment
         return NoticeComment.bl.can_comment_by(self.model, author)
 
+    def create_comment(self, author, ip, data):
+        from mini_fiction.models import NoticeComment
+        return NoticeComment.bl.create(self.model, author, ip, data)
+
     def select_comments(self):
         from mini_fiction.models import NoticeComment
-
         return orm.select(c for c in NoticeComment if c.notice == self.model)

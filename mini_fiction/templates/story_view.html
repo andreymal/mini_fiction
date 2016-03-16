@@ -96,15 +96,9 @@
         {% endif %}
 
         {% if story.bl.can_comment_by(current_user) %}
-            <a href="#" id="comment-add-link" class="comment-add-link">Добавить новый комментарий</a>
+            <a href="{{ url_for('story_comment.add', story_id=story.id) }}" id="comment-add-link" class="comment-add-link">Добавить новый комментарий</a>
 
-            <form id="comment-form" class="comment-form" method="POST" enctype="multipart/form-data" action="
-                {%- if edit -%}
-                    {{- url_for('comment.edit', story_id=story.id, pk=comment_id) -}}
-                {%- else -%}
-                    {{- url_for('story_comment.add', story_id=story.id) -}}
-                {%- endif -%}
-            ">
+            <form id="comment-form" class="comment-form" method="POST" enctype="multipart/form-data" action="{{ url_for('story_comment.add', story_id=story.id) }}">
             {% from 'macro.html' import comment_form_content %}
             {{ comment_form_content(comment_form, 'story', story.id) }}
             </form>

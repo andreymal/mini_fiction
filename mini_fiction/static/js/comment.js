@@ -129,7 +129,10 @@ core.define('comment', {
         if (form.parent.value && form.parent.value != '0') {
             parentComment = document.getElementById(form.parent.value);
         }
-        core.ajax.post(form.action, new FormData(form))
+
+        var formData = new FormData(form);
+        formData.append('extra_ajax', '1');
+        core.ajax.post(form.action, formData)
             .then(function(response) {
                 return response.json();
             })
@@ -179,7 +182,9 @@ core.define('comment', {
 
     _deleteOrRestoreEvent: function(event) {
         var form = this.form; // this is button
-        core.ajax.post(form.action, new FormData(form))
+        var formData = new FormData(form);
+        formData.append('extra_ajax', '1');
+        core.ajax.post(form.action, formData)
             .then(function(response) {
                 return response.json();
             })

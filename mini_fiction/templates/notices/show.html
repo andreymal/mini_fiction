@@ -32,7 +32,7 @@
         {% endif %}
 
         {% if notice.bl.can_comment_by(current_user) %}
-            <a href="#" id="comment-add-link" class="comment-add-link">Добавить новый комментарий</a>
+            <a href="{{ url_for('notice_comment.add', notice_id=notice.id) }}" id="comment-add-link" class="comment-add-link">Добавить новый комментарий</a>
 
             <form id="comment-form" class="comment-form" method="POST" enctype="multipart/form-data" action="{{- url_for('notice_comment.add', notice_id=notice.id) -}}">
             {% from 'macro.html' import comment_form_content %}

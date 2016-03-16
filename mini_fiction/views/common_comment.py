@@ -60,6 +60,7 @@ def add(target_attr, target, template, template_ajax=None, template_ajax_modal=F
     elif not target.bl.can_comment_by(user):
         abort(403)
 
+    extra_ajax = g.is_ajax and request.form.get('extra_ajax') == '1'
     form = CommentForm()
     if form.validate_on_submit():
         # Обработка POST-запроса
@@ -75,7 +76,7 @@ def add(target_attr, target, template, template_ajax=None, template_ajax_modal=F
         except ValidationError as exc:
             form.set_errors(exc.errors)
         else:
-            if g.is_ajax:
+            if extra_ajax:
                 # Для AJAX отвечаем просто html-кодом комментария и всякой технической инфой
                 return build_comment_tree_response(comment, target_attr, target)
             else:
@@ -85,7 +86,7 @@ def add(target_attr, target, template, template_ajax=None, template_ajax_modal=F
 
     # При ошибках с AJAX не церемонимся и просто отсылаем строку с ошибками
     # (на фронтенде будет всплывашка в углу)
-    if g.is_ajax and (form.errors or form.non_field_errors):
+    if extra_ajax and (form.errors or form.non_field_errors):
         errors = sum(form.errors.values(), []) + form.non_field_errors
         errors = '; '.join(str(x) for x in errors)
         return jsonify({'success': False, 'error': errors})
@@ -153,9 +154,10 @@ def delete(target_attr, comment, template, template_ajax=None, template_ajax_mod
     if not comment.bl.can_delete_or_restore_by(user):
         abort(403)
 
+    extra_ajax = g.is_ajax and request.form.get('extra_ajax') == '1'
     if request.method == 'POST':
         comment.bl.delete(user)  # из БД не удаляется!
-        if g.is_ajax:
+        if extra_ajax:
             return build_comment_response(comment, target_attr, target)
         else:
             return redirect(comment.bl.get_permalink())
@@ -181,9 +183,10 @@ def restore(target_attr, comment, template, template_ajax=None, template_ajax_mo
     if not comment.bl.can_delete_or_restore_by(user):
         abort(403)
 
+    extra_ajax = g.is_ajax and request.form.get('extra_ajax') == '1'
     if request.method == 'POST':
         comment.bl.restore(user)
-        if g.is_ajax:
+        if extra_ajax:
             return build_comment_response(comment, target_attr, target)
         else:
             return redirect(comment.bl.get_permalink())

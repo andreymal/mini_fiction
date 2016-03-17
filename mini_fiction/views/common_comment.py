@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-from flask import current_app, request, g, jsonify, abort, redirect, render_template
+from flask import request, g, jsonify, abort, redirect, render_template
 from flask_login import current_user
 from flask_babel import gettext
 
@@ -16,7 +16,7 @@ def build_comment_tree_response(comment, target_attr, target):
         **{
             target_attr: target,
             'comments_tree_list': [[comment, False]]
-        },
+        }
     )
     return jsonify({
         'success': True,

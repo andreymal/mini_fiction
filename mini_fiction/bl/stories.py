@@ -55,6 +55,19 @@ class StoryBL(BaseBL, Commentable):
         later(current_app.tasks['sphinx_update_story'].delay, story.id, ())
         return story
 
+    def edit_log(self, sl_action, editor, data):
+        from mini_fiction.models import StoryEditLogItem
+
+        sl = StoryEditLogItem(
+            action=sl_action,
+            user=editor,
+            story=self.model,
+        )
+        sl.is_staff = editor.is_staff
+        if sl_action == StoryEditLogItem.Actions.Edit:
+            sl.data = data
+        sl.flush()
+
     def update(self, editor, data):
         from mini_fiction.models import StoryEditLogItem, Category, Character, Classifier, Rating
 
@@ -82,20 +95,7 @@ class StoryBL(BaseBL, Commentable):
             story.classifications.add(Classifier.select(lambda x: x.id in data['classifications'])[:])
 
         if editor:
-            sl_action = StoryEditLogItem.Actions.Edit
-            if tuple(data.keys()) == ('approved',):
-                sl_action = StoryEditLogItem.Actions.Approve if data['approved'] else StoryEditLogItem.Actions.Unapprove
-            elif tuple(data.keys()) == ('draft',):
-                sl_action = StoryEditLogItem.Actions.Publish if not data['draft'] else StoryEditLogItem.Actions.Unpublish
-            sl = StoryEditLogItem(
-                action=sl_action,
-                user=editor,
-                story=story,
-            )
-            sl.is_staff = editor.is_staff
-            if sl_action == StoryEditLogItem.Actions.Edit:
-                sl.data = data
-            sl.flush()
+            self.edit_log(StoryEditLogItem.Actions.Edit, editor, data)
 
         if old_published != story.published:
             for c in story.chapters:
@@ -105,10 +105,19 @@ class StoryBL(BaseBL, Commentable):
         return story
 
     def approve(self, user, approved):
+        from mini_fiction.models import StoryEditLogItem
+
         story = self.model
         old_published = story.published
 
         story.approved = bool(approved)
+        if user:
+            self.edit_log(
+                StoryEditLogItem.Actions.Approve if story.approved else StoryEditLogItem.Actions.Unapprove,
+                user,
+                {'approved': story.approved}
+            )
+
         if old_published != story.published:
             later(current_app.tasks['sphinx_update_story'].delay, story.id, ('approved',))
             for c in story.chapters:
@@ -118,11 +127,21 @@ class StoryBL(BaseBL, Commentable):
                 c.story_published = story.published
 
     def publish(self, user, published):
+        from mini_fiction.models import StoryEditLogItem
+
         story = self.model
         old_published = story.published
 
         if story.publishable or (not story.draft and not story.publishable):
             story.draft = not published
+
+            if user:
+                self.edit_log(
+                    StoryEditLogItem.Actions.Publish if not story.draft else StoryEditLogItem.Actions.Unpublish,
+                    user,
+                    {'draft': story.draft}
+                )
+
             if old_published != story.published:
                 later(current_app.tasks['sphinx_update_story'].delay, story.id, ('draft',))
                 for c in story.chapters:

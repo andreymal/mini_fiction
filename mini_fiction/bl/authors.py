@@ -9,10 +9,14 @@ import string
 from datetime import datetime, timedelta
 from base64 import b64decode, b64encode
 
-import scrypt
 from flask import current_app, url_for, render_template
 from flask_babel import lazy_gettext
 from werkzeug.security import safe_str_cmp
+
+try:
+    import scrypt
+except ImportError:
+    scrypt = None
 
 try:
     import bcrypt
@@ -23,6 +27,9 @@ from mini_fiction.utils.misc import sendmail
 from mini_fiction.bl.utils import BaseBL
 from mini_fiction.validation import ValidationError, Validator
 from mini_fiction.validation.auth import REGISTRATION, LOGIN
+
+if not bcrypt and not scrypt:
+    raise ImportError('Cannot import bcrypt or scrypt')
 
 
 __all__ = ['AuthorBL']
@@ -186,6 +193,8 @@ class AuthorBL(BaseBL):
             return False
 
         if data.startswith('$scrypt$'):
+            if not scrypt:
+                raise NotImplementedError('scrypt is not available')
             try:
                 b64_salt, Nexp, r, p, keylen, h = data.split('$')[2:]
                 Nexp = int(Nexp, 10)
@@ -196,7 +205,9 @@ class AuthorBL(BaseBL):
                 raise ValueError('Invalid hash format')
             return safe_str_cmp(h, self._generate_password_hash(password, b64_salt, Nexp, r, p, keylen))
 
-        elif bcrypt is not None and data.startswith('$bcrypt$'):
+        elif data.startswith('$bcrypt$'):
+            if not bcrypt:
+                raise NotImplementedError('bcrypt is not available')
             try:
                 encoded = data.split('$', 2)[2].encode('utf-8')
                 encoded2 = bcrypt.hashpw(password.encode('utf-8'), encoded)
@@ -225,7 +236,7 @@ class AuthorBL(BaseBL):
             user.password = ''
             return
 
-        if current_app.config['PASSWORD_HASHER'] == 'scrypt':
+        if scrypt is not None and current_app.config['PASSWORD_HASHER'] == 'scrypt':
             b64_salt = b64encode(os.urandom(32)).decode('ascii')
             args = {'b64_salt': b64_salt, 'Nexp': 14, 'r': 8, 'p': 1, 'keylen': 64}
             h = self._generate_password_hash(password, **args)
@@ -235,6 +246,9 @@ class AuthorBL(BaseBL):
             salt = bcrypt.gensalt()
             encoded = bcrypt.hashpw(password.encode('utf-8'), salt)
             user.password = '$bcrypt$' + encoded.decode('utf-8', 'ascii')
+
+        else:
+            raise NotImplementedError('Cannot use current password hasher')
 
     def _generate_password_hash(self, password, b64_salt, Nexp=14, r=8, p=1, keylen=64):
         h = scrypt.hash(

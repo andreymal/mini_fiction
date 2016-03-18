@@ -851,6 +851,12 @@ input.hidden {
   font-size: 16px;
   margin-bottom: 10px;
 }
+blockquote {
+	margin: 5px 0;
+}
+blockquote > p {
+	line-height: inherit;
+}
 
 /* Registration form */
 .registration-form {
@@ -1135,7 +1141,7 @@ a.btn {
 	background: url('../i/downvote.png') center center no-repeat;
 }
 
-.comment-text {
+.comment-text, .comment-text p {
 	font-size: 12px;
 	margin-bottom: 4px;
 }

@@ -64,7 +64,13 @@ def comments(page):
         page_title='Лента комментариев',
         objlistname='comments',
         per_page=current_app.config['COMMENTS_COUNT']['stream'],
-        extra_context=lambda comments_list, _: {'with_story_link': True}
+        extra_context=lambda comments_list, _: {
+            'with_story_link': True,
+            'comment_votes_cache': Story.bl.select_comment_votes(
+                current_user._get_current_object(),
+                [x.id for x in comments_list]
+            )
+        }
     )
 
 

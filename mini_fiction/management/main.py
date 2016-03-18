@@ -67,6 +67,22 @@ def checknoticecomments():
         cmd()
 
 
+@manager.command
+def dumpdb(dirpath, models_list):
+    from mini_fiction.management.commands.dumploaddb import dumpdb as cmd
+    orm.sql_debug(False)
+    with db_session:
+        cmd(dirpath, [x.strip().lower() for x in models_list.split(',')])
+
+
+@manager.command
+def loaddb(pathlist):
+    from mini_fiction.management.commands.dumploaddb import loaddb as cmd
+    orm.sql_debug(False)
+    with db_session:
+        cmd([x.strip() for x in pathlist.split(',')])
+
+
 @manager.option('-h', '--host', dest='host', help='Server host (default 127.0.0.1)')
 @manager.option('-p', '--port', dest='port', help='Server port (default 5000)', type=int)
 @manager.option('-t', '--threaded', dest='threaded', help='Threaded mode', action='store_true')

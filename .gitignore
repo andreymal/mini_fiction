@@ -30,6 +30,7 @@ sdist/
 /media/
 /sphinx/
 /static/
+/dump/
 /sphinxroot.txt
 /local_sphinx.conf
 *.sqlite3

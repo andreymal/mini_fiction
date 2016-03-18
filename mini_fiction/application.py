@@ -6,6 +6,7 @@
 import os
 import logging
 import importlib
+import urllib.parse
 from logging.handlers import SMTPHandler
 
 from celery import Celery
@@ -159,7 +160,10 @@ def configure_ajax(app):
             return response
         if response.data and response.data.startswith(b'{') and response.content_type == 'text/html; charset=utf-8':
             response.content_type = 'application/json'
-            response.headers['X-Request-URL'] = request.url  # for github-fetch polyfill
+            # for github-fetch polyfill:
+            url = list(urllib.parse.urlsplit(request.url))
+            url[2] = urllib.parse.quote(url[2])
+            response.headers['X-Request-URL'] = urllib.parse.urlunsplit(url)
         elif response.status_code == 302:
             # Люблю разрабов js во всех смыслах
             response.data = flask_json.dumps({'page_content': {'redirect': response.headers.get('Location')}})

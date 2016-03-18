@@ -54,7 +54,7 @@ class Author(db.Entity, UserMixin):
     registration_profile = orm.Optional('RegistrationProfile')
     password_reset_profiles = orm.Set('PasswordResetProfile')
     coauthorstories = orm.Set('CoAuthorsStory')
-    CoAuthorsSeries = orm.Set('CoAuthorsSeries')
+    coauthorseries = orm.Set('CoAuthorsSeries')
     beta_reading = orm.Set('BetaReading')
     favorites = orm.Set('Favorites')
     bookmarks = orm.Set('Bookmark')
@@ -219,6 +219,8 @@ class Story(db.Entity):
     vote_average_index = orm.Required(int, size=16, unsigned=True, default=300)  # float can't be used with composite_index
     vote_stddev = orm.Required(float, default=0)
     comments_count = orm.Required(int, size=16, unsigned=True, default=0)
+    source_link = orm.Optional(str, 255)
+    source_title = orm.Optional(str, 255)
 
     in_series_permissions = orm.Set(InSeriesPermissions)
     chapters = orm.Set('Chapter')

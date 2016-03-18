@@ -56,6 +56,24 @@ STORY = {
         'default': '',
         'maxlength': 4096,
     },
+    'source_link': {
+        'type': 'string',
+        'required': False,
+        'default': '',
+        'minlength': 0,
+        'maxlength': 255,
+        'regex': r'^(https?://[^\/\ \?]+\.[^\/\ \?]+(/[^ ]*)?)?$',
+        'error_messages': {
+            'regex': 'Это не очень похоже на ссылку',
+        },
+    },
+    'source_title': {
+        'type': 'string',
+        'required': False,
+        'default': '',
+        'minlength': 0,
+        'maxlength': 255,
+    },
     'rating': {
         'type': 'integer',
         'required': True,

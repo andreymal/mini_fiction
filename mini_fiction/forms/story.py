@@ -70,6 +70,16 @@ class StoryForm(Form):
         render_kw=dict(attrs_markitup_dict, id='id_notes', cols=40, rows=10, maxlength=4096, placeholder='Заметки к рассказу'),
     )
 
+    source_link = TextField(
+        'Ссылка на источник (если есть)',
+        render_kw=dict(attrs_dict, maxlength=255, placeholder='http://')
+    )
+
+    source_title = TextField(
+        'Название источника',
+        render_kw=dict(attrs_dict, maxlength=255)
+    )
+
     rating = LazySelectField(
         'Рейтинг',
         choices=lambda: orm.select((x.id, x.name) for x in Rating).order_by(-1)[:],

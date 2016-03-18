@@ -53,6 +53,10 @@
 
         <blockquote class="more-info">
             <p><strong>Подробности и статистика</strong></p>
+
+            {% if story.source_link %}
+                <p class="story-source">Источник: <a href="{{ story.source_link }}" target="_blank">{{ story.source_title or story.source_link }}</a></p>
+            {% endif %}
             <p>
                 Рейтинг — <a href="{{ url_for('search.simple', search_type='rating', search_id=story.rating.id) }}">{{ story.rating.name }}</a><br/>
               События: {% for classifier in story.classifications.order_by('c.id') %}<a href="{{ url_for('search.simple', search_type='classifier', search_id=classifier.id) }}">{{ classifier.name }}</a>{% if not loop.last %}, {% endif %}{% endfor %}<br/>

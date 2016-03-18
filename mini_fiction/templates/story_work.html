@@ -88,6 +88,31 @@
                         {% endif %}
                       </div>
                 </div>
+                <!-- Источник -->
+                <div class="control-group{% if form.source_link.errors %} error{% endif %}">
+                    <label class="control-label">{{ form.source_link.label }}</label>
+                    <div class="controls">{{ form.source_link }}
+                        {% if form.source_link.errors %}
+                            {% for error in form.source_link.errors %}
+                        <span class="help-inline">{{ error }}</span>
+                            {% endfor %}
+                        {% else %}
+                            <span class="help-inline small">{{ form.source_link.description }}</span>
+                        {% endif %}
+                      </div>
+                </div>
+                <div class="control-group{% if form.source_title.errors %} error{% endif %}">
+                    <label class="control-label">{{ form.source_title.label }}</label>
+                    <div class="controls">{{ form.source_title }}
+                        {% if form.source_title.errors %}
+                            {% for error in form.source_title.errors %}
+                        <span class="help-inline">{{ error }}</span>
+                            {% endfor %}
+                        {% else %}
+                            <span class="help-inline small">{{ form.source_title.description }}</span>
+                        {% endif %}
+                      </div>
+                </div>
                 <!-- Рейтинг -->
                 <div class="control-group{% if form.rating.errors %} error{% endif %}">
                     <label class="control-label">{{ form.rating.label }}</label>

@@ -76,7 +76,7 @@ class StoryBL(BaseBL, Commentable):
         story = self.model
         old_published = story.published  # for chapters
 
-        for key in ('title', 'summary', 'notes', 'original', 'finished', 'freezed'):
+        for key in ('title', 'summary', 'notes', 'original', 'finished', 'freezed', 'source_link', 'source_title'):
             if key in data:
                 setattr(story, key, data[key])
 

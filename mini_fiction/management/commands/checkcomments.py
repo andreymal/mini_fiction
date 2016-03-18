@@ -83,12 +83,14 @@ def check_comments_for(target, comments_list):
 def checkstorycomments():
     first_story = orm.select(orm.min(x.id) for x in Story).first()
     last_story = orm.select(orm.max(x.id) for x in Story).first()
-    for story_id in range(first_story, last_story + 1):
-        story = Story.get(id=story_id)
-        if not story:
-            continue
 
-        print('Story {}'.format(story_id))
+    story_id = first_story
+    while True:
+        story = Story.select(lambda x: x.id >= story_id and x.id <= last_story).first()
+        if not story:
+            break
+
+        print('Story {}'.format(story.id))
         comments_list = story.bl.select_comments().order_by('c.date, c.id')
 
         # Проверка story_published
@@ -102,15 +104,21 @@ def checkstorycomments():
         # Всё остальное здесь
         check_comments_for(story, comments_list)
 
+        story_id = story.id + 1
+
 
 def checknoticecomments():
     first_notice = orm.select(orm.min(x.id) for x in Notice).first()
     last_notice = orm.select(orm.max(x.id) for x in Notice).first()
-    for notice_id in range(first_notice, last_notice + 1):
-        notice = Notice.get(id=notice_id)
+
+    notice_id = first_notice
+    while True:
+        notice = Notice.select(lambda x: x.id >= notice_id and x.id <= last_notice).first()
         if not notice:
-            continue
+            break
 
         print('Notice {} ({})'.format(notice.id, notice.name))
         comments_list = notice.bl.select_comments().order_by('c.date, c.id')
         check_comments_for(notice, comments_list)
+
+        notice_id = notice.id + 1

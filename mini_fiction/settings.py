@@ -164,7 +164,7 @@ class Config(object):
         # 'mini_fiction.downloads.txt.TXT_CP1251Download',
     )))
 
-    CELERY_ALWAYS_EAGER = False
+    CELERY_ALWAYS_EAGER = True
     CELERY_TASK_SERIALIZER = 'json'
     CELERY_ACCEPT_CONTENT = ['json', 'msgpack', 'yaml']
     CELERY_BROKER_URL = 'redis://localhost:6379/0'
@@ -175,7 +175,7 @@ class Config(object):
     RECAPTCHA_PUBLIC_KEY = ''
     RECAPTCHA_PRIVATE_KEY = ''
     RECAPTCHA_OPTIONS = {'hl': 'ru'}
-    NOCAPTCHA = False
+    NOCAPTCHA = True
 
     RANDOM_LOGOS = [
         {'endpoint': 'static', 'filename': 'i/logopics/logopic-{}.jpg'.format(i)}

@@ -48,9 +48,11 @@ mini_fiction runserver
 
 * Выполняем всё написанное выше
 
-* Дополнительно устанавливаем поисковый движок Sphinx и memcached. Если вы хотите использовать Celery, также поставьте Redis
+* Дополнительно устанавливаем поисковый движок Sphinx и memcached.
+  Если вы хотите использовать отдельный воркер Celery, также поставьте Redis
 
-* Устанавливаем MySQL, создаём пользователя и базу данных для него. Обязательно укажите кодировку UTF-8:
+* Устанавливаем MySQL, создаём пользователя и базу данных для него.
+  Обязательно укажите кодировку UTF-8:
 
 ```
 create database mini_fiction character set utf8;
@@ -73,22 +75,21 @@ class Local(Development):
     DATABASE = {
         'host': '127.0.0.1',
         'port': 3306,
-        'user': 'fanfics',  # не забудьте вписать свои данные
+        'user': 'fanfics',  # Не забудьте вписать свои данные!
         'passwd': 'fanfics',
         'db': 'fanfics',
     }
 
-```
-* Включаем поиск Sphinx
-
-```
+    # Включаем поиск Sphinx
     SPHINX_DISABLED = False
 
-```
-* Если хочется запустить отдельный воркер Celery, который будет обновлять индекс Sphinx, то прописываем это
-
-```
+    # Если хочется запустить отдельный воркер Celery, который будет обновлять индекс Sphinx, то прописываем это
     CELERY_ALWAYS_EAGER = False
+
+    # Для включения капчи на регистрации прописываем это:
+    # RECAPTCHA_PUBLIC_KEY = '6Ldcxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx'
+    # RECAPTCHA_PRIVATE_KEY = '6Ldczzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz'
+    # NOCAPTCHA = False
 ```
 
 * Прописываем созданные нами настройки в переменную окружения. Учтите, что созданный вами модуль должен быть доступен для импорта (например, с помощью `export PYTHONPATH=.`):

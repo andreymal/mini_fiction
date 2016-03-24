@@ -37,8 +37,8 @@ def stories(page):
 @db_session
 def chapters(page):
     objects = orm.select(c for c in Chapter if c.story_published and c.order != 1)
-    objects = objects.prefetch(Chapter.story, Story.coauthors, CoAuthorsStory.author)
-    objects = objects.order_by(Chapter.date.desc(), Chapter.id.desc())
+    objects = objects.prefetch(Chapter.text, Chapter.story, Story.coauthors, CoAuthorsStory.author)
+    objects = objects.order_by(Chapter.date.desc())
 
     return paginate_view(
         'stream/chapters.html',
@@ -69,7 +69,7 @@ def comments(page):
             'comment_votes_cache': Story.bl.select_comment_votes(
                 current_user._get_current_object(),
                 [x.id for x in comments_list]
-            )
+            ) if current_user.is_authenticated else {}
         }
     )
 

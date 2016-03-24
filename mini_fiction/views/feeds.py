@@ -45,8 +45,8 @@ def feed_chapters():
         url=request.url_root
     )
 
-    chapters = select(c for c in Chapter if c.story.approved and not c.story.draft)
-    chapters = chapters.order_by(Chapter.date.desc(), Chapter.id.desc())
+    chapters = select(c for c in Chapter if c.story_published)
+    chapters = chapters.order_by(Chapter.date.desc())
     chapters = chapters.prefetch(Chapter.story)[:current_app.config['RSS']['chapters']]
 
     for chapter in chapters:

@@ -126,14 +126,14 @@ class Config(object):
     ALLOWED_TAGS = [
         'b', 'i', 'strong', 'em', 's', 'u',
         'p', 'br', 'hr',
-        'a',
+        'img', 'a',
         'ul', 'ol', 'li',
         'blockquote', 'sup', 'sub', 'pre', 'small', 'tt'
     ]
 
     ALLOWED_ATTRIBUTES = {
         'img': ['src', 'alt', 'title', 'width', 'height'],
-        'a': ['href', 'rel', 'title'],
+        'a': ['href', 'rel', 'title', 'target'],
     }
 
     CHAPTER_ALLOWED_TAGS = [
@@ -147,7 +147,7 @@ class Config(object):
 
     CHAPTER_ALLOWED_ATTRIBUTES = {
         'img': ['src', 'alt', 'title', 'width', 'height'],
-        'a': ['href', 'rel', 'title'],
+        'a': ['href', 'rel', 'title', 'target'],
         'span': ['align'],
         'p': ['align'],
         'footnote': ['id'],

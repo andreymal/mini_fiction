@@ -76,6 +76,8 @@ HTML_FILTER_TEMPLATE = """<?xml version="1.0"?>
 
 <xsl:template match="@*"/>
 
+<xsl:template match="img/@src[not(re:match(.,'^((https?:)?/|#)'))]" mode="default-filters"/>
+
 <xsl:template match="a/@href[not(re:match(.,'^((https?:)?/|#)'))]" mode="default-filters"/>
 
 <xsl:template match="@*|node()" mode="default-filters">

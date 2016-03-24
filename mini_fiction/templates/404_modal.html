@@ -1,0 +1,14 @@
+<div class="modal-header">
+    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+    <h3>404 — книга не найдена</h3>
+</div>
+<div class="modal-body">
+    <div class="story-item">
+        <p>Кажется, такого рассказа нет. Яростно удалён или ещё не написан. А может, у вас неправильная ссылка?</p>
+        <p>Попробуйте поискать нужный специально обученным <a href="{{ url_for('search.main') }}">поиском</a> или вернуться на <a href="{{ url_for('index.index') }}">главную</a>.</p>
+    </div>
+</div>
+<div class="modal-footer">
+    <a href="#" class="btn" data-dismiss="modal" aria-hidden="true">Вернуться</a>
+</div>
+

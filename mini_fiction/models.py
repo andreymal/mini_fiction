@@ -17,6 +17,7 @@ from mini_fiction.filters.html import footnotes_to_html
 
 
 class AnonymousUser(AnonymousUserMixin):
+    id = None
     username = ''
     is_active = False
     is_staff = False
@@ -348,6 +349,8 @@ class Chapter(db.Entity):
     updated = orm.Required(datetime, 6, default=datetime.utcnow)
     words = orm.Required(int, default=0)
     story_published = orm.Required(bool)  # optimization of stream pages
+
+    orm.composite_index(date, story_published)
 
     bl = Resource('bl.chapter')
 

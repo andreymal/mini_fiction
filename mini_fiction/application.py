@@ -11,8 +11,9 @@ from logging.handlers import SMTPHandler
 
 from celery import Celery
 from werkzeug.contrib import cache
+from werkzeug.contrib.fixers import ProxyFix
 from werkzeug.exceptions import HTTPException
-from flask import Flask, current_app, request, g
+from flask import Flask, current_app, request, g, jsonify
 from flask import json as flask_json
 import flask_babel
 from flask_login import LoginManager
@@ -161,9 +162,14 @@ def configure_ajax(app):
         if response.data and response.data.startswith(b'{') and response.content_type == 'text/html; charset=utf-8':
             response.content_type = 'application/json'
             # for github-fetch polyfill:
-            url = list(urllib.parse.urlsplit(request.url))
-            url[2] = urllib.parse.quote(url[2])
-            response.headers['X-Request-URL'] = urllib.parse.urlunsplit(url)
+            url = bytearray(request.url, 'utf-8')
+            esc_url = []
+            for c in url:
+                if c > 127:
+                    esc_url.append('%' + hex(c)[2:].upper())
+                else:
+                    esc_url.append(chr(c))
+            response.headers['X-Request-URL'] = ''.join(esc_url)
         elif response.status_code == 302:
             # Люблю разрабов js во всех смыслах
             response.data = flask_json.dumps({'page_content': {'redirect': response.headers.get('Location')}})
@@ -176,17 +182,27 @@ def configure_errorpages(app):
     from flask import render_template
     from pony.orm import db_session
 
+    def _error_common(template, template_modal, code, e):
+        if getattr(g, 'is_ajax', False):
+            html = render_template(template_modal, error=e, error_code=code)
+            response = jsonify({'page_content': {'modal': True, 'content': html}})
+            response.status_code = code
+            return response
+        else:
+            html = render_template(template, error=e, error_code=code)
+            return html, code
+
     def _page403(e):
-        return render_template('403.html'), 403
+        return _error_common('403.html', '403_modal.html', 403, e)
 
     def _page404(e):
-        return render_template('404.html'), 404
+        return _error_common('404.html', '404_modal.html', 404, e)
 
     def _page500(e):
-        return render_template('500.html'), 500
+        return _error_common('500.html', '500_modal.html', 500, e)
 
     def _pageall(e):
-        return render_template('error.html', error=e), e.code or 500
+        return _error_common('error.html', 'error_modal.html', e.code or 500, e)
 
     app.errorhandler(403)(db_session(_page403))
     app.errorhandler(404)(db_session(_page404))
@@ -237,6 +253,10 @@ def configure_misc(app):
         for f, args, kwargs in getattr(g, 'after_request_callbacks', ()):
             f(*args, **kwargs)
         return response
+
+    # Pass proxies for correct request_addr
+    if app.config['PROXIES_COUNT'] > 0:
+        app.wsgi_app = ProxyFix(app.wsgi_app, app.config['PROXIES_COUNT'])
 
 
 def configure_development(app):

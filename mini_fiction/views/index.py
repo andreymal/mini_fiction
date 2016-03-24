@@ -6,7 +6,7 @@ from flask_babel import gettext
 from flask_login import current_user
 from pony.orm import select, db_session
 
-from mini_fiction.models import Story, Category, Chapter, StoryComment
+from mini_fiction.models import Story, Category, Chapter, StoryComment, CoAuthorsStory
 from mini_fiction.utils.views import cached_lists
 
 bp = Blueprint('index', __name__)
@@ -24,16 +24,8 @@ def index():
     stories = stories[:current_app.config['STORIES_COUNT']['main']]
 
     chapters = select(c for c in Chapter if c.story_published and c.order != 1)
-    # MySQL query optimization
-    # TODO: cacheops alternative?
-    # FIXME: good for comments, but not correct for chapters
-    opt_chapter_id = current_app.cache.get('index_opt_chapter_id')
-    if opt_chapter_id is not None:
-        chapters = chapters.filter(lambda x: x.id >= opt_chapter_id)
-    chapters = chapters.order_by(Chapter.date.desc(), Chapter.id.desc())
+    chapters = chapters.order_by(Chapter.date.desc())
     chapters = chapters[:current_app.config['CHAPTERS_COUNT']['main']]
-    if len(chapters) == current_app.config['CHAPTERS_COUNT']['main']:
-        current_app.cache.set('index_opt_chapter_id', chapters[-1].id - 500, timeout=1200)
 
     story_ids = [y.story.id for y in chapters]
     chapters_stories = select(x for x in Story if x.id in story_ids).prefetch(Story.coauthors)[:]

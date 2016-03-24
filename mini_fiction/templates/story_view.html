@@ -45,10 +45,11 @@
 
         <p>Написал: {% include 'includes/story_authors_list.html' %}</p>
 
-        <p class="story-description">{{ story.summary_as_html|striptags }}</p>
+        <div class="story-description">{{ story.summary_as_html }}</div>
 
         {% if story.notes %}
-            <p>Заметки к рассказу: {{ story.notes_as_html }}</p>
+            <div>Заметки к рассказу:</div>
+            <div class="story-notes">{{ story.notes_as_html }}</div>
         {% endif %}
 
         <blockquote class="more-info">

@@ -21,7 +21,7 @@ def favorites(user_id, page):
     if not user:
         abort(404)
 
-    objects = select(x.story for x in Favorites if x.author == user).order_by('-x.id')
+    objects = select(x.story for x in Favorites if x.author == user).without_distinct().order_by('-x.id')
 
     if current_user.is_authenticated and user.id == current_user.id:
         page_title = 'Мое избранное'
@@ -61,7 +61,7 @@ def submitted(page):
 @db_session
 @login_required
 def bookmarks(page):
-    objects = select(x.story for x in Bookmark if x.author.id == current_user.id).order_by('-x.id')
+    objects = select(x.story for x in Bookmark if x.author.id == current_user.id).without_distinct().order_by('-x.id')
 
     return paginate_view(
         'bookmarks.html',

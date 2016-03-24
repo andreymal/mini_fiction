@@ -1,0 +1,13 @@
+<div class="modal-header">
+    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+    <h3>{{ error.code }} — {{ error.name }}</h3>
+</div>
+<div class="modal-body">
+    <div class="story-item">
+        {{ error.get_description()|safe }}
+    </div>
+</div>
+<div class="modal-footer">
+    <a href="#" class="btn" data-dismiss="modal" aria-hidden="true">Вернуться</a>
+</div>
+

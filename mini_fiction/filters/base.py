@@ -35,10 +35,10 @@ def transform_xslt_params(kw):
     for key, value in kw.items():
         if isinstance(value, str):
             value = etree.XSLT.strparam(value)
-        elif isinstance(value, (int, float)):
-            value = str(value)
         elif isinstance(value, bool):
             value = 'true()' if value else 'false()'
+        elif isinstance(value, (int, float)):
+            value = str(value)
         else:
             raise TypeError(key)
         kw[key] = value

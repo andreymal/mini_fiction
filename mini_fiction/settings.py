@@ -68,6 +68,9 @@ class Config(object):
     MEDIA_URL = '/media/'
     STATIC_ROOT = os.path.join(os.path.dirname(__file__), 'static')
 
+    LOCALSTATIC_ROOT = None
+    LOCALTEMPLATES = None
+
     SPHINX_DISABLED = False
     SPHINX_CONFIG = {
         'connection_params': {'unix_socket': '/tmp/sphinx_fanfics.socket', 'charset': 'utf8'},

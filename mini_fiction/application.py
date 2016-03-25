@@ -9,6 +9,7 @@ import importlib
 import urllib.parse
 from logging.handlers import SMTPHandler
 
+import jinja2
 from celery import Celery
 from werkzeug.contrib import cache
 from werkzeug.contrib.fixers import ProxyFix
@@ -119,6 +120,7 @@ def configure_error_handlers(app):
 def configure_views(app):
     from mini_fiction.views import index, auth, story, chapter, search, author, stream, object_lists
     from mini_fiction.views import story_comment, feeds, staticpages, notices, notice_comment
+    from mini_fiction.views.localstatic import localstatic
     app.register_blueprint(index.bp)
     app.register_blueprint(auth.bp, url_prefix='/accounts')
     app.register_blueprint(story.bp, url_prefix='/story')
@@ -134,10 +136,13 @@ def configure_views(app):
     app.register_blueprint(notices.bp, url_prefix='/notice')
     app.register_blueprint(notice_comment.bp)
 
+    if app.config['LOCALSTATIC_ROOT']:
+        app.add_url_rule('/localstatic/<path:filename>', 'localstatic', localstatic)
+
     # Static invalidation
     @app.url_defaults
     def static_postfix(endpoint, values):
-        if endpoint == 'static' and 'v' not in values and 'STATIC_V' in app.config:
+        if endpoint in ('static', 'localstatic') and 'v' not in values and 'STATIC_V' in app.config:
             values['v'] = app.config['STATIC_V']
 
 
@@ -220,6 +225,13 @@ def configure_templates(app):
     app.templatetags = dict(registry.tags)
 
     app.jinja_env.filters['tojson_raw'] = flask_json.dumps  # not escapes &, < and >
+
+    if app.config['LOCALTEMPLATES']:
+        my_loader = jinja2.ChoiceLoader([
+            jinja2.FileSystemLoader(os.path.abspath(app.config['LOCALTEMPLATES'])),
+            app.jinja_loader,
+        ])
+        app.jinja_loader = my_loader
 
 
 def configure_search(app):

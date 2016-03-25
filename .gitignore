@@ -30,6 +30,9 @@ sdist/
 /media/
 /sphinx/
 /static/
+/localstatic/
+/templates/
+/localtemplates/
 /dump/
 /sphinxroot.txt
 /local_sphinx.conf

@@ -178,7 +178,7 @@ class Series(db.Entity):
     mark = orm.Required(int, size=16, default=0)
     notes = orm.Optional(orm.LongStr)
     original = orm.Required(bool, default=True)
-    summary = orm.Required(orm.LongStr, lazy=False)
+    summary = orm.Optional(orm.LongStr, lazy=False)
     title = orm.Required(str, 512)
     updated = orm.Required(datetime, 6, default=datetime.utcnow)
     views = orm.Required(int, default=0)

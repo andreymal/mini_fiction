@@ -129,22 +129,34 @@ def loaddb_entity(data, entity, restore_queue):
     create_data = {}
     create_relations = {}
     create_collections = {}
+    create_new_relations = {}
+    create_new_collections = {}
     for name, value in data.items():
         field = getattr(entity, name)
         assert isinstance(field, orm.core.Attribute)
 
-        '''if isinstance(field, orm.core.Collection):
-            create_collections[name] = value
-        else:
-            create_data[name] = value
-            print(name, field.py_type)
-            if issubclass(field.py_type, db.Entity):
-                print('entity!', field.py_type.__name__)'''
-
         if issubclass(field.py_type, db.Entity):
             # Отношения могут быть ещё не загружены в БД
             relation_name = field.py_type.__name__.lower()
-            if value is None or relation_name in restore_queue:
+            if value is not None and isinstance(value, dict):
+                # Если в значении не id, а словарь, то файлик нам предлагает это отношение создать
+                # (dumpdb такое не генерирует; просто удобно при ручном заполнении)
+                assert not isinstance(field, orm.core.Collection)
+                if isinstance(field, orm.core.Required):
+                    # Обязательный атрибут придётся создать сразу
+                    rel = field.py_type(**value)
+                    rel.flush()
+                    create_relations[name] = rel.id  # TODO: custom primary key
+                else:
+                    # Опциональный отложим
+                    create_new_relations[name] = value
+
+            elif value is not None and isinstance(value, list) and set(isinstance(x, dict) for x in value) == {True}:
+                # То же самое, но для коллекций
+                assert isinstance(field, orm.core.Collection)
+                create_new_collections[name] = value
+
+            elif value is None or relation_name in restore_queue:
                 # Если отношение пустое, то и делать ничего не надо
                 # Если отношение в очереди на потом, то просто не создаём связь
                 # (надеемся, что у этого самого отношения связь тоже прописана)
@@ -153,6 +165,7 @@ def loaddb_entity(data, entity, restore_queue):
                     create_collections[name] = []
                 else:
                     create_relations[name] = None
+
             else:
                 # Если в очереди нету, то запрашиваем из БД
                 if isinstance(field, orm.core.Collection):
@@ -176,11 +189,26 @@ def loaddb_entity(data, entity, restore_queue):
                 create_data[name] = value
 
     kwargs = dict(create_data)
-    kwargs.update(create_relations)
+    kwargs.update(create_relations)  # Уже существующие отношения (в т.ч. созданные выше обязательные)
     obj = entity(**kwargs)
-    obj.flush()
+    obj.flush()  # Получаем первичный ключ
+
+    # Уже существующие отношения в коллекцях
     for name, items in create_collections.items():
         getattr(obj, name).add(items)
+
+    # Создаваемые опциональные отношения
+    for name, objkeys in create_new_relations.items():
+        field = getattr(obj, name)
+        objkeys[field.reverse.name] = obj
+        rel = field.py_type(**objkeys)
+        rel.flush()
+
+    # Создаваемые опциональные отношения в коллекциях
+    for name, items in create_new_collections.items():
+        for objkeys in items:
+            getattr(obj, name).create(**objkeys)
+
     print('Created {} {}'.format(entity.__name__, obj.id))
 
 

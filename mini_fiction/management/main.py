@@ -76,11 +76,12 @@ def dumpdb(dirpath, models_list):
 
 
 @manager.command
-def loaddb(pathlist):
+@manager.option('-f', '--force', dest='force', help='Force rewrite existing data', action='store_true')
+def loaddb(pathlist, force=False):
     from mini_fiction.management.commands.dumploaddb import loaddb as cmd
     orm.sql_debug(False)
     with db_session:
-        cmd([x.strip() for x in pathlist.split(',')])
+        cmd([x.strip() for x in pathlist.split(',')], force=force)
 
 
 @manager.option('-h', '--host', dest='host', help='Server host (default 127.0.0.1)')

@@ -35,6 +35,15 @@ dumpdb_params = {
     'noticecomment': {'exclude': (
         'answers', 'edits', 'votes',
     )},
+    'category': {'exclude': (
+        'stories',
+    )},
+    'character': {'exclude': (
+        'stories',
+    )},
+    'classifier': {'exclude': (
+        'stories',
+    )},
 }
 
 
@@ -131,6 +140,12 @@ def loaddb_entity(data, entity, restore_queue):
     create_collections = {}
     create_new_relations = {}
     create_new_collections = {}
+
+    edit = False
+    if data.get('id') is not None:
+        obj = entity.get(id=data['id'])
+        edit = obj is not None
+
     for name, value in data.items():
         field = getattr(entity, name)
         assert isinstance(field, orm.core.Attribute)
@@ -142,11 +157,17 @@ def loaddb_entity(data, entity, restore_queue):
                 # Если в значении не id, а словарь, то файлик нам предлагает это отношение создать
                 # (dumpdb такое не генерирует; просто удобно при ручном заполнении)
                 assert not isinstance(field, orm.core.Collection)
-                if isinstance(field, orm.core.Required):
+                if edit and value.get('id') is None:
+                    raise ValueError('Cannot create relation without primary key because it is dangerous')
+                rel = field.py_type.get(id=value['id']) if value.get('id') is not None else None
+                if rel is not None:
+                    # Существующий атрибут пересоздавать не будем
+                    create_relations[name] = rel
+                elif isinstance(field, orm.core.Required):
                     # Обязательный атрибут придётся создать сразу
                     rel = field.py_type(**value)
                     rel.flush()
-                    create_relations[name] = rel.id  # TODO: custom primary key
+                    create_relations[name] = rel
                 else:
                     # Опциональный отложим
                     create_new_relations[name] = value
@@ -154,7 +175,13 @@ def loaddb_entity(data, entity, restore_queue):
             elif value is not None and isinstance(value, list) and set(isinstance(x, dict) for x in value) == {True}:
                 # То же самое, но для коллекций
                 assert isinstance(field, orm.core.Collection)
-                create_new_collections[name] = value
+                items = []
+                for item in value:
+                    if edit and item.get('id') is None:
+                        raise ValueError('Cannot create relation without primary key because it is dangerous')
+                    rel = field.py_type.get(id=item['id']) if item.get('id') is not None else None
+                    items.append(rel or item)
+                create_new_collections[name] = items
 
             elif value is None or relation_name in restore_queue:
                 # Если отношение пустое, то и делать ничего не надо
@@ -190,15 +217,23 @@ def loaddb_entity(data, entity, restore_queue):
 
     kwargs = dict(create_data)
     kwargs.update(create_relations)  # Уже существующие отношения (в т.ч. созданные выше обязательные)
-    obj = entity(**kwargs)
-    obj.flush()  # Получаем первичный ключ
+    if not edit:
+        obj = entity(**kwargs)
+        obj.flush()  # Получаем первичный ключ
+    else:
+        for name, value in kwargs.items():
+            setattr(obj, name, value)
 
-    # Уже существующие отношения в коллекцях
+    # Уже существующие отношения в коллекциях
     for name, items in create_collections.items():
-        getattr(obj, name).add(items)
+        ids = [x.id for x in getattr(obj, name)]
+        for rel in items:
+            if not edit or rel.id not in ids:
+                getattr(obj, name).add(rel)
 
     # Создаваемые опциональные отношения
     for name, objkeys in create_new_relations.items():
+        assert not edit or objkeys.get('id') is not None
         field = getattr(obj, name)
         objkeys[field.reverse.name] = obj
         rel = field.py_type(**objkeys)
@@ -207,12 +242,16 @@ def loaddb_entity(data, entity, restore_queue):
     # Создаваемые опциональные отношения в коллекциях
     for name, items in create_new_collections.items():
         for objkeys in items:
+            assert not edit or objkeys.get('id') is not None
             getattr(obj, name).create(**objkeys)
 
-    print('Created {} {}'.format(entity.__name__, obj.id))
+    if not edit:
+        print('Created {} {}'.format(entity.__name__, obj.id))
+    else:
+        print('Updated {} {}'.format(entity.__name__, obj.id))
 
 
-def loaddb(pathlist):
+def loaddb(pathlist, force=False):
     files = []
     for x in pathlist:
         if os.path.isdir(x):
@@ -248,9 +287,13 @@ def loaddb(pathlist):
         print('Some entities are not empty:')
         for x in notempty:
             print(' -{} (table {})'.format(x, table[x]._table_))
-        print('Please delete it with relations before loaddb.')
-        orm.rollback()
-        return
+        if not force:
+            print('Please delete it with relations before loaddb.')
+            orm.rollback()
+            return
+        if input('Continue? y/n ') not in ('Y', 'y'):
+            orm.rollback()
+            return
 
     while restore_queue:
         name = restore_queue.pop(0)
@@ -258,8 +301,10 @@ def loaddb(pathlist):
         for f in files_by_model[name]:
             print('Load {} from {}...'.format(name, f))
             with open(f, 'r', encoding='utf-8-sig') as fp:
-                assert fp.readline() == 'dump:{}\n'.format(name)
-                assert fp.readline() == '\n'
+                line = fp.readline()
+                assert line == 'dump:{}\n'.format(name)
+                line = fp.readline()
+                assert line == '\n'
 
                 cache = ''
                 while True:

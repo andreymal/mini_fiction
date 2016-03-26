@@ -77,15 +77,15 @@ class Author(db.Entity, UserMixin):
 
     @property
     def stories(self):
-        return orm.select(x.story for x in CoAuthorsStory if x.author == self)
+        return orm.select(x.story for x in CoAuthorsStory if x.author == self).without_distinct()
 
     @property
     def beta_stories(self):
-        return orm.select(x.story for x in BetaReading if x.beta == self)
+        return orm.select(x.story for x in BetaReading if x.beta == self).without_distinct()
 
     @property
     def series(self):
-        return orm.select(x.series for x in CoAuthorsSeries if x.author == self)
+        return orm.select(x.series for x in CoAuthorsSeries if x.author == self).without_distinct()
 
     @property
     def excluded_categories_list(self):
@@ -190,7 +190,7 @@ class Series(db.Entity):
 
     @property
     def stories(self):
-        return orm.select(x.story for x in InSeriesPermissions if x.series == self).order_by('x.id')
+        return orm.select(x.story for x in InSeriesPermissions if x.series == self).without_distinct().order_by('x.id')
 
 
 class Story(db.Entity):
@@ -250,15 +250,15 @@ class Story(db.Entity):
 
     @property
     def authors(self):
-        return orm.select(x.author for x in CoAuthorsStory if x.story == self).order_by('x.id')
+        return orm.select(x.author for x in CoAuthorsStory if x.story == self).without_distinct().order_by('x.id')
 
     @property
     def betas(self):
-        return orm.select(x.beta for x in BetaReading if x.story == self).order_by('x.id')
+        return orm.select(x.beta for x in BetaReading if x.story == self).without_distinct().order_by('x.id')
 
     @property
     def in_series(self):
-        return orm.select(x.series for x in InSeriesPermissions if x.story == self).order_by('x.id')
+        return orm.select(x.series for x in InSeriesPermissions if x.story == self).without_distinct().order_by('x.id')
 
     @property
     def published(self):

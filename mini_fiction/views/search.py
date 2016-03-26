@@ -96,6 +96,7 @@ def search_action(postform):
     data['pagination'] = pagination
     data['total'] = int(raw_result['total_found'])
     data['result'] = result
+    data['weights'] = [(x['id'], x['weight']) for x in raw_result['matches']]
     return render_template('search.html', **data)
 
 

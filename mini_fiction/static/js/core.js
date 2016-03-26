@@ -658,6 +658,7 @@ var core = {
 
         var formData = new FormData(form);
         // Нам не предоставили способа получить нажатую кнопочку отправки, костыляем
+        // FIXME: для <input form="formid" /> за пределами формы не работает, разумеется
         var submitButton = form.querySelector('input[type="submit"]:focus, button[type="submit"]:focus');
         // Если форму отправляют клавишей Enter, то нужно брать первую попавшуюся кнопку
         submitButton = submitButton || form.querySelector('input[type="submit"], button[type="submit"]');

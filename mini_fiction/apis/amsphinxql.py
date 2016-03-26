@@ -77,9 +77,11 @@ class SphinxConnection(object):
         q = '(' + ('%s, ' * (len(l) - 1)) + '%s)'
         return q, l
 
-    def search(self, index, query, fields=('id',), sort_by=None, limit=None, options=None, weights=None, **filters):
+    def search(self, index, query, fields=('id',), raw_fields=('WEIGHT() AS weight',), sort_by=None, limit=None, options=None, weights=None, **filters):
         # SELECT
         rfields = ', '.join('`%s`' % x for x in fields)
+        if raw_fields:
+            rfields = rfields + ', ' + ', '.join(raw_fields)
         sql = 'select %s from `%s` where match(%%s)' % (rfields, index)
         args = [str(query)]
 

@@ -8,7 +8,7 @@
         {{- breadcrumbs() }}
         <h1>Поиск рассказов</h1>
         <div>
-        <form action="{{ url_for('search.main') }}" method="GET" name="search" id="searchform" class="form-horizontal">
+        <form action="{{ url_for('search.main') }}" method="GET" name="search" id="searchform" class="form-horizontal" data-noajax="1">
             <fieldset>
                 <div class="padded">
                     <!-- Поле поиска -->
@@ -87,7 +87,13 @@
         {% if search_type == 0 %}
             <!-- Рассказы: начало вывода -->
             {% if result %}<div class="story-item"><h3>{{ ngettext("Found %(num)d story", "Found %(num)d stories", total) }}</h3></div>{% endif %}
-            {% with stories=result %}
+            {% if weights and config['DEBUG'] %}
+            <div style="font-size: 0.8em; line-height: 1.1em">
+                Weights:<br/>
+                {% for x in weights %}{{ x[0] }}: {{ x[1] }}<br/>{% endfor %}
+            </div>
+            {% endif -%}
+            {% with stories = result %}
                 {% include "includes/stories.html" %}
             {% endwith %}
             <!-- Рассказы: конец вывода -->

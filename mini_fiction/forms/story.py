@@ -6,7 +6,7 @@ from pony import orm
 
 from mini_fiction.models import Category, Character, Rating, Classifier
 from mini_fiction.forms.fields import LazySelectField, LazySelectMultipleField, GroupedModelChoiceField
-from mini_fiction.widgets import StoriesImgSelect, StoriesCheckboxSelect, StoriesCategorySelect, StoriesButtons
+from mini_fiction.widgets import StoriesCharacterSelect, StoriesCheckboxSelect, StoriesCategorySelect, StoriesButtons
 from mini_fiction.forms.form import Form
 
 
@@ -55,7 +55,7 @@ class StoryForm(Form):
         coerce=int,
         group_by_field='group',
         render_kw=img_attrs,
-        widget=StoriesImgSelect(),
+        widget=StoriesCharacterSelect(multiple=True),
         description='Следует выбрать персонажей, находящихся в гуще событий, а не всех пони, упомянутых в произведении.',
     )
 

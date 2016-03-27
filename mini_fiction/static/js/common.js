@@ -50,9 +50,25 @@ core.define('common', {
         $('.characters-select:checked + img', elem).addClass('ui-selected');
         $(".character-item", elem).click(function() {
             var input = $('input', this);
-            var checked = input.prop('checked');
-            input.prop('checked', !checked);
-            $('img', this).toggleClass('ui-selected', !checked);
+            var typ = input.attr('type');
+            var checked;
+            if (typ == 'checkbox') {
+                checked = input.prop('checked');
+                input.prop('checked', !checked);
+                $('img', this).toggleClass('ui-selected', !checked);
+
+            } else if (typ == 'radio') {
+                var oldInput = input[0].form.querySelector('input[name="' + input.attr('name') + '"]:checked');
+                if (oldInput) {
+                    $('img', oldInput.parentNode).toggleClass('ui-selected', false);
+                }
+                checked = input.prop('checked');
+                input.prop('checked', !checked);
+                $('img', this).toggleClass('ui-selected', !checked);
+
+            } else {
+                throw new Error('Unsupported input type ' + typ);
+            }
         });
     },
 

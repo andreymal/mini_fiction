@@ -34,31 +34,31 @@ class StoriesCheckboxSelect(Select):
         output = []
         for (option_value, option_label, selected) in field.iter_choices():
             output.append(
-                self.render_item(field, option_value, option_label, selected, label_class)
+                self.render_option(field, option_value, option_label, selected, label_class)
             )
         return Markup('\n'.join(output))
 
-    def render_item(self, field, option_value, option_label, selected, label_class):
+    def render_option(self, field, value, label, selected, label_class):
         cb = Input('checkbox' if self.multiple else 'radio')  # NOTE: CheckboxInput() is always checked if field.data is present
-        rendered_cb = cb(field, checked=selected, value=option_value, id='{}_{}'.format(field.id, option_value))
+        rendered_cb = cb(field, checked=selected, value=value, id='{}_{}'.format(field.id, value))
         label_class_final = ' class="%s"' % (label_class,)
-        return '<label%s>%s %s</label>' % (label_class_final, rendered_cb, option_label)
+        return '<label%s>%s %s</label>' % (label_class_final, rendered_cb, label)
 
 
 class StoriesCategorySelect(StoriesCheckboxSelect):
-    def render_item(self, field, option_value, option_label, selected, label_class):
+    def render_option(self, field, value, label, selected, label_class):
         categories = dict(orm.select((c.id, c.color) for c in Category)[:])  # NOTE: Pony ORM caches this
-        label_attrs = ' style="background-color: %s;"' % categories[option_value]
+        label_attrs = ' style="background-color: %s;"' % categories[value]
         cb = Input('checkbox' if self.multiple else 'radio')  # NOTE: CheckboxInput() is always checked if field.data is present
-        rendered_cb = cb(field, checked=selected, value=option_value, id='{}_{}'.format(field.id, option_value))
+        rendered_cb = cb(field, checked=selected, value=value, id='{}_{}'.format(field.id, value))
         label_class_final = ' class="%s"' % (label_class,)
-        return '<label%s%s>%s %s</label>' % (label_class_final, label_attrs, rendered_cb, option_label)
+        return '<label%s%s>%s %s</label>' % (label_class_final, label_attrs, rendered_cb, label)
 
 
 # TODO: optimize
 class StoriesImgSelect(Select):
-    def __init__(self):
-        super().__init__(multiple=True)
+    def __init__(self, multiple=False):
+        super().__init__(multiple=multiple)
 
     def __call__(self, field, **kwargs):
         if hasattr(field, 'coerce'):
@@ -83,16 +83,23 @@ class StoriesImgSelect(Select):
             output.append('</span>')
         return Markup('\n'.join(output))
 
-    @staticmethod
-    def render_option(field, value, label, selected, **kwargs):
+    def get_img_url(self, field, value):
+        raise NotImplementedError
+
+    def render_option(self, field, value, label, selected, **kwargs):
         container_attrs = kwargs['container_attrs']
         data_attrs = kwargs['data_attrs']
-        img_url = url_for('static', filename='i/characters/{}.png'.format(value))
+        img_url = self.get_img_url(field, value)
         img_class = 'ui-selected' if selected else ''
         item_image = '<img class="%s" src="%s" alt="%s" title="%s" />' % (img_class, img_url, label, label)
-        cb = Input('checkbox')
+        cb = Input('checkbox' if self.multiple else 'radio')
         rendered_cb = cb(field, value=value, checked=selected, **data_attrs)
         return Markup('<span %s>%s%s</span>' % (html_params(**container_attrs), rendered_cb, item_image))
+
+
+class StoriesCharacterSelect(StoriesImgSelect):
+    def get_img_url(self, field, value):
+        return url_for('static', filename='i/characters/{}.png'.format(value))
 
 
 class StoriesButtons(Select):

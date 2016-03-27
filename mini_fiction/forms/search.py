@@ -8,7 +8,7 @@ from pony import orm
 
 from mini_fiction.models import Category, Character, Rating, Classifier
 from mini_fiction.forms.fields import LazySelectMultipleField, GroupedModelChoiceField
-from mini_fiction.widgets import StoriesImgSelect, StoriesCheckboxSelect, StoriesCategorySelect, StoriesButtons, ButtonWidget
+from mini_fiction.widgets import StoriesCharacterSelect, StoriesCheckboxSelect, StoriesCategorySelect, StoriesButtons, ButtonWidget
 
 
 class SearchForm(Form):
@@ -97,7 +97,7 @@ class SearchForm(Form):
         coerce=int,
         group_by_field='group',
         render_kw=img_attrs,
-        widget=StoriesImgSelect(),
+        widget=StoriesCharacterSelect(multiple=True),
     )
 
     # Оригинал/перевод

@@ -1,0 +1,30 @@
+{% extends base %}
+{% from 'macro.html' import breadcrumbs with context %}
+{% block content %}
+<div class="row">
+    <div class="span12">
+        {{- breadcrumbs([
+            [url_for('admin_index.index'), _('Administration')],
+            [url_for('admin_categories.index'), _('Categories')],
+            [url_for('admin_categories.update', pk=category.id), category.name]
+        ]) }}
+    <h1>{{ category.name }}</h1>
+
+    <p>{{ _('Delete this category?') }}</p>
+
+    <form method="POST" enctype="multipart/form-data">
+          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+          <div class="control-group">
+            <div class="controls">
+                <input type="submit" class="btn btn-danger" value="{{ _('Delete') }}">
+            </div>
+        </div>
+    </form>
+        {{- breadcrumbs([
+            [url_for('admin_index.index'), _('Administration')],
+            [url_for('admin_categories.index'), _('Categories')],
+            [url_for('admin_categories.update', pk=category.id), category.name]
+        ]) }}
+    </div>
+</div>
+{% endblock %}

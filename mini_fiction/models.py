@@ -137,6 +137,8 @@ class Category(db.Entity):
 
     stories = orm.Set('Story')
 
+    bl = Resource('bl.category')
+
 
 class Classifier(db.Entity):
     """ Модель события """

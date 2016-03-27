@@ -4,7 +4,7 @@
 <div class="row welcome-box">
   <div class="span12 genra">
     {% for category in categories -%}
-        <a class="gen gen-{{ category.id }}" style="background-color: {{ category.color }}" href="{{ url_for('search.simple', search_type='category', search_id=category.id) }}">{{ category.name }}</a>
+        <a class="gen" style="background-color: {{ category.color }}" href="{{ url_for('search.simple', search_type='category', search_id=category.id) }}">{{ category.name }}</a>
     {%- endfor %}
   </div>
 </div>

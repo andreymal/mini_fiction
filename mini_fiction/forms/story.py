@@ -6,7 +6,7 @@ from pony import orm
 
 from mini_fiction.models import Category, Character, Rating, Classifier
 from mini_fiction.forms.fields import LazySelectField, LazySelectMultipleField, GroupedModelChoiceField
-from mini_fiction.widgets import StoriesImgSelect, StoriesCheckboxSelect, StoriesButtons
+from mini_fiction.widgets import StoriesImgSelect, StoriesCheckboxSelect, StoriesCategorySelect, StoriesButtons
 from mini_fiction.forms.form import Form
 
 
@@ -38,14 +38,13 @@ class StoryForm(Form):
         render_kw=dict(attrs_dict, maxlength=512, placeholder='Заголовок нового рассказа')
     )
 
-    # TODO: colors from database
     categories = LazySelectMultipleField(
         'Жанры',
         choices=lambda: orm.select((x.id, x.name) for x in Category)[:],
-        widget=StoriesCheckboxSelect(multiple=True),
+        widget=StoriesCategorySelect(multiple=True),
         description='',
         coerce=int,
-        render_kw={'label_attrs': ['checkbox', 'inline', 'gen'], 'label_id_related_attr': 'gen-'}
+        render_kw={'label_attrs': ['checkbox', 'inline', 'gen']}
     )
 
     characters = GroupedModelChoiceField(

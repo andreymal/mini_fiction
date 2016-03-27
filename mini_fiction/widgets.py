@@ -3,9 +3,12 @@
 
 from itertools import chain
 
+from pony import orm
 from flask import Markup, url_for
 from wtforms.widgets import Select, Input
 from wtforms.widgets.core import html_params
+
+from mini_fiction.models import Category
 
 
 class ButtonWidget(object):
@@ -27,23 +30,29 @@ class StoriesCheckboxSelect(Select):
 
     def __call__(self, field, **kwargs):
         attrs = dict(kwargs)
-        label_attrs = attrs.pop('label_attrs', None)
-        label_id_related_attr = attrs.pop('label_id_related_attr', False)
+        label_class = ' '.join(attrs.pop('label_attrs', ()))
         output = []
-        if label_attrs is not None:
-            label_class = ' '.join(label_attrs)
-        else:
-            label_class = ''
         for (option_value, option_label, selected) in field.iter_choices():
-            cb = Input('checkbox' if self.multiple else 'radio')  # FIXME: CheckboxInput() is always checked if field.data is present
-            rendered_cb = cb(field, checked=selected, value=option_value, id='{}_{}'.format(field.id, option_value))
-            if label_id_related_attr:
-                label_id_related_class = ' '+label_id_related_attr+'%s ' % option_value
-            else:
-                label_id_related_class = ''
-            label_class_final = ' class="%s%s"' % (label_class, label_id_related_class)
-            output.append('<label%s>%s %s</label>' % (label_class_final, rendered_cb, option_label))
+            output.append(
+                self.render_item(field, option_value, option_label, selected, label_class)
+            )
         return Markup('\n'.join(output))
+
+    def render_item(self, field, option_value, option_label, selected, label_class):
+        cb = Input('checkbox' if self.multiple else 'radio')  # NOTE: CheckboxInput() is always checked if field.data is present
+        rendered_cb = cb(field, checked=selected, value=option_value, id='{}_{}'.format(field.id, option_value))
+        label_class_final = ' class="%s"' % (label_class,)
+        return '<label%s>%s %s</label>' % (label_class_final, rendered_cb, option_label)
+
+
+class StoriesCategorySelect(StoriesCheckboxSelect):
+    def render_item(self, field, option_value, option_label, selected, label_class):
+        categories = dict(orm.select((c.id, c.color) for c in Category)[:])  # NOTE: Pony ORM caches this
+        label_attrs = ' style="background-color: %s;"' % categories[option_value]
+        cb = Input('checkbox' if self.multiple else 'radio')  # NOTE: CheckboxInput() is always checked if field.data is present
+        rendered_cb = cb(field, checked=selected, value=option_value, id='{}_{}'.format(field.id, option_value))
+        label_class_final = ' class="%s"' % (label_class,)
+        return '<label%s%s>%s %s</label>' % (label_class_final, label_attrs, rendered_cb, option_label)
 
 
 # TODO: optimize

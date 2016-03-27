@@ -147,10 +147,13 @@ def configure_views(app):
 
 
 def configure_admin_views(app):
-    from mini_fiction.views.admin import index, categories, htmlblocks, staticpages, authors, notices
+    from mini_fiction.views.admin import index, categories, characters, charactergroups
+    from mini_fiction.views.admin import htmlblocks, staticpages, authors, notices
     app.register_blueprint(index.bp, url_prefix='/admin')
     app.register_blueprint(htmlblocks.bp, url_prefix='/admin/htmlblocks')
     app.register_blueprint(categories.bp, url_prefix='/admin/categories')
+    app.register_blueprint(characters.bp, url_prefix='/admin/characters')
+    app.register_blueprint(charactergroups.bp, url_prefix='/admin/charactergroups')
     app.register_blueprint(staticpages.bp, url_prefix='/admin/staticpages')
     app.register_blueprint(authors.bp, url_prefix='/admin/authors')
     app.register_blueprint(notices.bp, url_prefix='/admin/notices')

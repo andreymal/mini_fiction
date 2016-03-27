@@ -14,3 +14,5 @@ def init_bl():
     registry.register('bl.notice', notices.NoticeBL)
     registry.register('bl.notice_comment', comments.NoticeCommentBL)
     registry.register('bl.category', sorting.CategoryBL)
+    registry.register('bl.character', sorting.CharacterBL)
+    registry.register('bl.charactergroup', sorting.CharacterGroupBL)

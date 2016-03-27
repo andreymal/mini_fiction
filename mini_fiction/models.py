@@ -113,6 +113,8 @@ class CharacterGroup(db.Entity):
 
     characters = orm.Set('Character')
 
+    bl = Resource('bl.charactergroup')
+
 
 class Character(db.Entity):
     """ Модель персонажа """
@@ -122,6 +124,8 @@ class Character(db.Entity):
     group = orm.Optional(CharacterGroup)
 
     stories = orm.Set('Story')
+
+    bl = Resource('bl.character')
 
     @property
     def thumb(self):

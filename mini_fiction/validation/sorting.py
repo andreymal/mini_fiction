@@ -27,3 +27,42 @@ CATEGORY = {
         },
     },
 }
+
+
+CHARACTER = {
+    'name': {
+        'type': 'string',
+        'required': True,
+        'minlength': 1,
+        'maxlength': 256,
+    },
+    'description': {
+        'type': 'string',
+        'required': False,
+        'default': '',
+        'minlength': 0,
+        'maxlength': 65535,
+    },
+    'group': {
+        'type': 'integer',
+        'required': True,
+        'coerce': int,
+    },
+}
+
+
+CHARACTER_GROUP = {
+    'name': {
+        'type': 'string',
+        'required': True,
+        'minlength': 1,
+        'maxlength': 256,
+    },
+    'description': {
+        'type': 'string',
+        'required': False,
+        'default': '',
+        'minlength': 0,
+        'maxlength': 65535,
+    },
+}

@@ -157,3 +157,30 @@ class Validator(cerberus.Validator):
                 self._error(field, gettext("Required field"))
         elif not isinstance(value, FileStorage):
             self._error(gettext("Must be of {constraint} type").format(constraint='FileStorage'))
+
+    def _validate_maxlength(self, max_length, field, value):
+        """ {'type': 'integer'} """
+        # Pony ORM автоматически strip'ает строки (если не указано иное),
+        # так что автоматически strip'аем их и здесь для удобства
+        if isinstance(value, str):
+            if len(value.strip()) > max_length:
+                self._error(field, lazy_gettext("Max length is {constraint}").format(constraint=max_length))
+        else:
+            super()._validate_maxlength(max_length, field, value)
+
+    def _validate_minlength(self, min_length, field, value):
+        """ {'type': 'integer'} """
+        if isinstance(value, str):
+            if len(value.strip()) < min_length:
+                self._error(field, lazy_gettext("Min length is {constraint}").format(constraint=min_length))
+        else:
+            super()._validate_minlength(min_length, field, value)
+
+    def _validate_maxlengthnostrip(self, max_length, field, value):
+        """ {'type': 'integer'} """
+        # Оставляем родной валидатор доступным
+        super()._validate_maxlength(max_length, field, value)
+
+    def _validate_minlengthnostrip(self, min_length, field, value):
+        """ {'type': 'integer'} """
+        super()._validate_minlength(min_length, field, value)

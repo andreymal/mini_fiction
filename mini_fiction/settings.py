@@ -65,7 +65,6 @@ class Config(object):
     SITE_FEEDBACK = '/'
 
     MEDIA_ROOT = os.path.join(os.getcwd(), 'media')
-    MEDIA_URL = '/media/'
     STATIC_ROOT = os.path.join(os.path.dirname(__file__), 'static')
 
     LOCALSTATIC_ROOT = None

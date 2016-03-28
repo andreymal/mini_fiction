@@ -4,11 +4,11 @@
 from itertools import chain
 
 from pony import orm
-from flask import Markup, url_for
+from flask import Markup
 from wtforms.widgets import Select, Input
 from wtforms.widgets.core import html_params
 
-from mini_fiction.models import Category
+from mini_fiction.models import Category, Character
 
 
 class ButtonWidget(object):
@@ -99,7 +99,8 @@ class StoriesImgSelect(Select):
 
 class StoriesCharacterSelect(StoriesImgSelect):
     def get_img_url(self, field, value):
-        return url_for('static', filename='i/characters/{}.png'.format(value))
+        characters = {x.id: x for x in orm.select(c for c in Character)[:]}  # NOTE: Pony ORM caches this
+        return characters[value].thumb
 
 
 class StoriesButtons(Select):

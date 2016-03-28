@@ -122,6 +122,7 @@ class Character(db.Entity):
     description = orm.Optional(orm.LongStr)
     name = orm.Required(str, 256)
     group = orm.Optional(CharacterGroup)
+    picture = orm.Required(str, 128)
 
     stories = orm.Set('Story')
 
@@ -129,7 +130,7 @@ class Character(db.Entity):
 
     @property
     def thumb(self):
-        return url_for('static', filename='i/characters/{}.png'.format(self.id))
+        return url_for('media', filename=self.picture)
 
 
 class Category(db.Entity):

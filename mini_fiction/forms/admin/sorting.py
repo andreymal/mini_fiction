@@ -3,6 +3,7 @@
 
 from flask_babel import lazy_gettext
 from wtforms import TextField, TextAreaField
+from flask_wtf.file import FileField
 
 from pony import orm
 
@@ -36,6 +37,12 @@ class CharacterForm(Form):
     name = TextField(
         lazy_gettext('Name'),
         render_kw=dict(attrs_dict, maxlength=256),
+    )
+
+    picture = FileField(
+        lazy_gettext('Picture'),
+        description=lazy_gettext('PNG only'),
+        render_kw=dict(attrs_dict, accept='image/png'),
     )
 
     description = TextAreaField(

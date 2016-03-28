@@ -36,6 +36,10 @@ CHARACTER = {
         'minlength': 1,
         'maxlength': 256,
     },
+    'picture': {
+        'type': 'file',
+        'required': True,
+    },
     'description': {
         'type': 'string',
         'required': False,

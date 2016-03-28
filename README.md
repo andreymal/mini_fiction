@@ -29,6 +29,8 @@ virtualenv --no-site-packages env
 mini_fiction seed
 ```
 
+(Примечание: для персонажей требуются картинки, находящиеся по пути `media/characters/{id}.png`; на момент написания этого примечания их предлагается добыть самостоятельно.)
+
 * Создаём учётную запись администратора:
 
 ```
@@ -41,7 +43,7 @@ mini_fiction createsuperuser
 mini_fiction runserver
 ```
 
-* Сайт станет доступен по адресу `http://localhost:5000/`.
+* Сайт станет доступен по адресу `http://localhost:5000/`. После авторизации доступна админка по адресу `http://localhost:5000/admin/`.
 
 
 ## Развёртывание приближенного к Production окружения (с поиском и прочим)
@@ -134,4 +136,4 @@ mini_fiction initsphinx
 celery -A mini_fiction worker --loglevel=INFO
 ```
 
-Для боевого (production) окружения наследуйте класс с настройками от модуля `mini_fiction.settings.Config` вместо `Development`.
+Для боевого (production) окружения наследуйте класс с настройками от модуля `mini_fiction.settings.Config` вместо `Development`. Это важно, так как в режиме разработки доступны некоторые средства для удалённого выполнения кода.

@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version:  0.0.1\n"
 "Report-Msgid-Bugs-To: andriyano-31@mail.ru\n"
-"POT-Creation-Date: 2016-03-27 22:54+0300\n"
+"POT-Creation-Date: 2016-03-28 16:46+0300\n"
 "Last-Translator: andreymal <andriyano-31@mail.ru>\n"
 "Language: ru\n"
 "Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && "
@@ -106,19 +106,27 @@ msgstr "Не удалось отрисовать объявление «{0}» д
 msgid "Cannot render notice \"{0}\" for you: {1}"
 msgstr "Не удалось отрисовать объявление «{0}» для вас: {1}"
 
-#: mini_fiction/bl/sorting.py:19 mini_fiction/bl/sorting.py:33
+#: mini_fiction/bl/sorting.py:22 mini_fiction/bl/sorting.py:36
 msgid "Category already exists"
 msgstr "Категория уже существует"
 
-#: mini_fiction/bl/sorting.py:52 mini_fiction/bl/sorting.py:77
+#: mini_fiction/bl/sorting.py:55 mini_fiction/bl/sorting.py:83
 msgid "Character already exists"
 msgstr "Персонаж уже существует"
 
-#: mini_fiction/bl/sorting.py:58 mini_fiction/bl/sorting.py:84
+#: mini_fiction/bl/sorting.py:61 mini_fiction/bl/sorting.py:90
 msgid "Group not found"
 msgstr "Группа не найдена"
 
-#: mini_fiction/bl/sorting.py:106 mini_fiction/bl/sorting.py:120
+#: mini_fiction/bl/sorting.py:118 mini_fiction/forms/admin/sorting.py:44
+msgid "PNG only"
+msgstr "Только PNG"
+
+#: mini_fiction/bl/sorting.py:122
+msgid "Maximum picture size is {maxsize} KiB"
+msgstr "Максимальный размер картинки {maxsize} КиБ"
+
+#: mini_fiction/bl/sorting.py:149 mini_fiction/bl/sorting.py:163
 msgid "Group already exists"
 msgstr "Группа уже существует"
 
@@ -180,9 +188,9 @@ msgid "Superuser can fully administer the site"
 msgstr "Суперпользователь может целиком администрировать сайт"
 
 #: mini_fiction/forms/admin/htmlblock.py:15
-#: mini_fiction/forms/admin/notice.py:15 mini_fiction/forms/admin/sorting.py:18
-#: mini_fiction/forms/admin/sorting.py:37
-#: mini_fiction/forms/admin/sorting.py:57
+#: mini_fiction/forms/admin/notice.py:15 mini_fiction/forms/admin/sorting.py:19
+#: mini_fiction/forms/admin/sorting.py:38
+#: mini_fiction/forms/admin/sorting.py:64
 #: mini_fiction/forms/admin/staticpage.py:15
 msgid "Name"
 msgstr "Название"
@@ -222,17 +230,21 @@ msgstr "Заголовок"
 msgid "Show on all pages"
 msgstr "Показать на всех страницах"
 
-#: mini_fiction/forms/admin/sorting.py:23
-#: mini_fiction/forms/admin/sorting.py:42
-#: mini_fiction/forms/admin/sorting.py:62
+#: mini_fiction/forms/admin/sorting.py:24
+#: mini_fiction/forms/admin/sorting.py:49
+#: mini_fiction/forms/admin/sorting.py:69
 msgid "Description"
 msgstr "Описание"
 
-#: mini_fiction/forms/admin/sorting.py:28
+#: mini_fiction/forms/admin/sorting.py:29
 msgid "Color"
 msgstr "Цвет"
 
-#: mini_fiction/forms/admin/sorting.py:47
+#: mini_fiction/forms/admin/sorting.py:43
+msgid "Picture"
+msgstr "Картинка"
+
+#: mini_fiction/forms/admin/sorting.py:54
 msgid "Group"
 msgstr "Группа"
 
@@ -552,120 +564,122 @@ msgstr "Pony ORM"
 msgid "Pony ORM queries"
 msgstr "Запросы Pony ORM"
 
-#: mini_fiction/validation/__init__.py:31
+#: mini_fiction/validation/__init__.py:32
+#: mini_fiction/validation/__init__.py:157
 msgid "Required field"
 msgstr "Обязательное поле"
 
-#: mini_fiction/validation/__init__.py:32
+#: mini_fiction/validation/__init__.py:33
 msgid "Unknown field"
 msgstr "Неизвестное поле"
 
-#: mini_fiction/validation/__init__.py:33
+#: mini_fiction/validation/__init__.py:34
 msgid "Field '{0}' is required"
 msgstr "Обязательное поле {0}"
 
-#: mini_fiction/validation/__init__.py:34
+#: mini_fiction/validation/__init__.py:35
 msgid "Depends on these values: {constraint}"
 msgstr "Зависит от следующих значений: {constraint}"
 
-#: mini_fiction/validation/__init__.py:35
+#: mini_fiction/validation/__init__.py:36
 msgid "{0} must not be present with '{field}'"
 msgstr "'{0}' не должно быть вместе с '{field}'"
 
-#: mini_fiction/validation/__init__.py:37
+#: mini_fiction/validation/__init__.py:38
 msgid "'{0}' is not a document, must be a dict"
 msgstr "'{0}' не документ, должен быть словарь"
 
-#: mini_fiction/validation/__init__.py:38
 #: mini_fiction/validation/__init__.py:39
+#: mini_fiction/validation/__init__.py:40
 msgid "Field should not be empty"
 msgstr "Поле не может быть пустым"
 
-#: mini_fiction/validation/__init__.py:40
+#: mini_fiction/validation/__init__.py:41
+#: mini_fiction/validation/__init__.py:159
 msgid "Must be of {constraint} type"
 msgstr "Должно иметь тип {constraint}"
 
-#: mini_fiction/validation/__init__.py:41
+#: mini_fiction/validation/__init__.py:42
 msgid "Length of list should be {constraint}, it is {0}"
 msgstr "Длина списка должна быть {constraint}, а не {0}"
 
-#: mini_fiction/validation/__init__.py:42
+#: mini_fiction/validation/__init__.py:43
 msgid "Min length is {constraint}"
 msgstr "Минимальная длина {constraint}"
 
-#: mini_fiction/validation/__init__.py:43
+#: mini_fiction/validation/__init__.py:44
 msgid "Max length is {constraint}"
 msgstr "Максимальная длина {constraint}"
 
-#: mini_fiction/validation/__init__.py:45
+#: mini_fiction/validation/__init__.py:46
 msgid "Value does not match regex '{constraint}'"
 msgstr "Значение не соответствует регулярному выражению {constraint}"
 
-#: mini_fiction/validation/__init__.py:46
+#: mini_fiction/validation/__init__.py:47
 msgid "Min value is {constraint}"
 msgstr "Минимальное значение {constraint}"
 
-#: mini_fiction/validation/__init__.py:47
+#: mini_fiction/validation/__init__.py:48
 msgid "Max value is {constraint}"
 msgstr "Максимальное значение {constraint}"
 
-#: mini_fiction/validation/__init__.py:48
-#: mini_fiction/validation/__init__.py:50
-#: mini_fiction/validation/__init__.py:151
+#: mini_fiction/validation/__init__.py:49
+#: mini_fiction/validation/__init__.py:51
+#: mini_fiction/validation/__init__.py:152
 msgid "Unallowed value {value}"
 msgstr "Недопустимое значение {value}"
 
-#: mini_fiction/validation/__init__.py:49
-#: mini_fiction/validation/__init__.py:51
+#: mini_fiction/validation/__init__.py:50
+#: mini_fiction/validation/__init__.py:52
 msgid "Unallowed values {0}"
 msgstr "Недопустимые значения {0}"
 
-#: mini_fiction/validation/__init__.py:53
+#: mini_fiction/validation/__init__.py:54
 msgid "Field '{field}' cannot be coerced"
 msgstr "Поле {field} не может быть преобразовано"
 
-#: mini_fiction/validation/__init__.py:54
+#: mini_fiction/validation/__init__.py:55
 msgid "Field '{field}' cannot be renamed"
 msgstr "Поле {field} не может быть переименовано"
 
-#: mini_fiction/validation/__init__.py:55
+#: mini_fiction/validation/__init__.py:56
 msgid "Field is read-only"
 msgstr "Поле доступно только для чтения"
 
-#: mini_fiction/validation/__init__.py:56
+#: mini_fiction/validation/__init__.py:57
 msgid "Default value for '{field}' cannot be set: {0}"
 msgstr "Не получилось установить значение по умолчанию для поля {field}: {0}"
 
-#: mini_fiction/validation/__init__.py:58
+#: mini_fiction/validation/__init__.py:59
 msgid "Mapping doesn't validate subschema: {0}"
 msgstr ""
 
-#: mini_fiction/validation/__init__.py:59
-#: mini_fiction/validation/__init__.py:62
+#: mini_fiction/validation/__init__.py:60
+#: mini_fiction/validation/__init__.py:63
 msgid "One or more sequence-items don't validate: {0}"
 msgstr ""
 
-#: mini_fiction/validation/__init__.py:60
+#: mini_fiction/validation/__init__.py:61
 msgid "One or more properties of a mapping  don't validate: {0}"
 msgstr ""
 
-#: mini_fiction/validation/__init__.py:61
+#: mini_fiction/validation/__init__.py:62
 msgid "One or more values in a mapping don't validate: {0}"
 msgstr ""
 
-#: mini_fiction/validation/__init__.py:64
+#: mini_fiction/validation/__init__.py:65
 msgid "One or more definitions validate"
 msgstr ""
 
-#: mini_fiction/validation/__init__.py:65
+#: mini_fiction/validation/__init__.py:66
 msgid "None or more than one rule validate"
 msgstr ""
 
-#: mini_fiction/validation/__init__.py:66
+#: mini_fiction/validation/__init__.py:67
 msgid "No definitions validate"
 msgstr ""
 
-#: mini_fiction/validation/__init__.py:67
+#: mini_fiction/validation/__init__.py:68
 msgid "One or more definitions don't validate"
 msgstr ""
 
@@ -676,7 +690,6 @@ msgstr "Цвет должен быть в формате «#HHH» или «#HHHH
 #: mini_fiction/views/auth.py:21
 msgid "Authorization"
 msgstr "Авторизация"
-
 
 #: mini_fiction/views/auth.py:28
 msgid "Cannot login"

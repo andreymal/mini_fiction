@@ -93,7 +93,8 @@
     "pk": 1,
     "fields": {
       "name": "Рэйнбоу Дэш",
-      "group": 2
+      "group": 2,
+      "picture": "characters/1.png"
     }
   },
   {
@@ -101,7 +102,8 @@
     "pk": 2,
     "fields": {
       "name": "Флаттершай",
-      "group": 2
+      "group": 2,
+      "picture": "characters/2.png"
     }
   },
   {
@@ -109,7 +111,8 @@
     "pk": 3,
     "fields": {
       "name": "Твайлайт Спаркл",
-      "group": 2
+      "group": 2,
+      "picture": "characters/3.png"
     }
   },
   {
@@ -117,7 +120,8 @@
     "pk": 4,
     "fields": {
       "name": "Рэрити",
-      "group": 2
+      "group": 2,
+      "picture": "characters/4.png"
     }
   },
   {
@@ -125,7 +129,8 @@
     "pk": 5,
     "fields": {
       "name": "Пинки Пай",
-      "group": 2
+      "group": 2,
+      "picture": "characters/5.png"
     }
   },
   {
@@ -133,7 +138,8 @@
     "pk": 6,
     "fields": {
       "name": "Эплджек",
-      "group": 2
+      "group": 2,
+      "picture": "characters/6.png"
     }
   },
   {
@@ -141,7 +147,8 @@
     "pk": 10,
     "fields": {
       "name": "Спайк",
-      "group": 2
+      "group": 2,
+      "picture": "characters/10.png"
     }
   },
 
@@ -150,7 +157,8 @@
     "pk": 11,
     "fields": {
       "name": "Принцесса Селестия",
-      "group": 3
+      "group": 3,
+      "picture": "characters/11.png"
     }
   },
   {
@@ -158,7 +166,8 @@
     "pk": 12,
     "fields": {
       "name": "Принцесса Луна",
-      "group": 3
+      "group": 3,
+      "picture": "characters/12.png"
     }
   },
 
@@ -167,7 +176,8 @@
     "pk": 7,
     "fields": {
       "name": "Эплблум",
-      "group": 4
+      "group": 4,
+      "picture": "characters/7.png"
     }
   },
   {
@@ -175,7 +185,8 @@
     "pk": 8,
     "fields": {
       "name": "Скуталу",
-      "group": 4
+      "group": 4,
+      "picture": "characters/8.png"
     }
   },
   {
@@ -183,7 +194,8 @@
     "pk": 9,
     "fields": {
       "name": "Свити Белл",
-      "group": 4
+      "group": 4,
+      "picture": "characters/9.png"
     }
   },
   {
@@ -191,7 +203,8 @@
     "pk": 66,
     "fields": {
       "name": "Бабс Сид",
-      "group": 4
+      "group": 4,
+      "picture": "characters/66.png"
     }
   },
 
@@ -200,7 +213,8 @@
     "pk": 43,
     "fields": {
       "name": "Другие пони",
-      "group": 5
+      "group": 5,
+      "picture": "characters/43.png"
     }
   },
   {
@@ -208,7 +222,8 @@
     "pk": 44,
     "fields": {
       "name": "ОС - пони",
-      "group": 5
+      "group": 5,
+      "picture": "characters/44.png"
     }
   },
   {
@@ -216,7 +231,8 @@
     "pk": 65,
     "fields": {
       "name": "Человеки",
-      "group": 5
+      "group": 5,
+      "picture": "characters/65.png"
     }
   },
 
@@ -225,7 +241,8 @@
     "pk": 13,
     "fields": {
       "name": "Гильда",
-      "group": 6
+      "group": 6,
+      "picture": "characters/13.png"
     }
   },
   {
@@ -233,7 +250,8 @@
     "pk": 14,
     "fields": {
       "name": "Зекора",
-      "group": 6
+      "group": 6,
+      "picture": "characters/14.png"
     }
   },
   {
@@ -241,7 +259,8 @@
     "pk": 15,
     "fields": {
       "name": "Трикси, Великая и Могучая",
-      "group": 6
+      "group": 6,
+      "picture": "characters/15.png"
     }
   },
   {
@@ -249,7 +268,8 @@
     "pk": 24,
     "fields": {
       "name": "Черили",
-      "group": 6
+      "group": 6,
+      "picture": "characters/24.png"
     }
   },
   {
@@ -257,7 +277,8 @@
     "pk": 26,
     "fields": {
       "name": "Хойти Тойти",
-      "group": 6
+      "group": 6,
+      "picture": "characters/26.png"
     }
   },
   {
@@ -265,7 +286,8 @@
     "pk": 27,
     "fields": {
       "name": "Фото Финиш",
-      "group": 6
+      "group": 6,
+      "picture": "characters/27.png"
     }
   },
   {
@@ -273,7 +295,8 @@
     "pk": 28,
     "fields": {
       "name": "Сапфир Шорз",
-      "group": 6
+      "group": 6,
+      "picture": "characters/28.png"
     }
   },
   {
@@ -281,7 +304,8 @@
     "pk": 29,
     "fields": {
       "name": "Спитфайр",
-      "group": 6
+      "group": 6,
+      "picture": "characters/29.png"
     }
   },
   {
@@ -289,7 +313,8 @@
     "pk": 30,
     "fields": {
       "name": "Сорен",
-      "group": 6
+      "group": 6,
+      "picture": "characters/30.png"
     }
   },
   {
@@ -297,7 +322,8 @@
     "pk": 31,
     "fields": {
       "name": "Принц Блюблад",
-      "group": 6
+      "group": 6,
+      "picture": "characters/31.png"
     }
   },
   {
@@ -305,7 +331,8 @@
     "pk": 32,
     "fields": {
       "name": "Литл Стронгхарт",
-      "group": 6
+      "group": 6,
+      "picture": "characters/32.png"
     }
   },
   {
@@ -313,7 +340,8 @@
     "pk": 49,
     "fields": {
       "name": "Найтмэр Мун",
-      "group": 6
+      "group": 6,
+      "picture": "characters/49.png"
     }
   },
 
@@ -322,7 +350,8 @@
     "pk": 48,
     "fields": {
       "name": "Дискорд",
-      "group": 7
+      "group": 7,
+      "picture": "characters/48.png"
     }
   },
   {
@@ -330,7 +359,8 @@
     "pk": 55,
     "fields": {
       "name": "Крэнки Дудль",
-      "group": 7
+      "group": 7,
+      "picture": "characters/55.png"
     }
   },
   {
@@ -338,7 +368,8 @@
     "pk": 57,
     "fields": {
       "name": "Дэринг Ду",
-      "group": 7
+      "group": 7,
+      "picture": "characters/57.png"
     }
   },
   {
@@ -346,7 +377,8 @@
     "pk": 59,
     "fields": {
       "name": "Флим",
-      "group": 7
+      "group": 7,
+      "picture": "characters/59.png"
     }
   },
   {
@@ -354,7 +386,8 @@
     "pk": 60,
     "fields": {
       "name": "Флэм",
-      "group": 7
+      "group": 7,
+      "picture": "characters/60.png"
     }
   },
   {
@@ -362,7 +395,8 @@
     "pk": 61,
     "fields": {
       "name": "Матильда",
-      "group": 7
+      "group": 7,
+      "picture": "characters/61.png"
     }
   },
   {
@@ -370,7 +404,8 @@
     "pk": 62,
     "fields": {
       "name": "Мистер Кейк",
-      "group": 7
+      "group": 7,
+      "picture": "characters/62.png"
     }
   },
   {
@@ -378,7 +413,8 @@
     "pk": 63,
     "fields": {
       "name": "Миссис Кейк",
-      "group": 7
+      "group": 7,
+      "picture": "characters/63.png"
     }
   },
   {
@@ -386,7 +422,8 @@
     "pk": 64,
     "fields": {
       "name": "Айрон Вилл",
-      "group": 7
+      "group": 7,
+      "picture": "characters/64.png"
     }
   },
   {
@@ -394,7 +431,8 @@
     "pk": 68,
     "fields": {
       "name": "Кризалис",
-      "group": 7
+      "group": 7,
+      "picture": "characters/68.png"
     }
   },
   {
@@ -402,7 +440,8 @@
     "pk": 70,
     "fields": {
       "name": "Принцесса Миаморе Каденца",
-      "group": 7
+      "group": 7,
+      "picture": "characters/70.png"
     }
   },
   {
@@ -410,7 +449,8 @@
     "pk": 71,
     "fields": {
       "name": "Шайнинг Армор",
-      "group": 7
+      "group": 7,
+      "picture": "characters/71.png"
     }
   },
 
@@ -419,7 +459,8 @@
     "pk": 69,
     "fields": {
       "name": "Король Сомбра",
-      "group": 8
+      "group": 8,
+      "picture": "characters/69.png"
     }
   },
   {
@@ -427,7 +468,8 @@
     "pk": 74,
     "fields": {
       "name": "Лайтнин Даст",
-      "group": 8
+      "group": 8,
+      "picture": "characters/74.png"
     }
   },
 
@@ -436,7 +478,8 @@
     "pk": 16,
     "fields": {
       "name": "Биг Макинтош",
-      "group": 10
+      "group": 10,
+      "picture": "characters/16.png"
     }
   },
   {
@@ -444,7 +487,8 @@
     "pk": 17,
     "fields": {
       "name": "Грэнни Смит",
-      "group": 10
+      "group": 10,
+      "picture": "characters/17.png"
     }
   },
   {
@@ -452,7 +496,8 @@
     "pk": 18,
     "fields": {
       "name": "Брейберн",
-      "group": 10
+      "group": 10,
+      "picture": "characters/18.png"
     }
   },
 
@@ -461,7 +506,8 @@
     "pk": 19,
     "fields": {
       "name": "Диамонд Тиара",
-      "group": 11
+      "group": 11,
+      "picture": "characters/19.png"
     }
   },
   {
@@ -469,7 +515,8 @@
     "pk": 20,
     "fields": {
       "name": "Сильвер Спун",
-      "group": 11
+      "group": 11,
+      "picture": "characters/20.png"
     }
   },
   {
@@ -477,7 +524,8 @@
     "pk": 21,
     "fields": {
       "name": "Твист",
-      "group": 11
+      "group": 11,
+      "picture": "characters/21.png"
     }
   },
   {
@@ -485,7 +533,8 @@
     "pk": 22,
     "fields": {
       "name": "Снипс",
-      "group": 11
+      "group": 11,
+      "picture": "characters/22.png"
     }
   },
   {
@@ -493,7 +542,8 @@
     "pk": 23,
     "fields": {
       "name": "Снейлз",
-      "group": 11
+      "group": 11,
+      "picture": "characters/23.png"
     }
   },
   {
@@ -501,7 +551,8 @@
     "pk": 50,
     "fields": {
       "name": "Пипсквик",
-      "group": 11
+      "group": 11,
+      "picture": "characters/50.png"
     }
   },
 
@@ -510,7 +561,8 @@
     "pk": 33,
     "fields": {
       "name": "Энджел",
-      "group": 12
+      "group": 12,
+      "picture": "characters/33.png"
     }
   },
   {
@@ -518,7 +570,8 @@
     "pk": 34,
     "fields": {
       "name": "Вайнона",
-      "group": 12
+      "group": 12,
+      "picture": "characters/34.png"
     }
   },
   {
@@ -526,7 +579,8 @@
     "pk": 35,
     "fields": {
       "name": "Опалесенс",
-      "group": 12
+      "group": 12,
+      "picture": "characters/35.png"
     }
   },
   {
@@ -534,7 +588,8 @@
     "pk": 36,
     "fields": {
       "name": "Гамми",
-      "group": 12
+      "group": 12,
+      "picture": "characters/36.png"
     }
   },
   {
@@ -542,7 +597,8 @@
     "pk": 37,
     "fields": {
       "name": "Совелий",
-      "group": 12
+      "group": 12,
+      "picture": "characters/37.png"
     }
   },
   {
@@ -550,7 +606,8 @@
     "pk": 38,
     "fields": {
       "name": "Филомина",
-      "group": 12
+      "group": 12,
+      "picture": "characters/38.png"
     }
   },
   {
@@ -558,7 +615,8 @@
     "pk": 53,
     "fields": {
       "name": "Танк",
-      "group": 12
+      "group": 12,
+      "picture": "characters/53.png"
     }
   },
 
@@ -567,7 +625,8 @@
     "pk": 25,
     "fields": {
       "name": "Мэр",
-      "group": 13
+      "group": 13,
+      "picture": "characters/25.png"
     }
   },
   {
@@ -575,7 +634,8 @@
     "pk": 39,
     "fields": {
       "name": "Дерпи Хувз",
-      "group": 13
+      "group": 13,
+      "picture": "characters/39.png"
     }
   },
   {
@@ -583,7 +643,8 @@
     "pk": 40,
     "fields": {
       "name": "Лира",
-      "group": 13
+      "group": 13,
+      "picture": "characters/40.png"
     }
   },
   {
@@ -591,7 +652,8 @@
     "pk": 41,
     "fields": {
       "name": "Бон-Бон",
-      "group": 13
+      "group": 13,
+      "picture": "characters/41.png"
     }
   },
   {
@@ -599,7 +661,8 @@
     "pk": 42,
     "fields": {
       "name": "DJ PON-3",
-      "group": 13
+      "group": 13,
+      "picture": "characters/42.png"
     }
   },
   {
@@ -607,7 +670,8 @@
     "pk": 45,
     "fields": {
       "name": "Карамель",
-      "group": 13
+      "group": 13,
+      "picture": "characters/45.png"
     }
   },
   {
@@ -615,7 +679,8 @@
     "pk": 46,
     "fields": {
       "name": "Доктор Хувз",
-      "group": 13
+      "group": 13,
+      "picture": "characters/46.png"
     }
   },
   {
@@ -623,7 +688,8 @@
     "pk": 47,
     "fields": {
       "name": "Октавия",
-      "group": 13
+      "group": 13,
+      "picture": "characters/47.png"
     }
   },
   {
@@ -631,7 +697,8 @@
     "pk": 51,
     "fields": {
       "name": "Бэрри Пунш",
-      "group": 13
+      "group": 13,
+      "picture": "characters/51.png"
     }
   },
   {
@@ -639,7 +706,8 @@
     "pk": 52,
     "fields": {
       "name": "Кэррот Топ",
-      "group": 13
+      "group": 13,
+      "picture": "characters/52.png"
     }
   },
   {
@@ -647,7 +715,8 @@
     "pk": 54,
     "fields": {
       "name": "Фэнси Пэнтс",
-      "group": 13
+      "group": 13,
+      "picture": "characters/54.png"
     }
   },
   {
@@ -655,7 +724,8 @@
     "pk": 56,
     "fields": {
       "name": "Флёр де Лис",
-      "group": 13
+      "group": 13,
+      "picture": "characters/56.png"
     }
   },
   {
@@ -663,7 +733,8 @@
     "pk": 58,
     "fields": {
       "name": "Колгейт",
-      "group": 13
+      "group": 13,
+      "picture": "characters/58.png"
     }
   },
   {
@@ -671,7 +742,8 @@
     "pk": 67,
     "fields": {
       "name": "Вандерболты",
-      "group": 13
+      "group": 13,
+      "picture": "characters/67.png"
     }
   },
   {
@@ -679,7 +751,8 @@
     "pk": 72,
     "fields": {
       "name": "Стража Дворца",
-      "group": 13
+      "group": 13,
+      "picture": "characters/72.png"
     }
   },
   {
@@ -687,7 +760,8 @@
     "pk": 73,
     "fields": {
       "name": "Сестра Рэдхарт",
-      "group": 13
+      "group": 13,
+      "picture": "characters/73.png"
     }
   },
   {
@@ -695,7 +769,8 @@
     "pk": 75,
     "fields": {
       "name": "Мод Пай",
-      "group": 13
+      "group": 13,
+      "picture": "characters/75.png"
     }
   }
 ]

@@ -3,6 +3,9 @@
 
 # pylint: disable=unexpected-keyword-arg,no-value-for-parameter
 
+import os
+
+from flask import current_app
 from flask_babel import lazy_gettext
 
 from mini_fiction.bl.utils import BaseBL
@@ -60,8 +63,11 @@ class CharacterBL(BaseBL):
         if errors:
             raise ValidationError(errors)
 
+        picture = self.validate_and_get_picture_data(data.pop('picture'))
+
         character = self.model(**data)
         character.flush()
+        character.bl.set_picture_data(picture)
         return character
 
     def update(self, author, data):
@@ -88,13 +94,50 @@ class CharacterBL(BaseBL):
         if errors:
             raise ValidationError(errors)
 
+        if data.get('picture'):
+            picture = self.validate_and_get_picture_data(data['picture'])
+        else:
+            picture = None
+
         for key, value in data.items():
-            setattr(character, key, value)
+            if key == 'picture':
+                if picture is not None:
+                    self.set_picture_data(picture)
+            else:
+                setattr(character, key, value)
 
         return character
 
     def delete(self, author):
         self.model.delete()
+
+    def validate_and_get_picture_data(self, picture):
+        fp = picture.stream
+        header = fp.read(4)
+        if header != b'\x89PNG':
+            raise ValidationError({'picture': [lazy_gettext('PNG only')]})
+        data = header + fp.read(16384 - 4 + 1)  # 16 KiB + 1 byte for validation
+        if len(data) > 16384:
+            raise ValidationError({'picture': [
+                lazy_gettext('Maximum picture size is {maxsize} KiB').format(maxsize=16)
+            ]})
+        return data
+
+    def set_picture_data(self, data):
+        filename = str(self.model.id) + '.png'
+        pathset = ('characters', filename)
+        urlpath = '/'.join(pathset)  # equivalent to ospath except Windows!
+        ospath = os.path.join(current_app.config['MEDIA_ROOT'], *pathset)
+
+        dirpath = os.path.dirname(ospath)
+        if not os.path.isdir(dirpath):
+            os.makedirs(dirpath)
+
+        with open(ospath, 'wb') as fp:
+            fp.write(data)
+
+        self.model.picture = urlpath
+        return urlpath
 
 
 class CharacterGroupBL(BaseBL):

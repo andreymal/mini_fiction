@@ -4,6 +4,7 @@
 import copy
 
 import cerberus
+from werkzeug.datastructures import FileStorage
 from flask_babel import gettext, lazy_gettext
 
 # when https://github.com/nicolaiarocci/cerberus/issues/174 will be solved, it can be rewritten
@@ -149,3 +150,10 @@ class Validator(cerberus.Validator):
         choices = self._allowed_func_caches[allowed_func]
         if value not in choices:
             self._error(field, gettext("Unallowed value {value}").format(value=value))
+
+    def _validate_type_file(self, field, value):
+        if value in ('', b''):
+            if self.schema[field].get('required') and not self.update:
+                self._error(field, gettext("Required field"))
+        elif not isinstance(value, FileStorage):
+            self._error(gettext("Must be of {constraint} type").format(constraint='FileStorage'))

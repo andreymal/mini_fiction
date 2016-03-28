@@ -1,7 +1,6 @@
-/* ToDo отправить коммент - кнопка странная */
 /* Body, base and containers */
 body {
-    background: #f6f6f6 url('../i/body-bg.png') repeat 0 0;
+    background-color: #dde;
 }
 
 .container {
@@ -20,15 +19,13 @@ body {
 }
 
 .page-header {
-    background: #1D2A4F url('../i/header-bg.jpg') no-repeat 0 0;
+    background: #1D2A4F no-repeat 0 0;
     height: 80px;
     font-family: Georgia, Times, serif;
 }
 
 .logopic {
     height: 240px;
-    background: transparent url('../i/logopics/logopic-6.jpg') no-repeat 0 0;
-    background-size: cover;
 }
 
 .carousel {
@@ -79,7 +76,7 @@ a.slidesjs-navigation {
 /* Main menu */
 .nav-pills.nav-main {
     padding: 10px 20px 10px;
-    background: #1D2A4F url('../i/menu-bg.jpg') no-repeat 0 0;
+    background: #1D2A4F no-repeat 0 0;
     margin-bottom: 0;
     font-size: 16px;
 }
@@ -312,52 +309,6 @@ img.avatar-small, .character-list img {
 
 .starvote.star-6 {
     background-position: 0px -144px;
-}
-
-.upvotes {
-    color: #66CC66;
-}
-
-.downvotes {
-    color: #E54F49;
-}
-
-.vote {
-    font-size: 14px;
-    vertical-align: middle;
-}
-
-.vote a {
-    line-height: 16px;
-    height: 16px;
-    font-weight: bold;
-    text-decoration: none;
-    cursor: pointer;
-}
-
-.vote a:hover {
-    opacity: 0.8;
-}
-
-.vote .upvote {
-    color: green;
-    padding: 4px 0 5px 30px;
-    background: transparent url('../i/upvote-24.png?1') no-repeat 0 0;
-}
-
-.vote .upvote.unvoted:not(:hover) {
-    opacity: 0.3;
-}
-
-.vote .downvote {
-    color: red;
-    padding: 4px 30px 5px 0;
-    margin-right: 0.5em;
-    background: transparent url('../i/downvote-24.png?1') no-repeat 100% 0;
-}
-
-.vote .downvote.unvoted:not(:hover) {
-    opacity: 0.3;
 }
 
 h1 .alert {
@@ -1165,11 +1116,6 @@ a.btn {
     display: inline-block;
 }
 
-#comment-add-link + .comment-form { /* only for non-answer comment form */
-    background: transparent url('../i/pageart/comments.png') no-repeat 90% 100%;
-    min-height: 250px;
-}
-
 .comment-form-content {
     background-color: white;
     width: 70%;
@@ -1206,7 +1152,7 @@ a.btn {
 /* Footer */
 .footer {
     padding: 10px 20px 5px;
-    background: #1D2A4F url('../i/header-bg.jpg') no-repeat 0 0;
+    background: #1D2A4F no-repeat 0 0;
     color: #FAFAE8;
     text-align: center;
     border-radius: 0 0 8px 8px;
@@ -1221,55 +1167,12 @@ a.btn {
     padding-top: 8px;
 }
 
-/* Красивые картинки, маскоты, графика, истерэги */
-.page-special,.page-404 .message-404,.message-502,.message-403,.text-faq,.text-help,.text-terms
-    {
-    margin-bottom: 200px;
-}
-
 .message-500 {
     margin-bottom: 300px;
 }
 
-.page-404 {
-    background: transparent url('../i/pageart/404.png') no-repeat 90% 100%;
-}
-
-.page-500 {
-    background: transparent url('../i/pageart/500.png') no-repeat 90% 100%;
-}
-
-.page-tech-work {
-    background: transparent url('../i/pageart/tech-work.png') no-repeat 90%
-        100%;
-}
-
-.page-502 {
-    background: transparent url('../i/pageart/502.png') no-repeat 90% 80%;
-}
-
 .passres-form-text {
     margin-bottom: 160px;
-}
-
-.passres-form {
-    background: transparent url('../i/pageart/passres-form.png') no-repeat
-        90% 90%;
-}
-
-.passres-confirm {
-    background: transparent url('../i/pageart/passres-confirm.png')
-        no-repeat 90% 100%;
-}
-
-.passres-complete {
-    background: transparent url('../i/pageart/passres-complete.png')
-        no-repeat 90% 100%;
-}
-
-.passres-done {
-    background: transparent url('../i/pageart/passres-done.png') no-repeat
-        90% 90%;
 }
 
 .login-text {
@@ -1280,10 +1183,6 @@ a.btn {
     margin-top: 20px;
 }
 
-.login-page {
-    background: transparent url('../i/pageart/login.png') no-repeat 90% 100%;
-}
-
 .page-faq h2,.page-terms h2,.page-help h2 {
     margin-top: 24px;
 }
@@ -1292,38 +1191,12 @@ a.btn {
     margin-bottom: 8px;
 }
 
-.text-faq,.text-terms,.text-help {
+.text-faq, .text-terms, .text-help {
     width: 70%;
 }
 
-.page-faq {
-    background: transparent url('../i/pageart/faq.png') no-repeat 90% 100%;
-}
-
-.page-terms {
-    background: transparent url('../i/pageart/terms.png') no-repeat 90% 100%;
-}
-
-.page-help {
-    background: transparent url('../i/pageart/help.png') no-repeat 90% 100%;
-}
-
-/* Больное наследие Еврипони */
-.servicelinks {
-    display: block;
-    text-align: right;
-    list-style-type: none;
-}
-
-.servicelinks a {
-    font-size: 10px;
-    color: #E6E9F2;
-    text-decoration: none;
-    font-family: Verdana, Arial, sans-serif;
-}
-
 .main-menu {
-    padding: 4px 0 0;
+    padding: 34px 0 0;
     margin: 0;
     color: #CDCAE9;
     list-style-type: none;
@@ -1335,12 +1208,12 @@ a.btn {
     padding: 5px 20px 0 0;
 }
 
-#logolink {
+.main-menu .logolink {
     font-size: 38px;
     padding: 0 23px 0 0;
 }
 
-#logolink a {
+.main-menu .logolink a {
     color: #CDCAE9 !important;
     text-decoration: none;
     cursor: default;
@@ -1375,27 +1248,6 @@ a.btn {
     color: #333;
     padding-right: 1%;
     padding-top: 1.5%;
-}
-/**
- * RSS + Twitter icons
-*/
-.twitter {
-    background-image: url('../i/twitter.png');
-}
-
-.rss {
-    background-image: url('../i/rss.png');
-}
-
-.rss:hover,.twitter:hover {
-    background-position: 0 -32px;
-}
-
-.rss,.twitter {
-    float: right;
-    width: 32px;
-    height: 32px;
-    margin: 6px 0 0 12px;
 }
 
 /* ajax loading icon */

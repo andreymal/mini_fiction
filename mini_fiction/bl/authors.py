@@ -288,14 +288,22 @@ class AuthorBL(BaseBL):
         if url:
             return url
 
-        return url_for('static', filename='i/userpic.jpg')
+        default_userpic = dict(current_app.config['DEFAULT_USERPIC'])
+        if 'endpoint' in default_userpic:
+            return url_for(default_userpic.pop('endpoint'), **default_userpic)
+        else:
+            return default_userpic['url']
 
     def get_small_avatar_url(self):
         url = self.get_tabun_avatar_url()
         if url:
             return url.replace('100x100', '24x24')
 
-        return url_for('static', filename='i/userpic.jpg')
+        default_userpic = dict(current_app.config['DEFAULT_USERPIC'])
+        if 'endpoint' in default_userpic:
+            return url_for(default_userpic.pop('endpoint'), **default_userpic)
+        else:
+            return default_userpic['url']
 
     def get_tabun_avatar_url(self):
         tabun = self._model().tabun

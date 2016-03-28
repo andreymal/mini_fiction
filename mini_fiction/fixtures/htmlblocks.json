@@ -1,7 +1,7 @@
 [
   {
     "fields": {
-      "content": "\t<!-- Header start -->\r\n\t<div class=\"page-header\">\r\n\t\t<ul class=\"servicelinks\">\r\n\t\t\t<li>&nbsp;</li>\r\n\t\t</ul>\r\n\r\n\t\t<a title=\"Подписаться на RSS поток\" href=\"{{ url_for('feeds.stories') }}\" class=\"rss\" data-noajax=\"1\"></a>\r\n\t\t<a title=\"Твиттер Everypony.ru\" href=\"https://twitter.com/#!/everypony_ru\" class=\"twitter\"></a>\r\n    \r\n\t\t<ul class=\"main-menu\">\r\n\t\t\t<li id=\"logolink\"><a href=\"{{ url_for('index.index') }}\">Библиотека</a></li>\r\n\t\t\t<li><a href=\"https://everypony.ru\">Блог</a></li>\r\n\t\t\t<li><a href=\"https://forum.everypony.ru\">Форум</a></li>\r\n\t\t\t<li><a href=\"https://wiki.everypony.ru\">Вики</a></li>\r\n\t\t\t<li><a href=\"https://tabun.everypony.ru\">Табун</a></li>\r\n\t\t\t<li><a href=\"https://minecraft.everypony.ru\">Майнкрафт</a></li>\r\n\t\t</ul>\r\n\t</div>\r\n\t<!-- Header end -->",
+      "content": "<!-- Header start -->\r\n    <div class=\"page-header\">\r\n        <ul class=\"main-menu\">\r\n            <li class=\"logolink\"><a href=\"{{ url_for('index.index') }}\">{{ SITE_NAME }}</a></li>\r\n        </ul>\r\n    </div>\r\n    <!-- Header end -->",
       "name": "header",
       "is_template": true
     },
@@ -10,29 +10,11 @@
   },
   {
     "fields": {
-      "content": "<!-- Footer start -->\r\n<div class=\"footer\">\r\n<ul class=\"nav nav-pills nav-main\">\r\n    <li>\r\n        <p>Все права принадлежат пони.</p>\r\n    </li>\r\n    <li id=\"nav_terms\" class=\"right\">\r\n        <a href=\"{{ url_for('staticpages.index', name='terms') }}\">Правила</a>\r\n    </li>\r\n</ul>\r\n</div>\r\n<!-- Footer end -->",
+      "content": "<!-- Footer start -->\r\n<div class=\"footer\">\r\n<ul class=\"nav nav-pills nav-main\">\r\n    <li>\r\n        <p><small>Powered by <a href=\"https://github.com/andreymal/mini_fiction\" target=\"_blank\">mini_fiction</a></small></p>\r\n    </li>\r\n    <li id=\"nav_terms\" class=\"right\">\r\n        <a href=\"{{ url_for('staticpages.index', name='terms') }}\">Правила</a>\r\n    </li>\r\n</ul>\r\n</div>\r\n<!-- Footer end -->",
       "name": "footer",
       "is_template": true
     },
     "model": "HtmlBlock",
     "pk": 2
-  },
-  {
-    "fields": {
-      "content": "        <p>Перед добавлением рассказа рекомендуем прочитать <a href=\"{{ url_for('staticpages.index', name='terms') }}\">правила</a> и <a href=\"{{ url_for('staticpages.index', name='help') }}\">справку</a>. Они сделают вашу жизнь и жизни читателей проще.</p>\n            <p>Вкратце:</p>\n            <ul>\n                <li>Сейчас вы задаете основные параметры рассказа. Следующим шагом будет добавление глав.</li>\n                <li>Не забудьте опубликовать рассказ в кабинете автора, когда закончите писать чистовик.</li>\n            </ul>",
-      "name": "story_add",
-      "is_template": true
-    },
-    "model": "HtmlBlock",
-    "pk": 3
-  },
-  {
-    "fields": {
-      "content": "            <h1>Добавление новой главы</h1>\n            <p>Перед добавлением главы рекомендуем прочитать <a href=\"{{ url_for('staticpages.index', name='terms') }}\">правила</a> и <a href=\"{{ url_for('staticpages.index', name='help') }}\">справку</a>. Они сделают вашу жизнь и жизни читателей проще.</p>",
-      "name": "chapter_add",
-      "is_template": true
-    },
-    "model": "HtmlBlock",
-    "pk": 4
   }
 ]

@@ -63,6 +63,7 @@ class Config(object):
         'ru': 'Библиотека'
     }
     SITE_FEEDBACK = '/'
+    FAVICON_URL = None
 
     MEDIA_ROOT = os.path.join(os.getcwd(), 'media')
     STATIC_ROOT = os.path.join(os.path.dirname(__file__), 'static')
@@ -179,10 +180,8 @@ class Config(object):
     RECAPTCHA_OPTIONS = {'hl': 'ru'}
     NOCAPTCHA = True
 
-    RANDOM_LOGOS = [
-        {'endpoint': 'static', 'filename': 'i/logopics/logopic-{}.jpg'.format(i)}
-        for i in range(1, 9)
-    ]
+    RANDOM_LOGOS = []
+    DEFAULT_USERPIC = {'endpoint': 'static', 'filename': 'i/userpic.png'}
 
 
 class Development(Config):

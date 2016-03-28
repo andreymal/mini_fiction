@@ -21,7 +21,10 @@ def favorites(user_id, page):
     if not user:
         abort(404)
 
-    objects = select(x.story for x in Favorites if x.author == user).without_distinct().order_by('-x.id')
+    objects = select(x.story for x in Favorites if x.author == user)
+    if not current_user.is_authenticated or (not current_user.is_staff and current_user.id != user.id):
+        objects = objects.filter(lambda story: not story.draft and story.approved)
+    objects = objects.without_distinct().order_by('-x.id')
 
     if current_user.is_authenticated and user.id == current_user.id:
         page_title = 'Мое избранное'

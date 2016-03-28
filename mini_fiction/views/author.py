@@ -29,7 +29,11 @@ def info(user_id=None, comments_page=1):
         comments_list = StoryComment.select(lambda x: not x.deleted and x.story in select(x.story for x in CoAuthorsStory if x.author == author))
         comments_list = comments_list.order_by(StoryComment.id.desc())
         stories = author.stories.order_by(Story.date.desc(), Story.id.desc())
-        data['all_views'] = StoryView.select(lambda x: x.story in stories).count()  # TODO: optimize it
+
+        # TODO: optimize it
+        story_ids = select(x.story.id for x in CoAuthorsStory if x.author == author)
+        data['all_views'] = StoryView.select(lambda x: x.story.id in story_ids).count()
+
         data['page_title'] = gettext('My cabinet')
         template = 'author_dashboard.html'
     else:

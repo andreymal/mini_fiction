@@ -70,3 +70,20 @@ CHARACTER_GROUP = {
         'maxlength': 65535,
     },
 }
+
+
+CLASSIFIER = {
+    'name': {
+        'type': 'string',
+        'required': True,
+        'minlength': 1,
+        'maxlength': 256,
+    },
+    'description': {
+        'type': 'string',
+        'required': False,
+        'default': '',
+        'minlength': 0,
+        'maxlength': 65535,
+    },
+}

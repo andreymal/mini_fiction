@@ -153,6 +153,8 @@ class Classifier(db.Entity):
 
     stories = orm.Set('Story')
 
+    bl = Resource('bl.classifier')
+
 
 class Rating(db.Entity):
     """ Модель рейтинга """

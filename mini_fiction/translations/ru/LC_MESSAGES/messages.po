@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version:  0.0.1\n"
 "Report-Msgid-Bugs-To: andriyano-31@mail.ru\n"
-"POT-Creation-Date: 2016-03-28 16:46+0300\n"
+"POT-Creation-Date: 2016-03-28 17:08+0300\n"
 "Last-Translator: andreymal <andriyano-31@mail.ru>\n"
 "Language: ru\n"
 "Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && "
@@ -130,6 +130,10 @@ msgstr "Максимальный размер картинки {maxsize} КиБ"
 msgid "Group already exists"
 msgstr "Группа уже существует"
 
+#: mini_fiction/bl/sorting.py:180 mini_fiction/bl/sorting.py:194
+msgid "Classifier already exists"
+msgstr "Классификатор уже существует"
+
 #: mini_fiction/bl/staticpages.py:62
 msgid "This is system page, you cannot delete it"
 msgstr "Это системная страница, вы не можете её удалить"
@@ -191,6 +195,7 @@ msgstr "Суперпользователь может целиком админ�
 #: mini_fiction/forms/admin/notice.py:15 mini_fiction/forms/admin/sorting.py:19
 #: mini_fiction/forms/admin/sorting.py:38
 #: mini_fiction/forms/admin/sorting.py:64
+#: mini_fiction/forms/admin/sorting.py:78
 #: mini_fiction/forms/admin/staticpage.py:15
 msgid "Name"
 msgstr "Название"
@@ -233,6 +238,7 @@ msgstr "Показать на всех страницах"
 #: mini_fiction/forms/admin/sorting.py:24
 #: mini_fiction/forms/admin/sorting.py:49
 #: mini_fiction/forms/admin/sorting.py:69
+#: mini_fiction/forms/admin/sorting.py:83
 msgid "Description"
 msgstr "Описание"
 
@@ -354,6 +360,10 @@ msgid "Character groups"
 msgstr "Группы персонажей"
 
 #: mini_fiction/templates/admin/index.html:14
+msgid "Classifications (events)"
+msgstr "Классифкаторы (события)"
+
+#: mini_fiction/templates/admin/index.html:15
 #: mini_fiction/templates/admin/htmlblocks/delete.html:9
 #: mini_fiction/templates/admin/htmlblocks/delete.html:26
 #: mini_fiction/templates/admin/htmlblocks/work.html:10
@@ -362,7 +372,7 @@ msgstr "Группы персонажей"
 msgid "HTML Blocks"
 msgstr "HTML-блоки"
 
-#: mini_fiction/templates/admin/index.html:15
+#: mini_fiction/templates/admin/index.html:16
 #: mini_fiction/templates/admin/staticpages/delete.html:9
 #: mini_fiction/templates/admin/staticpages/delete.html:26
 #: mini_fiction/templates/admin/staticpages/work.html:10
@@ -371,7 +381,7 @@ msgstr "HTML-блоки"
 msgid "Static pages"
 msgstr "Статические страницы"
 
-#: mini_fiction/templates/admin/index.html:16
+#: mini_fiction/templates/admin/index.html:17
 #: mini_fiction/templates/admin/notices/delete.html:9
 #: mini_fiction/templates/admin/notices/delete.html:26
 #: mini_fiction/templates/admin/notices/work.html:10
@@ -382,7 +392,7 @@ msgstr "Статические страницы"
 msgid "Notices"
 msgstr "Объявления"
 
-#: mini_fiction/templates/admin/index.html:18
+#: mini_fiction/templates/admin/index.html:19
 #: mini_fiction/templates/admin/authors/update.html:10
 #: mini_fiction/templates/admin/authors/update.html:35
 #: mini_fiction/views/admin/authors.py:31
@@ -411,6 +421,12 @@ msgstr "Авторы"
 #: mini_fiction/templates/admin/characters/index.html:28
 #: mini_fiction/templates/admin/characters/work.html:9
 #: mini_fiction/templates/admin/characters/work.html:33
+#: mini_fiction/templates/admin/classifications/delete.html:7
+#: mini_fiction/templates/admin/classifications/delete.html:24
+#: mini_fiction/templates/admin/classifications/index.html:7
+#: mini_fiction/templates/admin/classifications/index.html:26
+#: mini_fiction/templates/admin/classifications/work.html:9
+#: mini_fiction/templates/admin/classifications/work.html:29
 #: mini_fiction/templates/admin/htmlblocks/delete.html:8
 #: mini_fiction/templates/admin/htmlblocks/delete.html:25
 #: mini_fiction/templates/admin/htmlblocks/index.html:7
@@ -441,6 +457,7 @@ msgstr "(это вы)"
 #: mini_fiction/templates/admin/categories/work.html:18
 #: mini_fiction/templates/admin/charactergroups/work.html:22
 #: mini_fiction/templates/admin/characters/work.html:18
+#: mini_fiction/templates/admin/classifications/work.html:14
 #: mini_fiction/templates/admin/htmlblocks/work.html:14
 #: mini_fiction/templates/admin/notices/work.html:16
 #: mini_fiction/templates/admin/staticpages/work.html:16
@@ -451,6 +468,7 @@ msgstr "Сохранено!"
 #: mini_fiction/templates/admin/categories/work.html:23
 #: mini_fiction/templates/admin/charactergroups/work.html:27
 #: mini_fiction/templates/admin/characters/work.html:23
+#: mini_fiction/templates/admin/classifications/work.html:19
 #: mini_fiction/templates/admin/htmlblocks/work.html:20
 #: mini_fiction/templates/admin/notices/work.html:22
 #: mini_fiction/templates/admin/staticpages/work.html:22
@@ -479,6 +497,8 @@ msgstr "Удалить эту категорию?"
 #: mini_fiction/templates/admin/charactergroups/work.html:30
 #: mini_fiction/templates/admin/characters/delete.html:19
 #: mini_fiction/templates/admin/characters/work.html:26
+#: mini_fiction/templates/admin/classifications/delete.html:19
+#: mini_fiction/templates/admin/classifications/work.html:22
 #: mini_fiction/templates/admin/htmlblocks/delete.html:20
 #: mini_fiction/templates/admin/htmlblocks/work.html:21
 #: mini_fiction/templates/admin/notices/delete.html:20
@@ -488,6 +508,7 @@ msgstr "Удалить эту категорию?"
 #: mini_fiction/views/admin/categories.py:110
 #: mini_fiction/views/admin/charactergroups.py:109
 #: mini_fiction/views/admin/characters.py:110
+#: mini_fiction/views/admin/classifications.py:109
 #: mini_fiction/views/admin/htmlblocks.py:116
 #: mini_fiction/views/admin/notices.py:125
 #: mini_fiction/views/admin/staticpages.py:126
@@ -497,12 +518,14 @@ msgstr "Удалить"
 #: mini_fiction/templates/admin/categories/index.html:24
 #: mini_fiction/templates/admin/charactergroups/index.html:26
 #: mini_fiction/templates/admin/characters/index.html:26
+#: mini_fiction/templates/admin/classifications/index.html:24
 #: mini_fiction/templates/admin/htmlblocks/index.html:16
 #: mini_fiction/templates/admin/notices/index.html:24
 #: mini_fiction/templates/admin/staticpages/index.html:24
 #: mini_fiction/views/admin/categories.py:52
 #: mini_fiction/views/admin/charactergroups.py:52
 #: mini_fiction/views/admin/characters.py:52
+#: mini_fiction/views/admin/classifications.py:52
 #: mini_fiction/views/admin/htmlblocks.py:47
 #: mini_fiction/views/admin/notices.py:55
 #: mini_fiction/views/admin/staticpages.py:55
@@ -516,6 +539,18 @@ msgstr "Удалить эту группу персонажей?"
 #: mini_fiction/templates/admin/characters/delete.html:13
 msgid "Delete this character?"
 msgstr "Удалить этого персонажа?"
+
+#: mini_fiction/templates/admin/classifications/delete.html:8
+#: mini_fiction/templates/admin/classifications/delete.html:25
+#: mini_fiction/templates/admin/classifications/work.html:10
+#: mini_fiction/templates/admin/classifications/work.html:30
+#: mini_fiction/views/admin/classifications.py:30
+msgid "Classifications"
+msgstr "Классификаторы"
+
+#: mini_fiction/templates/admin/classifications/delete.html:13
+msgid "Delete this classifier?"
+msgstr "Удалить этот классификатор?"
 
 #: mini_fiction/templates/admin/htmlblocks/delete.html:14
 msgid "Delete this HTML Block?"

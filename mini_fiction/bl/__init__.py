@@ -16,3 +16,4 @@ def init_bl():
     registry.register('bl.category', sorting.CategoryBL)
     registry.register('bl.character', sorting.CharacterBL)
     registry.register('bl.charactergroup', sorting.CharacterGroupBL)
+    registry.register('bl.classifier', sorting.ClassifierBL)

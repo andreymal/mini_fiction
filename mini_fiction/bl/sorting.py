@@ -10,7 +10,7 @@ from flask_babel import lazy_gettext
 
 from mini_fiction.bl.utils import BaseBL
 from mini_fiction.validation import Validator, ValidationError
-from mini_fiction.validation.sorting import CATEGORY, CHARACTER, CHARACTER_GROUP
+from mini_fiction.validation.sorting import CATEGORY, CHARACTER, CHARACTER_GROUP, CLASSIFIER
 
 
 class CategoryBL(BaseBL):
@@ -166,6 +166,37 @@ class CharacterGroupBL(BaseBL):
             setattr(group, key, value)
 
         return group
+
+    def delete(self, author):
+        self.model.delete()
+
+
+class ClassifierBL(BaseBL):
+    def create(self, author, data):
+        data = Validator(CLASSIFIER).validated(data)
+
+        exist_classifier = self.model.get(name=data['name'])
+        if exist_classifier:
+            raise ValidationError({'name': [lazy_gettext('Classifier already exists')]})
+
+        classifier = self.model(**data)
+        classifier.flush()
+        return classifier
+
+    def update(self, author, data):
+        data = Validator(CLASSIFIER).validated(data, update=True)
+        classifier = self.model
+
+        if 'name' in data:
+            from mini_fiction.models import Classifier
+            exist_classifier = Classifier.get(name=data['name'])
+            if exist_classifier and exist_classifier.id != classifier.id:
+                raise ValidationError({'name': [lazy_gettext('Classifier already exists')]})
+
+        for key, value in data.items():
+            setattr(classifier, key, value)
+
+        return classifier
 
     def delete(self, author):
         self.model.delete()

@@ -93,7 +93,7 @@ def edit():
 
     if request.method == 'POST' and request.form:
         if 'save_password' in request.form:
-            password_form = AuthorEditPasswordForm(request.form)
+            password_form = AuthorEditPasswordForm()
             if password_form.validate_on_submit():
                 if not author.bl.authenticate(password_form.old_password.data):
                     password_form_errors.append(gettext('Old password is incorrect'))
@@ -105,7 +105,7 @@ def edit():
                     return redirect(url_for('auth.login'))
 
         if 'save_profile' in request.form:
-            profile_form = AuthorEditProfileForm(request.form)
+            profile_form = AuthorEditProfileForm()
             if profile_form.validate_on_submit():
                 try:
                     author.bl.update(profile_form.data)
@@ -115,7 +115,7 @@ def edit():
                     data['profile_ok'] = True
 
         if 'save_email' in request.form:
-            email_form = AuthorEditEmailForm(request.form)
+            email_form = AuthorEditEmailForm()
             if email_form.validate_on_submit():
                 if not author.bl.authenticate(email_form.password.data):
                     email_form_errors.append(gettext('Password is incorrect'))
@@ -124,7 +124,7 @@ def edit():
                     data['email_ok'] = True
 
         if 'save_prefs' in request.form:
-            prefs_form = AuthorEditPrefsForm(request.form)
+            prefs_form = AuthorEditPrefsForm()
             if prefs_form.validate_on_submit():
                 author.bl.update(prefs_form.data)
                 data['prefs_ok'] = True

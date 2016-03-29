@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version:  0.0.1\n"
 "Report-Msgid-Bugs-To: andriyano-31@mail.ru\n"
-"POT-Creation-Date: 2016-03-29 21:13+0300\n"
+"POT-Creation-Date: 2016-03-29 23:03+0300\n"
 "Last-Translator: andreymal <andriyano-31@mail.ru>\n"
 "Language: ru\n"
 "Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && "
@@ -22,28 +22,44 @@ msgstr ""
 msgid "Add new"
 msgstr "Добавить новый"
 
-#: mini_fiction/bl/authors.py:41
+#: mini_fiction/bl/authors.py:43
 msgid "Please set username and password"
 msgstr "Укажите имя пользователя и пароль"
 
-#: mini_fiction/bl/authors.py:45
+#: mini_fiction/bl/authors.py:47
 msgid "User already exists"
 msgstr "Пользователь уже существует"
 
-#: mini_fiction/bl/authors.py:47 mini_fiction/views/auth.py:110
+#: mini_fiction/bl/authors.py:49 mini_fiction/views/auth.py:110
 #: mini_fiction/views/author.py:101
 msgid "Password is too bad, please change it"
 msgstr "Пароль слишком плохой, поменяйте его"
 
-#: mini_fiction/bl/authors.py:49 mini_fiction/bl/authors.py:138
+#: mini_fiction/bl/authors.py:51 mini_fiction/bl/authors.py:263
 msgid "Email address is already in use"
 msgstr "Электропочта уже используется"
 
-#: mini_fiction/bl/authors.py:99
+#: mini_fiction/bl/authors.py:101
 msgid "Invalid contact type"
 msgstr "Неправильный тип контакта"
 
-#: mini_fiction/bl/authors.py:273
+#: mini_fiction/bl/authors.py:143
+msgid "Too big avatar; must be {value} KiB or smaller"
+msgstr "Слишком большой аватар; надо {value} КиБ или меньше"
+
+#: mini_fiction/bl/authors.py:150
+msgid "Cannot read avatar"
+msgstr "Не получилось прочитать аватар"
+
+#: mini_fiction/bl/authors.py:185
+msgid "Too small avatar; must be {w}x{h} or bigger"
+msgstr "Слишком маленький аватар; надо {w}x{h} или больше"
+
+#: mini_fiction/bl/authors.py:187
+msgid "Too big avatar; must be {w}x{h} or smaller"
+msgstr "Слишком большой аватар; надо {w}x{h} или меньше"
+
+#: mini_fiction/bl/authors.py:398
 msgid ""
 "Please enter a correct username and password. Note that both fields may "
 "be case-sensitive."
@@ -51,7 +67,7 @@ msgstr ""
 "Пожалуйста, введите правильные имя пользователя и пароль. Оба поля могут "
 "быть чувствительны к регистру."
 
-#: mini_fiction/bl/authors.py:275
+#: mini_fiction/bl/authors.py:400
 msgid "Account is disabled"
 msgstr "Аккаунт отключен"
 
@@ -159,7 +175,19 @@ msgstr "Не удалось отрисовать статическую стра
 msgid "Cannot render staticpage \"{0}\" for you: {1}"
 msgstr "Не удалось отрисовать статическую страницу «{0}» для вас: {1}"
 
-#: mini_fiction/forms/author.py:148 mini_fiction/forms/register.py:28
+#: mini_fiction/forms/author.py:35
+msgid "Avatar"
+msgstr "Аватар"
+
+#: mini_fiction/forms/author.py:37
+msgid "The recommended size is 100x100 pixels"
+msgstr "Рекомендуемый размер 100x100 пикселей"
+
+#: mini_fiction/forms/author.py:41
+msgid "Delete avatar"
+msgstr "Удалить аватар"
+
+#: mini_fiction/forms/author.py:159 mini_fiction/forms/register.py:28
 #: mini_fiction/forms/register.py:65
 msgid "Passwords do not match"
 msgstr "Пароли не совпадают"

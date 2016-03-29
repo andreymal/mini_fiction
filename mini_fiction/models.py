@@ -47,6 +47,10 @@ class Author(db.Entity, UserMixin):
     comments_maxdepth = orm.Optional(int, size=16, unsigned=True, nullable=True, default=None)
     comment_spoiler_threshold = orm.Optional(int, size=16, nullable=True, default=None)
 
+    avatar_small = orm.Optional(str, 255)
+    avatar_medium = orm.Optional(str, 255)
+    avatar_large = orm.Optional(str, 255)
+
     registration_profile = orm.Optional('RegistrationProfile')
     password_reset_profiles = orm.Set('PasswordResetProfile')
     contacts = orm.Set('Contact')

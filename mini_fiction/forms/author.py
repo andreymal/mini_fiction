@@ -4,7 +4,8 @@
 from pony import orm
 from flask import current_app, g
 from flask_babel import lazy_gettext
-from wtforms import TextField, TextAreaField, PasswordField, SelectField, IntegerField, FieldList, FormField, validators
+from wtforms import TextField, TextAreaField, PasswordField, SelectField, IntegerField
+from wtforms import BooleanField, FileField, FieldList, FormField, validators
 
 from mini_fiction.models import Category
 from mini_fiction.forms.form import Form
@@ -29,6 +30,16 @@ class ContactForm(Form):
 
 class AuthorEditProfileForm(Form):
     attrs_dict = {'class': 'input-xlarge'}
+
+    avatar = FileField(
+        lazy_gettext('Avatar'),
+        render_kw=dict(attrs_dict, accept='image/*'),
+        description=lazy_gettext('The recommended size is 100x100 pixels'),
+    )
+
+    delete_avatar = BooleanField(
+        lazy_gettext('Delete avatar'),
+    )
 
     bio = TextAreaField(
         'Пару слов о себе',

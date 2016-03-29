@@ -218,7 +218,8 @@ class Story(db.Entity):
     categories = orm.Set(Category)
     classifications = orm.Set(Classifier)
     cover = orm.Required(bool, default=False)
-    date = orm.Required(datetime, 6, default=datetime.utcnow, index=True)
+    date = orm.Required(datetime, 6, default=datetime.utcnow)
+    first_published_at = orm.Optional(datetime, 6, index=True)
     draft = orm.Required(bool, default=True)
     approved = orm.Required(bool, default=False)
     finished = orm.Required(bool, default=False)
@@ -249,7 +250,7 @@ class Story(db.Entity):
     beta_reading = orm.Set('BetaReading')
 
     orm.composite_index(approved, draft)
-    orm.composite_index(approved, draft, date)
+    orm.composite_index(approved, draft, first_published_at)
     orm.composite_index(approved, draft, vote_average_index)
 
     bl = Resource('bl.story')

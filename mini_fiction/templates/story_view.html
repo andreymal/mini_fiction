@@ -13,7 +13,7 @@
             {% if story.finished %} <sup class="complete">завершен</sup>{% endif %}{% if story.freezed %} <sup class="suspended">заморожен</sup>{% endif %}
               {% include 'includes/story_control_buttons.html' %}
           </h1>
-        {% if current_user.is_authenticated %}
+        {% if current_user.is_authenticated and not story.bl.is_author(current_user) %}
         <div class="vote-area">
             Ваша оценка:
             <span class="starblock">
@@ -60,13 +60,25 @@
             {% endif %}
             <p>
                 Рейтинг — <a href="{{ url_for('search.simple', search_type='rating', search_id=story.rating.id) }}">{{ story.rating.name }}</a><br/>
-              События: {% for classifier in story.classifications.order_by('c.id') %}<a href="{{ url_for('search.simple', search_type='classifier', search_id=classifier.id) }}">{{ classifier.name }}</a>{% if not loop.last %}, {% endif %}{% endfor %}<br/>
-              {{ ngettext("%(num)d word", "%(num)d words", story.words) }}, {{ ngettext("%(num)d view", "%(num)d views", story.views) }}<br/>
-              Опубликован: <time datetime="{{ story.date.strftime('%Y-%m-%dT%H:%M:%SZ') }}">
-                {{- story.date|datetimeformat('d.MM.Y') -}}
-              </time>, последнее изменение – <time datetime="{{ story.updated.strftime('%Y-%m-%dT%H:%M:%SZ') }}">
-                {{- story.updated|timedeltaformat -}}
-              </time> назад
+
+                События: {% for classifier in story.classifications.order_by('c.id') %}<a href="{{ url_for('search.simple', search_type='classifier', search_id=classifier.id) }}">{{ classifier.name }}</a>{% if not loop.last %}, {% endif %}{% endfor %}<br/>
+                {{ ngettext("%(num)d word", "%(num)d words", story.words) }}, {{ ngettext("%(num)d view", "%(num)d views", story.views) }}<br/>
+
+                {% if not story.first_published_at or current_user.is_staff or story.bl.is_author(current_user) %}
+                    Создан: <time datetime="{{ story.date.strftime('%Y-%m-%dT%H:%M:%SZ') }}">
+                        {{- story.date|datetimeformat('d.MM.Y') -}}
+                    </time>
+                    {%- if not story.first_published_at %}, последнее изменение – <time datetime="{{ story.updated.strftime('%Y-%m-%dT%H:%M:%SZ') }}">
+                        {{- story.updated|timedeltaformat }} назад
+                    </time>{% endif %}<br/>
+                {% endif %}
+                {% if story.first_published_at %}
+                    Опубликован: <time datetime="{{ story.first_published_at.strftime('%Y-%m-%dT%H:%M:%SZ') }}">
+                        {{- story.first_published_at|datetimeformat('d.MM.Y') -}}
+                    </time>, последнее изменение – <time datetime="{{ story.updated.strftime('%Y-%m-%dT%H:%M:%SZ') }}">
+                        {{- story.updated|timedeltaformat }} назад
+                    </time><br/>
+                {%- endif -%}
           </p>
       </blockquote>
 

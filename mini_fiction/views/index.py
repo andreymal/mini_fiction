@@ -3,10 +3,9 @@
 
 from flask import Blueprint, current_app, render_template
 from flask_babel import gettext
-from flask_login import current_user
 from pony.orm import select, db_session
 
-from mini_fiction.models import Story, Category, Chapter, StoryComment, CoAuthorsStory
+from mini_fiction.models import Story, Category, Chapter, StoryComment
 from mini_fiction.utils.views import cached_lists
 
 bp = Blueprint('index', __name__)
@@ -19,7 +18,7 @@ def index():
 
     categories = Category.select()[:]
 
-    stories = Story.select_published().order_by(Story.date.desc(), Story.id.desc())
+    stories = Story.select_published().order_by(Story.first_published_at.desc(), Story.id.desc())
     stories = stories.prefetch(Story.characters, Story.categories, Story.coauthors)
     stories = stories[:current_app.config['STORIES_COUNT']['main']]
 

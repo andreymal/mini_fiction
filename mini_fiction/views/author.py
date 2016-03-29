@@ -29,7 +29,7 @@ def info(user_id=None, comments_page=1):
         author = current_user._get_current_object()
         comments_list = StoryComment.select(lambda x: not x.deleted and x.story in select(x.story for x in CoAuthorsStory if x.author == author))
         comments_list = comments_list.order_by(StoryComment.id.desc())
-        stories = author.stories.order_by(Story.date.desc(), Story.id.desc())
+        stories = author.stories.order_by(Story.first_published_at.desc(), Story.id.desc())
 
         # TODO: optimize it
         story_ids = select(x.story.id for x in CoAuthorsStory if x.author == author)
@@ -45,7 +45,7 @@ def info(user_id=None, comments_page=1):
         comments_list = comments_list.order_by(StoryComment.id.desc())
         data['page_title'] = gettext('Author: {author}').format(author=author.username)
         stories = Story.accessible(current_user).filter(lambda x: x in select(y.story for y in CoAuthorsStory if y.author == author))
-        stories = stories.order_by(Story.date.desc(), Story.id.desc())
+        stories = stories.order_by(Story.first_published_at.desc(), Story.id.desc())
         template = 'author_overview.html'
 
     comments_count = comments_list.count()

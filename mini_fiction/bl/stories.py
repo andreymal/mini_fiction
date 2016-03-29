@@ -5,6 +5,7 @@
 
 import random
 import ipaddress
+from datetime import datetime
 from statistics import mean, pstdev
 
 from pony import orm
@@ -119,6 +120,8 @@ class StoryBL(BaseBL, Commentable):
             )
 
         if old_published != story.published:
+            if story.published and not story.first_published_at:
+                story.first_published_at = datetime.utcnow()
             later(current_app.tasks['sphinx_update_story'].delay, story.id, ('approved',))
             for c in story.chapters:
                 c.story_published = story.published  # TODO: update Chapter where story = story.id
@@ -143,6 +146,8 @@ class StoryBL(BaseBL, Commentable):
                 )
 
             if old_published != story.published:
+                if story.published and not story.first_published_at:
+                    story.first_published_at = datetime.utcnow()
                 later(current_app.tasks['sphinx_update_story'].delay, story.id, ('draft',))
                 for c in story.chapters:
                     c.story_published = story.published

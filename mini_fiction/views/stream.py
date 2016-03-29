@@ -18,7 +18,7 @@ bp = Blueprint('stream', __name__)
 @bp.route('/stories/page/<int:page>/')
 @db_session
 def stories(page):
-    objects = Story.select_published().order_by(Story.date.desc(), Story.id.desc())
+    objects = Story.select_published().order_by(Story.first_published_at.desc(), Story.id.desc())
     objects = objects.prefetch(Story.characters, Story.categories, Story.coauthors, CoAuthorsStory.author)
     return paginate_view(
         'stream/stories.html',

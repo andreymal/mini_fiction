@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 from flask import Markup, current_app
-from wtforms import TextAreaField, ValidationError, validators
+from wtforms import TextAreaField, ValidationError
 
 from mini_fiction.forms.form import Form
 

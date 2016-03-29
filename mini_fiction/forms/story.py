@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-from wtforms import SelectField, TextField, TextAreaField, validators
+from wtforms import SelectField, TextField, TextAreaField
 from pony import orm
 
 from mini_fiction.models import Category, Character, Rating, Classifier
@@ -56,7 +56,7 @@ class StoryForm(Form):
         group_by_field='group',
         render_kw=img_attrs,
         widget=StoriesCharacterSelect(multiple=True),
-        description='Следует выбрать персонажей, находящихся в гуще событий, а не всех пони, упомянутых в произведении.',
+        description='Следует выбрать персонажей, находящихся в гуще событий, а не всех упомянутых в произведении.',
     )
 
     summary = TextAreaField(

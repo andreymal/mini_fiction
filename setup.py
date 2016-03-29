@@ -29,13 +29,16 @@ requirements = read_requirements('requirements.txt', deplinks)
 optional_requirements = read_requirements('optional-requirements.txt', deplinks)
 
 
+import mini_fiction
+
+
 setup(
     name='mini_fiction',
-    version='0.0.1',
-    description='Website for fanfics',
+    version=mini_fiction.__version__,
+    description='CMS for fanfics',
     author='andreymal',
     author_email='andriyano-31@mail.ru',
-    license='GPL',
+    license='GPLv3',
     url='https://github.com/andreymal/mini_fiction',
     platforms='any',
     packages=find_packages(),
@@ -54,13 +57,15 @@ setup(
     classifiers=[
         'Development Status :: 4 - Beta',
         'Framework :: Flask',
-        'License :: OSI Approved :: GNU General Public License (GPL)',
+        'License :: OSI Approved',
+        'License :: OSI Approved :: GNU General Public License v3 (GPLv3)',
         'Operating System :: OS Independent',
         'Programming Language :: Python',
         'Programming Language :: Python :: 3',
         'Programming Language :: Python :: 3.4',
         'Programming Language :: Python :: 3.5',
-        "Topic :: Internet :: WWW/HTTP :: WSGI",
-        "Topic :: Internet :: WWW/HTTP :: WSGI :: Application",
+        'Programming Language :: Python :: Implementation :: CPython',
+        'Topic :: Internet :: WWW/HTTP :: WSGI',
+        'Topic :: Internet :: WWW/HTTP :: WSGI :: Application',
     ],
 )

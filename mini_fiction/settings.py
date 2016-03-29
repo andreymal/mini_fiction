@@ -179,6 +179,37 @@ class Config(object):
         # 'mini_fiction.downloads.txt.TXT_CP1251Download',
     )))
 
+    CONTACTS = [
+        {
+            'name': 'website',
+            'label': {
+                'default': 'Website',
+                'ru': 'Вебсайт',
+            },
+            'schema': {'regex': r'^https?://.+$'},
+            'link_template': '{value}',
+            'title_template': '{value}',
+        },
+        {
+            'name': 'xmpp',
+            'label': {
+                'default': 'Jabber ID (XMPP)',
+            },
+            'schema': {'regex': r'^.+@([^.@][^@]+)'},
+            'link_template': 'xmpp:{value}',
+            'title_template': '{value}',
+        },
+        {
+            'name': 'skype',
+            'label': {
+                'default': 'Skype ID',
+            },
+            'schema': {'regex': r'^[a-zA-Z0-9\._-]+$'},
+            'link_template': 'skype:{value}',
+            'title_template': '{value}',
+        },
+    ]
+
     CELERY_ALWAYS_EAGER = False
     CELERY_TASK_SERIALIZER = 'json'
     CELERY_ACCEPT_CONTENT = ['json', 'msgpack', 'yaml']

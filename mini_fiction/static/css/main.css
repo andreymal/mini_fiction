@@ -940,24 +940,6 @@ a.btn {
 .contact-links a {
     line-height: 16px;
     height: 16px;
-    padding: 0 0 0 22px;
-    background: transparent url('../i/jabber.png') no-repeat 0 0;
-}
-
-.contact-links .skypelink {
-    background-image: url('../i/skype.png');
-}
-
-.contact-links .tabunlink {
-    background-image: url('../i/tabun.png');
-}
-
-.contact-links .forumlink {
-    background-image: url('../i/forum.png');
-}
-
-.contact-links .vkontaktlink {
-    background-image: url('../i/vk.png');
 }
 
 /* === Bottom of the page stuff === */

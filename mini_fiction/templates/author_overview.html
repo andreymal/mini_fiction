@@ -42,13 +42,7 @@
             {% endif %}
         </p>
         <p class="author-description">{{ author.bio_as_html }}</p>
-        <p class="contact-links">
-            {% if author.jabber %}<a href="xmpp:{{ author.jabber }}" class="jabberlink">{{ author.jabber }}</a><br/>{% endif %}
-            {% if author.skype %}<a href="skype:{{ author.skype }}" class="skypelink">{{ author.skype }}</a><br/>{% endif %}
-            {% if author.tabun %}<a href="https://tabun.everypony.ru/profile/{{ author.tabun }}/" class="tabunlink">{{ author.tabun }}</a><br/>{% endif %}
-            {% if author.forum %}<a href="{{ author.forum }}" class="forumlink">{{ author.username }}</a><br/>{% endif %}
-            {% if author.vk %}<a href="https://vk.com/{{ author.vk }}" class="vkontaktlink">{{ author.vk }}</a><br/>{% endif %}
-        </p>
+        {% with contacts=author.contacts.select().order_by('c.id')[:] %}{% include 'includes/author_contacts.html' %}{% endwith %}
     </div>
     <div class="span8">
         {% if series %}

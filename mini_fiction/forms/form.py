@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
+from wtforms import FormField, FieldList
 from flask_wtf import Form as BaseForm
 
 
@@ -21,4 +22,10 @@ class Form(BaseForm):
                 field.errors = list(field.errors) + list(errors)
             else:
                 field.errors = list(errors)
+            if isinstance(field, FieldList):
+                for i, e in errors.items():
+                    if isinstance(field.entries[i], FormField):
+                        field.entries[i].set_errors(e)
+                    else:
+                        field.entries[i].errors = list(e)
         self._errors = None  # pylint: disable=W0201

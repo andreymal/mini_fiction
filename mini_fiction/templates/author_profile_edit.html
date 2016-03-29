@@ -19,7 +19,7 @@
                                     <label class="control-label">{{ field.label.text }}</label>
                                     <div class="controls">
                                         {{ field }}
-                                        {% if field.errors %}
+                                        {% if field.errors and field.name != 'contacts' %}
                                             {% for error in field.errors %}
                                                 <span class="help-inline">{{ error }}</span>
                                             {% endfor %}

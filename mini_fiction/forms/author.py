@@ -2,13 +2,29 @@
 # -*- coding: utf-8 -*-
 
 from pony import orm
+from flask import current_app, g
 from flask_babel import lazy_gettext
-from flask_wtf import Form
-from wtforms import TextField, TextAreaField, PasswordField, SelectField, IntegerField, validators
+from wtforms import TextField, TextAreaField, PasswordField, SelectField, IntegerField, FieldList, FormField, validators
 
 from mini_fiction.models import Category
-from mini_fiction.forms.fields import LazySelectMultipleField
-from mini_fiction.widgets import StoriesButtons
+from mini_fiction.forms.form import Form
+from mini_fiction.forms.fields import LazySelectField, LazySelectMultipleField
+from mini_fiction.widgets import StoriesButtons, ContactsWidget
+
+
+class ContactForm(Form):
+    name = LazySelectField(
+        '',
+        [validators.Required()],
+        choices=lambda: [
+            (x['name'], x['label'].get(g.locale.language) or x['label']['default'])
+            for x in current_app.config['CONTACTS']
+        ],
+    )
+    value = TextField(
+        '',
+        [validators.Optional()],
+    )
 
 
 class AuthorEditProfileForm(Form):
@@ -23,55 +39,11 @@ class AuthorEditProfileForm(Form):
         render_kw=dict(attrs_dict, placeholder='Небольшое описание, отображается в профиле', cols=40, rows=10),
     )
 
-    jabber = TextField(
-        'Jabber ID (XMPP)',
-        [
-            validators.Optional(),
-            validators.Email('Пожалуйста, исправьте ошибку в адресе jabber: похоже, он неправильный'),
-            validators.Length(max=75),
-        ],
-        render_kw=dict(attrs_dict, maxlength=75, placeholder='Адрес jabber-аккаунта'),
-        description='Пример: user@server.com',
-    )
-
-    skype = TextField(
-        'Skype ID',
-        [
-            validators.Optional(),
-            validators.Regexp(r'^[a-zA-Z0-9\._-]+$', message='Пожалуйста, исправьте ошибку в логине skype: похоже, он неправильный'),
-            validators.Length(max=32),
-        ],
-        render_kw=dict(attrs_dict, maxlength=32, placeholder='Логин skype'),
-    )
-
-    tabun = TextField(
-        'Логин на Табуне',
-        [
-            validators.Optional(),
-            validators.Regexp(r'^[a-zA-Z0-9-_]+$', message='Пожалуйста, исправьте ошибку в имени пользователя: похоже, оно неправильно'),
-            validators.Length(max=32),
-        ],
-        render_kw=dict(attrs_dict, maxlength=32),
-    )
-
-    forum = TextField(
-        'Профиль на Форуме',
-        [
-            validators.Optional(),
-            validators.Length(max=72),
-        ],
-        render_kw=dict(attrs_dict, maxlength=32, placeholder='URL вашего профиля'),
-        description='Вставьте полную ссылку на профиль',
-    )
-
-    vk = TextField(
-        'Логин ВКонтакте',
-        [
-            validators.Optional(),
-            validators.Regexp(r'^[a-zA-Z0-9\._-]+$', message='Пожалуйста, исправьте ошибку в логине ВК: похоже, он неправильный'),
-            validators.Length(max=32),
-        ],
-        render_kw=dict(attrs_dict, maxlength=32),
+    contacts = FieldList(
+        FormField(ContactForm),
+        'Контакты',
+        widget=ContactsWidget(),
+        render_kw={'class': 'contacts-form'},
     )
 
 

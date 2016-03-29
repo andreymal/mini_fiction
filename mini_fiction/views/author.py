@@ -6,10 +6,11 @@ from flask_babel import gettext
 from flask_login import current_user, login_required, logout_user
 from pony.orm import select, db_session
 
-from mini_fiction.models import Author, Story, CoAuthorsStory, StoryComment, StoryView
+from mini_fiction.models import Author, Story, CoAuthorsStory, StoryComment, StoryView, Contact
 from mini_fiction.utils.misc import Paginator
 from mini_fiction.utils.views import cached_lists
 from mini_fiction.forms.author import AuthorEditEmailForm, AuthorEditPasswordForm, AuthorEditProfileForm, AuthorEditPrefsForm
+from mini_fiction.validation import ValidationError
 
 bp = Blueprint('author', __name__)
 
@@ -106,8 +107,12 @@ def edit():
         if 'save_profile' in request.form:
             profile_form = AuthorEditProfileForm(request.form)
             if profile_form.validate_on_submit():
-                author.bl.update(profile_form.data)
-                data['profile_ok'] = True
+                try:
+                    author.bl.update(profile_form.data)
+                except ValidationError as exc:
+                    profile_form.set_errors(exc.errors)
+                else:
+                    data['profile_ok'] = True
 
         if 'save_email' in request.form:
             email_form = AuthorEditEmailForm(request.form)
@@ -125,13 +130,13 @@ def edit():
                 data['prefs_ok'] = True
 
     if not profile_form:
+        contacts = Contact.select(lambda x: x.author == author).order_by(Contact.id)[:]
         profile_form = AuthorEditProfileForm(formdata=None, data={
             'bio': author.bio,
-            'jabber': author.jabber,
-            'skype': author.skype,
-            'tabun': author.tabun,
-            'forum': author.forum,
-            'vk': author.vk
+            'contacts': [
+                {'name': c.name, 'value': c.value}
+                for c in contacts
+            ] + [{'name': '', 'value': ''}]
         })
     if not email_form:
         email_form = AuthorEditEmailForm(formdata=None, data={'email': author.email})

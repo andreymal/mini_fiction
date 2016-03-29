@@ -14,6 +14,7 @@ core.define('common', {
     },
 
     load: function(content) {
+        this.bindContactsAdd();
         this.markitupFor(content);
         this.buttonsFor(content);
         this.bootstrapFor(content);
@@ -31,6 +32,11 @@ core.define('common', {
 
     unloadModal: function(modalElement) {
         this.markitupDestroy(modalElement);
+    },
+
+    bindContactsAdd: function() {
+        // Виджет редактирования контактов
+        core.bind('.contacts-add', 'click', this._addContactEvent);
     },
 
     markitupFor: function(elem) {
@@ -102,5 +108,24 @@ core.define('common', {
                 }
             });
         });
+    },
+
+    _addContactEvent: function(event) {
+        var newId = (this.parentNode.children.length - 1).toString();
+        var newItem = this.previousElementSibling.cloneNode(true);
+
+        var nameField = newItem.querySelector('select');
+        nameField.name = 'contacts-' + newId + '-name';
+        nameField.id = nameField.name;
+        nameField.value = nameField.querySelector('option').value;
+
+        var valueField = newItem.querySelector('input');
+        valueField.name = 'contacts-' + newId + '-value';
+        valueField.id = valueField.name;
+        valueField.value = '';
+
+        this.parentNode.insertBefore(newItem, this);
+        event.preventDefault();
+        return false;
     }
 });

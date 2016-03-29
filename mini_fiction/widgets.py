@@ -4,7 +4,8 @@
 from itertools import chain
 
 from pony import orm
-from flask import Markup
+from flask import escape
+from flask_babel import gettext
 from wtforms.widgets import Select, Input
 from wtforms.widgets.core import html_params
 
@@ -16,7 +17,7 @@ class ButtonWidget(object):
         pass
 
     def __call__(self, field, text='', **kwargs):
-        return Markup('<button %s>%s</button>' % (html_params(**kwargs), text))
+        return '<button %s>%s</button>' % (html_params(**kwargs), text)
 
 
 class ServiceButtonWidget(Input):
@@ -36,7 +37,7 @@ class StoriesCheckboxSelect(Select):
             output.append(
                 self.render_option(field, option_value, option_label, selected, label_class)
             )
-        return Markup('\n'.join(output))
+        return '\n'.join(output)
 
     def render_option(self, field, value, label, selected, label_class):
         cb = Input('checkbox' if self.multiple else 'radio')  # NOTE: CheckboxInput() is always checked if field.data is present
@@ -81,7 +82,7 @@ class StoriesImgSelect(Select):
                     **attrs
                 ))
             output.append('</span>')
-        return Markup('\n'.join(output))
+        return '\n'.join(output)
 
     def get_img_url(self, field, value):
         raise NotImplementedError
@@ -94,7 +95,7 @@ class StoriesImgSelect(Select):
         item_image = '<img class="%s" src="%s" alt="%s" title="%s" />' % (img_class, img_url, label, label)
         cb = Input('checkbox' if self.multiple else 'radio')
         rendered_cb = cb(field, value=value, checked=selected, **data_attrs)
-        return Markup('<span %s>%s%s</span>' % (html_params(**container_attrs), rendered_cb, item_image))
+        return '<span %s>%s%s</span>' % (html_params(**container_attrs), rendered_cb, item_image)
 
 
 class StoriesCharacterSelect(StoriesImgSelect):
@@ -131,4 +132,34 @@ class StoriesButtons(Select):
         data = '<div %s>%s</div>' % (html_params(**data_container_attrs), ' '.join(data_container))
         output.append(btn)
         output.append(data)
-        return Markup('\n'.join(output))
+        return '\n'.join(output)
+
+
+class ContactsWidget(object):
+    def __call__(self, field, **kwargs):
+        item_attrs_dict = kwargs.pop('item_attrs', None)
+
+        attrs = ''
+        for k, v in kwargs.items():
+            attrs += ' {}="{}"'.format(escape(k), escape(v))
+
+        item_attrs = ''
+        if item_attrs_dict:
+            for k, v in item_attrs_dict.items():
+                item_attrs += ' {}="{}"'.format(escape(k), escape(v))
+
+        output = ['<div%s>' % attrs]
+        for contact in field:
+            output.append('<div%s>' % item_attrs)
+            output.append(contact.form.name())
+            output.append(contact.form.value())
+            if contact.errors:
+                for errors in contact.errors.values():
+                    for error in errors:
+                        output.append('<span class="help-inline">{}</span>'.format(escape(error)))
+            output.append('')
+            output.append('</select>')
+            output.append('</div>')
+        output.append('<a href="" class="contacts-add">{}</a>'.format(escape(gettext('Add new'))))
+        output.append('</div>')
+        return '\n'.join(output)

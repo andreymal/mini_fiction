@@ -66,6 +66,7 @@ develop:
 babel-extract:
 	pybabel extract \
 		-F babel.cfg \
+		-k lazy_gettext \
 		-o messages.pot \
 		--project mini_fiction \
 		--copyright-holder andreymal \

@@ -63,7 +63,7 @@ class AuthorBL(BaseBL):
 
     def update(self, data):
         user = self.model
-        for field in ('bio', 'jabber', 'skype', 'tabun', 'forum', 'vk', 'email'):
+        for field in ('bio', 'email'):
             if field in data:
                 setattr(user, field, data[field])
         if 'excluded_categories' in data:
@@ -81,6 +81,52 @@ class AuthorBL(BaseBL):
                 pass  # Если бралось значение из настроек проекта, то его и оставляем
             else:
                 user.comment_spoiler_threshold = int(data['comment_spoiler_threshold'])
+
+        if 'contacts' in data:
+            contacts = [x for x in data['contacts'] if x.get('name') and x.get('value')]
+            lenc = len(contacts)
+
+            schemas = {}
+            for x in current_app.config['CONTACTS']:
+                schema = dict(x.get('schema') or {})
+                schema['type'] = 'string'
+                schema['maxlength'] = 255
+                schemas[x['name']] = schema
+
+            errors = {}
+            for i, x in enumerate(contacts):
+                if x.get('name') not in schemas:
+                    errors[i] = {'name': [lazy_gettext('Invalid contact type')]}
+                    continue
+                schema = dict(schemas[x['name']])
+                v = Validator({'value': schema})
+                v.validate({'value': x['value']})
+                if v.errors:
+                    errors[i] = v.errors
+
+            if errors:
+                raise ValidationError({'contacts': errors})
+
+            from mini_fiction.models import Contact
+
+            old_contacts = Contact.select(lambda x: x.author == user).order_by(Contact.id)[:]
+            while len(old_contacts) > lenc:
+                old_contacts.pop().delete()
+
+            for oldc, newc in zip(old_contacts, contacts):
+                if oldc.name != newc['name']:
+                    oldc.name = newc['name']
+                if oldc.value != newc['value']:
+                    oldc.value = newc['value']
+
+            i = len(old_contacts)
+            while i < lenc:
+                old_contacts.append(Contact(
+                    author=user,
+                    name=contacts[i]['name'],
+                    value=contacts[i]['value'],
+                ))
+                i = len(old_contacts)
 
     def register(self, data):
         from mini_fiction.models import RegistrationProfile
@@ -306,31 +352,4 @@ class AuthorBL(BaseBL):
             return default_userpic['url']
 
     def get_tabun_avatar_url(self):
-        tabun = self._model().tabun
-        if not tabun:
-            return
-
-        url = None
-        try:
-            key = 'tabun_avatar:' + tabun
-            url = current_app.cache.get(key)
-            if current_app.config['LOAD_TABUN_AVATARS'] and not url:
-                import urllib.request
-                from urllib.parse import urljoin
-                import lxml.etree as etree
-
-                profile_url = 'https://tabun.everypony.ru/profile/' + urllib.request.quote(tabun)
-                req = urllib.request.Request(profile_url)
-                req.add_header('User-Agent', 'Mozilla/5.0; mini_fiction')  # for CloudFlare
-                data = urllib.request.urlopen(req).read()
-                doc = etree.HTML(data.decode('utf-8'))
-                links = doc.xpath('//*[contains(@class, "profile-info-about")]//a[contains(@class, "avatar")]/img/@src')
-                if links:
-                    url = urljoin(profile_url, links[0])
-                current_app.cache.set(key, url, timeout=300 * (1 + random.random()))
-        except Exception:
-            if current_app.config['DEBUG']:
-                import traceback
-                traceback.print_exc()
-
-        return url
+        return None  # TODO: add avatar uploading

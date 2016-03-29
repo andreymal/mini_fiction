@@ -1,13 +1,14 @@
 # Russian translations for mini_fiction.
 # Copyright (C) 2016 andreymal
-# This file is distributed under the same license as the mini_fiction project.
+# This file is distributed under the same license as the mini_fiction
+# project.
 # andreymal <andriyano-31@mail.ru>, 2016.
 #
 msgid ""
 msgstr ""
 "Project-Id-Version:  0.0.1\n"
 "Report-Msgid-Bugs-To: andriyano-31@mail.ru\n"
-"POT-Creation-Date: 2016-03-28 17:08+0300\n"
+"POT-Creation-Date: 2016-03-29 21:13+0300\n"
 "Last-Translator: andreymal <andriyano-31@mail.ru>\n"
 "Language: ru\n"
 "Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && "
@@ -16,6 +17,10 @@ msgstr ""
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 2.2.0\n"
+
+#: mini_fiction/widgets.py:163
+msgid "Add new"
+msgstr "Добавить новый"
 
 #: mini_fiction/bl/authors.py:41
 msgid "Please set username and password"
@@ -26,15 +31,19 @@ msgid "User already exists"
 msgstr "Пользователь уже существует"
 
 #: mini_fiction/bl/authors.py:47 mini_fiction/views/auth.py:110
-#: mini_fiction/views/author.py:96
+#: mini_fiction/views/author.py:101
 msgid "Password is too bad, please change it"
 msgstr "Пароль слишком плохой, поменяйте его"
 
-#: mini_fiction/bl/authors.py:49 mini_fiction/bl/authors.py:92
+#: mini_fiction/bl/authors.py:49 mini_fiction/bl/authors.py:138
 msgid "Email address is already in use"
 msgstr "Электропочта уже используется"
 
-#: mini_fiction/bl/authors.py:227
+#: mini_fiction/bl/authors.py:99
+msgid "Invalid contact type"
+msgstr "Неправильный тип контакта"
+
+#: mini_fiction/bl/authors.py:273
 msgid ""
 "Please enter a correct username and password. Note that both fields may "
 "be case-sensitive."
@@ -42,7 +51,7 @@ msgstr ""
 "Пожалуйста, введите правильные имя пользователя и пароль. Оба поля могут "
 "быть чувствительны к регистру."
 
-#: mini_fiction/bl/authors.py:229
+#: mini_fiction/bl/authors.py:275
 msgid "Account is disabled"
 msgstr "Аккаунт отключен"
 
@@ -150,7 +159,7 @@ msgstr "Не удалось отрисовать статическую стра
 msgid "Cannot render staticpage \"{0}\" for you: {1}"
 msgstr "Не удалось отрисовать статическую страницу «{0}» для вас: {1}"
 
-#: mini_fiction/forms/author.py:176 mini_fiction/forms/register.py:28
+#: mini_fiction/forms/author.py:148 mini_fiction/forms/register.py:28
 #: mini_fiction/forms/register.py:65
 msgid "Passwords do not match"
 msgstr "Пароли не совпадают"
@@ -639,10 +648,12 @@ msgid "Length of list should be {constraint}, it is {0}"
 msgstr "Длина списка должна быть {constraint}, а не {0}"
 
 #: mini_fiction/validation/__init__.py:43
+#: mini_fiction/validation/__init__.py:175
 msgid "Min length is {constraint}"
 msgstr "Минимальная длина {constraint}"
 
 #: mini_fiction/validation/__init__.py:44
+#: mini_fiction/validation/__init__.py:167
 msgid "Max length is {constraint}"
 msgstr "Максимальная длина {constraint}"
 
@@ -738,23 +749,23 @@ msgstr "Регистрация закрыта"
 msgid "Registration in library"
 msgstr "Регистрация в библиотеке"
 
-#: mini_fiction/views/author.py:33
+#: mini_fiction/views/author.py:38
 msgid "My cabinet"
 msgstr "Мой кабинет"
 
-#: mini_fiction/views/author.py:41
+#: mini_fiction/views/author.py:46
 msgid "Author: {author}"
 msgstr "Автор: {author}"
 
-#: mini_fiction/views/author.py:79
+#: mini_fiction/views/author.py:84
 msgid "Profile settings"
 msgstr "Настройки профиля"
 
-#: mini_fiction/views/author.py:94
+#: mini_fiction/views/author.py:99
 msgid "Old password is incorrect"
 msgstr "Старый пароль неверный"
 
-#: mini_fiction/views/author.py:112
+#: mini_fiction/views/author.py:121
 msgid "Password is incorrect"
 msgstr "Неверный пароль"
 

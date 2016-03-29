@@ -41,11 +41,6 @@ class Author(db.Entity, UserMixin):
     date_joined = orm.Required(datetime, 6, default=datetime.utcnow)
 
     bio = orm.Optional(orm.LongStr)
-    jabber = orm.Optional(str, 75)
-    skype = orm.Optional(str, 256)
-    tabun = orm.Optional(str, 256)
-    forum = orm.Optional(str, 200)
-    vk = orm.Optional(str, 200)
     excluded_categories = orm.Optional(str, 200)  # TODO: use it on index page
     detail_view = orm.Required(bool, default=False)
     nsfw = orm.Required(bool, default=False)
@@ -54,6 +49,7 @@ class Author(db.Entity, UserMixin):
 
     registration_profile = orm.Optional('RegistrationProfile')
     password_reset_profiles = orm.Set('PasswordResetProfile')
+    contacts = orm.Set('Contact')
     coauthorstories = orm.Set('CoAuthorsStory')
     coauthorseries = orm.Set('CoAuthorsSeries')
     beta_reading = orm.Set('BetaReading')
@@ -103,6 +99,13 @@ class PasswordResetProfile(db.Entity):
     activation_key = orm.Required(str, 40, unique=True)
     user = orm.Required(Author)
     activated = orm.Required(bool, default=False)
+
+
+class Contact(db.Entity):
+    """ Модель контакта пользователя """
+    author = orm.Required(Author)
+    name = orm.Required(str, 64)
+    value = orm.Required(str, 255)
 
 
 class CharacterGroup(db.Entity):

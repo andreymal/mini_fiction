@@ -22,7 +22,7 @@ class Local(Development):
     # ERROR_EMAIL_FROM = 'minifiction@example.org'
 
     EMAIL_PORT = 1025
-    DEFAULT_FROM_EMAIL = 'minifiction@andreymal.org'
+    DEFAULT_FROM_EMAIL = 'minifiction@example.org'
 
     RECAPTCHA_PUBLIC_KEY = '...'
     RECAPTCHA_PRIVATE_KEY = '...'
@@ -35,3 +35,7 @@ class Local(Development):
 
     # SPHINX_CONFIG = dict(Development.SPHINX_CONFIG)
     # SPHINX_CONFIG['connection_params'] = {'host': '127.0.0.1', 'port': 9306, 'charset': 'utf8'}
+
+    # SPHINX_ROOT = '/path/to/directory/sphinx'
+    # SPHINX_SEARCHD = dict(Development.SPHINX_SEARCHD)
+    # SPHINX_SEARCHD['listen'] = '0.0.0.0:9306:mysql41'

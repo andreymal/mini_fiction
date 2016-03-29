@@ -36,6 +36,12 @@ def initsphinx():
 
 
 @manager.command
+def sphinxconf():
+    from mini_fiction.management.commands.sphinxconf import sphinxconf as cmd
+    cmd()
+
+
+@manager.command
 def collectstatic():
     from mini_fiction.management.commands.collectstatic import collectstatic as cmd
     orm.sql_debug(False)

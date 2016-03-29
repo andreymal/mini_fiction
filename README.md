@@ -119,28 +119,16 @@ class Local(Development):
 export MINIFICTION_SETTINGS = local_settings.Local
 ```
 
-* Создаём файл с локальными настройками Sphinx (и настраиваем по желанию):
-
-```
-cp local_sphinx.example.conf local_sphinx.conf
-```
-
-* В файле sphinxroot.txt указываем рабочий каталог Sphinx:
-
-```
-echo 'sphinx' > sphinxroot.txt
-```
-
-* И создаём его:
+* Создаём каталоги для работы Sphinx (вы можете переопределить путь настройкой `SPHINX_ROOT`):
 
 ```
 mkdir sphinx && mkdir sphinx/binlog
 ```
 
-* Теперь можно запустить Sphinx:
+* Теперь можно запустить Sphinx. (Примечание: `sphinxconf.sh` просто запускает `mini_fiction sphinxconf`, который генерирует настройки; не забудьте про включение виртуального окружения (при его наличии) и `MINIFICTION_SETTINGS`, иначе что-нибудь пойдёт не так.)
 
 ```
-searchd --config sphinxconf.py
+searchd --config sphinxconf.sh
 ```
 
 * Если база данных уже не пустая, а поиск ещё пустой, то загружаем данные в индексы Sphinx:

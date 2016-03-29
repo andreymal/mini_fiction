@@ -2,6 +2,7 @@ include LICENSE.txt
 include Makefile
 include *.md
 include *requirements.txt
+include mini_fiction/sphinx.conf
 recursive-exclude * __pycache__
 recursive-exclude * *.py[co]
 recursive-include mini_fiction/filters *

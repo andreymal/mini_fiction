@@ -90,6 +90,18 @@ class Config(object):
         },
     }
 
+    SPHINX_ROOT = os.path.join(os.getcwd(), 'sphinx')
+    SPHINX_SEARCHD = {
+        'listen': '/tmp/sphinx_fanfics.socket:mysql41',
+        'log': '{sphinxroot}/searchd.log',
+        'query_log': '{sphinxroot}/query.log',
+        'read_timeout': 5,
+        'max_children': 20,
+        'pid_file': '{sphinxroot}/sphinx.pid',
+        'binlog_path': '{sphinxroot}/binlog',
+    }
+    SPHINX_CUSTOM = ''
+
     COMMENTS_COUNT = {
         'page': 25,
         'main': 5,
@@ -167,7 +179,7 @@ class Config(object):
         # 'mini_fiction.downloads.txt.TXT_CP1251Download',
     )))
 
-    CELERY_ALWAYS_EAGER = True
+    CELERY_ALWAYS_EAGER = False
     CELERY_TASK_SERIALIZER = 'json'
     CELERY_ACCEPT_CONTENT = ['json', 'msgpack', 'yaml']
     CELERY_BROKER_URL = 'redis://localhost:6379/0'
@@ -193,4 +205,3 @@ class Development(Config):
     SPHINX_DISABLED = True
     STARS_MINIMUM_VOTES = 1
     PUBLISH_SIZE_LIMIT = 20
-    NOCAPTCHA = True

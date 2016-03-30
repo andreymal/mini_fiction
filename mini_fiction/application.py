@@ -11,6 +11,7 @@ from logging.handlers import SMTPHandler
 
 import jinja2
 from celery import Celery
+from werkzeug.urls import iri_to_uri
 from werkzeug.contrib import cache
 from werkzeug.contrib.fixers import ProxyFix
 from werkzeug.exceptions import HTTPException
@@ -174,14 +175,7 @@ def configure_ajax(app):
         if response.data and response.data.startswith(b'{') and response.content_type == 'text/html; charset=utf-8':
             response.content_type = 'application/json'
             # for github-fetch polyfill:
-            url = bytearray(request.url, 'utf-8')
-            esc_url = []
-            for c in url:
-                if c > 127:
-                    esc_url.append('%' + hex(c)[2:].upper())
-                else:
-                    esc_url.append(chr(c))
-            response.headers['X-Request-URL'] = ''.join(esc_url)
+            response.headers['X-Request-URL'] = iri_to_uri(request.url)
         elif response.status_code == 302:
             # Люблю разрабов js во всех смыслах
             response.data = flask_json.dumps({'page_content': {'redirect': response.headers.get('Location')}})
@@ -199,6 +193,8 @@ def configure_errorpages(app):
             html = render_template(template_modal, error=e, error_code=code)
             response = jsonify({'page_content': {'modal': True, 'content': html}})
             response.status_code = code
+            # for github-fetch polyfill:
+            response.headers['X-Request-URL'] = iri_to_uri(request.url)
             return response
         else:
             html = render_template(template, error=e, error_code=code)

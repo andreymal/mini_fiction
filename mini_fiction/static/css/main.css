@@ -1,6 +1,7 @@
 /* Body, base and containers */
 body {
     background-color: #dde;
+    word-wrap: break-word;
 }
 
 .container {

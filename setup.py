@@ -10,13 +10,16 @@ if sys.version_info < (3, 4):
 
 
 def read_requirements(f, links):
-    with open(f, 'r') as fp:
+    with open(f, 'r', encoding='utf-8-sig') as fp:
         reqs = fp.read().splitlines()
     result = []
     for line in reqs:
         if not line or line.startswith('#'):
             continue
         if line.startswith('git+'):
+            # Should be installed by pip
+            result.append(line.rsplit('#egg=', 1)[-1])
+        elif line.startswith('http://') or line.startswith('https://'):
             links.append(line)
             result.append(line.rsplit('#egg=', 1)[-1])
         else:
@@ -27,6 +30,7 @@ def read_requirements(f, links):
 deplinks = []
 requirements = read_requirements('requirements.txt', deplinks)
 optional_requirements = read_requirements('optional-requirements.txt', deplinks)
+test_requirements = read_requirements('test-requirements.txt', deplinks)
 
 
 import mini_fiction
@@ -54,6 +58,7 @@ setup(
     extras_require={
         'full': optional_requirements,
     },
+    setup_requires=['pytest-runner'],
     classifiers=[
         'Development Status :: 4 - Beta',
         'Framework :: Flask',
@@ -68,4 +73,6 @@ setup(
         'Topic :: Internet :: WWW/HTTP :: WSGI',
         'Topic :: Internet :: WWW/HTTP :: WSGI :: Application',
     ],
+    test_suite="tests",
+    tests_require=requirements + test_requirements,
 )

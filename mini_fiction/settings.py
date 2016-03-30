@@ -236,3 +236,20 @@ class Development(Config):
     SPHINX_DISABLED = True
     STARS_MINIMUM_VOTES = 1
     PUBLISH_SIZE_LIMIT = 20
+
+
+class Test(Config):
+    LOCALES = {'ru': 'Русский'}
+    DATABASE_ENGINE = 'sqlite'
+    DATABASE = {
+        'filename': os.path.join(os.getcwd(), 'testdb.sqlite3'),  # ':memory:' breaks with connection pool
+        'create_db': True,
+    }
+    DATABASE_CLEANER = {'provider': 'sqlite3'}  # TODO: MySQL and PostgreSQL
+    TESTING = True
+    SQL_DEBUG = False
+    MEMCACHE_SERVERS = None
+    CELERY_ALWAYS_EAGER = True
+    SPHINX_DISABLED = True  # TODO: test it
+    STARS_MINIMUM_VOTES = 3
+    PUBLISH_SIZE_LIMIT = 20

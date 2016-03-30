@@ -7,6 +7,9 @@ help:
 	@echo "clean-build - remove build artifacts"
 	@echo "clean-pyc - remove Python file artifacts"
 	@echo "lint - check style with pylint"
+	@echo "test - run tests quickly with the default Python with pytest"
+	@echo "test-all - run tests on every Python version with tox"
+	@echo "coverage - check code coverage quickly with the default Python and pytest"
 	@echo "release - package and upload a release"
 	@echo "release-sign - package and upload a release with PGP sign"
 	@echo "dist - package"
@@ -39,6 +42,17 @@ lint:
 	--lint-packages mini_fiction \
 	--lint-rcfile pylintrc
 
+test:
+	python setup.py test
+
+test-all:
+	tox
+
+coverage:
+	pip install -r test-requirements.txt
+	py.test --cov=mini_fiction --cov-report=html tests
+	ls -lh htmlcov/index.html
+
 release: clean
 	python setup.py sdist upload
 	pybabel compile -d mini_fiction/translations
@@ -59,6 +73,7 @@ install: clean
 	python setup.py install
 
 develop:
+	pip install -r requirements.txt
 	pip install -r dev-requirements.txt
 	python setup.py develop
 	pybabel compile -d mini_fiction/translations

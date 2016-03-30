@@ -5,6 +5,13 @@ __pycache__/
 # virtualenv
 /env/
 
+# Tests
+/.tox/
+/.cache/
+/htmlcov/
+/.coverage
+/ghostdriver.log
+
 # Distribution / packaging
 .Python
 build/

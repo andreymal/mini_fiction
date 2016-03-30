@@ -1,0 +1,6 @@
+factory-boy
+pytest-selenium
+pytest-flask
+pytest-cov
+pytest
+tox

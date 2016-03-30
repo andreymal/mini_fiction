@@ -22,6 +22,13 @@ def apply_for_app(app):
 
 @task
 @db_session
+def sendmail(to, subject, body, fro=None, config=None):
+    from mini_fiction.utils import misc
+    misc.sendmail(to, subject, body, fro=fro, config=config)
+
+
+@task
+@db_session
 def sphinx_update_story(story_id, update_fields):
     story = Story.get(id=story_id)
     if not story:

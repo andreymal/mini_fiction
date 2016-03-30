@@ -25,7 +25,7 @@ try:
 except ImportError:
     bcrypt = None
 
-from mini_fiction.utils.misc import sendmail
+from mini_fiction.utils.misc import call_after_request as later
 from mini_fiction.bl.utils import BaseBL
 from mini_fiction.validation import ValidationError, Validator
 from mini_fiction.validation.auth import REGISTRATION, LOGIN
@@ -272,7 +272,8 @@ class AuthorBL(BaseBL):
         )
         rp.flush()
 
-        sendmail(
+        later(
+            current_app.tasks['sendmail'].delay,
             data['email'],
             render_template('registration/activation_email_subject.txt'),
             render_template('registration/activation_email.txt', activation_key=rp.activation_key),
@@ -303,7 +304,8 @@ class AuthorBL(BaseBL):
         )
         prp.flush()
 
-        sendmail(
+        later(
+            current_app.tasks['sendmail'].delay,
             user.email,
             render_template('registration/password_reset_email_subject.txt'),
             render_template('registration/password_reset_email.txt', activation_key=prp.activation_key, user=user),

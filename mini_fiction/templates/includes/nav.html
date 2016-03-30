@@ -7,6 +7,8 @@
     matched=is_current_endpoint('staticpages.index', name='help')
 ) }}
 
+{%- set next_url = (url_for(request.endpoint, **request.view_args) if request.endpoint and request.view_args != None else None) -%}
+
 {%- if current_user.is_authenticated %}
     {{ nav_item(
         'Избранное',
@@ -14,7 +16,7 @@
         matched=is_current_endpoint('object_lists.favorites', user_id=current_user.id)
     ) }}
     {{ nav_item('Закладки', url_for('object_lists.bookmarks'), 'object_lists.bookmarks') }}
-    {{ nav_item('Выход', url_for('auth.logout'), right=True) }}
+    {{ nav_item('Выход', url_for('auth.logout', next=next_url), right=True) }}
     {{ nav_item(
         'Профиль',
         url_for('author.info', user_id=current_user.id),
@@ -42,7 +44,9 @@
     {{ hook('nav') }}
 
     <li class="right">
-        <form class="login-form form-inline" action="{{ url_for('auth.login') }}" method="POST" enctype="multipart/form-data">
+        <form class="login-form form-inline" action="
+                {{- url_for('auth.login', next=next_url) -}}
+            " method="POST" enctype="multipart/form-data">
             <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
                 <input id="id_username" type="text" name="username" placeholder="Логин" class="input-small" maxlength="30">
                 <input type="password" name="password" id="id_password" placeholder="Пароль" class="input-small">

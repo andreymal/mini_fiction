@@ -127,4 +127,7 @@ def password_reset_complete():
 @db_session
 def logout():
     logout_user()
-    return redirect(url_for('index.index'))
+    next_url = request.args.get('next')
+    if not next_url or len(next_url) < 2 or next_url[0] != '/' or next_url.startswith('//'):
+        next_url = url_for('index.index')
+    return redirect(next_url)

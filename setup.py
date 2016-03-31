@@ -32,6 +32,9 @@ requirements = read_requirements('requirements.txt', deplinks)
 optional_requirements = read_requirements('optional-requirements.txt', deplinks)
 test_requirements = read_requirements('test-requirements.txt', deplinks)
 
+with open('README.rst', 'r', encoding='utf-8-sig') as rfp:
+    desc = rfp.read()
+
 
 import mini_fiction
 
@@ -40,6 +43,7 @@ setup(
     name='mini_fiction',
     version=mini_fiction.__version__,
     description='CMS for fanfics',
+    long_description=desc,
     author='andreymal',
     author_email='andriyano-31@mail.ru',
     license='GPLv3',

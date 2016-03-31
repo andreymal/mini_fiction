@@ -2,7 +2,11 @@
 mini_fiction
 ============
 
-Library CMS for fanfics. Currently in development.
+.. image:: https://api.travis-ci.org/andreymal/mini_fiction.png
+    :target: https://travis-ci.org/andreymal/mini_fiction
+    :alt: Build Status
+
+Library CMS on Python for fanfics. Currently in development.
 
 Short feature list: fanfics with genres, characters and events; comments with trees;
 search (by Sphinx); user profiles with contacts; moderation of fanfics and comments;

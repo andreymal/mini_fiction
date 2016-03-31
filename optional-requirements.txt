@@ -1,2 +1,4 @@
 bcrypt
+scrypt
 mysqlclient
+Pillow

@@ -9,29 +9,15 @@ import random
 import string
 from io import BytesIO
 from datetime import datetime, timedelta
-from base64 import b64decode, b64encode
 
 from flask import current_app, url_for, render_template
 from flask_babel import lazy_gettext
-from werkzeug.security import safe_str_cmp
 
-try:
-    import scrypt
-except ImportError:
-    scrypt = None
-
-try:
-    import bcrypt
-except ImportError:
-    bcrypt = None
-
+from mini_fiction import hashers
 from mini_fiction.utils.misc import call_after_request as later
 from mini_fiction.bl.utils import BaseBL
 from mini_fiction.validation import ValidationError, Validator
 from mini_fiction.validation.auth import REGISTRATION, LOGIN
-
-if not bcrypt and not scrypt:
-    raise ImportError('Cannot import bcrypt or scrypt')
 
 
 __all__ = ['AuthorBL']
@@ -132,7 +118,7 @@ class AuthorBL(BaseBL):
 
         if data.get('delete_avatar'):
             self.delete_avatar()
-        elif data.get('avatar'):
+        elif current_app.config['AVATARS_UPLOADING'] and data.get('avatar'):
             try:
                 import Image
             except ImportError:
@@ -157,21 +143,28 @@ class AuthorBL(BaseBL):
 
         root = os.path.join(current_app.config['MEDIA_ROOT'])
 
-        path = os.path.join(root, user.avatar_small)
-        if os.path.isfile(path):
-            os.remove(path)
-        path = os.path.join(root, user.avatar_medium)
-        if os.path.isfile(path):
-            os.remove(path)
-        path = os.path.join(root, user.avatar_large)
-        if os.path.isfile(path):
-            os.remove(path)
+        if user.avatar_small:
+            path = os.path.join(root, user.avatar_small)
+            if os.path.isfile(path):
+                os.remove(path)
+            user.avatar_small = ''
 
-        user.avatar_small = ''
-        user.avatar_medium = ''
-        user.avatar_large = ''
+        if user.avatar_medium:
+            path = os.path.join(root, user.avatar_medium)
+            if os.path.isfile(path):
+                os.remove(path)
+            user.avatar_medium = ''
+
+        if user.avatar_large:
+            path = os.path.join(root, user.avatar_large)
+            if os.path.isfile(path):
+                os.remove(path)
+            user.avatar_large = ''
 
     def validate_and_set_avatar(self, image, image_data=None):
+        if not current_app.config['AVATARS_UPLOADING']:
+            raise ValidationError({'avatar': ['Avatar uploading is disabled']})
+
         try:
             import Image
         except ImportError:
@@ -365,28 +358,14 @@ class AuthorBL(BaseBL):
         if not data:
             return False
 
-        if data.startswith('$scrypt$'):
-            if not scrypt:
-                raise NotImplementedError('scrypt is not available')
-            try:
-                b64_salt, Nexp, r, p, keylen, h = data.split('$')[2:]
-                Nexp = int(Nexp, 10)
-                r = int(r, 10)
-                p = int(p, 10)
-                keylen = int(keylen, 10)
-            except:
-                raise ValueError('Invalid hash format')
-            return safe_str_cmp(h, self._generate_password_hash(password, b64_salt, Nexp, r, p, keylen))
+        if data.startswith('$pbkdf2$'):
+            return hashers.pbkdf2_check(data.split('$', 2)[2], password)
+
+        elif data.startswith('$scrypt$'):
+            return hashers.scrypt_check(data.split('$', 2)[2], password)
 
         elif data.startswith('$bcrypt$'):
-            if not bcrypt:
-                raise NotImplementedError('bcrypt is not available')
-            try:
-                encoded = data.split('$', 2)[2].encode('utf-8')
-                encoded2 = bcrypt.hashpw(password.encode('utf-8'), encoded)
-                return safe_str_cmp(encoded, encoded2)
-            except:
-                raise ValueError('Invalid hash format')
+            return hashers.bcrypt_check(data.split('$', 2)[2], password)
 
         else:
             raise NotImplementedError('Unknown algorithm')
@@ -409,27 +388,17 @@ class AuthorBL(BaseBL):
             user.password = ''
             return
 
-        if scrypt is not None and current_app.config['PASSWORD_HASHER'] == 'scrypt':
-            b64_salt = b64encode(os.urandom(32)).decode('ascii')
-            args = {'b64_salt': b64_salt, 'Nexp': 14, 'r': 8, 'p': 1, 'keylen': 64}
-            h = self._generate_password_hash(password, **args)
-            user.password = '$scrypt${b64_salt}${Nexp}${r}${p}${keylen}${h}'.format(h=h, **args)
+        if current_app.config['PASSWORD_HASHER'] == 'pbkdf2':
+            user.password = '$pbkdf2$' + hashers.pbkdf2_encode(password)  # $pbkdf2$pbkdf2_sha256$50000$...
 
-        elif bcrypt is not None and current_app.config['PASSWORD_HASHER'] == 'bcrypt':
-            salt = bcrypt.gensalt()
-            encoded = bcrypt.hashpw(password.encode('utf-8'), salt)
-            user.password = '$bcrypt$' + encoded.decode('utf-8', 'ascii')
+        elif current_app.config['PASSWORD_HASHER'] == 'scrypt':
+            user.password = '$scrypt$' + hashers.scrypt_encode(password)
+
+        elif current_app.config['PASSWORD_HASHER'] == 'bcrypt':
+            user.password = '$bcrypt$' + hashers.bcrypt_encode(password)
 
         else:
             raise NotImplementedError('Cannot use current password hasher')
-
-    def _generate_password_hash(self, password, b64_salt, Nexp=14, r=8, p=1, keylen=64):
-        h = scrypt.hash(
-            password.encode('utf-8'),
-            b64decode(b64_salt),
-            2 << Nexp, r, p, keylen
-        )
-        return b64encode(h).decode('ascii')
 
     def is_password_good(self, password, extra=()):
         if len(password) < 6:

@@ -14,6 +14,10 @@
 
         {% if saved %}<div class="alert-mini green">{{ _('Saved!') }}</div>{% endif %}
 
+        {% if config['DEBUG'] and current_user.is_superuser %}
+            <div class="password-hash">{{ author.password }}</div><br/>
+        {% endif %}
+
         <form class="form-horizontal" method="POST" enctype="multipart/form-data">
         {{ form_fields(form) }}
         <div class="controls">

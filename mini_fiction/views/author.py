@@ -83,6 +83,9 @@ def edit():
     author = current_user._get_current_object()
     data = {'page_title': gettext('Profile settings'), 'user': author}
 
+    has_avatar = bool(author.avatar_small or author.avatar_medium or author.avatar_large)
+    avatar_uploading = bool(current_app.config['AVATARS_UPLOADING'])
+
     profile_form = None
     email_form = None
     password_form = None
@@ -106,6 +109,11 @@ def edit():
 
         if 'save_profile' in request.form:
             profile_form = AuthorEditProfileForm()
+            if not has_avatar:
+                del profile_form.delete_avatar
+            if not avatar_uploading:
+                del profile_form.avatar
+
             if profile_form.validate_on_submit():
                 try:
                     author.bl.update(profile_form.data)
@@ -138,6 +146,10 @@ def edit():
                 for c in contacts
             ] + [{'name': '', 'value': ''}]
         })
+        if not has_avatar:
+            del profile_form.delete_avatar
+        if not avatar_uploading:
+            del profile_form.avatar
     if not email_form:
         email_form = AuthorEditEmailForm(formdata=None, data={'email': author.email})
     if not password_form:

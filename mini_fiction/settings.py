@@ -55,7 +55,7 @@ class Config(object):
     ]
     PONYORM_RECORD_QUERIES = False
 
-    PASSWORD_HASHER = 'scrypt'  # or 'bcrypt'
+    PASSWORD_HASHER = 'pbkdf2'  # or 'bcrypt' or 'scrypt'
 
     SITE_URL = 'http://localhost:5000'
     SITE_NAME = {
@@ -137,7 +137,7 @@ class Config(object):
     CHECK_PASSWORDS_SECURITY = True
 
     REGISTRATION_OPEN = True
-    LOAD_TABUN_AVATARS = True
+    AVATARS_UPLOADING = False
 
     ALLOWED_TAGS = [
         'b', 'i', 'strong', 'em', 's', 'u',

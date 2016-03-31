@@ -38,44 +38,44 @@ clean-translations:
 	rm -f mini_fiction/translations/*/LC_MESSAGES/*.mo
 
 lint:
-	python setup.py lint \
+	python3 setup.py lint \
 	--lint-packages mini_fiction \
 	--lint-rcfile pylintrc
 
 test:
-	python setup.py test
+	python3 setup.py test
 
 test-all:
 	tox
 
 coverage:
-	pip install -r test-requirements.txt
+	pip3 install -r test-requirements.txt
 	py.test --cov=mini_fiction --cov-report=html tests
 	ls -lh htmlcov/index.html
 
 release: clean
-	python setup.py sdist upload
+	python3 setup.py sdist upload
 	pybabel compile -d mini_fiction/translations
-	python setup.py bdist_wheel upload
+	python3 setup.py bdist_wheel upload
 
 release-sign: clean
-	python setup.py sdist upload --sign
+	python3 setup.py sdist upload --sign
 	pybabel compile -d mini_fiction/translations
-	python setup.py bdist_wheel upload --sign
+	python3 setup.py bdist_wheel upload --sign
 
 dist: clean
-	python setup.py sdist
+	python3 setup.py sdist
 	pybabel compile -d mini_fiction/translations
-	python setup.py bdist_wheel
+	python3 setup.py bdist_wheel
 	ls -lh dist
 
 install: clean
-	python setup.py install
+	python3 setup.py install
 
 develop:
-	pip install -r requirements.txt
-	pip install -r dev-requirements.txt
-	python setup.py develop
+	pip3 install -r requirements.txt
+	pip3 install -r dev-requirements.txt
+	python3 setup.py develop
 	pybabel compile -d mini_fiction/translations
 
 babel-extract:

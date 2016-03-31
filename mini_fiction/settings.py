@@ -99,6 +99,7 @@ class Config(object):
         'max_children': 20,
         'pid_file': '{sphinxroot}/sphinx.pid',
         'binlog_path': '{sphinxroot}/binlog',
+        'workers': 'threads',
     }
     SPHINX_CUSTOM = ''
 

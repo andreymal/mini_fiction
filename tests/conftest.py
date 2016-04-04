@@ -1,6 +1,8 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
+import time
+
 import pytest
 from pony.orm import db_session
 
@@ -35,6 +37,16 @@ def selenium(selenium):
 def factories():
     import factories as factories_module
     return factories_module
+
+
+@pytest.fixture
+def wait_ajax(selenium):
+    def wait():
+        i = 0
+        while i < 20 and selenium.execute_script('return window.core && window.core.state.current !== null;'):
+            time.sleep(0.15)
+            i += 1
+    return wait
 
 
 @pytest.yield_fixture(scope="function", autouse=True)

@@ -270,10 +270,10 @@ ul.nav-main-profile { /* TODO: refactor */
 }
 
 .nav-user-avatar {
-    width: 40px;
-    height: 40px;
+    width: 30px;
+    height: 30px;
     display: inline-block;
-    margin-left: 10px;
+    margin: 5px;
 }
 
 .nav-profile-menu-content {

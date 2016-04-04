@@ -1,57 +1,65 @@
 {%- from 'macro.html' import nav_item -%}
-{{ nav_item('Главная', url_for('index.index'), 'index.index') }}
-{{ nav_item('Поиск', url_for('search.main'), 'search.') }}
-{{ nav_item(
-    'Справка',
-    url_for('staticpages.index', name='help'),
-    matched=is_current_endpoint('staticpages.index', name='help')
-) }}
+{%- set next_url = (url_for(request.endpoint, **request.view_args) if request.endpoint and not request.endpoint.startswith('auth.') and request.view_args != None else None) -%}
 
-{%- set next_url = (url_for(request.endpoint, **request.view_args) if request.endpoint and request.view_args != None else None) -%}
+<div id="mobile-menu-btn" class="nav-icon mobile-menu-btn"></div>
 
 {%- if current_user.is_authenticated %}
-    {{ nav_item(
-        'Избранное',
-        url_for('object_lists.favorites', user_id=current_user.id),
-        matched=is_current_endpoint('object_lists.favorites', user_id=current_user.id)
-    ) }}
-    {{ nav_item('Закладки', url_for('object_lists.bookmarks'), 'object_lists.bookmarks') }}
-    {{ nav_item('Выход', url_for('auth.logout', next=next_url), right=True) }}
-    {{ nav_item(
-        'Профиль',
-        url_for('author.info', user_id=current_user.id),
-        matched=is_current_endpoint('author.info', user_id=current_user.id),
-        right=True
-    ) }}
-    {{ nav_item(
-        'Кабинет автора',
-        url_for('author.info'),
-        matched=is_current_endpoint('author.info', user_id=None),
-        right=True
-    ) }}
-    {{ nav_item('Добавить рассказ', url_for('story.add'), 'story.add', right=True) }}
-
-    {% if current_user.is_staff %}
-        {{ nav_item('Новые ({})'.format(submitted_stories_count()), url_for('object_lists.submitted'), 'object_lists.submitted', right=True) }}
-    {% endif %}
-
-    {{ hook('nav') }}
-{%- else %}
+<div id="nav-main-profile" class="nav-main-profile">
+    <div class="nav-icon nav-icon-bell" title="{{ _('Notifications') }}">
+        <a id="nav-icon-bell" class="nav-icon-bell-link" href="{{ url_for('notifications.index') }}" data-ajax="{{ url_for('notifications.index', popup='1') }}"></a>
+        <span class="new-count" style="display: none"></span>
+        <div class="bell-popup" id="bell-popup" style="display: none;">
+            <div class="bell-popup-content" id="bell-popup-content">test</div>
+        </div>
+    </div>
+    <a href="{{ url_for('story.add') }}" class="nav-icon nav-icon-add" title="{{ _('Add story') }}"></a>
+    <div class="nav-profile-menu">
+    <div class="nav-profile-menu-header" id="nav-profile-menu-header">
+    <span class="nav-username">{{ current_user.username }}</span>
+    <img src="{{ current_user.bl.get_avatar_url() }}" alt="" class="nav-user-avatar" />
+    </div>
+    <ul class="nav-profile-menu-content nav-items" id="nav-profile-menu-content">
+        {{ nav_item(
+            _('Favorites'),
+            url_for('object_lists.favorites', user_id=current_user.id),
+            matched=is_current_endpoint('object_lists.favorites', user_id=current_user.id)
+        ) }}
+        {{ nav_item(_('Bookmarks'), url_for('object_lists.bookmarks'), 'object_lists.bookmarks') }}{{ nav_item(
+            _('Profile'),
+            url_for('author.info', user_id=current_user.id),
+            matched=is_current_endpoint('author.info', user_id=current_user.id),
+        ) }}
+        {{ nav_item(
+            _('My cabinet'),
+            url_for('author.info'),
+            matched=is_current_endpoint('author.info', user_id=None),
+        ) }}
+        {% if current_user.is_staff %}
+            {{ nav_item(
+                _('Administration'),
+                url_for('admin_index.index'),
+                'admin_index.index',
+            ) }}
+        {% endif %}
+        {{ nav_item(_('Log out'), url_for('auth.logout', next=next_url)) }}
+    </ul>
+    </div><!-- /nav-profile-menu -->
+</div>
+{%- else -%}
+<ul id="nav-main-profile" class="nav-items nav-main-profile">
+    {{ nav_item(_('Log in'), url_for('auth.login', next=next_url), 'auth.login') }}
     {%- if config.REGISTRATION_OPEN %}
-        {{ nav_item('Регистрация', url_for('auth.registration'), 'auth.registration') }}
+        {{ nav_item(_('Register'), url_for('auth.registration'), 'auth.registration') }}
     {% endif %}
+</ul>
+{%- endif -%}
 
-    {{ hook('nav') }}
-
-    <li class="right">
-        <form class="login-form form-inline" action="
-                {{- url_for('auth.login', next=next_url) -}}
-            " method="POST" enctype="multipart/form-data">
-            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
-                <input id="id_username" type="text" name="username" placeholder="Логин" class="input-small" maxlength="30">
-                <input type="password" name="password" id="id_password" placeholder="Пароль" class="input-small">
-                <button class="btn" type="submit">Войти</button>
-                <a href="{{ url_for('auth.password_reset') }}">Забыл<br/> пароль</a>
-        </form>
-    </li>
-{% endif %}
+<ul id="nav-main-links" class="nav-items nav-main-links">
+    {{ nav_item(_('Index'), url_for('index.index'), 'index.index') }}
+    {{ nav_item(_('Search'), url_for('search.main'), 'search.') }}
+    {{ nav_item(
+        'Справка',
+        url_for('staticpages.index', name='help'),
+        matched=is_current_endpoint('staticpages.index', name='help')
+    ) }}
+</ul>

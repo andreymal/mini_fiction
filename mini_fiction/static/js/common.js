@@ -1,6 +1,8 @@
 'use strict';
 
 core.define('common', {
+    menuState: false,
+
     init: function() {
         // Кнопка закрытия объявления, если таковое присутствует
         var btn = document.getElementById('close-shown-notice');
@@ -18,6 +20,28 @@ core.define('common', {
         this.markitupFor(content);
         this.buttonsFor(content);
         this.bootstrapFor(content);
+
+        // Переключение мобильного меню
+        document.getElementById('mobile-menu-btn').addEventListener('click', function(event) {
+            var l = document.getElementById('nav-main-links');
+            l.classList.toggle('shown');
+            core.common.menuState = l.classList.contains('shown');
+            event.preventDefault();
+            return false;
+        });
+
+        if (this.menuState) {
+            document.getElementById('nav-main-links').classList.add('shown');
+        }
+
+        // Переключение меню профиля
+        document.getElementById('nav-profile-menu-header').addEventListener('click', function(event) {
+            var l = document.getElementById('nav-profile-menu-content');
+            l.classList.toggle('shown');
+            core.common.profileMenuState = l.classList.contains('shown');
+            event.preventDefault();
+            return false;
+        });
     },
 
     loadModal: function(modalElement) {

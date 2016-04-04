@@ -122,6 +122,7 @@ def configure_error_handlers(app):
 def configure_views(app):
     from mini_fiction.views import index, auth, story, chapter, search, author, stream, object_lists
     from mini_fiction.views import story_comment, feeds, staticpages, notices, notice_comment
+    from mini_fiction.views import notifications
     from mini_fiction.views import misc
     app.register_blueprint(index.bp)
     app.register_blueprint(auth.bp, url_prefix='/accounts')
@@ -137,6 +138,7 @@ def configure_views(app):
     app.register_blueprint(staticpages.bp)
     app.register_blueprint(notices.bp, url_prefix='/notice')
     app.register_blueprint(notice_comment.bp)
+    app.register_blueprint(notifications.bp, url_prefix='/notifications')
 
     app.add_url_rule('/media/<path:filename>', 'media', misc.media)
     if app.config['LOCALSTATIC_ROOT']:

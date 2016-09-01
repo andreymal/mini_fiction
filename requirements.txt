@@ -3,7 +3,7 @@ Flask-Login
 Flask-Script
 Flask-Babel
 Flask
-git+https://github.com/nicolaiarocci/cerberus.git#egg=cerberus
+Cerberus>=1.0.1,<1.1
 unidecode
 python3-memcached
 redis

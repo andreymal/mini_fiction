@@ -18,7 +18,7 @@ class ValidationError(ValueError):
     def __str__(self):
         msgs = []
         for field, errors in self.errors.items():
-            error_msg = ', '.join(str(x) for x in errors) if isinstance(errors, list) else str(errors)
+            error_msg = ', '.join(str(x) for x in errors)
             msgs.append('{}: {}'.format(field, error_msg))
         return '; '.join(msgs)
 
@@ -85,16 +85,6 @@ class CustomErrorHandler(cerberus.errors.BasicErrorHandler):
             return super().format_message(field, error)
         else:
             return tmp
-
-    def insert_error(self, path, node):
-        if len(path) == 1:
-            field = path[0]
-            if field in self.tree and node not in self.tree[field]:
-                self.tree[field].append(node)
-            else:
-                self.tree[field] = [node]
-        else:
-            super().insert_error(path, node)
 
 
 class Validator(cerberus.Validator):

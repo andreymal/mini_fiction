@@ -19,7 +19,7 @@ from flask import Flask, current_app, request, g, jsonify
 from flask import json as flask_json
 import flask_babel
 from flask_login import LoginManager
-from flask_wtf.csrf import CsrfProtect
+from flask_wtf.csrf import CSRFProtect
 
 from mini_fiction import models  # pylint: disable=unused-import
 from mini_fiction import database, tasks
@@ -84,7 +84,7 @@ def configure_cache(app):
 
 
 def configure_forms(app):
-    app.csrf = CsrfProtect(app)
+    app.csrf = CSRFProtect(app)
 
 
 def configure_users(app):

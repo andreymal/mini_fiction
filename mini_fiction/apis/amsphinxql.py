@@ -47,18 +47,20 @@ class SphinxConnection(object):
             f, action = f.rsplit('__', 1)
 
             if action == 'in':
-                q, l = self.prepare_list(x)
-                if sql:
-                    sql += ' and '
-                sql += '`%s` in %s' % (f, q)
-                args.extend(l)
+                if x:
+                    q, l = self.prepare_list(x)
+                    if sql:
+                        sql += ' and '
+                    sql += '`%s` in %s' % (f, q)
+                    args.extend(l)
 
             elif action == 'not_in':
-                q, l = self.prepare_list(x)
-                if sql:
-                    sql += ' and '
-                sql += '`%s` not in %s' % (f, q)
-                args.extend(l)
+                if x:
+                    q, l = self.prepare_list(x)
+                    if sql:
+                        sql += ' and '
+                    sql += '`%s` not in %s' % (f, q)
+                    args.extend(l)
 
             elif action in self.actions_list:
                 if sql:

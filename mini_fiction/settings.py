@@ -82,11 +82,10 @@ class Config(object):
         'limit': 10,
         'select_options': {
             'ranker': 'sph04',
-            'cutoff': 50000,
             'max_matches': 1000,
             'retry_count': 5,
             'retry_delay': 1,
-            'max_query_time': 10,
+            'max_query_time': 10000,  # in milliseconds
         },
     }
 

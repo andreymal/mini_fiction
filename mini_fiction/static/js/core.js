@@ -2,48 +2,36 @@
 
 
 var core = {
-    modulesList: [],
-    unloadQueue: [],
-    unloadModalQueue: [],
     csrftoken: null,
     nav: null,
     content: null,
 
     modalShow: false,
     modalClosing: false,
+    modalPageLoaded: false,
     modalElement: null,
     modalBackgr: null,
     loadingIcon: null,
     notifications: null,
 
-    loaded: false,
-    loadedModal: false,
+    initCallbacks: [],
+    loadCallbacks: [],
+    unloadCallbacks: [],
+    loadModalCallbacks: [],
+    unloadModalCallbacks: [],
 
-    state: {
-        enabled: window.history !== undefined && window.history.pushState !== undefined,
-        current: null, // информация о текущем ajax-запросе
-        lastId: 0, // id последнего ajax-запроса
-        modal: false, // является ли текущая «страница» модальным окном
-        v: null,
-        initAt: null,
-    },
-
-    /*
-     * Подключение модуля
-     * (нужно в первую очередь для вызова у него unload/load при кликах по ссылкам)
-     */
-    define: function(name, module) {
-        if (this[name] !== undefined) {
-            throw new Error('Conflict');
-        }
-        this[name] = module;
-        this.modulesList.push(name);
-    },
+    started: false,
 
     /*
      * Инициализация всего этого дела
      */
     init: function() {
+        if (this.started) {
+            return;
+        }
+        this.started = true;
+
+        // Это вызывается напрямую из других модулей при ошибках fetch
         this.handleError = this.__handleError.bind(this);
 
         this.nav = document.getElementById('nav-main');
@@ -54,137 +42,68 @@ var core = {
         this.loadingIcon = document.getElementById('loading-icon');
         this.notifications = document.getElementById('notifications');
 
-        // прикручивание ajax всем ссылкам и формам; если не нравится, можно убрать
-        if (this.state.enabled) {
-            // document.body.addEventListener('click', this._linkClickEvent);
-            // Нативный listener выполняется раньше, чем jQuery live event в bootstrap,
-            // отчего ломаются переключалка вкладок в справке и спойлеры.
-            // Поэтому, пока он здесь присутствует, приходится тоже делать live event
-            $(document).on('click', 'a', this._linkClickEvent);
+        var i;
 
-            window.addEventListener('popstate', this._popstateEvent.bind(this));
-            if (window.FormData) {
-                window.addEventListener('submit', this._submitEvent.bind(this));
-            }
-
-            // Сохраняем заголовок в стеке истории
-            history.replaceState(this.buildHistoryState(), '', location.toString());
+        for (i = 0; i < this.initCallbacks.length; i++) {
+            this.initCallbacks[i]();
         }
+        this.initCallbacks = null;
 
-        for (var i = 0; i < this.modulesList.length; i++) {
-            var module = this[this.modulesList[i]];
-            if (module.hasOwnProperty('init')) {
-                try {
-                    module.init();
-                } catch (e) {
-                    console.error(e);
-                }
-            }
-        }
-
-        this.state.initAt = new Date().getTime();
-
-        this.load();
+        // Включение навигации через ajax
+        this.ajaxify();
 
         // Показываем предустановленное модальное окно
         if (this.modalElement.childNodes.length > 0) {
             this.modal(null, true, true);
         }
+
+        // Имитируем событие загрузки страницы, чтобы другие модули обработали страницу
+        var isModal = window.amajaxify && window.amajaxify.isModalNow();
+        var content = isModal ? this.modalElement : this.content;
+        for (i = 0; i < this.loadCallbacks.length; i++) {
+            this.loadCallbacks[i](content, isModal);
+        }
     },
 
-    /*
-     * Загрузка подключенных модулей после завершения загрузки DOM (в т.ч. через ajax)
-     */
-    load: function() {
-        if (this.loaded) {
-            return false;
-        }
-        for (var i = 0; i < this.modulesList.length; i++) {
-            var module = this[this.modulesList[i]];
-            if (module.hasOwnProperty('unload')) {
-                this.unloadQueue.push(module);
+    oninit: function(callback, noautostart) {
+        if (this.started) {
+            if (!noautostart) {
+                callback();
             }
-            if (module.hasOwnProperty('load')) {
-                try {
-                    module.load(this.content);
-                } catch (e) {
-                    console.error(e);
-                }
-            }
+            return;
         }
-        // $('#content .bootstrap').each(stuff.bootstrap); // TODO: в модуль
-        this.loaded = true;
-        return true;
+        this.initCallbacks.push(callback);
     },
 
-    /*
-     * Выгрузка подключенных модулей перед заменой содержимого страницы на полученное через ajax
-     */
-    unload: function() {
-        if (!this.loaded) {
-            return false;
+    onload: function(callback, noautostart) {
+        this.loadCallbacks.push(callback);
+        if (this.started && !noautostart) {
+            var isModal = window.amajaxify && window.amajaxify.isModalNow();
+            var content = isModal ? this.modalElement : this.content;
+            callback(content, isModal);
         }
-        for (var i = this.unloadQueue.length - 1; i >= 0; i--) {
-            try {
-                this.unloadQueue[i].unload(this.content);
-            } catch (e) {
-                console.error(e);
-            }
-        }
-        this.unloadQueue = [];
-        this.loaded = false;
-        return true;
     },
 
-    /*
-     * Загрузка подключенных модулей после завершения загрузки DOM модального окна
-     */
-    loadModal: function() {
-        if (this.loadedModal) {
-            return false;
-        }
-        for (var i = 0; i < this.modulesList.length; i++) {
-            var module = this[this.modulesList[i]];
-            if (module.hasOwnProperty('unloadModal')) {
-                this.unloadModalQueue.push(module);
-            }
-            if (module.hasOwnProperty('loadModal')) {
-                try {
-                    module.loadModal(this.modalElement);
-                } catch (e) {
-                    console.error(e);
-                }
-            }
-        }
-        this.loadedModal = true;
-        return true;
+    onunload: function(callback) {
+        this.unloadCallbacks.push(callback);
     },
 
-    /*
-     * Выгрузка подключенных модулей перед заменой содержимого или скрытия модального окна
-     */
-    unloadModal: function() {
-        if (!this.loadedModal) {
-            return false;
-        }
-        for (var i = this.unloadModalQueue.length - 1; i >= 0; i--) {
-            try {
-                this.unloadModalQueue[i].unloadModal(this.modalElement);
-            } catch (e) {
-                console.error(e);
-            }
-        }
-        this.unloadModalQueue = [];
-        this.loadedModal = false;
-        return true;
+    onloadModal: function(callback) {
+        this.loadModalCallbacks.push(callback);
     },
 
+    onunloadModal: function(callback) {
+        this.unloadModalCallbacks.push(callback);
+    },
+
+    /** Показывает уведомление с переданным текстом */
     notify: function(text) {
         var not = document.createElement('div');
         not.textContent = text;
         this.putNotification(not);
     },
 
+    /** Показывает уведомление-ошибку с переданным текстом */
     notifyError: function(text) {
         var not = document.createElement('div');
         not.classList.add('notice-error');
@@ -192,6 +111,7 @@ var core = {
         this.putNotification(not);
     },
 
+    /** Отображает переданный HTML-элемент как ошибку */
     putNotification: function(not) {
         not.classList.add('notification');
         not.classList.add('notice-hidden');
@@ -208,6 +128,7 @@ var core = {
         not.classList.remove('notice-hidden');
     },
 
+    /** Скрывает переданный HTML-элемент, который был ранее отображён как уведомление */
     popNotification: function(not) {
         if (not.parentNode !== this.notifications || not.classList.contains('notice-hidden')) {
             return false;
@@ -233,6 +154,8 @@ var core = {
     /*
      * Отображение модального окна.
      * При force отображает, даже если какое-то модальное окно уже есть: заменяет его содержимое.
+     * При norewrite не перезаписывает содержимое html-кодом из первого параметра; это позволяет
+     * отобразить предусатнволенную в HTML-коде всплывашку.
      * На location, ajax, history и прочее никак не влияет.
      */
     modal: function(html, force, norewrite) {
@@ -260,7 +183,7 @@ var core = {
      * На location, ajax, history и прочее никак не влияет.
      */
     modalHide: function() {
-        if (!this.modalShow) {
+        if (!this.modalShow || this.modalClosing) {
             return false;
         }
         this.modalClosing = true;
@@ -281,14 +204,14 @@ var core = {
 
     /*
      * Обработка клика на фон модального окна или его кнопок закрытия.
-     * Если оно было открыто через ajax при клике по ссылке (точнее, при вызове setContent),
+     * Если оно было открыто через amajaxify при клике по ссылке,
      * то выполняет history.back() и модальное окно закрывается уже событием popstate.
      * Иначе просто вызывает modalHide и на location, ajax, history и прочее никак не влияет.
      */
     _modalHideEvent: function(event) {
         event.stopImmediatePropagation();
         event.preventDefault();
-        if (this.state.modal) {
+        if (window.amajaxify && window.amajaxify.isModalNow()) {
             window.history.back();
             return false;
         }
@@ -296,175 +219,49 @@ var core = {
         return false;
     },
 
-    /*
-     * Сбор информации для пихания в history pushState/replaceState
-     */
-    buildHistoryState: function() {
-        return {
-            modal: this.state.modal,
-            title: document.head.getElementsByTagName('title')[0].innerHTML
-        };
+    ajaxify: function() {
+        var amajaxify = window.amajaxify;
+        if (!amajaxify) {
+            console.warn('amajaxify library is not found; AJAX is disabled');
+            return;
+        }
+
+        var initOk = amajaxify.init({
+            customFetch: core.ajax.fetch.bind(core.ajax),
+            withoutClickHandler: true,
+            allowScriptTags: true,
+            bindWithjQuery: true,
+            updateModalFunc: function(html) {
+                if (html !== null) {
+                    this.modal(html, true);
+                } else if (this.modalShow && !this.modalClosing) {
+                    this.modalHide();
+                }
+            }.bind(this),
+        });
+        if (!initOk) {
+            // maybe Wayback Machine
+            return;
+        }
+
+        core.utils.setLiveClickListenerFallback(amajaxify.linkClickHandler.bind(amajaxify));
+
+        document.addEventListener('amajaxify:load', this._ajaxLoadEvent.bind(this));
+        document.addEventListener('amajaxify:unload', this._ajaxUnloadEvent.bind(this));
+
+        document.addEventListener('amajaxify:error', this._ajaxErrorEvent.bind(this));
+
+        document.addEventListener('amajaxify:beginrequest', this._ajaxBeginEvent.bind(this));
+        document.addEventListener('amajaxify:endrequest', this._ajaxEndEvent.bind(this));
     },
 
-    /*
-     * Подгружает контент страницы по ajax со всеми необходимыми действиями:
-     * history.pushState, unload/load, вот это вот всё.
-     */
-    goto: function(method, link, body, options) {
-        if (this.state.current !== null) {
-            return false;
-            // TODO: сделать наоборот отмену предыдущего запроса
-        }
-        var current = {
-            options: options || {},
-            id: ++this.state.lastId,
-            response: null,
-            next: null,
-            request: [method, link]
-        };
-        this.state.current = current;
-        if (this.state.lastId === 32767) {
-            this.state.lastId = -32769;
-        }
-
-        var hash = null;
-        var f = link.indexOf('#');
-        if (f > 0) {
-            hash = link.substring(f + 1);
-            link = link.substring(0, f);
-        }
-        current.options.hash = hash;
-
-        this.loadingIcon.classList.remove('loader-hidden');
-        this.ajax.fetch(link, {method: method, body: body, redirect: 'error'})
-            .then(function(response) {
-                this.state.current.response = response;
-                return response.json();
-            }.bind(this))
-            .then(this._linkAjaxResponse.bind(this))
-            .catch(this._linkAjaxFailed.bind(this))
-            .then(this._linkAjaxFinished.bind(this));
-    },
-
-    /*
-     * Устанавливает контент страницы (обычно полученный по ajax методом goto).
-     * data является объектом с атрибутами modal (true/false), nav и content (код
-     * соответствующих блоков). При указанном link делает history.pushState.
-     */
-    setContent: function(data, link, options) {
-        options = options || {};
-
-        if (data.modal && data.modal_content) {
-            // modal_content для случая, когда надо загрузить окошко одновременно
-            // с загруженной страницей (например, предупреждение NSFW).
-            // А показывать два модальных окна одновременно нереально
-            throw new Error('Arguments conflict');
-        }
-
-        // Выгрузка модулей
-
-        // В любом случае нам выгружать модальное окно
-        if (this.state.modal) {
-            this.unloadModal();
-        }
-
-        // Если новый контент не для модального окна, то выгружаем модули, привязанные к контенту
-        if (!data.modal) {
-            this.unload();
-        }
-
-        if (!data.modal && this.state.modal) {
-            this.modalHide();
-        }
-
-        // innerHTML для &mdash; -> — и подобного
-        if (data.title) {
-            document.head.getElementsByTagName('title')[0].innerHTML = data.title;
-        }
-        if (data.modal) {
-            if (!this.state.modal) {
-                this.state.modal = true;
-            }
-            this.modal(data.content, true);
-        } else {
-            this.state.modal = false;
-            this.nav.innerHTML = data.nav;
-            this.content.innerHTML = data.content;
-        }
-
-        // Шаманим с адресной строкой
-        var state = this.buildHistoryState();
-        if (link !== undefined && !options.nopushstate) {
-            history.pushState(state, '', link);
-        } else {
-            // state сохранить в любом случае надо
-            history.replaceState(state, '', location.toString());
-        }
-        if (!options.noscroll && !data.modal && window.scrollY > 400) {
-            window.scrollTo(0, 0);
-        }
-        if (options.hash) {
-            // FIXME: может, как-то можно вызвать родное поведение браузера?
-            // (location.hash будет мусорить историю при options.nopushstate == true)
-            history.replaceState(state, '', '#' + options.hash);
-            var helem = document.getElementById(options.hash);
-            if (helem) {
-                helem.scrollIntoView();
-            }
-        }
-
-        if (data.modal_content) {
-            // На момент написания loadModal и unloadModal решено здесь не вызывать
-            // (если приспичит вызывать, то в init надо будет вызывать тоже)
-            this.modal(data.modal_content);
-        }
-
-        if (!data.modal) {
-            // Если новый контент не для модального окна, то загружаем модули, привязанные к контенту
-            this.load();
-        } else {
-            // Иначе — к модальному окну
-            this.loadModal();
-        }
-
-        // Костыль для того, что нам неподконтрольно (пока что)
-        if (window.grecaptcha) {
-            window.grecaptcha.reset();
-        }
-
-        // Не всё легко написать нормально — Flask-WTF RecaptchaField, например, вставляет <script>
-        this.enableScriptTags(this.content);
-    },
-
-    enableScriptTags: function(elem) {
-        var scripts = Array.prototype.slice.call(elem.getElementsByTagName('script'));
-        for (var i = 0; i < scripts.length; i++) {
-            var s = scripts[i];
-            var parent = s.parentNode || s.parentElement;
-            var next = s.nextElementSibling || null;
-            parent.removeChild(s);
-
-            var s2 = document.createElement('script');
-            if (s.src) {
-                s2.src = s.src;
-            }
-            if (s.type) {
-                s2.type = s.type;
-            }
-            s2.innerHTML = s.innerHTML;
-            if (next) {
-                parent.insertBefore(s2, next);
-            } else {
-                parent.appendChild(s2);
-            }
-        }
-    },
 
     /*
      * Общие для большинства запросов обработчики ответа
      */
     handleResponse: function(data, url) {
-        if (this.handleResponsePage(data, url)) {
+        if (data.page_content) {
+            window.amajaxify.handlePageData(url, data.page_content);
             return true;
         }
         if (!data.success) {
@@ -474,216 +271,85 @@ var core = {
         return false;
     },
 
-    handleResponsePage: function(data, url) {
-        if (!data.page_content) {
-            return false;
-        }
-        if (data.page_content.full_link) {
-            // Сервер нас просит открыть страницу без ajax
-            window.location = data.page_content.full_link;
-            return true;
-        }
-        if (data.page_content.redirect) {
-            if (this.state.current) {
-                this.state.current.next = data.page_content.redirect;
-            } else {
-                this.goto('GET', data.page_content.redirect);
-            }
-        } else {
-            if (data.page_content.csrftoken) {
-                this.ajax.setCsrfToken(data.page_content.csrftoken);
-            }
-            core.setContent(data.page_content, url);
-        }
-        return true;
-    },
-
     handleError: null, // см. init
 
     __handleError: function(exc) {
-        console.error('Fetch error with state', this.state.current);
+        console.error('Fetch error');
         console.error(exc);
         this.notifyError(exc.toString());
     },
 
-    /*
-     * Перехват кликов по любым ссылкам на странице
-     */
-    _linkClickEvent: function(event) {
-        if (event.isDefaultPrevented !== undefined && event.isDefaultPrevented()) {
-            // костыль (см. init)
-            return false;
-        }
-        if (!core.state.enabled || event.defaultPrevented) {
-            return;
-        }
-
-        // Ищем ссылку, по которой кликнули
-        var target = event.target || event.srcElement;
-        while (target && target.tagName.toLowerCase() != 'a' && target !== document.body) {
-            target = target.parentNode || parent.srcElement;
-        }
-        if (!target || target == document.body) {
-            return;
-        }
-
-        // Проверяем, что её можно обрабатывать
-        if (target.dataset.noajax == '1') {
-            return;
-        }
-
-        var href = target.href;
-        var host = (location.origin || (location.protocol + '//' + location.host));
-
-        // Если ссылка различается только якорем, то просто меняем его (браузер прокрутит всё сам)
-        var h = href.indexOf('#');
-        if (h > 0) {
-            var currentPage = location.toString();
-            if (currentPage.indexOf('#') > 0) {
-                currentPage = currentPage.substring(0, currentPage.indexOf('#'));
-            }
-            var hrefPage = href.substring(0, h);
-            if (currentPage == hrefPage) {
-                history.pushState(history.state, '', href.substring(h));
-                return;
-            }
-        }
-
-        // Проверяем, что она в пределах хоста
-        if (target.target || (href.indexOf(host + '/') !== 0 && href != host)) {
-            // Если другой хост или target="_blank", то браузер сделает всё сам
-            return;
-        }
-
-        // Всё норм, переходим
-        core.goto('GET', href);
-
-        event.stopImmediatePropagation();
-        event.preventDefault();
-        return false;
-    },
-
-    _linkAjaxResponse: function(data) {
-        if (!data.page_content) {
-            throw new Error('Incorrect server response');
-        }
-        if (data.page_content.full_link) {
-            // Сервер нас просит открыть страницу без ajax
-            window.location = data.page_content.full_link;
-            return;
-        }
-        if (data.page_content.redirect) {
-            this.state.current.next = data.page_content.redirect;
-            return;
-        }
-        if (data.page_content.csrftoken) {
-            this.ajax.setCsrfToken(data.page_content.csrftoken);
-        }
-
-        this._linkAjaxDisableIfNeeded(data);
-        this.setContent(data.page_content, this.state.current.response.url, this.state.current.options);
-    },
-
-    _linkAjaxDisableIfNeeded: function(data) {
-        // Если версия статики не совпадает с нашей, то пришло время обновлять страницу полностью
-        if (data.page_content.v) {
-            if (this.state.v !== null && this.state.v !== data.page_content.v) {
-                this.state.enabled = false;
-            } else if (this.state.v === null) {
-                this.state.v = data.page_content.v;
-            }
-        }
-
-        // Да и через часик обновить тоже не будет лишним
-        if (new Date().getTime() - this.state.initAt > 3600000) {
-            this.state.enabled = false;
-        }
-    },
-
-    _linkAjaxFailed: function(exc) {
-        this.handleError(exc);
-    },
-
-    _linkAjaxFinished: function() {
-        // Так как даже ES6 fetch не даёт перехватывать редиректы,
-        // бэкенд присылает нам редирект через json, и после завершения
-        // обработки запроса мы здесь сами редиректимся
-        var next = this.state.current.next;
-        this.state.current = null;
-        if (next) {
-            this.goto('GET', next);
+    // amajaxify utils
+    setLoading: function(isLoading) {
+        if (isLoading) {
+            this.loadingIcon.classList.remove('loader-hidden');
         } else {
             this.loadingIcon.classList.add('loader-hidden');
         }
     },
 
-    /*
-     * Обработка нажатия кнопок Назад/Вперёд браузера
-     */
-    _popstateEvent: function(event) {
-        if (this.state.modal && (!event.state || !event.state.modal)) {
-            // Если контент текущей страницы в модальном окне, а предыдущей/следующей
-            // не в модальном, то просто прячем окно и больше ничего не делаем
-            this.state.modal = false;
-            this.unloadModal();
-            this.modalHide();
-            if (event.state && event.state.title) {
-                document.head.getElementsByTagName('title')[0].innerHTML = event.state.title;
-            }
-            // FIXME: при нажатии «Вперёд» при модальном окне контент не совпадает с ссылкой,
-            // но без сохранения старого location не починить
-            return;
-        } else if (!this.state.modal) {
-            // Но прятать окна, не являющиеся страницами, в любом случае надо (NSFW-предупреждение, например)
-            this.modalHide();
+    _ajaxLoadEvent: function(event) {
+        var i;
+
+        if (event.detail.content.csrftoken) {
+            core.ajax.setCsrfToken(event.detail.content.csrftoken);
         }
-        // Здесь в принципе можно организовать кэширование, но нужно ли?
-        this.goto('GET', location.toString(), undefined, {nopushstate: true, noscroll: true});
+
+        if (event.detail.toModal) {
+            if (event.detail.content.modal_content) {
+                console.warn('modal_content is not available on modal page; look like backend bug');
+            }
+            this.modalPageLoaded = true;
+            for (i = 0; i < this.loadModalCallbacks.length; i++) {
+                this.loadModalCallbacks[i](this.modalElement);
+            }
+
+        } else {
+            if (event.detail.content.modal_content) {
+                this.modal(event.detail.content.modal_content);
+            }
+
+            for (i = 0; i < this.loadCallbacks.length; i++) {
+                this.loadCallbacks[i](this.content);
+            }
+        }
     },
 
-    /*
-     * Перехват отправки любой формы
-     */
-    _submitEvent: function(event) {
-        var form = event.target || event.srcElement;
-        if (form.dataset.noajax == '1' || !this.state.enabled || event.defaultPrevented) {
-            return;
-        }
-
-        var href = form.action || location.toString();
-        var host = (location.origin || (location.protocol + '//' + location.host)) + '/';
-        if (href.indexOf(host) !== 0) {
-            return;
-        }
-
-        var formData = new FormData(form);
-        // Нам не предоставили способа получить нажатую кнопочку отправки, костыляем
-        // FIXME: для <input form="formid" /> за пределами формы не работает, разумеется
-        var submitButton = form.querySelector('input[type="submit"]:focus, button[type="submit"]:focus');
-        // Если форму отправляют клавишей Enter, то нужно брать первую попавшуюся кнопку
-        submitButton = submitButton || form.querySelector('input[type="submit"], button[type="submit"]');
-
-        if (submitButton && submitButton.name) {
-            formData.append(submitButton.name, submitButton.value || '');
-        }
-
-        var method = (form.method || 'GET').toUpperCase();
-        if (method == 'GET') {
-            if (formData.entries === undefined) {
-                // Ждём реализации в других браузерах
-                return;
+    _ajaxUnloadEvent: function(event) {
+        var i;
+        // Если текущая страница — модальное окно, выгружаем его
+        if (this.modalPageLoaded) {
+            for (i = 0; i < this.unloadModalCallbacks.length; i++) {
+                this.unloadCallbacks[i](this.modalElement);
             }
-            var started = href.indexOf('?') > 0;
-            var i, entry;
-            for (i = formData.entries(); !(entry = i.next()).done;) {
-                href += (started ? '&' : '?') + encodeURIComponent(entry.value[0]) + '=' + encodeURIComponent(entry.value[1]);
-                started = true;
+            this.modalPageLoaded = false;
+        }
+
+        // Если следующая страница не будет всплывающим окном, то выгружаем текущую
+        if (!event.detail.toModal) {
+            for (i = 0; i < this.unloadCallbacks.length; i++) {
+                this.unloadCallbacks[i](this.content);
             }
         }
-        this.goto(form.method, href, method != 'GET' ? formData : undefined);
+    },
+
+    _ajaxBeginEvent: function() {
+        this.setLoading(true);
+    },
+
+    _ajaxEndEvent: function() {
+        this.setLoading(false);
+    },
+
+    _ajaxErrorEvent: function(event) {
         event.preventDefault();
+        if (event.detail.response && event.detail.response.status >= 400) {
+            this.notifyError('Ошибка ' + event.detail.response.status);
+        } else {
+            this.handleError(event.detail.exc);
+        }
         return false;
-    }
+    },
 };
 
 
@@ -741,4 +407,73 @@ core.ajax = {
 };
 
 
-document.addEventListener('DOMContentLoaded', core.init.bind(core));
+core.utils = {
+    liveListeners: {},
+    liveListenerFallback: null,
+
+    init: function() {
+        document.body.addEventListener('click', this._liveClick.bind(this));
+    },
+
+    addThisEventListener: function(obj, type, listener, useCapture) {
+        var thisListener = function(event) {
+            return listener(obj, event);
+        };
+        obj.addEventListener(type, thisListener, useCapture);
+        return thisListener;  // for removeEventListener if needed
+    },
+
+    /**
+     * Навешивание обработчика на элементы с определённым классом.
+     * Отличие от простого addEventListener в том, что это не слетает при изменении DOM
+     * (то есть отлично дружит с amajaxify); аналог jQuery live events
+     */
+    addLiveClickListener: function(className, listener) {
+        if (!this.liveListeners.hasOwnProperty(className)) {
+            this.liveListeners[className] = [];
+        }
+        this.liveListeners[className].push(listener);
+    },
+
+    /**
+     * Обработчик клика по умолчанию, если на классы элемента, на который кликнули,
+     * не прикреплено ни одного обработчика через addLiveClickListener или если
+     * они не запретили действие по умолчанию
+     */
+    setLiveClickListenerFallback: function(func) {
+        this.liveListenerFallback = func;
+    },
+
+    _liveClick: function(event) {
+        var target = event.target || event.srcElement;
+
+        // Перебираем элементы, пока не найдём тот, для класса которого есть обработчик
+        while (!event.cancelBubble && target && target !== document.body) {
+            // Перебираем классы, для которых есть обработчики
+            for (var className in this.liveListeners) {
+                if (!this.liveListeners.hasOwnProperty(className)) {
+                    continue;
+                }
+
+                // Если у текущего элемента есть нужный класс
+                if (target.classList.contains(className)) {
+                    // Вызываем обработчики
+                    for (var i = 0; i < this.liveListeners[className].length; i++) {
+                        this.liveListeners[className][i](event, target);
+                    }
+                }
+            }
+
+            // Берём родителя и продолжаем дальше (если предыдущие обработчики не запретили всплытие)
+            target = target.parentNode || target.parentElement;
+        }
+
+        // Если никто ничего не запретил, вызываем обработчик по умолчанию
+        if (!event.cancelBubble && !event.defaultPrevented && this.liveListenerFallback) {
+            this.liveListenerFallback(event);
+        }
+    }
+};
+
+document.addEventListener('DOMContentLoaded', core.init.bind(core)); // new browsers
+document.addEventListener('load', core.init.bind(core)); // old browsers

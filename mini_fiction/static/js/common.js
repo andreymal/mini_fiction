@@ -1,6 +1,9 @@
 'use strict';
 
-core.define('common', {
+/* global core: false, $: false, mySettings: false */
+
+
+var common = {
     menuState: false,
 
     init: function() {
@@ -10,7 +13,7 @@ core.define('common', {
             btn.addEventListener('click', function() {
                 var expiration_date = new Date();
                 expiration_date.setFullYear(expiration_date.getFullYear() + 10);
-                document.cookie = 'last_notice=' + parseInt(btn.dataset.id) + '; path=/; expires=' + expiration_date.toGMTString();
+                document.cookie = 'last_notice=' + parseInt(btn.getAttribute('data-id')) + '; path=/; expires=' + expiration_date.toGMTString();
             });
         }
     },
@@ -25,7 +28,7 @@ core.define('common', {
         document.getElementById('mobile-menu-btn').addEventListener('click', function(event) {
             var l = document.getElementById('nav-main-links');
             l.classList.toggle('shown');
-            core.common.menuState = l.classList.contains('shown');
+            common.menuState = l.classList.contains('shown');
             event.preventDefault();
             return false;
         });
@@ -35,27 +38,30 @@ core.define('common', {
         }
 
         // Переключение меню профиля
-        document.getElementById('nav-profile-menu-header').addEventListener('click', function(event) {
-            var l = document.getElementById('nav-profile-menu-content');
-            l.classList.toggle('shown');
-            core.common.profileMenuState = l.classList.contains('shown');
-            event.preventDefault();
-            return false;
-        });
+        var profileMenuHeader = document.getElementById('nav-profile-menu-header');
+        if (profileMenuHeader) {
+            profileMenuHeader.addEventListener('click', function(event) {
+                var l = document.getElementById('nav-profile-menu-content');
+                l.classList.toggle('shown');
+                common.profileMenuState = l.classList.contains('shown');
+                event.preventDefault();
+                return false;
+            });
+        }
     },
 
-    loadModal: function(modalElement) {
-        this.markitupFor(modalElement);
-        this.buttonsFor(modalElement);
-        this.bootstrapFor(modalElement);
+    loadModal: function(content) {
+        this.markitupFor(content);
+        this.buttonsFor(content);
+        this.bootstrapFor(content);
     },
 
     unload: function(content) {
         this.markitupDestroy(content);
     },
 
-    unloadModal: function(modalElement) {
-        this.markitupDestroy(modalElement);
+    unloadModal: function(content) {
+        this.markitupDestroy(content);
     },
 
     bindContactsAdd: function() {
@@ -152,4 +158,11 @@ core.define('common', {
         event.preventDefault();
         return false;
     }
-});
+};
+
+
+core.oninit(common.init.bind(common));
+core.onload(common.load.bind(common));
+core.onunload(common.unload.bind(common));
+core.onloadModal(common.loadModal.bind(common));
+core.onunloadModal(common.unloadModal.bind(common));

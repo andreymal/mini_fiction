@@ -104,7 +104,7 @@ def add(target_attr, target, template, template_ajax=None, template_ajax_modal=F
 
     if g.is_ajax and template_ajax:
         html = render_template(template_ajax, **data)
-        return jsonify({'page_content': {'modal': template_ajax_modal, 'content': html}})
+        return jsonify({'page_content': {'modal': html} if template_ajax_modal else {'content': html}})
     else:
         return render_template(template, **data)
 
@@ -144,7 +144,7 @@ def edit(target_attr, comment, template, template_ajax=None, template_ajax_modal
 
     if g.is_ajax and template_ajax:
         html = render_template(template_ajax, **data)
-        return jsonify({'page_content': {'modal': template_ajax_modal, 'content': html}})
+        return jsonify({'page_content': {'modal': html} if template_ajax_modal else {'content': html}})
     else:
         return render_template(template, **data)
 
@@ -173,7 +173,7 @@ def delete(target_attr, comment, template, template_ajax=None, template_ajax_mod
 
     if g.is_ajax and template_ajax:
         html = render_template(template_ajax, **data)
-        return jsonify({'page_content': {'modal': template_ajax_modal, 'content': html}})
+        return jsonify({'page_content': {'modal': html} if template_ajax_modal else {'content': html}})
     else:
         return render_template(template, **data)
 
@@ -202,7 +202,7 @@ def restore(target_attr, comment, template, template_ajax=None, template_ajax_mo
 
     if g.is_ajax and template_ajax:
         html = render_template(template_ajax, **data)
-        return jsonify({'page_content': {'modal': template_ajax_modal, 'content': html}})
+        return jsonify({'page_content': {'modal': html} if template_ajax_modal else {'content': html}})
     else:
         return render_template(template, **data)
 

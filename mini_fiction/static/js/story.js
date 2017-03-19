@@ -1,6 +1,9 @@
 'use strict';
 
-core.define('story', {
+/* global core: false, $: false */
+
+
+var story = {
     panel: null,
 
     init: function() {
@@ -54,14 +57,10 @@ core.define('story', {
                     return response.json();
                 })
                 .then(function(response) {
-                    if (core.handleResponsePage(response, url)) {
+                    if (core.handleResponse(response, url)) {
                         return;
                     }
-                    if (response.success) {
-                        core.story.setPublished(response.story_id, response.published);
-                    } else {
-                        core.modal(response.modal);
-                    }
+                    story.setPublished(response.story_id, response.published);
                 }).catch(core.handleError);
         });
 
@@ -78,7 +77,7 @@ core.define('story', {
                     if (core.handleResponse(response, url)) {
                         return;
                     }
-                    core.story.setApproved(response.story_id, response.approved);
+                    story.setApproved(response.story_id, response.approved);
                 }).catch(core.handleError);
         });
 
@@ -95,7 +94,7 @@ core.define('story', {
                     if (core.handleResponse(response, url)) {
                         return;
                     }
-                    core.story.setFavorited(response.story_id, response.favorited);
+                    story.setFavorited(response.story_id, response.favorited);
                 }).catch(core.handleError);
         });
 
@@ -112,7 +111,7 @@ core.define('story', {
                     if (core.handleResponse(response, url)) {
                         return;
                     }
-                    core.story.setBookmarked(response.story_id, response.bookmarked);
+                    story.setBookmarked(response.story_id, response.bookmarked);
                 }).catch(core.handleError);
         });
 
@@ -126,10 +125,10 @@ core.define('story', {
                     return response.json();
                 })
                 .then(function(response) {
-                    if (core.handleResponsePage(response, url)) {
+                    if (core.handleResponse(response, url)) {
                         return;
                     }
-                    core.story.updateStoryVote(response);
+                    story.updateStoryVote(response);
                 }).catch(core.handleError);
         });
 
@@ -374,7 +373,7 @@ core.define('story', {
             data.chapters.push(parseInt(items[i]));
         }
 
-        var url = '/story/' + document.getElementById('sortable_chapters').dataset.story + '/sort/';
+        var url = '/story/' + document.getElementById('sortable_chapters').getAttribute('data-story') + '/sort/';
         core.ajax.postJSON(url, data)
             .then(function(response) {
                 return response.json();
@@ -383,4 +382,9 @@ core.define('story', {
                 core.handleResponse(response, url);
             }).catch(core.handleError);
     }
-});
+};
+
+
+core.oninit(story.init.bind(story));
+core.onload(story.load.bind(story));
+core.onunload(story.unload.bind(story));

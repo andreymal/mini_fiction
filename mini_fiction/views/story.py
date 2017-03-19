@@ -120,7 +120,7 @@ def publish(pk):
         }
         html = render_template('includes/ajax/story_ajax_publish_warning.html', **data)
         if g.is_ajax:
-            return jsonify({'success': False, 'page_content': {'modal': True, 'content': html}})
+            return jsonify({'success': False, 'page_content': {'modal': html}})
         else:
             return redirect(url_for('story.view', pk=story.id))  # TODO: add warning here too
 
@@ -287,7 +287,7 @@ def delete(pk):
 
     if g.is_ajax:
         html = render_template('includes/ajax/story_ajax_confirm_delete.html', page_title=page_title, story=story)
-        return jsonify({'page_content': {'modal': True, 'title': page_title, 'content': html}})
+        return jsonify({'page_content': {'modal': html, 'title': page_title}})
     else:
         return render_template('story_confirm_delete.html', **data)
 

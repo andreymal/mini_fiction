@@ -1,13 +1,19 @@
 'use strict';
 
-core.define('bell', {
+/* global core: false */
+
+
+var bell = {
     load: function() {
         var link = document.getElementById('nav-icon-bell');
+        if (!link) {
+            return;
+        }
         link.addEventListener('click', function(event) {
             if (window.innerWidth <= 640) {
-                return;
+                return; // На узких экранах просто открываем страницу с уведомлениями
             }
-            core.bell.togglePopup();
+            bell.togglePopup();
             event.preventDefault();
             return false;
         });
@@ -26,7 +32,7 @@ core.define('bell', {
         var link = document.getElementById('nav-icon-bell');
         var popup = document.getElementById('bell-popup');
         var content = document.getElementById('bell-popup-content');
-        var url = link.dataset.ajax;
+        var url = link.getAttribute('data-ajax');
 
         popup.style.display = '';
         link.parentNode.classList.add('active');
@@ -37,11 +43,14 @@ core.define('bell', {
             })
             .then(function(data) {
                 if (core.handleResponse(data, url)) {
-                    core.bell.hidePopup();
+                    bell.hidePopup();
                     return;
                 }
                 content.innerHTML = data.popup;
-            }).catch(core.handleError);
+            }).then(null, function(exc) {
+                bell.hidePopup();
+                core.handleError(exc);
+            });
 
         content.innerHTML = '';
     },
@@ -52,4 +61,7 @@ core.define('bell', {
         popup.style.display = 'none';
         link.parentNode.classList.remove('active');
     }
-});
+};
+
+
+core.onload(bell.load.bind(bell));

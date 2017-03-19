@@ -1,6 +1,9 @@
 'use strict';
 
-core.define('comment', {
+/* global amajaxify: false, core: false */
+
+
+var comments = {
     addlink: null,
     form: null,
 
@@ -42,7 +45,7 @@ core.define('comment', {
                     comment.scrollIntoView();
                 }
             }
-            core.comment.treeAutoload();
+            comments.treeAutoload();
         }, linkBlock);
     },
 
@@ -105,7 +108,7 @@ core.define('comment', {
             if (comment) {
                 after = comment;
                 this.form.parent.value = commentId;
-                this.form.style.marginLeft = parseInt(comment.dataset.depth) + 1 + '%';
+                this.form.style.marginLeft = parseInt(comment.getAttribute('data-depth')) + 1 + '%';
             } else {
                 this.form.parent.value = 0;
                 this.form.style.marginLeft = '0';
@@ -137,8 +140,8 @@ core.define('comment', {
                 return response.json();
             })
             .then(function(data) {
-                core.comment._submittedFormEvent(data, parentComment);
-            }).catch(core.handleError)
+                comments._submittedFormEvent(data, parentComment);
+            }).then(null, core.handleError)
             .then(function() {
                 form.text.disabled = false;
                 form.querySelector('input[type="submit"]').disabled = false;
@@ -167,16 +170,16 @@ core.define('comment', {
             } else if (document.getElementById('comments-tree')) {
                 document.getElementById('comments-tree').appendChild(d.firstElementChild);
             } else if (data.link) {
-                core.goto('GET', data.link);
+                amajaxify.goto('GET', data.link);
             }
         } else if (data.link) {
-            core.goto('GET', data.link);
+            amajaxify.goto('GET', data.link);
         }
     },
 
     _answerEvent: function(event) {
         event.preventDefault();
-        core.comment.setCommentForm(parseInt(this.dataset.parent || 0));
+        comments.setCommentForm(parseInt(this.getAttribute('data-parent') || 0));
         return false;
     },
 
@@ -195,12 +198,12 @@ core.define('comment', {
                 var comment = document.getElementById(data.comment.toString());
                 if (comment) {
                     comment.innerHTML = data.html;
-                    core.comment.bindTreeLinksFor(comment);
-                    core.comment.bindLinksFor(comment);
+                    comments.bindTreeLinksFor(comment);
+                    comments.bindLinksFor(comment);
                 }
                 history.back();
             })
-            .catch(core.handleError);
+            .then(null, core.handleError);
         event.preventDefault();
         return false;
     },
@@ -209,7 +212,7 @@ core.define('comment', {
         event.stopImmediatePropagation();
         event.preventDefault();
 
-        var url = this.dataset.ajaxHref;
+        var url = this.getAttribute('data-ajax-href');
         var pagination = document.getElementById('comments-pagination');
         pagination.classList.add('pagination-loading');
         core.ajax.fetch(url)
@@ -220,8 +223,8 @@ core.define('comment', {
                 if (core.handleResponse(data, url)) {
                     return;
                 }
-                core.comment._commentProcess(data);
-            }).catch(core.handleError).then(function() {
+                comments._commentProcess(data);
+            }).then(null, core.handleError).then(function() {
                 pagination.classList.remove('pagination-loading');
             });
     },
@@ -250,7 +253,7 @@ core.define('comment', {
     },
 
     _treeLinkEvent: function(event) {
-        core.comment.loadTreeFor(this.dataset['for']);
+        comments.loadTreeFor(this.getAttribute('data-for'));
         event.preventDefault();
         return false;
     },
@@ -263,7 +266,7 @@ core.define('comment', {
             return false;
         }
 
-        var href = linkBlock.dataset.ajaxHref;
+        var href = linkBlock.getAttribute('data-ajax-href');
         if (!href) {
             return false;
         }
@@ -276,7 +279,7 @@ core.define('comment', {
                 if (core.handleResponse(data, href)) {
                     return;
                 }
-                core.comment._treeLoadedEvent(linkBlock, data);
+                comments._treeLoadedEvent(linkBlock, data);
             }).catch(core.handleError).then(function() {
                 linkBlock.classList.remove('comment-tree-loading');
             });
@@ -303,7 +306,7 @@ core.define('comment', {
         if (this.classList.contains('vote-disabled')) {
             return false;
         }
-        core.comment.vote(this.parentNode, this.classList.contains('vote-down') ? -1 : 1);
+        comments.vote(this.parentNode, this.classList.contains('vote-down') ? -1 : 1);
         return false;
     },
 
@@ -315,7 +318,7 @@ core.define('comment', {
         var formData = new FormData();
         formData.append('value', value);
 
-        var href = voteArea.dataset.href;
+        var href = voteArea.getAttribute('data-href');
         voteArea.classList.add('voting');
         core.ajax.post(href, formData)
             .then(function(response) {
@@ -326,9 +329,12 @@ core.define('comment', {
                 }
                 voteArea.innerHTML = data.html;
                 core.notify('Ваш голос учтён');
-            }).catch(core.handleError).then(function() {
+            }).then(null, core.handleError).then(function() {
                 voteArea.classList.remove('voting');
             });
         return true;
     }
-});
+};
+
+
+core.onload(comments.load.bind(comments));

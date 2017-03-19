@@ -144,7 +144,7 @@ def delete(pk):
 
     if g.is_ajax:
         html = render_template('includes/ajax/chapter_ajax_confirm_delete.html', page_title=page_title, story=story, chapter=chapter)
-        return jsonify({'page_content': {'modal': True, 'title': page_title, 'content': html}})
+        return jsonify({'page_content': {'modal': html, 'title': page_title}})
     else:
         return render_template('chapter_confirm_delete.html', **data)
 

@@ -195,7 +195,7 @@ def configure_errorpages(app):
     def _error_common(template, template_modal, code, e):
         if getattr(g, 'is_ajax', False):
             html = render_template(template_modal, error=e, error_code=code)
-            response = jsonify({'page_content': {'modal': True, 'content': html}})
+            response = jsonify({'page_content': {'modal': html}})
             response.status_code = code
             # for github-fetch polyfill:
             response.headers['X-Request-URL'] = iri_to_uri(request.url)

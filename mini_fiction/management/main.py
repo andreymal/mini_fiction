@@ -90,17 +90,6 @@ def loaddb(pathlist, force=False):
         cmd([x.strip() for x in pathlist.split(',')], force=force)
 
 
-@manager.option('-h', '--host', dest='host', help='Server host (default 127.0.0.1)')
-@manager.option('-p', '--port', dest='port', help='Server port (default 5000)', type=int)
-@manager.option('-t', '--threaded', dest='threaded', help='Threaded mode', action='store_true')
-def runserver(host, port=None, threaded=False):
-    manager.app.run(
-        host=host,
-        port=port,
-        threaded=threaded
-    )
-
-
 def run():
     manager.run()
 

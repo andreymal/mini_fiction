@@ -65,7 +65,7 @@ class CharacterBL(BaseBL):
 
         picture = self.validate_and_get_picture_data(data.pop('picture'))
 
-        character = self.model(**data)
+        character = self.model(**data, picture='pending')
         character.flush()
         character.bl.set_picture_data(picture)
         return character

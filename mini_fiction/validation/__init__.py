@@ -141,12 +141,8 @@ class Validator(cerberus.Validator):
         if value not in choices:
             self._error(field, gettext("Unallowed value {value}").format(value=value))
 
-    def _validate_type_file(self, field, value):
-        if value in ('', b''):
-            if self.schema[field].get('required') and not self.update:
-                self._error(field, gettext("Required field"))
-        elif not isinstance(value, FileStorage):
-            self._error(gettext("Must be of {constraint} type").format(constraint='FileStorage'))
+    def _validate_type_file(self, value):
+        return isinstance(value, FileStorage)
 
     def _validate_maxlength(self, max_length, field, value):
         """ {'type': 'integer'} """

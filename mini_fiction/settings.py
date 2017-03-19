@@ -31,6 +31,8 @@ class Config(object):
     LOGGER_LEVEL = logging.INFO
     LOGGER_STDERR = True
 
+    TEMPLATES_AUTO_RELOAD = False
+
     ADMINS = []
     ERROR_EMAIL_FROM = 'mini_fiction@localhost.com'
     ERROR_EMAIL_SUBJECT = 'miniFiction error'
@@ -236,6 +238,7 @@ class Development(Config):
     SPHINX_DISABLED = True
     STARS_MINIMUM_VOTES = 1
     PUBLISH_SIZE_LIMIT = 20
+    TEMPLATES_AUTO_RELOAD = True
 
 
 class Test(Config):

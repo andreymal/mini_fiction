@@ -6,7 +6,6 @@
 import os
 import logging
 import importlib
-import urllib.parse
 from logging.handlers import SMTPHandler
 
 import jinja2
@@ -14,7 +13,6 @@ from celery import Celery
 from werkzeug.urls import iri_to_uri
 from werkzeug.contrib import cache
 from werkzeug.contrib.fixers import ProxyFix
-from werkzeug.exceptions import HTTPException
 from flask import Flask, current_app, request, g, jsonify
 from flask import json as flask_json
 import flask_babel

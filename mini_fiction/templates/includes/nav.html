@@ -12,11 +12,10 @@
             <div class="bell-popup-content" id="bell-popup-content">test</div>
         </div>
     </div>
-    <a href="{{ url_for('story.add') }}" class="nav-icon nav-icon-add" title="{{ _('Add story') }}"></a>
+    <a href="{{ url_for('story.add') }}" class="nav-icon nav-icon-add{% if is_current_endpoint('story.add') %} active{% endif %}" title="{{ _('Add story') }}"></a>
     <div class="nav-profile-menu">
     <div class="nav-profile-menu-header" id="nav-profile-menu-header">
-    <span class="nav-username">{{ current_user.username }}</span>
-    <img src="{{ current_user.bl.get_avatar_url() }}" alt="" class="nav-user-avatar" />
+        <div class="nav-profile-menu-text"><span class="nav-username">{{ current_user.username }}</span></div><img src="{{ current_user.bl.get_avatar_url() }}" alt="" class="nav-user-avatar" />
     </div>
     <ul class="nav-profile-menu-content nav-items" id="nav-profile-menu-content">
         {{ nav_item(

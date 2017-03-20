@@ -10,7 +10,7 @@
   },
   {
     "fields": {
-      "content": "<!-- Footer start -->\r\n<div class=\"footer\">\r\n<ul class=\"nav-items nav-footer\">\r\n    <li class=\"left\">\r\n        <p><small>Powered by <a href=\"https://github.com/andreymal/mini_fiction\" target=\"_blank\">mini_fiction</a></small></p>\r\n    </li>\r\n    <li class=\"right\">\r\n        <a href=\"{{ url_for('staticpages.index', name='terms') }}\">Правила</a>\r\n    </li>\r\n</ul>\r\n</div>\r\n<!-- Footer end -->",
+      "content": "<ul class=\"nav-items nav-items-right\">\n    <li>\n        <a href=\"{{ url_for('staticpages.index', name='terms') }}\">\u041f\u0440\u0430\u0432\u0438\u043b\u0430</a>\n    </li>\n</ul>\n\nPowered by <a href=\"https://github.com/andreymal/mini_fiction\" target=\"_blank\">mini_fiction</a>",
       "name": "footer",
       "is_template": true
     },

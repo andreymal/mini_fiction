@@ -46,4 +46,6 @@ Save ``local_settings.example.py`` as ``local_settings.py`` and enable it:
 
 Then ``mini_fiction runserver`` in the same directory with this file.
 
+You can run ``mini_fiction status`` to check some configuration variables.
+
 For more information see ``INSTALL.md`` (in Russian).

@@ -24,6 +24,7 @@ class Local(Development):
     # ERROR_EMAIL_HANDLER_PARAMS = {'mailhost': ('127.0.0.1', 1025)}
     ERROR_EMAIL_FROM = 'minifiction@example.org'
 
+    # EMAIL_HOST = '127.0.0.1'
     # EMAIL_PORT = 1025
     DEFAULT_FROM_EMAIL = 'minifiction@example.org'
 
@@ -37,6 +38,8 @@ class Local(Development):
 
     # REGISTRATION_OPEN = False
     CHECK_PASSWORDS_SECURITY = True
+
+    DEBUG_TB_ENABLED = True
 
     # PROXIES_COUNT = 1  # uncomment it if you use nginx as frontend
     # SECRET_KEY = 'foo'

@@ -119,10 +119,7 @@ class AuthorBL(BaseBL):
         if data.get('delete_avatar'):
             self.delete_avatar()
         elif current_app.config['AVATARS_UPLOADING'] and data.get('avatar'):
-            try:
-                import Image
-            except ImportError:
-                from PIL import Image
+            from PIL import Image
 
             image_data = data['avatar'].stream.read(256 * 1024 + 1)
             if len(image_data) > 256 * 1024:
@@ -165,10 +162,7 @@ class AuthorBL(BaseBL):
         if not current_app.config['AVATARS_UPLOADING']:
             raise ValidationError({'avatar': ['Avatar uploading is disabled']})
 
-        try:
-            import Image
-        except ImportError:
-            from PIL import Image
+        from PIL import Image
 
         user = self.model
 

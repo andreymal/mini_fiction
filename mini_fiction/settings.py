@@ -36,7 +36,7 @@ class Config(object):
     ADMINS = []
     ERROR_EMAIL_FROM = 'mini_fiction@localhost.com'
     ERROR_EMAIL_SUBJECT = 'miniFiction error'
-    ERROR_EMAIL_HANDLER_PARAMS = {'mailhost': '127.0.0.1'}
+    ERROR_EMAIL_HANDLER_PARAMS = None
 
     BABEL_DEFAULT_LOCALE = 'ru'
     BABEL_DEFAULT_TIMEZONE = 'Europe/Moscow'
@@ -123,7 +123,7 @@ class Config(object):
 
     RSS = {'stories': 20, 'chapters': 20, 'comments': 100}
 
-    EMAIL_HOST = 'localhost'
+    EMAIL_HOST = None
     EMAIL_PORT = 25
     EMAIL_HOST_USER = ''
     EMAIL_HOST_PASSWORD = ''
@@ -234,7 +234,6 @@ class Config(object):
 class Development(Config):
     DEBUG = True
     SQL_DEBUG = True
-    DEBUG_TB_ENABLED = True
     CHECK_PASSWORDS_SECURITY = False
     SPHINX_DISABLED = True
     STARS_MINIMUM_VOTES = 1

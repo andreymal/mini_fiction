@@ -67,9 +67,42 @@ class Paginator(object):
             yield page
 
 
+def connectmail(config=None):
+    if config is None:
+        config = current_app.config
+
+    if config.get('EMAIL_USE_SSL'):
+        s = smtplib.SMTP_SSL(
+            config['EMAIL_HOST'],
+            config['EMAIL_PORT'],
+            timeout=10,
+            keyfile=config['EMAIL_SSL_KEYFILE'],
+            certfile=config['EMAIL_SSL_CERTFILE'],
+        )
+    else:
+        s = smtplib.SMTP(
+            config['EMAIL_HOST'],
+            config['EMAIL_PORT'],
+            timeout=10,
+        )
+
+    if not config.get('EMAIL_USE_SSL') and config.get('EMAIL_USE_TLS'):
+        s.ehlo()
+        s.starttls(keyfile=config['EMAIL_SSL_KEYFILE'], certfile=config['EMAIL_SSL_CERTFILE'])
+        s.ehlo()
+
+    if config.get('EMAIL_HOST_USER'):
+        s.login(config['EMAIL_HOST_USER'], config['EMAIL_HOST_PASSWORD'])
+
+    return s
+
+
 def sendmail(to, subject, body, fro=None, config=None):
     if config is None:
         config = current_app.config
+
+    if not config.get('EMAIL_HOST'):
+        return False
 
     if not body:
         return False
@@ -100,33 +133,10 @@ def sendmail(to, subject, body, fro=None, config=None):
     msg['Subject'] = subject_b64
 
     try:
-        if config.get('EMAIL_USE_SSL'):
-            s = smtplib.SMTP_SSL(
-                config['EMAIL_HOST'],
-                config['EMAIL_PORT'],
-                timeout=10,
-                keyfile=config['EMAIL_SSL_KEYFILE'],
-                certfile=config['EMAIL_SSL_CERTFILE'],
-            )
-        else:
-            s = smtplib.SMTP(
-                config['EMAIL_HOST'],
-                config['EMAIL_PORT'],
-                timeout=10,
-            )
-
-        if not config.get('EMAIL_USE_SSL') and config.get('EMAIL_USE_TLS'):
-            s.ehlo()
-            s.starttls(keyfile=config['EMAIL_SSL_KEYFILE'], certfile=config['EMAIL_SSL_CERTFILE'])
-            s.ehlo()
-
-        if config.get('EMAIL_HOST_USER'):
-            s.login(config['EMAIL_HOST_USER'], config['EMAIL_HOST_PASSWORD'])
+        s = connectmail(config)
         s.sendmail(fro, to, msg.as_string().encode('utf-8'))
         s.quit()
-    except (KeyboardInterrupt, SystemExit):
-        raise
-    except:
+    except Exception:
         import traceback
         traceback.print_exc()  # we can't use flask.logger, because it uses sendmail :)
         return False

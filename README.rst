@@ -25,6 +25,7 @@ Quick start
 .. code::
 
     pip install mini_fiction
+    mkdir media
     mini_fiction seed
     mini_fiction createsuperuser
     mini_fiction runserver

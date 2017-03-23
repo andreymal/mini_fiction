@@ -31,7 +31,8 @@ class Local(Development):
     # RECAPTCHA_PRIVATE_KEY = '...'
     # NOCAPTCHA = False
 
-    # CELERY_ALWAYS_EAGER = False
+    # CELERY_CONFIG = dict(Config.CELERY_CONFIG)
+    # CELERY_CONFIG['task_always_eager'] = False
     # SPHINX_DISABLED = False
 
     # REGISTRATION_OPEN = False

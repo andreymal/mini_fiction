@@ -247,8 +247,8 @@ def configure_search(app):
 
 
 def configure_celery(app):
-    app.celery = Celery('mini_fiction', broker=app.config['CELERY_BROKER_URL'])
-    app.celery.conf.update(app.config)
+    app.celery = Celery('mini_fiction', broker=app.config['CELERY_CONFIG']['broker_url'])
+    app.celery.conf.update(app.config['CELERY_CONFIG'])
 
     TaskBase = app.celery.Task
 

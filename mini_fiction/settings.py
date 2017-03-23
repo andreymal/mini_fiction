@@ -212,10 +212,12 @@ class Config(object):
         },
     ]
 
-    CELERY_ALWAYS_EAGER = False
-    CELERY_TASK_SERIALIZER = 'json'
-    CELERY_ACCEPT_CONTENT = ['json', 'msgpack', 'yaml']
-    CELERY_BROKER_URL = 'redis://localhost:6379/0'
+    CELERY_CONFIG = {
+        'broker_url': 'redis://localhost:6379/0',
+        'task_always_eager': False,
+        'task_serializer': 'json',
+        'accept_content': {'json', 'msgpack', 'yaml'},
+    }
 
     NSFW_RATING_IDS = (1,)
 
@@ -234,11 +236,12 @@ class Development(Config):
     SQL_DEBUG = True
     DEBUG_TB_ENABLED = True
     CHECK_PASSWORDS_SECURITY = False
-    CELERY_ALWAYS_EAGER = True
     SPHINX_DISABLED = True
     STARS_MINIMUM_VOTES = 1
     PUBLISH_SIZE_LIMIT = 20
     TEMPLATES_AUTO_RELOAD = True
+    CELERY_CONFIG = dict(Config.CELERY_CONFIG)
+    CELERY_CONFIG['task_always_eager'] = True
 
 
 class Test(Config):
@@ -252,7 +255,8 @@ class Test(Config):
     TESTING = True
     SQL_DEBUG = False
     MEMCACHE_SERVERS = None
-    CELERY_ALWAYS_EAGER = True
     SPHINX_DISABLED = True  # TODO: test it
     STARS_MINIMUM_VOTES = 3
     PUBLISH_SIZE_LIMIT = 20
+    CELERY_CONFIG = dict(Config.CELERY_CONFIG)
+    CELERY_CONFIG['task_always_eager'] = True

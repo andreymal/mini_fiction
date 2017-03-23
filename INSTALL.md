@@ -226,7 +226,8 @@ sudo apt-get install redis-server
 * Включаем использование отдельных воркеров в настройках:
 
 ```python
-CELERY_ALWAYS_EAGER = False
+CELERY_CONFIG = dict(Config.CELERY_CONFIG)
+CELERY_CONFIG['task_always_eager'] = False
 ```
 
 * Включаем сам воркер:
@@ -241,6 +242,12 @@ celery -A mini_fiction worker --loglevel=INFO
 ```
 pip3 install flower
 flower -A mini_fiction
+```
+
+Управление через консоль также доступно:
+
+```
+celery -A mini_fiction status
 ```
 
 

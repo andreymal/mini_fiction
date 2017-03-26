@@ -3,6 +3,7 @@
 
 # pylint: disable=unexpected-keyword-arg,no-value-for-parameter
 
+import json
 import random
 import ipaddress
 from datetime import datetime
@@ -56,47 +57,70 @@ class StoryBL(BaseBL, Commentable):
         later(current_app.tasks['sphinx_update_story'].delay, story.id, ())
         return story
 
-    def edit_log(self, sl_action, editor, data):
-        from mini_fiction.models import StoryEditLogItem
+    def edit_log(self, editor, data):
+        from mini_fiction.models import StoryLog
 
-        sl = StoryEditLogItem(
-            action=sl_action,
+        assert isinstance(data, dict)
+        for k, v in data.items():
+            assert isinstance(k, str)
+            assert isinstance(v, list)
+            assert len(v) == 2
+
+        sl = StoryLog(
             user=editor,
             story=self.model,
+            by_staff=editor.is_staff,
+            data_json=json.dumps(data, ensure_ascii=False),
         )
-        sl.is_staff = editor.is_staff
-        if sl_action == StoryEditLogItem.Actions.Edit:
-            sl.data = data
-        sl.flush()
+
+        return sl
 
     def update(self, editor, data):
-        from mini_fiction.models import StoryEditLogItem, Category, Character, Classifier, Rating
+        from mini_fiction.models import Category, Character, Classifier, Rating
 
         data = Validator(STORY).validated(data, update=True)
 
         story = self.model
         old_published = story.published  # for chapters
 
+        edited_data = {}
+
         for key in ('title', 'summary', 'notes', 'original', 'finished', 'freezed', 'source_link', 'source_title'):
-            if key in data:
+            if key in data and getattr(story, key) != data[key]:
+                edited_data[key] = [getattr(story, key), data[key]]
                 setattr(story, key, data[key])
 
-        if 'rating' in data:
+        if 'rating' in data and story.rating.id != data['rating']:
+            edited_data['rating'] = [story.rating.id, data['rating']]
             story.rating = Rating.get(id=data['rating'])
 
         # TODO: refactor
         if 'categories' in data:
-            story.categories.clear()
-            story.categories.add(Category.select(lambda x: x.id in data['categories'])[:])
-        if 'characters' in data:
-            story.characters.clear()
-            story.characters.add(Character.select(lambda x: x.id in data['characters'])[:])
-        if 'classifications' in data:
-            story.classifications.clear()
-            story.classifications.add(Classifier.select(lambda x: x.id in data['classifications'])[:])
+            old_value = [x.id for x in story.categories]
+            new_value = list(data['categories'])
+            if set(old_value) != set(new_value):
+                edited_data['categories'] = [old_value, new_value]
+                story.categories.clear()
+                story.categories.add(Category.select(lambda x: x.id in data['categories'])[:])
 
-        if editor:
-            self.edit_log(StoryEditLogItem.Actions.Edit, editor, data)
+        if 'characters' in data:
+            old_value = [x.id for x in story.characters]
+            new_value = list(data['characters'])
+            if set(old_value) != set(new_value):
+                edited_data['characters'] = [old_value, new_value]
+                story.characters.clear()
+                story.characters.add(Character.select(lambda x: x.id in data['characters'])[:])
+
+        if 'classifications' in data:
+            old_value = [x.id for x in story.classifications]
+            new_value = list(data['classifications'])
+            if set(old_value) != set(new_value):
+                edited_data['classifications'] = [old_value, new_value]
+                story.classifications.clear()
+                story.classifications.add(Classifier.select(lambda x: x.id in data['classifications'])[:])
+
+        if editor and edited_data:
+            self.edit_log(editor, edited_data)
 
         if old_published != story.published:
             for c in story.chapters:
@@ -106,18 +130,17 @@ class StoryBL(BaseBL, Commentable):
         return story
 
     def approve(self, user, approved):
-        from mini_fiction.models import StoryEditLogItem
-
         story = self.model
+
+        old_approved = story.approved
+        if approved == old_approved:
+            return
+
         old_published = story.published
 
         story.approved = bool(approved)
         if user:
-            self.edit_log(
-                StoryEditLogItem.Actions.Approve if story.approved else StoryEditLogItem.Actions.Unapprove,
-                user,
-                {'approved': story.approved}
-            )
+            self.edit_log(user, {'approved': [old_approved, story.approved]})
 
         if old_published != story.published:
             if story.published and not story.first_published_at:
@@ -130,20 +153,18 @@ class StoryBL(BaseBL, Commentable):
                 c.story_published = story.published
 
     def publish(self, user, published):
-        from mini_fiction.models import StoryEditLogItem
-
         story = self.model
         old_published = story.published
+
+        old_draft = story.draft
+        if (not published) == story.draft:
+            return True
 
         if story.publishable or (not story.draft and not story.publishable):
             story.draft = not published
 
             if user:
-                self.edit_log(
-                    StoryEditLogItem.Actions.Publish if not story.draft else StoryEditLogItem.Actions.Unpublish,
-                    user,
-                    {'draft': story.draft}
-                )
+                self.edit_log(user, {'draft': [old_draft, story.draft]})
 
             if old_published != story.published:
                 if story.published and not story.first_published_at:

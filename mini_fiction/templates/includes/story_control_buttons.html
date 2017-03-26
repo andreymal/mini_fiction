@@ -25,7 +25,7 @@
                 <li><a class="story_delete" href="{{ url_for('story.delete', pk=story.id) }}">Удалить</a></li>
             {% endif %}
             {% if current_user.is_staff %}
-                <li><a href="{{ url_for('story.edit_log', pk=story.id) }}">Лог модерации</a></li>
+                <li><a href="{{ url_for('story.edit_log', pk=story.id) }}">{{ _('Moderation log') }}</a></li>
             {% endif %}
             </ul>
         </div>

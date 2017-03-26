@@ -5,8 +5,9 @@ from pony import orm
 from pony.orm import db_session
 from flask import Blueprint, current_app, abort
 from flask_login import current_user
+from flask_babel import gettext as _
 
-from mini_fiction.models import Story, Chapter, CoAuthorsStory, StoryEditLogItem, StoryComment
+from mini_fiction.models import Story, Chapter, CoAuthorsStory, StoryLog, StoryComment
 from mini_fiction.utils.views import paginate_view, cached_lists
 
 
@@ -82,12 +83,12 @@ def edit_log(page):
     if not current_user.is_staff:
         abort(403)
 
-    objects = StoryEditLogItem.select(lambda x: x.is_staff).order_by(StoryEditLogItem.date.desc())
+    objects = StoryLog.select(lambda x: x.by_staff).order_by(StoryLog.created_at.desc())
     return paginate_view(
         'story_edit_log.html',
         objects,
         count=objects.count(),
-        page_title='Лог модерации',
+        page_title=_('Moderation log'),
         objlistname='edit_log',
         per_page=current_app.config.get('EDIT_LOGS_PER_PAGE', 100),
     )

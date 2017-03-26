@@ -7,20 +7,25 @@
     <div class="span12 story-page">
         {{- breadcrumbs() }}
 
-        {% for item in edit_log %}
+        {% for item, extra in prepare_editlog(edit_log) %}
             <p>
                 {% with user=item.user %}
                     {% include 'includes/userlink.html' %}
                 {% endwith %}
-                {{ item.action_verb() }} рассказ <a href="{{ item.story.url }}">{{ item.story.title }}</a>
-                {{ item.date|datetimeformat }}
+                {{ extra.label }} <a href="{{ item.story.url }}">{{ item.story.title }}</a>
+                <time datetime="{{ item.created_at.strftime('%Y-%m-%dT%H:%M:%SZ') }}" class="editlog-date">{{ item.created_at|datetimeformat }}</time>
 
-                {% if item.json_data %}
-                    <ul><ul>
+                {% if extra.list_items %}
+                    <ul>
                     {% for k, v in item.data.items() %}
-                        <li><strong>{{ k }}:</strong> {{ v }}</li>
+                        <li>
+                            <strong class="editlog-key">{{ k }}:</strong>
+                            <span class="editlog-value-old">{{ v[0] }}</span>
+                            →
+                            <span class="editlog-value-new">{{ v[1] }}</span>
+                        </li>
                     {% endfor %}
-                    </ul></ul>
+                    </ul>
                 {% endif %}
             </p>
         {% endfor %}

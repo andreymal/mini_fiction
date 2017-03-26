@@ -59,7 +59,7 @@ class Author(db.Entity, UserMixin):
     beta_reading = orm.Set('BetaReading')
     favorites = orm.Set('Favorites')
     bookmarks = orm.Set('Bookmark')
-    edit_log = orm.Set('StoryEditLogItem')
+    edit_log = orm.Set('StoryLog')
     views = orm.Set('StoryView')
     activity = orm.Set('Activity')
     votes = orm.Set('Vote')
@@ -242,7 +242,7 @@ class Story(db.Entity):
 
     in_series_permissions = orm.Set(InSeriesPermissions)
     chapters = orm.Set('Chapter')
-    edit_log = orm.Set('StoryEditLogItem')
+    edit_log = orm.Set('StoryLog')
     story_views_set = orm.Set('StoryView')
     activity = orm.Set('Activity')
     votes = orm.Set('Vote')
@@ -567,63 +567,19 @@ class Activity(db.Entity):
     last_comment_id = orm.Required(int, default=0)
 
 
-class StoryEditLogItem(db.Entity):
-    class Actions:
-        Publish = 1
-        Unpublish = 2
-        Approve = 3
-        Unapprove = 4
-        Edit = 5
-
-        action_verbs = {
-            Publish: 'опубликовал',
-            Unpublish: 'отправил в черновики',
-            Approve: 'одобрил',
-            Unapprove: 'отозвал',
-            Edit: 'отредактировал',
-        }
-
+class StoryLog(db.Entity):
+    created_at = orm.Required(datetime, 6, default=datetime.utcnow, index=True)
     user = orm.Required(Author)
     story = orm.Required(Story)
-    action = orm.Required(int)  # TODO: choices=Actions.action_verbs.items()
-    json_data = orm.Optional(orm.LongStr, lazy=False)
-    date = orm.Required(datetime, 6, default=datetime.utcnow, index=True)
-    is_staff = orm.Required(bool, default=False)
+    data_json = orm.Required(orm.LongStr, lazy=False)
+    by_staff = orm.Required(bool, default=False)
 
-    orm.composite_index(story, date)
-    orm.composite_index(is_staff, date)
-
-    # TODO: move to bl
-
-    def action_verb(self):
-        return self.Actions.action_verbs[self.action]
+    orm.composite_index(story, created_at)
+    orm.composite_index(by_staff, created_at)
 
     @property
     def data(self):
-        return json.loads(self.json_data)
-
-    @data.setter
-    def data(self, value):
-        def default(o):
-            if isinstance(o, db.Entity):
-                return o.id
-            if isinstance(o, orm.Query):
-                return o[:]
-            raise TypeError
-        self.json_data = json.dumps(
-            value,
-            ensure_ascii=False,
-            default=default,
-        )
-
-    @classmethod
-    def create(cls, data=None, **kw):
-        obj = cls(**kw)
-        obj.is_staff = kw['user'].is_staff
-        if data is not None:
-            obj.data = data
-        obj.flush()
-        return obj
+        return json.loads(self.data_json)
 
 
 class Notice(db.Entity):

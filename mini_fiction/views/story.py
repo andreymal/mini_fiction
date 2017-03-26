@@ -11,7 +11,7 @@ from pony.orm import db_session
 
 from mini_fiction.forms.story import StoryForm
 from mini_fiction.forms.comment import CommentForm
-from mini_fiction.models import Story, Chapter, Rating, StoryEditLogItem, Favorites, Bookmark
+from mini_fiction.models import Story, Chapter, Rating, StoryLog, Favorites, Bookmark
 from mini_fiction.validation import ValidationError
 from mini_fiction.utils.misc import calc_maxdepth
 
@@ -193,8 +193,9 @@ def edit_log(pk):
     story = Story.get(id=pk)
     if not story:
         abort(404)
+
     data = dict(
-        edit_log=story.edit_log.select().order_by(StoryEditLogItem.date.desc()).prefetch(StoryEditLogItem.user),
+        edit_log=story.edit_log.select().order_by(StoryLog.created_at.desc()).prefetch(StoryLog.user),
         page_title="История редактирования рассказа \"{}\"".format(story.title),
         story=story,
     )

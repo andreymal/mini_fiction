@@ -3,8 +3,8 @@
 
 <div id="mobile-menu-btn" class="nav-icon mobile-menu-btn"></div>
 
-{%- if current_user.is_authenticated %}
 <div id="nav-main-profile" class="nav-main-profile">
+{%- if current_user.is_authenticated %}
     <div class="nav-icon nav-icon-bell" title="{{ _('Notifications') }}">
         <a id="nav-icon-bell" class="nav-icon-bell-link" href="{{ url_for('notifications.index') }}" data-ajax="{{ url_for('notifications.index', popup='1') }}"></a>
         <span class="new-count" style="display: none"></span>
@@ -43,15 +43,15 @@
         {{ nav_item(_('Log out'), url_for('auth.logout', next=next_url)) }}
     </ul>
     </div><!-- /nav-profile-menu -->
-</div>
 {%- else -%}
-<ul id="nav-main-profile" class="nav-items nav-main-profile">
+<ul class="nav-items">
     {{ nav_item(_('Log in'), url_for('auth.login', next=next_url), 'auth.login') }}
     {%- if config.REGISTRATION_OPEN %}
         {{ nav_item(_('Register'), url_for('auth.registration'), 'auth.registration') }}
     {% endif %}
 </ul>
 {%- endif -%}
+</div><!-- /nav-main-profile -->
 
 <ul id="nav-main-links" class="nav-items nav-main-links">
     {{ nav_item(_('Index'), url_for('index.index'), 'index.index') }}

@@ -457,34 +457,67 @@ class StoryBL(BaseBL, Commentable):
 
 
 class ChapterBL(BaseBL):
-    def create(self, story, title, notes='', text=''):
+    def create(self, story, editor, data):
         from mini_fiction.models import Chapter
 
         new_order = orm.select(orm.max(x.order) for x in Chapter if x.story == story).first()
 
         chapter = self.model(
             story=story,
-            title=title,
-            notes=notes,
-            text=text,
+            title=data['title'],
+            notes=data['notes'],
+            text=data['text'],
             story_published=story.published,
         )
         chapter.order = (new_order or 0) + 1
         self._update_words_count(chapter)
         chapter.flush()
+        chapter.bl.edit_log(editor, 'add', {})
         later(current_app.tasks['sphinx_update_chapter'].delay, chapter.id)
         return chapter
 
-    def update(self, **data):
+    def edit_log(self, editor, action, data, chapter_text_diff=None):
+        from mini_fiction.models import StoryLog
 
         chapter = self.model
-        if 'title' in data:
+
+        assert isinstance(data, dict)
+        for k, v in data.items():
+            assert isinstance(k, str)
+            assert isinstance(v, list)
+            assert len(v) == 2
+
+        sl = StoryLog(
+            user=editor,
+            story=chapter.story,
+            chapter_action=action,
+            chapter=chapter,
+            chapter_title=chapter.title,
+            by_staff=editor.is_staff,
+            data_json=json.dumps(data, ensure_ascii=False),
+            chapter_text_diff=json.dumps(chapter_text_diff, ensure_ascii=False) if chapter_text_diff is not None else '',
+        )
+
+        return sl
+
+    def update(self, editor, data):
+        chapter = self.model
+        edited_data = {}
+        chapter_text_diff = None
+
+        if 'title' in data and data['title'] != chapter.title:
+            edited_data['title'] = [chapter.title, data['title']]
             chapter.title = data['title']
-        if 'notes' in data:
+        if 'notes' in data and data['notes'] != chapter.notes:
+            edited_data['notes'] = [chapter.notes, data['notes']]
             chapter.notes = data['notes']
-        if 'text' in data:
+        if 'text' in data and data['text'] != chapter.text:
+            chapter_text_diff = [['-', chapter.text], ['+', data['text']]]  # TODO: SequenceMatcher
             chapter.text = data['text']
             self._update_words_count(chapter)
+
+        chapter.bl.edit_log(editor, 'edit', edited_data, chapter_text_diff=chapter_text_diff)
+
         later(current_app.tasks['sphinx_update_chapter'].delay, chapter.id)
         return chapter
 
@@ -496,7 +529,7 @@ class ChapterBL(BaseBL):
             story = chapter.story
             story.words = story.words - old_words + new_words
 
-    def delete(self):
+    def delete(self, editor):
         from mini_fiction.models import Chapter
 
         chapter = self.model
@@ -505,6 +538,7 @@ class ChapterBL(BaseBL):
         later(current_app.tasks['sphinx_delete_chapter'].delay, story.id, chapter.id)
 
         old_order = chapter.order
+        chapter.bl.edit_log(editor, 'delete', {})
         chapter.delete()
 
         for c in Chapter.select(lambda x: x.story == story and x.order > old_order):

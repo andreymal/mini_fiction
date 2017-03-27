@@ -366,6 +366,7 @@ class Chapter(db.Entity):
     updated = orm.Required(datetime, 6, default=datetime.utcnow)
     words = orm.Required(int, default=0)
     story_published = orm.Required(bool)  # optimization of stream pages
+    edit_log = orm.Set('StoryLog')
 
     orm.composite_index(date, story_published)
 
@@ -571,8 +572,17 @@ class StoryLog(db.Entity):
     created_at = orm.Required(datetime, 6, default=datetime.utcnow, index=True)
     user = orm.Required(Author)
     story = orm.Required(Story)
-    data_json = orm.Required(orm.LongStr, lazy=False)
+
+    chapter_action = orm.Optional(str, 12, py_check=lambda x: x in {'', 'add', 'edit', 'delete'})
+    chapter = orm.Optional(Chapter)
+    chapter_title = orm.Optional(orm.LongStr, lazy=False)  # На случай, если главу удалят
+    # если chapter_action пуст, data_json относится к рассказу, иначе к главе (кроме text)
+    data_json = orm.Required(orm.LongStr, lazy=False)  # {key: [old_value, new_value]}
     by_staff = orm.Required(bool, default=False)
+
+    # [["=", длина], ["-", "удалённый кусок"], ["+", "добавленный кусок"]]
+    # Дифф перевёрнутый: для получения старого текста нужно применить его к новому!
+    chapter_text_diff = orm.Optional(orm.LongStr)
 
     orm.composite_index(story, created_at)
     orm.composite_index(by_staff, created_at)

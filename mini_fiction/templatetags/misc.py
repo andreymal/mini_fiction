@@ -25,22 +25,32 @@ def prepare_editlog(edit_log):
 
     # Подсчитываем для шаблона, как красиво вывести изменения
     for log_item in edit_log:
-        log_extra_item = {'list_items': False, 'label': pgettext('story_edit_log', 'edited story')}
-        edited_data = log_item.data
+        if not log_item.chapter_action:
+            # Изменение рассказа
+            log_extra_item = {'mode': 'story', 'list_items': False, 'label': pgettext('story_edit_log', 'edited story')}
+            edited_data = log_item.data
 
-        if len(edited_data) == 1:
-            if 'draft' in edited_data and edited_data['draft'][1] is True:
-                log_extra_item['label'] = pgettext('story_edit_log', 'published story')
-            elif 'draft' in edited_data and edited_data['draft'][1] is False:
-                log_extra_item['label'] = pgettext('story_edit_log', 'sent to drafts story')
-            elif 'approved' in edited_data and edited_data['approved'][1] is True:
-                log_extra_item['label'] = pgettext('story_edit_log', 'approved story')
-            elif 'approved' in edited_data and edited_data['approved'][1] is False:
-                log_extra_item['label'] = pgettext('story_edit_log', 'unapproved story')
+            if len(edited_data) == 1:
+                if 'draft' in edited_data and edited_data['draft'][1] is True:
+                    log_extra_item['label'] = pgettext('story_edit_log', 'published story')
+                elif 'draft' in edited_data and edited_data['draft'][1] is False:
+                    log_extra_item['label'] = pgettext('story_edit_log', 'sent to drafts story')
+                elif 'approved' in edited_data and edited_data['approved'][1] is True:
+                    log_extra_item['label'] = pgettext('story_edit_log', 'approved story')
+                elif 'approved' in edited_data and edited_data['approved'][1] is False:
+                    log_extra_item['label'] = pgettext('story_edit_log', 'unapproved story')
+                else:
+                    log_extra_item['list_items'] = True
             else:
                 log_extra_item['list_items'] = True
+
         else:
-            log_extra_item['list_items'] = True
+            # Изменение главы
+            log_extra_item = {'mode': 'chapter', 'list_items': bool(log_item.data), 'label': pgettext('story_edit_log', 'edited chapter')}
+            if log_item.chapter_action == 'add':
+                log_extra_item['label'] = pgettext('story_edit_log', 'added chapter')
+            elif log_item.chapter_action == 'delete':
+                log_extra_item['label'] = pgettext('story_edit_log', 'deleted chapter')
 
         log_data.append((log_item, log_extra_item))
 

@@ -228,6 +228,7 @@ def configure_templates(app):
     from mini_fiction.templatetags import random_stories, random_logo, submitted_stories_count
     from mini_fiction.templatetags import story_comments_delta, html_block, hook, shown_notice
     from mini_fiction.templatetags import get_comment_threshold, misc
+    from mini_fiction.templatetags import i18n
     from mini_fiction.templatetags import registry
     app.templatetags = dict(registry.tags)
 

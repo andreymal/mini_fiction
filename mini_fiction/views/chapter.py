@@ -67,9 +67,12 @@ def add(story_id):
     if form.validate_on_submit():
         chapter = Chapter.bl.create(
             story=story,
-            title=form.title.data,
-            notes=form.notes.data,
-            text=form.text.data,
+            editor=user,
+            data={
+                'title': form.title.data,
+                'notes': form.notes.data,
+                'text': form.text.data,
+            }
         )
         return redirect(url_for('chapter.edit', pk=chapter.id))
 
@@ -103,9 +106,12 @@ def edit(pk):
     form = ChapterForm(data=chapter_data)
     if form.validate_on_submit():
         chapter.bl.update(
-            title=form.title.data,
-            notes=form.notes.data,
-            text=form.text.data,
+            editor=user,
+            data={
+                'title': form.title.data,
+                'notes': form.notes.data,
+                'text': form.text.data,
+            }
         )
         return redirect(url_for('chapter.edit', pk=chapter.id))
 
@@ -132,7 +138,7 @@ def delete(pk):
     story = chapter.story
 
     if request.method == 'POST':
-        chapter.bl.delete()
+        chapter.bl.delete(editor=user)
         return redirect(url_for('story.edit', pk=story.id))
 
     page_title = 'Подтверждение удаления главы'

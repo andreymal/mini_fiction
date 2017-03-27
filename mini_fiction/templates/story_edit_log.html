@@ -4,45 +4,72 @@
 {% block content %}
 
 <div class="row">
-    <div class="span12 story-page">
-        {{- breadcrumbs() }}
+<div class="span12 story-page">
+{{- breadcrumbs() }}
 
-        {% for item, extra in prepare_editlog(edit_log) %}
-            <p>
-                {% with user=item.user %}
-                    {% include 'includes/userlink.html' %}
-                {% endwith %}
-                {{ extra.label }} <a href="{{ item.story.url }}">{{ item.story.title }}</a>
-                <time datetime="{{ item.created_at.strftime('%Y-%m-%dT%H:%M:%SZ') }}" class="editlog-date">{{ item.created_at|datetimeformat }}</time>
+{% for item, extra in prepare_editlog(edit_log) %}<p>
+    {% if extra.mode == 'story' %}
+        {% with user=item.user %}
+            {% include 'includes/userlink.html' %}
+        {% endwith %}
+        {{ extra.label }} <a href="{{ item.story.url }}">{{ item.story.title }}</a>
+        <time datetime="{{ item.created_at.strftime('%Y-%m-%dT%H:%M:%SZ') }}" class="editlog-date">{{ item.created_at|datetimeformat }}</time>
 
-                {% if extra.list_items %}
-                    <ul>
-                    {% for k, v in item.data.items() %}
-                        <li>
-                            <strong class="editlog-key">{{ k }}:</strong>
-                            <span class="editlog-value-old">{{ v[0] }}</span>
-                            →
-                            <span class="editlog-value-new">{{ v[1] }}</span>
-                        </li>
-                    {% endfor %}
-                    </ul>
-                {% endif %}
-            </p>
-        {% endfor %}
-
-        {% if page_obj %}
-            <div id="stories-pagination" class="pagination center">
-                {% if page_obj.has_previous() %}
-                    <a class="btn" href="{{ url_for(endpoint, page=page_obj.number - 1, **view_args) }}">← Назад</a>
-                {% endif %}
-                <span class="btn btn-primary">
-                    {{ page_obj.number }} / {{ page_obj.num_pages }}
-                </span>
-                {% if page_obj.has_next() %}
-                    <a class="btn" href="{{ url_for(endpoint, page=page_obj.number + 1, **view_args) }}">Вперед →</a>
-                {% endif %}
-              </div>
+        {% if extra.list_items %}
+            <ul>
+            {% for k, v in item.data.items() %}
+                <li>
+                    <strong class="editlog-key">{{ k }}:</strong>
+                    <span class="editlog-value-old">{{ v[0] }}</span>
+                    →
+                    <span class="editlog-value-new">{{ v[1] }}</span>
+                </li>
+            {% endfor %}
+            </ul>
         {% endif %}
-    </div>
+
+    {%- elif extra.mode == 'chapter' %}
+        {% with user=item.user %}
+            {% include 'includes/userlink.html' %}
+        {% endwith %}
+        {{ extra.label }}
+        {% if item.chapter -%}
+            <a href="{{ url_for('chapter.view', story_id=item.story.id, chapter_order=item.chapter.order) }}">«{{ item.chapter_title }}»</a>
+        {%- else -%}
+            «{{ item.chapter_title }}»
+        {%- endif %}
+        {{ pgettext('story_edit_log', 'of story') }} <a href="{{ item.story.url }}">{{ item.story.title }}</a>
+        <time datetime="{{ item.created_at.strftime('%Y-%m-%dT%H:%M:%SZ') }}" class="editlog-date">{{ item.created_at|datetimeformat }}</time>
+
+        {% if extra.list_items %}
+            <ul>
+            {% for k, v in item.data.items() %}
+                <li>
+                    <strong class="editlog-key">{{ k }}:</strong>
+                    <span class="editlog-value-old">{{ v[0] }}</span>
+                    →
+                    <span class="editlog-value-new">{{ v[1] }}</span>
+                </li>
+            {% endfor %}
+            </ul>
+        {% endif %}
+
+    {%- else %}???{% endif %}
+</p>{% endfor %}
+
+{% if page_obj %}
+    <div id="stories-pagination" class="pagination center">
+        {% if page_obj.has_previous() %}
+            <a class="btn" href="{{ url_for(endpoint, page=page_obj.number - 1, **view_args) }}">← Назад</a>
+        {% endif %}
+        <span class="btn btn-primary">
+            {{ page_obj.number }} / {{ page_obj.num_pages }}
+        </span>
+        {% if page_obj.has_next() %}
+            <a class="btn" href="{{ url_for(endpoint, page=page_obj.number + 1, **view_args) }}">Вперед →</a>
+        {% endif %}
+      </div>
+{% endif %}
+</div>
 </div>
 {% endblock %}

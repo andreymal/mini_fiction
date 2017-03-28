@@ -484,7 +484,7 @@ class ChapterBL(BaseBL):
         assert isinstance(data, dict)
         for k, v in data.items():
             assert isinstance(k, str)
-            assert isinstance(v, list)
+            assert isinstance(v, (list, tuple))
             assert len(v) == 2
 
         sl = StoryLog(
@@ -508,11 +508,27 @@ class ChapterBL(BaseBL):
         if 'title' in data and data['title'] != chapter.title:
             edited_data['title'] = [chapter.title, data['title']]
             chapter.title = data['title']
+
         if 'notes' in data and data['notes'] != chapter.notes:
             edited_data['notes'] = [chapter.notes, data['notes']]
             chapter.notes = data['notes']
+
         if 'text' in data and data['text'] != chapter.text:
-            chapter_text_diff = [['-', chapter.text], ['+', data['text']]]  # TODO: SequenceMatcher
+            from mini_fiction.utils import diff as utils_diff
+
+            if len(chapter.text) <= current_app.config['MAX_SIZE_FOR_DIFF'] and len(data['text']) <= current_app.config['MAX_SIZE_FOR_DIFF']:
+                # Для небольших текстов используем дифф на питоне, который красивый, но не быстрый
+                chapter_text_diff = utils_diff.get_diff_default(chapter.text, data['text'])
+            else:
+                try:
+                    # Для больших текстов используем библиотеку на C++, которая даёт диффы быстро, но не очень красиво
+                    import diff_match_patch  # pylint: disable=W0612
+                except ImportError:
+                    # Если библиотеки нет, то и дифф не получился
+                    chapter_text_diff = [('-', chapter.text), ('+', data['text'])]
+                else:
+                    chapter_text_diff = utils_diff.get_diff_google(chapter.text, data['text'])
+
             chapter.text = data['text']
             self._update_words_count(chapter)
 

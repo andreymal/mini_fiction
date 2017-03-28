@@ -91,6 +91,7 @@ class ProjectStatus(Status):
         'sphinx': 'Sphinx search',
         'avatars': 'Avatars uploading',
         'celery': 'Celery',
+        'diff': 'google-diff-match-patch',
     }
 
     def cache(self):
@@ -249,6 +250,21 @@ class ProjectStatus(Status):
             sum(len(x) for x in scheduled_tasks.values())
         ))
 
+    def diff(self):
+        try:
+            import diff_match_patch  # pylint: disable=W0612
+        except ImportError:
+            return self._ok('diff', 'not installed (we recommend install it: pip install diff_match_patch_python)')
+
+        from mini_fiction.utils.diff import get_diff_google
+
+        try:
+            assert get_diff_google('foo bar baz', 'foo baz baz') == [('=', 6), ('-', 'r'), ('+', 'z'), ('=', 4)]
+        except Exception as exc:
+            return self._fail('diff', 'not working: ' + str(exc))
+        else:
+            return self._ok('diff', 'working')
+
     def generate(self):
         yield self.cache()
         yield self.cache_working()
@@ -261,6 +277,7 @@ class ProjectStatus(Status):
         yield self.sphinx()
         yield self.avatars()
         yield self.celery()
+        yield self.diff()
 
 
 class UsersStatus(Status):

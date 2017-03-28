@@ -171,7 +171,8 @@ class Config(object):
         'font': ['size', 'color'],
     }
 
-    PUBLISH_SIZE_LIMIT = 1000
+    PUBLISH_SIZE_LIMIT = 1000  # words
+    MAX_SIZE_FOR_DIFF = 75000  # chars
     STARS_MINIMUM_VOTES = 2
 
     STORY_DOWNLOAD_FORMATS = tuple(reversed((

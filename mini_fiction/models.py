@@ -581,7 +581,6 @@ class StoryLog(db.Entity):
     by_staff = orm.Required(bool, default=False)
 
     # [["=", длина], ["-", "удалённый кусок"], ["+", "добавленный кусок"]]
-    # Дифф перевёрнутый: для получения старого текста нужно применить его к новому!
     chapter_text_diff = orm.Optional(orm.LongStr)
 
     orm.composite_index(story, created_at)

@@ -1517,6 +1517,78 @@ a.btn {
 }
 
 
+/* edit log */
+
+ul.editlog {
+    list-style: none outside none;
+    margin: 0;
+    padding: 0;
+}
+
+.editlog-item {
+    margin: 0;
+    padding: 6px;
+    line-height: 1.25;
+}
+
+ul.editlog .editlog-item:nth-child(2n+1) {
+    background-color: #fefefe;
+}
+
+.editlog-date {
+    font-size: 12px;
+    color: #888;
+}
+
+.editlog-changed-items {
+    margin-left: 28px;
+}
+
+.editlog-changes-link {
+    font-size: 12px;
+    margin-left: 24px;
+}
+
+.editlog-chapter-diff {
+    word-break: normal;
+    max-height: 20em;
+    overflow-y: auto;
+    background-color: white;
+    line-height: 1.25;
+}
+
+.editlog-chapter-diff ins {
+    text-decoration: none;
+    background-color: #7f7;
+}
+
+.editlog-chapter-diff del {
+    text-decoration: none;
+    background-color: #f77;
+}
+
+.editlog-unchanged {
+    color: #999;
+}
+
+.editlog-expand-btn-wrap {
+    text-align: center;
+    font-family: Arial, sans-serif;
+    font-size: 12px;
+    padding: 4px;
+    line-height: 1.1;
+    background-color: #eee;
+    border-radius: 4px;
+}
+
+.editlog-expand-btn, .editlog-expand-btn:visited {
+    color: #555;
+    text-decoration: none;
+    display: inline-block;
+    border-bottom: 1px dotted #555;
+}
+
+
 /* notice pages */
 
 .notice {

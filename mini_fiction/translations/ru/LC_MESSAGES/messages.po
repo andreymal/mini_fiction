@@ -1,5 +1,5 @@
 # Russian translations for mini_fiction.
-# Copyright (C) 2016 andreymal
+# Copyright (C) 2017 andreymal
 # This file is distributed under the same license as the mini_fiction
 # project.
 # andreymal <andriyano-31@mail.ru>, 2016.
@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version:  0.0.2\n"
 "Report-Msgid-Bugs-To: andriyano-31@mail.ru\n"
-"POT-Creation-Date: 2017-03-27 00:23+0300\n"
+"POT-Creation-Date: 2017-03-28 23:33+0300\n"
 "Last-Translator: andreymal <andriyano-31@mail.ru>\n"
 "Language: ru\n"
 "Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && "
@@ -334,7 +334,8 @@ msgstr[1] "%(num)d комментария"
 msgstr[2] "%(num)d комментариев"
 
 #: mini_fiction/templates/includes/story_control_buttons.html:28
-#: mini_fiction/templates/index.html:20 mini_fiction/views/stream.py:91
+#: mini_fiction/templates/index.html:20 mini_fiction/views/editlog.py:30
+#: mini_fiction/views/editlog.py:49
 msgid "Moderation log"
 msgstr "Лог модерации"
 
@@ -353,11 +354,6 @@ msgid_plural "Found %(num)d chapters"
 msgstr[0] "Всего нашли %(num)d главу"
 msgstr[1] "Всего нашли %(num)d главы"
 msgstr[2] "Всего нашли %(num)d глав"
-
-#: mini_fiction/templates/story_edit_log.html:41
-msgctxt "story_edit_log"
-msgid "of story"
-msgstr "рассказа"
 
 #: mini_fiction/templates/includes/ajax/story_ajax_publish_warning.html:9
 #: mini_fiction/templates/includes/stories.html:24
@@ -618,6 +614,15 @@ msgstr "Удалить это объявление?"
 msgid "Delete this static page?"
 msgstr "Удалить эту статическую страницу?"
 
+#: mini_fiction/templates/includes/edit_log_item.html:32
+msgctxt "story_edit_log"
+msgid "of story"
+msgstr "рассказа"
+
+#: mini_fiction/templates/includes/edit_log_item.html:46
+msgid "Show changes"
+msgstr "Показать изменения"
+
 #: mini_fiction/templates/includes/nav.html:8
 msgid "Notifications"
 msgstr "Уведомления"
@@ -683,46 +688,6 @@ msgstr[2] "Показать %(num)d глав"
 msgid "Edit"
 msgstr "Редактировать"
 
-#: mini_fiction/templatetags/misc.py:30
-msgctxt "story_edit_log"
-msgid "edited story"
-msgstr "отредактировал рассказ"
-
-#: mini_fiction/templatetags/misc.py:35
-msgctxt "story_edit_log"
-msgid "published story"
-msgstr "опубликовал рассказ"
-
-#: mini_fiction/templatetags/misc.py:37
-msgctxt "story_edit_log"
-msgid "sent to drafts story"
-msgstr "отправил в черновики рассказ"
-
-#: mini_fiction/templatetags/misc.py:39
-msgctxt "story_edit_log"
-msgid "approved story"
-msgstr "одобрил рассказ"
-
-#: mini_fiction/templatetags/misc.py:41
-msgctxt "story_edit_log"
-msgid "unapproved story"
-msgstr "отозвал рассказ"
-
-#: mini_fiction/templatetags/misc.py:49
-msgctxt "story_edit_log"
-msgid "edited chapter"
-msgstr "отредактировал главу"
-
-#: mini_fiction/templatetags/misc.py:51
-msgctxt "story_edit_log"
-msgid "added chapter"
-msgstr "добавил главу"
-
-#: mini_fiction/templatetags/misc.py:53
-msgctxt "story_edit_log"
-msgid "deleted chapter"
-msgstr "удалил главу"
-
 #: mini_fiction/utils/debugtoolbar.py:96
 msgid "Pony ORM"
 msgstr "Pony ORM"
@@ -730,6 +695,54 @@ msgstr "Pony ORM"
 #: mini_fiction/utils/debugtoolbar.py:107
 msgid "Pony ORM queries"
 msgstr "Запросы Pony ORM"
+
+#: mini_fiction/utils/misc.py:182
+msgctxt "story_edit_log"
+msgid "edited story"
+msgstr "отредактировал рассказ"
+
+#: mini_fiction/utils/misc.py:187
+msgctxt "story_edit_log"
+msgid "published story"
+msgstr "опубликовал рассказ"
+
+#: mini_fiction/utils/misc.py:189
+msgctxt "story_edit_log"
+msgid "sent to drafts story"
+msgstr "отправил в черновики рассказ"
+
+#: mini_fiction/utils/misc.py:191
+msgctxt "story_edit_log"
+msgid "approved story"
+msgstr "одобрил рассказ"
+
+#: mini_fiction/utils/misc.py:193
+msgctxt "story_edit_log"
+msgid "unapproved story"
+msgstr "отозвал рассказ"
+
+#: mini_fiction/utils/misc.py:204
+msgctxt "story_edit_log"
+msgid "edited chapter"
+msgstr "отредактировал главу"
+
+#: mini_fiction/utils/misc.py:209
+msgctxt "story_edit_log"
+msgid "added chapter"
+msgstr "добавил главу"
+
+#: mini_fiction/utils/misc.py:211
+msgctxt "story_edit_log"
+msgid "deleted chapter"
+msgstr "удалил главу"
+
+#: mini_fiction/utils/misc.py:267
+#, python-format
+msgid "Show %(num)s unchanged symbol"
+msgid_plural "Show %(num)s unchanged symbols"
+msgstr[0] "Показать %(num)s неизменённый символ"
+msgstr[1] "Показать %(num)s неизменённых символа"
+msgstr[2] "Показать %(num)s неизменённых символов"
 
 #: mini_fiction/validation/__init__.py:32
 msgid "Required field"

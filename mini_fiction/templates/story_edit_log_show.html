@@ -1,0 +1,20 @@
+{% extends base %}
+{% from 'macro.html' import breadcrumbs with context %}
+
+{% block content %}
+
+<div class="row">
+<div class="span12 story-page">
+{{- breadcrumbs() }}
+
+<div class="editlog-item" id="edit_log_{{ item.id }}">
+    {%- include 'includes/edit_log_item.html' with context -%}
+</div>
+
+{% if extra.diff_html %}
+<pre class="editlog-chapter-diff">{{ extra.diff_html|safe }}</pre>
+{% endif %}
+
+{{- breadcrumbs() }}
+
+{% endblock %}

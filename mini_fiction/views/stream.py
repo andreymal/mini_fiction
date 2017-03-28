@@ -3,11 +3,10 @@
 
 from pony import orm
 from pony.orm import db_session
-from flask import Blueprint, current_app, abort
+from flask import Blueprint, current_app
 from flask_login import current_user
-from flask_babel import gettext as _
 
-from mini_fiction.models import Story, Chapter, CoAuthorsStory, StoryLog, StoryComment
+from mini_fiction.models import Story, Chapter, CoAuthorsStory, StoryComment
 from mini_fiction.utils.views import paginate_view, cached_lists
 
 
@@ -72,23 +71,4 @@ def comments(page):
                 [x.id for x in comments_list]
             ) if current_user.is_authenticated else {}
         }
-    )
-
-
-@bp.route('/editlog/page/last/', defaults={'page': -1})
-@bp.route('/editlog/', defaults={'page': 1})
-@bp.route('/editlog/page/<int:page>/')
-@db_session
-def edit_log(page):
-    if not current_user.is_staff:
-        abort(403)
-
-    objects = StoryLog.select(lambda x: x.by_staff).order_by(StoryLog.created_at.desc())
-    return paginate_view(
-        'story_edit_log.html',
-        objects,
-        count=objects.count(),
-        page_title=_('Moderation log'),
-        objlistname='edit_log',
-        per_page=current_app.config.get('EDIT_LOGS_PER_PAGE', 100),
     )

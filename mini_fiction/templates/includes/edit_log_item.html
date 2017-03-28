@@ -1,0 +1,49 @@
+<time datetime="{{ item.created_at.strftime('%Y-%m-%dT%H:%M:%SZ') }}" class="editlog-date">{{ item.created_at|datetimeformat }}</time><br/>
+
+{% if extra.mode == 'story' %}
+    {% with user=item.user %}
+        {% include 'includes/userlink.html' %}
+    {% endwith %}
+    {{ extra.label }} <a href="{{ item.story.url }}">{{ item.story.title }}</a>
+
+    {% if extra.list_items %}
+        <ul class="editlog-changed-item">
+        {% for k, v in item.data.items() %}
+            <li>
+                <strong class="editlog-key">{{ k }}:</strong>
+                <span class="editlog-value-old">{{ v[0] }}</span>
+                →
+                <span class="editlog-value-new">{{ v[1] }}</span>
+            </li>
+        {% endfor %}
+        </ul>
+    {% endif %}
+
+{%- elif extra.mode == 'chapter' %}
+    {% with user=item.user %}
+        {% include 'includes/userlink.html' %}
+    {% endwith %}
+    {{ extra.label }}
+    {% if item.chapter -%}
+        <a href="{{ url_for('chapter.view', story_id=item.story.id, chapter_order=item.chapter.order) }}">«{{ item.chapter_title }}»</a>
+    {%- else -%}
+        «{{ item.chapter_title }}»
+    {%- endif %}
+    {{ pgettext('story_edit_log', 'of story') }} <a href="{{ item.story.url }}">{{ item.story.title }}</a>
+
+    {% if extra.list_items %}
+        <ul class="editlog-changed-items">
+        {% for k, v in item.data.items() %}
+            <li>
+                <strong class="editlog-key">{{ k }}:</strong>
+                <span class="editlog-value-old">{{ v[0] }}</span>
+                →
+                <span class="editlog-value-new">{{ v[1] }}</span>
+            </li>
+        {% endfor %}
+        </ul>
+    {% elif not extra.diff_html and extra.diff_html_available %}
+        <br/>&nbsp;<a href="{{ url_for('editlog.show', editlog_id=item.id) }}" class="editlog-changes-link">{{ _('Show changes') }}</a>
+    {% endif %}
+
+{%- else %}???{% endif %}

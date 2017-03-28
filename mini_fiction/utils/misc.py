@@ -1,13 +1,17 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
+import json
 import math
 import smtplib
 from base64 import b64encode
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 
-from flask import current_app, g
+from flask import current_app, g, escape
+from flask_babel import pgettext, ngettext
+
+from mini_fiction.utils import diff as utils_diff
 
 
 class Paginator(object):
@@ -170,3 +174,115 @@ def calc_comment_threshold(user):
         return user.comment_spoiler_threshold
     else:
         return current_app.config['COMMENT_SPOILER_THRESHOLD']
+
+
+def get_editlog_extra_info(log_item, prepare_chapter_diff=False):
+    if not log_item.chapter_action:
+        # Изменение рассказа
+        log_extra_item = {'mode': 'story', 'list_items': False, 'label': pgettext('story_edit_log', 'edited story')}
+        edited_data = log_item.data
+
+        if len(edited_data) == 1:
+            if 'draft' in edited_data and edited_data['draft'][1] is True:
+                log_extra_item['label'] = pgettext('story_edit_log', 'published story')
+            elif 'draft' in edited_data and edited_data['draft'][1] is False:
+                log_extra_item['label'] = pgettext('story_edit_log', 'sent to drafts story')
+            elif 'approved' in edited_data and edited_data['approved'][1] is True:
+                log_extra_item['label'] = pgettext('story_edit_log', 'approved story')
+            elif 'approved' in edited_data and edited_data['approved'][1] is False:
+                log_extra_item['label'] = pgettext('story_edit_log', 'unapproved story')
+            else:
+                log_extra_item['list_items'] = True
+        else:
+            log_extra_item['list_items'] = True
+
+    else:
+        # Изменение главы
+        log_extra_item = {
+            'mode': 'chapter',
+            'list_items': bool(log_item.data),
+            'label': pgettext('story_edit_log', 'edited chapter'),
+            'diff_html_available': False,
+            'diff_html': None,
+        }
+        if log_item.chapter_action == 'add':
+            log_extra_item['label'] = pgettext('story_edit_log', 'added chapter')
+        elif log_item.chapter_action == 'delete':
+            log_extra_item['label'] = pgettext('story_edit_log', 'deleted chapter')
+        if log_item.chapter and log_item.chapter_text_diff:
+            log_extra_item['diff_html_available'] = True
+
+        if prepare_chapter_diff and log_extra_item['diff_html_available']:
+            # Для отображения диффа пользователю его надо разжать, получив старый текст
+            from pony import orm
+            from mini_fiction.models import StoryLog
+
+            logs = orm.select(
+                (x.created_at, x.chapter_text_diff) for x in StoryLog
+                if x.chapter == log_item.chapter and x.created_at >= log_item.created_at
+            ).order_by(-1)[:]
+
+            chapter_text = log_item.chapter.text
+            # Последовательно откатываем более новые изменения у нового текста, получая таким образом старый
+            for x in logs:
+                if not x[1]:
+                    continue
+                chapter_text = utils_diff.revert_diff(chapter_text, json.loads(x[1]))
+
+            # Теперь у нас есть старый текст, и можно отрисовать данный дифф к нему
+            log_extra_item['diff_html'] = diff2html(chapter_text, json.loads(log_item.chapter_text_diff))
+
+    return log_extra_item
+
+
+def diff2html(s, diff):
+    result = []
+    ctx = max(0, current_app.config['DIFF_CONTEXT_SIZE'])
+    offset = 0
+    for i, item in enumerate(diff):
+        act, data = item
+
+        if act == '=':
+            data = s[offset:offset + data]
+            if len(data) < ctx * 3:
+                result.append(escape(data))
+            else:
+                if ctx == 0:
+                    l, mid, r = '', data, ''
+                elif i == 0:
+                    l, mid, r = '', data[:-ctx], data[-ctx:]
+                elif i == len(diff) - 1:
+                    l, mid, r = data[:ctx], data[ctx:], ''
+                else:
+                    l, mid, r = data[:ctx], data[ctx:-ctx], data[-ctx:]
+
+                f = l.rfind(' ', 0, len(l) - 2)
+                if f >= 0 and f > ctx - 30:
+                    mid = l[f:] + mid
+                    l = l[:f]
+                f = r.find(' ', len(r) + 2)
+                if f < ctx + 30:
+                    mid = mid + r[:f + 1]
+                    r = r[f + 1:]
+
+                result.append(escape(l))
+                result.append('<div class="editlog-expand-btn-wrap"><a href="#" class="editlog-expand-btn">')
+                result.append(ngettext('Show %(num)s unchanged symbol', 'Show %(num)s unchanged symbols', len(mid)))
+                result.append('</a></div><span class="editlog-unchanged" style="display: none;">')
+                result.append(escape(mid))
+                result.append('</span>')
+                result.append(escape(r))
+            offset += len(data)
+
+        elif act == '+':
+            result.append('<ins>')
+            result.append(escape(data))
+            result.append('</ins>')
+
+        elif act == '-':
+            result.append('<del>')
+            result.append(escape(data))
+            result.append('</del>')
+            offset += len(data)
+
+    return ''.join(result)

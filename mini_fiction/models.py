@@ -54,9 +54,8 @@ class Author(db.Entity, UserMixin):
     registration_profile = orm.Optional('RegistrationProfile')
     password_reset_profiles = orm.Set('PasswordResetProfile')
     contacts = orm.Set('Contact')
-    coauthorstories = orm.Set('CoAuthorsStory')
+    contributing = orm.Set('StoryContributor')
     coauthorseries = orm.Set('CoAuthorsSeries')
-    beta_reading = orm.Set('BetaReading')
     favorites = orm.Set('Favorites')
     bookmarks = orm.Set('Bookmark')
     edit_log = orm.Set('StoryLog')
@@ -77,11 +76,7 @@ class Author(db.Entity, UserMixin):
 
     @property
     def stories(self):
-        return orm.select(x.story for x in CoAuthorsStory if x.author == self).without_distinct()
-
-    @property
-    def beta_stories(self):
-        return orm.select(x.story for x in BetaReading if x.beta == self).without_distinct()
+        return orm.select(x.story for x in StoryContributor if x.user == self and x.is_author).without_distinct()
 
     @property
     def series(self):
@@ -213,7 +208,7 @@ class Story(db.Entity):
     """ Модель рассказа """
 
     title = orm.Required(str, 512)
-    coauthors = orm.Set('CoAuthorsStory')
+    contributors = orm.Set('StoryContributor')
     characters = orm.Set(Character)
     categories = orm.Set(Category)
     classifications = orm.Set(Classifier)
@@ -247,7 +242,6 @@ class Story(db.Entity):
     activity = orm.Set('Activity')
     votes = orm.Set('Vote')
     comments = orm.Set('StoryComment')
-    beta_reading = orm.Set('BetaReading')
 
     orm.composite_index(approved, draft)
     orm.composite_index(approved, draft, first_published_at)
@@ -389,12 +383,24 @@ class Chapter(db.Entity):
         )
 
 
-class CoAuthorsStory(db.Entity):
-    """ Промежуточная модель хранения взаимосвязей авторства рассказов (включая соавторов) """
+class StoryContributor(db.Entity):
+    """ Промежуточная модель хранения всех пользователей, участвовавших в написании рассказов """
 
-    author = orm.Required(Author)
+    # is_editor, is_author:
+    # - False, False — бета-читатель
+    # - True, False — редактор
+    # - True, True — автор (соавтор)
+    # - False, True — автор, с которым поругались :)
+
     story = orm.Required(Story)
-    approved = orm.Required(bool, default=False)
+    user = orm.Required(Author)
+    is_editor = orm.Required(bool, default=False)
+    is_author = orm.Required(bool, default=False)
+    created_at = orm.Required(datetime, 6, default=datetime.utcnow)
+    updated_at = orm.Required(datetime, 6, default=datetime.utcnow)
+
+    def before_update(self):
+        self.updated_at = datetime.utcnow()
 
 
 class CoAuthorsSeries(db.Entity):
@@ -403,14 +409,6 @@ class CoAuthorsSeries(db.Entity):
     author = orm.Optional(Author)
     series = orm.Optional(Series)
     approved = orm.Required(bool, default=False)
-
-
-class BetaReading(db.Entity):
-    """ Промежуточная модель хранения взаимосвязей рассказов, бета-читателей и результатов вычитки """
-
-    beta = orm.Optional(Author)
-    story = orm.Optional(Story)
-    checked = orm.Required(bool, default=False)
 
 
 class StoryComment(db.Entity):

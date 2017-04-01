@@ -5,7 +5,7 @@ from pony.orm import select, db_session
 from flask import Blueprint, current_app, abort
 from flask_login import current_user, login_required
 
-from mini_fiction.models import Author, Story, CoAuthorsStory, Favorites, Bookmark
+from mini_fiction.models import Author, Story, StoryContributor, Favorites, Bookmark
 from mini_fiction.utils.views import paginate_view, cached_lists
 
 
@@ -82,7 +82,7 @@ def bookmarks(page):
 def top(page):
     objects = Story.select_published().filter(lambda x: x.vote_total >= current_app.config['STARS_MINIMUM_VOTES'])
     objects = objects.order_by(Story.vote_average.desc(), Story.id.desc())
-    objects = objects.prefetch(Story.characters, Story.categories, Story.coauthors, CoAuthorsStory.author)
+    objects = objects.prefetch(Story.characters, Story.categories, Story.contributors, StoryContributor.user)
     return paginate_view(
         'stream/stories.html',
         objects,

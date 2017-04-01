@@ -6,7 +6,7 @@ from pony.orm import db_session
 from flask import Blueprint, current_app
 from flask_login import current_user
 
-from mini_fiction.models import Story, Chapter, CoAuthorsStory, StoryComment
+from mini_fiction.models import Story, Chapter, StoryContributor, StoryComment
 from mini_fiction.utils.views import paginate_view, cached_lists
 
 
@@ -19,7 +19,7 @@ bp = Blueprint('stream', __name__)
 @db_session
 def stories(page):
     objects = Story.select_published().order_by(Story.first_published_at.desc(), Story.id.desc())
-    objects = objects.prefetch(Story.characters, Story.categories, Story.coauthors, CoAuthorsStory.author)
+    objects = objects.prefetch(Story.characters, Story.categories, Story.contributors, StoryContributor.user)
     return paginate_view(
         'stream/stories.html',
         objects,
@@ -37,7 +37,7 @@ def stories(page):
 @db_session
 def chapters(page):
     objects = orm.select(c for c in Chapter if c.story_published and c.order != 1)
-    objects = objects.prefetch(Chapter.text, Chapter.story, Story.coauthors, CoAuthorsStory.author)
+    objects = objects.prefetch(Chapter.text, Chapter.story, Story.contributors, StoryContributor.user)
     objects = objects.order_by(Chapter.date.desc())
 
     return paginate_view(

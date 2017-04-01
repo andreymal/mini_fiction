@@ -24,7 +24,7 @@ def initsphinx():
     count = Story.select().count()
     while True:
         stories = tuple(Story.select(lambda x: x.id > pk).prefetch(
-            Story.coauthors,
+            Story.contributors,
             Story.characters,
             Story.categories,
             Story.classifications,

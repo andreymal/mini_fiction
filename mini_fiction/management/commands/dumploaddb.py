@@ -13,18 +13,13 @@ from mini_fiction.database import db
 
 
 dumpdb_params = {
-    'story_disabled': {'with_collections': True, 'exclude': (
-        'edit_log', 'story_views_set', 'votes', 'favorites', 'bookmarks',
-        'comments', 'in_series_permissions', 'beta_reading', 'coauthors',
-        'chapters', 'activity',
-    )},
     'story': {'exclude': (
         'edit_log', 'story_views_set', 'votes', 'favorites', 'bookmarks',
         'comments', 'activity',
     )},
     'author': {'exclude': (
-        'beta_reading', 'activity', 'edit_log',
-        'favorites', 'bookmarks', 'coauthorstories', 'coauthorseries',
+        'activity', 'edit_log',
+        'favorites', 'bookmarks', 'contributing', 'coauthorseries',
         'notices', 'votes', 'views',
         'notice_comments', 'notice_comment_edits', 'notice_comment_votes',
         'story_comments', 'story_comment_edits', 'story_comment_votes',
@@ -58,7 +53,7 @@ restoredb_order = (
 
     'story',
     'chapter',
-    'coauthorsstory',
+    'storycontributor',
     'storycomment',
 
     'series',

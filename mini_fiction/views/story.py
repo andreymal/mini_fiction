@@ -104,7 +104,7 @@ def publish(pk):
         abort(404)
 
     user = current_user._get_current_object()
-    if not user.is_staff and not story.bl.editable_by(user):
+    if not user.is_staff and not story.bl.publishable_by(user):
         abort(403)
 
     if story.bl.publish(user, story.draft):  # draft == not published
@@ -211,7 +211,7 @@ def add():
     form = StoryForm(request.form, data={'finished': 0, 'freezed': 0, 'original': 1, 'rating': rating})
     if form.validate_on_submit():
         try:
-            story = Story.bl.create([(user, True)], form.data)
+            story = Story.bl.create([user], form.data)
         except ValidationError as exc:
             form.set_errors(exc.errors)
         else:

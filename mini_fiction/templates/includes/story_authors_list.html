@@ -1,4 +1,4 @@
-{% for author in story.authors|sort(attribute='id') %}
+{% for author in story.authors %}
     {% if loop.first %}
            <a class="authorlink" href="{{ url_for('author.info', user_id=author.id) }}">{{author.username}}</a>
            {% if loop.length > 1 %}(в соавторстве с{% endif %}

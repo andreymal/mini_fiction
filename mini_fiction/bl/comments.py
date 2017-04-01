@@ -247,10 +247,10 @@ class StoryCommentBL(BaseCommentBL):
         return comment
 
     def select_by_story_author(self, user):
-        from mini_fiction.models import CoAuthorsStory
+        from mini_fiction.models import StoryContributor
 
         return self.model.select(
-            lambda x: not x.deleted and x.story in orm.select(y.story for y in CoAuthorsStory if y.author.id == user.id)
+            lambda x: not x.deleted and x.story in orm.select(y.story for y in StoryContributor if y.user.id == user.id and y.is_author)
         )
 
 

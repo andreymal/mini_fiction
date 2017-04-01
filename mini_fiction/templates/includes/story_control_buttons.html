@@ -6,9 +6,11 @@
                     {{ 'Отозвать' if story.approved else 'Одобрить' }}
                 </a>
             {% endif %}
-            <a class="btn btn-mini story_publish{% if story.publishable and story.draft %} btn-primary{% endif %}" href="{{ url_for('story.publish', pk=story.id) }}">
-                {{ 'Опубликовать' if story.draft else 'В черновики' }}
-            </a>
+            {% if story.bl.publishable_by(current_user) %}
+                <a class="btn btn-mini story_publish{% if story.publishable and story.draft %} btn-primary{% endif %}" href="{{ url_for('story.publish', pk=story.id) }}">
+                    {{ 'Опубликовать' if story.draft else 'В черновики' }}
+                </a>
+            {% endif %}
             {% if not current_user.is_staff and not story_edit %}
                 <a class="btn btn-warning btn-mini" href="{{ url_for('story.edit', pk=story.id) }}">Редактировать</a>
             {% endif %}

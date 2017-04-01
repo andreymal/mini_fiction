@@ -28,10 +28,13 @@ class StoryBL(BaseBL, Commentable):
         4: "comments DESC"
     }
 
-    _authors = None
+    _contributors = None
 
     def create(self, authors, data):
-        from mini_fiction.models import Category, Character, Classifier, Author, CoAuthorsStory
+        from mini_fiction.models import Category, Character, Classifier, Author, StoryContributor
+
+        if not authors:
+            raise ValueError('Authors are required')
 
         data = Validator(STORY).validated(data)
 
@@ -48,12 +51,12 @@ class StoryBL(BaseBL, Commentable):
         story.categories.add(Category.select(lambda x: x.id in data['categories'])[:])
         story.characters.add(Character.select(lambda x: x.id in data['characters'])[:])
         story.classifications.add(Classifier.select(lambda x: x.id in data['classifications'])[:])
-        for author, approved in authors:
-            author = author
-            CoAuthorsStory(
+        for author in authors:
+            StoryContributor(
                 story=story,
-                author=author,
-                approved=approved,
+                user=author,
+                is_editor=True,
+                is_author=True,
             ).flush()
 
         later(current_app.tasks['sphinx_update_story'].delay, story.id, ())
@@ -280,9 +283,9 @@ class StoryBL(BaseBL, Commentable):
 
     def get_all_views_for_author(self, author):
         # TODO: optimize it
-        from mini_fiction.models import CoAuthorsStory, StoryView
+        from mini_fiction.models import StoryContributor, StoryView
 
-        story_ids = orm.select(x.story.id for x in CoAuthorsStory if x.author == author)
+        story_ids = orm.select(x.story.id for x in StoryContributor if x.user == author and x.is_author)
         return StoryView.select(lambda x: x.story.id in story_ids).count()
 
     def select_accessible(self, user):
@@ -296,36 +299,69 @@ class StoryBL(BaseBL, Commentable):
             return default_queryset
 
     def select_by_author(self, author, queryset=None):
-        from mini_fiction.models import CoAuthorsStory
+        from mini_fiction.models import StoryContributor
 
         if not queryset:
             queryset = self.model.select()
-        return queryset.filter(lambda x: x in orm.select(y.story for y in CoAuthorsStory if y.author == author))
+        return queryset.filter(lambda x: x in orm.select(y.story for y in StoryContributor if y.user == author and y.is_author))
 
     # access control
 
-    def get_authors(self):
-        if self._authors is None:
-            self._authors = [x.author for x in sorted(self.model.coauthors, key=lambda x: x.id)]
-        return self._authors
+    def get_contributors(self):
+        if self._contributors is None:
+            self._contributors = sorted(self.model.contributors, key=lambda x: x.id)
+        return self._contributors
 
-    def is_author(self, author):
+    def get_authors(self):
+        return [x.user for x in self.get_contributors() if x.is_author]
+
+    def get_editors(self):
+        return [x.user for x in self.get_contributors() if x.is_editor]
+
+    def is_contributor(self, user):
         return (
-            author and author.is_authenticated and
-            author in self.get_authors()
+            user and user.is_authenticated and
+            user in [x.user for x in self.get_contributors()]
         )
 
-    def editable_by(self, author):
-        return author and (author.is_staff or self.is_author(author))
+    def is_author(self, user):
+        return (
+            user and user.is_authenticated and
+            user in self.get_authors()
+        )
 
-    def deletable_by(self, author):
-        return self.is_author(author)
+    def is_editor(self, user):
+        return (
+            user and user.is_authenticated and
+            user in self.get_editors()
+        )
 
-    def has_access(self, user=None):
+    def editable_by(self, user):
+        return user and (user.is_staff or self.is_editor(user))
+
+    def publishable_by(self, user):
+        return user and (user.is_staff or self.is_editor(user) and self.is_author(user))
+
+    def deletable_by(self, user):
+        allowed_user = None
+        for c in self.get_contributors():
+            if c.is_editor and c.is_author:
+                allowed_user = c.user
+                break
+        return user and user == allowed_user
+
+    def has_access(self, user):
         story = self.model
         if user and user.is_staff:
             return True
-        if story.published or self.is_author(user) or self.editable_by(user):
+        if story.published or self.is_contributor(user):
+            return True
+        return False
+
+    def has_beta_access(self, user):
+        if user and user.is_staff:
+            return True
+        if self.is_contributor(user):
             return True
         return False
 

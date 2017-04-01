@@ -4,6 +4,7 @@
 import ipaddress
 from datetime import datetime, timedelta
 
+from pony import orm
 from flask import current_app, url_for
 from flask_babel import lazy_gettext
 
@@ -244,6 +245,13 @@ class StoryCommentBL(BaseCommentBL):
         comment = super().create(*args, **kwargs)
         later(current_app.tasks['sphinx_update_comments_count'].delay, comment.story.id)
         return comment
+
+    def select_by_story_author(self, user):
+        from mini_fiction.models import CoAuthorsStory
+
+        return self.model.select(
+            lambda x: not x.deleted and x.story in orm.select(y.story for y in CoAuthorsStory if y.author.id == user.id)
+        )
 
 
 class NoticeCommentBL(BaseCommentBL):

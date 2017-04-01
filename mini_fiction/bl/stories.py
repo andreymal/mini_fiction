@@ -28,6 +28,8 @@ class StoryBL(BaseBL, Commentable):
         4: "comments DESC"
     }
 
+    _authors = None
+
     def create(self, authors, data):
         from mini_fiction.models import Category, Character, Classifier, Author, CoAuthorsStory
 
@@ -211,7 +213,7 @@ class StoryBL(BaseBL, Commentable):
         from mini_fiction.models import Vote
 
         story = self.model
-        if story.is_author(user):
+        if self.is_author(user):
             raise ValueError('Нельзя голосовать за свой рассказ')
         if value < 1 or value > 5:
             raise ValueError('Неверное значение')
@@ -276,12 +278,41 @@ class StoryBL(BaseBL, Commentable):
 
         return stars
 
+    def get_all_views_for_author(self, author):
+        # TODO: optimize it
+        from mini_fiction.models import CoAuthorsStory, StoryView
+
+        story_ids = orm.select(x.story.id for x in CoAuthorsStory if x.author == author)
+        return StoryView.select(lambda x: x.story.id in story_ids).count()
+
+    def select_accessible(self, user):
+        cls = self.model
+        default_queryset = cls.select(lambda x: x.approved and not x.draft)
+        if not user.is_authenticated:
+            return default_queryset
+        if user.is_staff:
+            return cls.select()
+        else:
+            return default_queryset
+
+    def select_by_author(self, author, queryset=None):
+        from mini_fiction.models import CoAuthorsStory
+
+        if not queryset:
+            queryset = self.model.select()
+        return queryset.filter(lambda x: x in orm.select(y.story for y in CoAuthorsStory if y.author == author))
+
     # access control
+
+    def get_authors(self):
+        if self._authors is None:
+            self._authors = [x.author for x in sorted(self.model.coauthors, key=lambda x: x.id)]
+        return self._authors
 
     def is_author(self, author):
         return (
             author and author.is_authenticated and
-            author.id in [x.author.id for x in self.model.coauthors]
+            author in self.get_authors()
         )
 
     def editable_by(self, author):

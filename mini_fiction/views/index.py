@@ -5,7 +5,7 @@ from flask import Blueprint, current_app, render_template
 from flask_babel import gettext
 from pony.orm import select, db_session
 
-from mini_fiction.models import Story, Category, Chapter, StoryComment
+from mini_fiction.models import Story, CoAuthorsStory, Category, Chapter, StoryComment
 from mini_fiction.utils.views import cached_lists
 
 bp = Blueprint('index', __name__)
@@ -27,7 +27,7 @@ def index():
     chapters = chapters[:current_app.config['CHAPTERS_COUNT']['main']]
 
     story_ids = [y.story.id for y in chapters]
-    chapters_stories = select(x for x in Story if x.id in story_ids).prefetch(Story.coauthors)[:]
+    chapters_stories = select(x for x in Story if x.id in story_ids).prefetch(Story.coauthors, CoAuthorsStory.author)[:]
     chapters_stories = {x.id: x for x in chapters_stories}
     chapters = [(x, chapters_stories[x.story.id]) for x in chapters]
 

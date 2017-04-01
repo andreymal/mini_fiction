@@ -2,6 +2,6 @@
       <div class="story-item">
         <h3><a href="{{ url_for('chapter.view', story_id=chapter.story.id, chapter_order=chapter.order) }}">{{ chapter.title }}</a></h3>
         <p>{{ chapter.text_as_html|striptags|truncate(200) }}</p>
-           <p><a href="{{ url_for('story.view', pk=chapter.story.id) }}">{{ chapter.story.title }}</a> от <a class="authorlink" href="{{ url_for('author.info', user_id=chapter.story.authors.first().id) }}">{{ chapter.story.authors.first().username }}</a> {{ chapter.date|timedeltaformat }} назад</p>
+           <p><a href="{{ url_for('story.view', pk=chapter.story.id) }}">{{ chapter.story.title }}</a> от <a class="authorlink" href="{{ url_for('author.info', user_id=chapter.story.authors[0].id) }}">{{ chapter.story.authors[0].username }}</a> {{ chapter.date|timedeltaformat }} назад</p>
     </div>
 {% endfor %}

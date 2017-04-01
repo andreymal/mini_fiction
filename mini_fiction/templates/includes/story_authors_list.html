@@ -1,5 +1,4 @@
-{% for coauthor in story.coauthors|sort(attribute='id') %}
-    {%- set author = coauthor.author -%}
+{% for author in story.authors|sort(attribute='id') %}
     {% if loop.first %}
            <a class="authorlink" href="{{ url_for('author.info', user_id=author.id) }}">{{author.username}}</a>
            {% if loop.length > 1 %}(в соавторстве с{% endif %}

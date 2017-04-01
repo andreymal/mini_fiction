@@ -21,7 +21,7 @@ class FB2Download(ZipFileDownloadFormat):
         doc = fb2.join_fb2_docs(
             chapters,
             title=story.title,
-            author_name=story.authors.first().username,  # TODO: multiple authors
+            author_name=story.authors[0].username,  # TODO: multiple authors
         )
         return etree.tostring(doc, encoding='UTF-8', xml_declaration=True)
 

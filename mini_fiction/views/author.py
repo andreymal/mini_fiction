@@ -4,9 +4,9 @@
 from flask import Blueprint, current_app, request, render_template, abort, redirect, url_for
 from flask_babel import gettext
 from flask_login import current_user, login_required, logout_user
-from pony.orm import select, db_session
+from pony.orm import db_session
 
-from mini_fiction.models import Author, Story, CoAuthorsStory, StoryComment, StoryView, Contact
+from mini_fiction.models import Author, Story, StoryComment, Contact
 from mini_fiction.utils.misc import Paginator
 from mini_fiction.utils.views import cached_lists
 from mini_fiction.forms.author import AuthorEditEmailForm, AuthorEditPasswordForm, AuthorEditProfileForm, AuthorEditPrefsForm
@@ -27,13 +27,11 @@ def info(user_id=None, comments_page=1):
         if not current_user.is_authenticated:
             abort(403)
         author = current_user._get_current_object()
-        comments_list = StoryComment.select(lambda x: not x.deleted and x.story in select(x.story for x in CoAuthorsStory if x.author == author))
+        comments_list = StoryComment.bl.select_by_story_author(author)
         comments_list = comments_list.order_by(StoryComment.id.desc())
         stories = author.stories.order_by(Story.first_published_at.desc(), Story.id.desc())
 
-        # TODO: optimize it
-        story_ids = select(x.story.id for x in CoAuthorsStory if x.author == author)
-        data['all_views'] = StoryView.select(lambda x: x.story.id in story_ids).count()
+        data['all_views'] = Story.bl.get_all_views_for_author(author)
 
         data['page_title'] = gettext('My cabinet')
         template = 'author_dashboard.html'
@@ -44,7 +42,7 @@ def info(user_id=None, comments_page=1):
         comments_list = StoryComment.select(lambda x: x.author == author and not x.deleted and x.story_published)
         comments_list = comments_list.order_by(StoryComment.id.desc())
         data['page_title'] = gettext('Author: {author}').format(author=author.username)
-        stories = Story.accessible(current_user).filter(lambda x: x in select(y.story for y in CoAuthorsStory if y.author == author))
+        stories = Story.bl.select_by_author(author, queryset=Story.bl.select_accessible(current_user))
         stories = stories.order_by(Story.first_published_at.desc(), Story.id.desc())
         template = 'author_overview.html'
 

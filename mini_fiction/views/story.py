@@ -104,7 +104,7 @@ def publish(pk):
         abort(404)
 
     user = current_user._get_current_object()
-    if not user.is_staff and not story.editable_by(user):
+    if not user.is_staff and not story.bl.editable_by(user):
         abort(403)
 
     if story.bl.publish(user, story.draft):  # draft == not published
@@ -232,7 +232,7 @@ def edit(pk):
     story = Story.get(id=pk)
     if not story:
         abort(404)
-    if not story.editable_by(user):
+    if not story.bl.editable_by(user):
         abort(403)
 
     data = {
@@ -273,7 +273,7 @@ def delete(pk):
     if not story:
         abort(404)
     user = current_user._get_current_object()
-    if not story.deletable_by(user):
+    if not story.bl.deletable_by(user):
         abort(403)
 
     if request.method == 'POST':

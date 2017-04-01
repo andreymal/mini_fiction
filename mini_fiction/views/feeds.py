@@ -22,12 +22,12 @@ def feed_stories():
     )
     stories = Story.select_published().order_by(Story.first_published_at.desc(), Story.id.desc())[:current_app.config['RSS']['stories']]
     for story in stories:
-        coauthor = story.coauthors.select().first()
+        author = story.authors[0]
         feed.add(
             story.title,
             Markup(story.summary).striptags(),
             content_type='text',
-            author=coauthor.author.username if coauthor else 'N/A',
+            author=author.username,
             url=url_for('story.view', pk=story.id, _external=True),
             updated=story.updated,
             published=story.date
@@ -51,7 +51,7 @@ def feed_chapters():
 
     for chapter in chapters:
         story = chapter.story
-        coauthor = story.coauthors.select().first()
+        author = story.authors[0]
         data = Markup(chapter.text).striptags()[:251]
         if len(data) == 251:
             data = data[:-1] + '…'
@@ -59,7 +59,7 @@ def feed_chapters():
             chapter.title,
             data,
             content_type='text',
-            author=coauthor.author.username if coauthor else 'N/A',
+            author=author.username,
             url=url_for('chapter.view', story_id=story.id, chapter_order=chapter.order, _external=True),
             updated=chapter.updated,
             published=chapter.date,

@@ -60,7 +60,7 @@ def add(story_id):
     if not story:
         abort(404)
     user = current_user._get_current_object()
-    if not story.editable_by(user):
+    if not story.bl.editable_by(user):
         abort(403)
 
     form = ChapterForm(data={'button_submit': 'Добавить'})
@@ -93,7 +93,7 @@ def edit(pk):
     if not chapter:
         abort(404)
     user = current_user._get_current_object()
-    if not chapter.story.editable_by(user):
+    if not chapter.story.bl.editable_by(user):
         abort(403)
 
     chapter_data = {
@@ -132,7 +132,7 @@ def delete(pk):
     if not chapter:
         abort(404)
     user = current_user._get_current_object()
-    if not chapter.story.editable_by(user):
+    if not chapter.story.bl.editable_by(user):
         abort(403)
 
     story = chapter.story
@@ -162,7 +162,7 @@ def sort(story_id):
     story = Story.get(id=story_id)
     if not story:
         abort(404)
-    if not story.editable_by(current_user._get_current_object()):
+    if not story.bl.editable_by(current_user._get_current_object()):
         abort(403)
 
     if not request.json or not request.json.get('chapters'):

@@ -5,7 +5,7 @@ from flask import Blueprint, current_app, request, render_template, abort, url_f
 from flask_login import current_user
 from pony.orm import db_session, select
 
-from mini_fiction.models import Story, StoryComment, CoAuthorsStory, Author
+from mini_fiction.models import Story, StoryComment, Author
 from mini_fiction.utils.misc import Paginator
 from mini_fiction.views import common_comment
 
@@ -142,7 +142,7 @@ def ajax_author_dashboard(page):
     if not current_user.is_authenticated:
         abort(403)
 
-    comments_list = StoryComment.select(lambda x: not x.deleted and x.story in select(x.story for x in CoAuthorsStory if x.author.id == current_user.id))
+    comments_list = StoryComment.bl.select_by_story_author(current_user)
     comments_list = comments_list.order_by(StoryComment.id.desc())
     comments_count = comments_list.count()
 

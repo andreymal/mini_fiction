@@ -42,7 +42,7 @@
                     {% for chapter in story.chapters.select()|sort(attribute='order') %}
                         <li>
                             <a class="chapter-title" href="{{ url_for('chapter.view', story_id=story.id, chapter_order=chapter.order) }}">{{ chapter.title }}</a>
-                            {% if story.editable_by(current_user) %}
+                            {% if story.bl.editable_by(current_user) %}
                                 <sup><a class="edit-link" href="{{ url_for('chapter.edit', pk=chapter.id) }}">Редактировать</a></sup>
                             {% endif %}
                             <br/>

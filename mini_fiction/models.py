@@ -267,15 +267,7 @@ class Story(db.Entity):
 
     @property
     def authors(self):
-        return orm.select(x.author for x in CoAuthorsStory if x.story == self).without_distinct().order_by('x.id')
-
-    @property
-    def betas(self):
-        return orm.select(x.beta for x in BetaReading if x.story == self).without_distinct().order_by('x.id')
-
-    @property
-    def in_series(self):
-        return orm.select(x.series for x in InSeriesPermissions if x.story == self).without_distinct().order_by('x.id')
+        return self.bl.get_authors()
 
     @property
     def published(self):
@@ -306,29 +298,6 @@ class Story(db.Entity):
     def last_comments_by_author(self, author):
         act = self.activity.select(lambda x: x.author.id == author.id).first()
         return act.last_comments if act else 0
-
-    @classmethod
-    def accessible(cls, user):
-        default_queryset = cls.select(lambda x: x.approved and not x.draft)
-        if not user.is_authenticated:
-            return default_queryset
-        if user.is_staff:
-            return cls.select()
-        else:
-            return default_queryset
-
-    # Проверка авторства
-    def editable_by(self, author):
-        # TODO: remove
-        return self.bl.editable_by(author)
-
-    def deletable_by(self, user):
-        # TODO: remove
-        return self.bl.deletable_by(user)
-
-    def is_author(self, author):
-        # TODO: remove
-        return self.bl.is_author(author)
 
     # Проверка возможности публикации
     @property
@@ -397,9 +366,6 @@ class Chapter(db.Entity):
     @property
     def views(self):
         return orm.select(orm.count(x.author) for x in StoryView if x.story == self.story and x.chapter == self).first()
-
-    def editable_by(self, author):
-        return self.story.editable_by(author)
 
     notes_as_html = filtered_html_property('notes', filter_html)
 

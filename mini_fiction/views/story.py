@@ -208,7 +208,7 @@ def edit_log(pk):
 def add():
     user = current_user._get_current_object()
     rating = Rating.select().order_by(Rating.id.desc()).first().id
-    form = StoryForm(request.form, data={'finished': 0, 'freezed': 0, 'original': 1, 'rating': rating})
+    form = StoryForm(data={'finished': 0, 'freezed': 0, 'original': 1, 'rating': rating})
     if form.validate_on_submit():
         try:
             story = Story.bl.create([user], form.data)
@@ -247,6 +247,8 @@ def edit(pk):
         'characters': [x.id for x in story.characters],
         'classifications': [x.id for x in story.classifications],
         'rating': story.rating.id,
+        'source_link': story.source_link,
+        'source_title': story.source_title,
     }
     for key in ('title', 'summary', 'notes', 'original', 'finished', 'freezed'):
         story_data[key] = getattr(story, key)

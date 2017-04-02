@@ -44,6 +44,8 @@ class StoryBL(BaseBL, Commentable):
             rating=data['rating'],
             original=data['original'],
             freezed=data['freezed'],
+            source_link=data['source_link'],
+            source_title=data['source_title'],
             finished=data['finished'],
             notes=data['notes'],
         )

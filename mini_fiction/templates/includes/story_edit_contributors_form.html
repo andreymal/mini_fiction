@@ -1,0 +1,58 @@
+
+<form action="{{ url_for('story.edit', pk=story.id) }}" data-ajaxaction="{{ url_for('story.edit', pk=story.id) }}?short=1" method="POST" enctype="multipart/form-data" class="form-horizontal" id="story-edit-contributors-form">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+
+    <fieldset>
+        <legend>Доступ к рассказу</legend>
+
+        <div class="control-group{% if contr_error %} error{% endif %}">
+        <div class="controls controls-contributors">
+
+        {% if contr_saved -%}
+            <div class="alert-mini green">Изменения сохранены</div>
+        {% endif -%}
+
+        <div class="help-block">
+            Здесь вы можете добавить пользователей, которые смогут читать и комментировать (и редактировать, если разрешите) даже неопубликованный рассказ.
+        </div>
+
+        {% for contributor in story.bl.get_contributors() %}<div class="controls-contributors-item">
+            <span class="controls-contributors-user">
+                <a class="authorlink" href="{{ url_for('author.info', user_id=contributor.user.id) }}">{{ contributor.user.username }}</a>
+            </span>
+            <span class="controls-contributors-access">
+                <select name="access_{{ contributor.user.id }}"{% if not current_user.is_staff and contributor.user.id == current_user.id %} disabled{% endif %}>
+                    <option value="">Нет доступа</option>
+                    <option value="beta"{% if not contributor.is_editor and not contributor.is_author %} selected{% endif %}>Бета-читатель</option>
+                    <option value="editor"{% if contributor.is_editor and not contributor.is_author %} selected{% endif %}>Редактор</option>
+                    <option value="author"{% if contributor.is_editor and contributor.is_author %} selected{% endif %}>Автор (соавтор)</option>
+                    {% if not contributor.is_editor and contributor.is_author %}<option value="author_readonly" selected>Автор (без доступа к редактированию)</option>{% endif %}
+                </select>
+            </span>
+        </div>{% endfor %}
+
+        <div class="controls-contributors-item controls-contributors-item-add">
+            <span class="controls-contributors-addlabel">Добавить:&nbsp;</span><span class="controls-contributors-user">
+                <input type="text" name="access_new_user" placeholder="Ник пользователя" />
+            </span>
+            <span class="controls-contributors-access">
+                <select name="access_new">
+                    <option value="beta" selected>Бета-читатель</option>
+                    <option value="editor">Редактор</option>
+                    <option value="author">Автор (соавтор)</option>
+                </select>
+            </span>
+        </div>
+
+        {% if contr_error %}
+            <div class="help-block">{{ contr_error }}</div>
+        {% endif %}
+
+        </div><!-- /controls -->
+        </div><!-- /control-group -->
+
+        <div class="form-actions">
+            <button type="submit" class="btn btn-primary" name="act" value="save_access">Сохранить настройки доступа</button>
+        </div>
+    </fieldset>
+</form>

@@ -307,6 +307,35 @@ class StoryBL(BaseBL, Commentable):
             queryset = self.model.select()
         return queryset.filter(lambda x: x in orm.select(y.story for y in StoryContributor if y.user == author and y.is_author))
 
+    def edit_contributors(self, contributors):
+        from mini_fiction.models import Author, StoryContributor
+
+        objs = {x.user.id: x for x in self.get_contributors()}
+        for user_id, acc in contributors.items():
+            user = Author.get(id=user_id)
+            if not user:
+                raise ValueError('User not found')
+
+            if acc is None:
+                if user_id in objs:
+                    objs.pop(user_id).delete()
+                continue
+
+            if user_id not in objs:
+                objs[user_id] = StoryContributor(
+                    story=self.model,
+                    user=user,
+                    is_editor=acc['is_editor'],
+                    is_author=acc['is_author'],
+                )
+                objs[user_id].flush()
+            else:
+                objs[user_id].is_editor = acc['is_editor']
+                objs[user_id].is_author = acc['is_author']
+
+        self._contributors = None
+
+
     # access control
 
     def get_contributors(self):
@@ -342,6 +371,9 @@ class StoryBL(BaseBL, Commentable):
         return user and (user.is_staff or self.is_editor(user))
 
     def publishable_by(self, user):
+        return user and (user.is_staff or self.is_editor(user) and self.is_author(user))
+
+    def can_edit_contributors(self, user):
         return user and (user.is_staff or self.is_editor(user) and self.is_author(user))
 
     def deletable_by(self, user):

@@ -11,7 +11,7 @@ from pony.orm import db_session
 
 from mini_fiction.forms.story import StoryForm
 from mini_fiction.forms.comment import CommentForm
-from mini_fiction.models import Story, Chapter, Rating, StoryLog, Favorites, Bookmark
+from mini_fiction.models import Author, Story, Chapter, Rating, StoryLog, Favorites, Bookmark
 from mini_fiction.validation import ValidationError
 from mini_fiction.utils.misc import calc_maxdepth
 
@@ -253,17 +253,81 @@ def edit(pk):
     for key in ('title', 'summary', 'notes', 'original', 'finished', 'freezed'):
         story_data[key] = getattr(story, key)
 
-    form = StoryForm(request.form, data=story_data)
-    if form.validate_on_submit():
-        try:
-            story = story.bl.update(user, form.data)
-        except ValidationError as exc:
-            form.set_errors(exc.errors)
-        else:
-            data['saved'] = True
+    action = request.form.get('act') if request.method == 'POST' else None
+
+    form = StoryForm(data=story_data)
 
     data['form'] = form
+    data['contr_error'] = None
+    data['contr_saved'] = False
     data['page_title'] = 'Редактирование «{}»'.format(story.title)
+
+    if action == 'save_story':
+        if form.validate_on_submit():
+            try:
+                story = story.bl.update(user, form.data)
+            except ValidationError as exc:
+                form.set_errors(exc.errors)
+            else:
+                data['saved'] = True
+
+    elif action == 'save_access':
+        if not story.bl.can_edit_contributors(user):
+            abort(403)
+
+        error = None
+        access = {}
+        for k, v in request.form.items():
+            if not k.startswith('access_'):
+                continue
+            k = k[7:]
+
+            if k == 'new' and request.form.get('access_new_user'):
+                acc_user = Author.get(username=request.form['access_new_user'])
+                if not acc_user:
+                    error = 'Пользователь с ником {} не найден'.format(request.form.get('access_new_user') or 'N/A')
+                    break
+            elif k.isdigit():
+                acc_user = Author.get(id=int(k))
+                if not acc_user:
+                    error = 'Пользователь с id {} не найден'.format(k)
+                    break
+            else:
+                continue
+
+            if not user.is_staff and acc_user.id == current_user.id:
+                continue
+
+            if not v:
+                access[acc_user.id] = None
+            elif v == 'beta':
+                access[acc_user.id] = {'is_editor': False, 'is_author': False}
+            elif v == 'editor':
+                access[acc_user.id] = {'is_editor': True, 'is_author': False}
+            elif v == 'author':
+                access[acc_user.id] = {'is_editor': True, 'is_author': True}
+            elif v == 'author_readonly':
+                if current_user.is_staff:
+                    access[acc_user.id] = {'is_editor': False, 'is_author': True}
+            else:
+                error = 'Некорректное значение доступа {}'.format(v)
+                break
+
+        if error:
+            data['contr_error'] = error
+            if g.is_ajax:
+                page_title = 'Ошибка редактирования доступа'
+                html = render_template('includes/ajax/story_edit_contributors_error.html', page_title=page_title, contr_error=error)
+                return jsonify({'page_content': {'modal': html, 'title': page_title}})
+            return render_template('story_work.html', **data)
+
+        else:
+            story.bl.edit_contributors(access)
+            data['contr_saved'] = True
+            if request.args.get('short') == '1':
+                html = render_template('includes/story_edit_contributors_form.html', **data)
+                return jsonify({'success': True, 'form': html})
+
     return render_template('story_work.html', **data)
 
 

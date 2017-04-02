@@ -5,6 +5,8 @@
 
 var story = {
     panel: null,
+    contributorsForm: null,
+    _contributorsSendEventBinded: null,
 
     init: function() {
         // Каруселька со случайными рассказами
@@ -132,6 +134,9 @@ var story = {
                 }).catch(core.handleError);
         });
 
+        // Редактирование доступа
+        this.contributorsStuff();
+
         // Сортировка глав рассказа
         $('#sortable_chapters').sortable({
             update: this._sortEvent.bind(this)
@@ -139,6 +144,11 @@ var story = {
     },
 
     unload: function() {
+        if (this.contributorsForm) {
+            this.contributorsForm.removeEventListener('submit', this._contributorsSendEventBinded);
+            this._contributorsSendEventBinded = null;
+            this.contributorsForm = null;
+        }
         this.removePanel();
     },
 
@@ -276,6 +286,55 @@ var story = {
 
         core.notify('Ваш голос учтен!');
         return true;
+    },
+
+    contributorsStuff: function() {
+        if (!window.amajaxify.isEnabled()) {
+            return;
+        }
+        this.contributorsForm = document.getElementById('story-edit-contributors-form');
+        if (!this.contributorsForm) {
+            return;
+        }
+
+        this._contributorsSendEventBinded = this._contributorsSendEvent.bind(this);
+        this.contributorsForm.addEventListener('submit', this._contributorsSendEventBinded);
+    },
+
+    _contributorsSendEvent: function(event) {
+        event.preventDefault();
+
+        var url = this.contributorsForm.getAttribute('data-ajaxaction') ||  this.contributorsForm.action;
+        var formData = new FormData(this.contributorsForm);
+        formData.append('act', 'save_access');
+
+        this.contributorsForm.act.disabled = true;
+        core.ajax.post(url, formData)
+            .then(function(response) {
+                return response.json();
+            })
+            .then(function(response) {
+                if (core.handleResponse(response, url)) {
+                    this.contributorsForm.act.disabled = false;
+                    return;
+                }
+
+                var parser = document.createElement('div');
+                parser.innerHTML = response.form;
+                var newForm = parser.firstElementChild;
+
+                this.contributorsForm.removeEventListener('submit', this._contributorsSendEventBinded);
+                this.contributorsForm.parentNode.insertBefore(newForm, this.contributorsForm);
+                this.contributorsForm.parentNode.removeChild(this.contributorsForm);
+                this.contributorsForm = newForm;
+                newForm.addEventListener('submit', this._contributorsSendEventBinded);
+
+            }.bind(this)).then(null, function(err) {
+                this.contributorsForm.act.disabled = false;
+                core.handleError(err);
+            }.bind(this));
+
+        return false;
     },
 
     panelStuff: function() {

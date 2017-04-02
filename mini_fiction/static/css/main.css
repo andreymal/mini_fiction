@@ -1517,6 +1517,38 @@ a.btn {
 }
 
 
+/* editing contributors */
+
+.controls-contributors-item {
+    margin: 4px 0;
+}
+
+.controls-contributors-user {
+    display: inline-block;
+    min-width: 140px;
+    text-align: right;
+}
+
+.controls-contributors-user > input {
+    width: 126px;
+}
+
+.controls-contributors-access {
+    display: inline-block;
+}
+
+.controls-contributors-access > select {
+    width: auto;
+}
+
+.controls-contributors-addlabel {
+    width: 100px;
+    margin-left: -100px;
+    display: inline-block;
+    text-align: right;
+}
+
+
 /* edit log */
 
 ul.editlog {

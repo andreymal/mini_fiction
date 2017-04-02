@@ -182,12 +182,24 @@
                 <!-- Действия -->
                   <div class="form-actions">
                 {% if story_edit %}
-                    <input type="submit" class="btn btn-primary" value="Сохранить" />
+                    <button type="submit" class="btn btn-primary" name="act" value="save_story">Сохранить рассказ</button>
                 {% else %}
-                    <input type="submit" class="btn btn-primary" value="Добавить рассказ" />
+                    <button type="submit" class="btn btn-primary" name="act" value="save_story">Добавить рассказ</button>
                 {% endif %}
                   </div>
-                  {% if story_edit %}
+
+              </fieldset>
+
+        </form>
+
+        {% if story_edit %}
+        {% if story.bl.can_edit_contributors(current_user) %}
+            {%- include 'includes/story_edit_contributors_form.html' with context %}
+        {% endif %}
+
+        <form method="POST" enctype="multipart/form-data" class="form-horizontal">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+              <fieldset>
                       <legend>Главы</legend>
                       <div class="control-group">
                         <div class="controls events">
@@ -205,8 +217,8 @@
                             <a href="{{ url_for('chapter.add', story_id=story.id) }}" class="btn btn-success">Добавить главу</a>
                         </div>
                     </div>
-                  {% endif %}
               </fieldset>
+        {% endif %}
         </form>
       </div>
 

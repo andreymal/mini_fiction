@@ -1,5 +1,5 @@
 /*!
- * amajaxify.js (2017-03)
+ * amajaxify.js (2017-04)
  * License: MIT
  * Библиотека для загрузки загрузки страниц и отправки форм с помощью
  * ES6 fetch и HTML5 History API для разных ништяков.
@@ -9,7 +9,7 @@
  * Генерирует следующие события на объекте document:
  *
  * - amajaxify:beginrequest(detail={method, url})
- *   Непосредственно перед отправкой запроса на сервера
+ *   Непосредственно перед отправкой запроса на сервер
  *
  * - amajaxify:unload(detail={url, content, toModal})
  *   Перед удалением старого содержимого страницы и загрузкой нового.
@@ -68,7 +68,8 @@ var amajaxify = {
         }
 
         if (!options.force) {
-            if (location.hostname == 'web.archive.org' || location.hostname == 'archive.is') {
+            var archiveHosts = ['web.archive.org', 'archive.is', 'archive.today', 'archive.li', 'archive.fo', 'peeep.us'];
+            if (archiveHosts.indexOf(location.hostname.toLowerCase()) >= 0) {
                 console.log('amajaxify: Wayback Machine detected, AJAX disabled');
                 return false;
             }
@@ -116,6 +117,11 @@ var amajaxify = {
 
         this.state.enabled = true;
         return true;
+    },
+
+
+    isEnabled: function() {
+        return this.state.enabled;
     },
 
 
@@ -301,7 +307,7 @@ var amajaxify = {
         options может содержать:
         - replaceState (true/false) — если нужно заменить текущую сслыку
           в истории, а не добавлять новую
-        - noScroll (true/false) — не прокручивать страницу вверх после
+        - noScroll (true/false) — не прокручивать страницу вверх после
           обновления страницы
 
         */
@@ -497,7 +503,7 @@ var amajaxify = {
     _popstateEvent: function(event) {
         if (!event.state || !event.state.amajaxify) {
             // Это какой-то не наш state (например, баганутый Safari всегда вызывает popstate после onload)
-            // FIXME: Иногда это бывает нажатие «Назад» после обновления страницы, и это надо обработать,
+            // FIXME: Иногда это бывает нажатие «Назад» после обновления страницы, и это надо обработать,
             // но хз как чтоб с Safari не накосячить
             return;
         }

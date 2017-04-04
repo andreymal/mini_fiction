@@ -1,6 +1,6 @@
 {% for story in stories %}
     <!-- Вывод рассказа: начало -->
-    {%- set story_chapters_count = chapters_count_cache.get(story.id, 0) if chapters_count_cache is defined else story.chapters.count() %}
+    {%- set story_chapters_count = chapters_count_cache.get(story.id, 0) if chapters_count_cache is defined else story.bl.select_accessible_chapters(current_user).count() %}
     <div class="story-item" id="story_{{ story.id }}">
         <h3>
             <a href="{{ url_for('story.view', pk=story.id) }}">{{ story.title }}</a>
@@ -39,9 +39,9 @@
             <button class="btn btn-collapse btn-small" data-toggle="collapse" data-target="#story-{{ story.id }}">{{ ngettext("Show %(num)d chapter", "Show %(num)d chapters", story_chapters_count) }}</button>
             <div id="story-{{ story.id }}" class="collapse">
                 <ul class="chapters-list">
-                    {% for chapter in story.chapters.select()|sort(attribute='order') %}
+                    {% for chapter in story.bl.select_accessible_chapters(current_user)|sort(attribute='order') %}
                         <li>
-                            <a class="chapter-title" href="{{ url_for('chapter.view', story_id=story.id, chapter_order=chapter.order) }}">{{ chapter.title }}</a>
+                            <a class="chapter-title" href="{{ url_for('chapter.view', story_id=story.id, chapter_order=chapter.order) }}">{{ chapter.title }}</a>{% if chapter.draft %} <sup class="draft">{{ _('Draft') }}</sup>{% endif %}
                             {% if story.bl.editable_by(current_user) %}
                                 <sup><a class="edit-link" href="{{ url_for('chapter.edit', pk=chapter.id) }}">Редактировать</a></sup>
                             {% endif %}

@@ -66,6 +66,24 @@ var story = {
                 }).catch(core.handleError);
         });
 
+        // Публикация главы
+        core.bind('#content .js-btn-publish-chapter', 'click', function(event) {
+            event.stopImmediatePropagation();
+            event.preventDefault();
+            var link = this;
+            var url = link.href;
+            core.ajax.post(url)
+                .then(function(response) {
+                    return response.json();
+                })
+                .then(function(response) {
+                    if (core.handleResponse(response, url)) {
+                        return;
+                    }
+                    story.setChapterPublished(link, response.published);
+                }).catch(core.handleError);
+        });
+
         // Одобрение
         core.bind('#content .story_approve', 'click', function(event) {
             event.stopImmediatePropagation();
@@ -165,6 +183,21 @@ var story = {
             } else {
                 btn.classList.add('btn-primary');
                 btn.textContent = 'Опубликовать';
+            }
+            return true;
+        } else {
+            return false;
+        }
+    },
+
+    setChapterPublished: function(btn, published) {
+        if (btn) {
+            if (published) {
+                btn.classList.remove('btn-primary');
+                btn.textContent = 'в черновики';
+            } else {
+                btn.classList.add('btn-primary');
+                btn.textContent = 'опубликовать';
             }
             return true;
         } else {

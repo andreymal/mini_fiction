@@ -155,6 +155,8 @@ class StoryBL(BaseBL, Commentable):
             later(current_app.tasks['sphinx_update_story'].delay, story.id, ('approved',))
             for c in story.chapters:
                 c.story_published = story.published  # TODO: update Chapter where story = story.id
+                if story.published and not c.draft and not c.first_published_at:
+                    c.first_published_at = datetime.utcnow()
                 later(current_app.tasks['sphinx_update_chapter'].delay, c.id)
             for c in story.comments:  # TODO: update StoryComment where story = story.id
                 c.story_published = story.published
@@ -177,14 +179,27 @@ class StoryBL(BaseBL, Commentable):
                 if story.published and not story.first_published_at:
                     story.first_published_at = datetime.utcnow()
                 later(current_app.tasks['sphinx_update_story'].delay, story.id, ('draft',))
-                for c in story.chapters:
+                for c in sorted(story.chapters, key=lambda c: c.order):
                     c.story_published = story.published
+                    if story.published and not c.draft and not c.first_published_at:
+                        c.first_published_at = datetime.utcnow()
                     later(current_app.tasks['sphinx_update_chapter'].delay, c.id)
                 for c in story.comments:
                     c.story_published = story.published
             return True
 
         return False
+
+    def publish_all_chapters(self):
+        story = self.model
+        for c in sorted(story.chapters, key=lambda x: x.order):
+            if not c.draft:
+                continue
+            story.words += c.words
+            c.draft = False
+            later(current_app.tasks['sphinx_update_chapter'].delay, c.id)
+            if story.published and not c.first_published_at:
+                c.first_published_at = datetime.utcnow()
 
     def delete(self):
         story = self.model
@@ -293,7 +308,7 @@ class StoryBL(BaseBL, Commentable):
     def select_accessible(self, user):
         cls = self.model
         default_queryset = cls.select(lambda x: x.approved and not x.draft)
-        if not user.is_authenticated:
+        if not user or not user.is_authenticated:
             return default_queryset
         if user.is_staff:
             return cls.select()
@@ -306,6 +321,14 @@ class StoryBL(BaseBL, Commentable):
         if not queryset:
             queryset = self.model.select()
         return queryset.filter(lambda x: x in orm.select(y.story for y in StoryContributor if y.user == author and y.is_author))
+
+    def select_accessible_chapters(self, user):
+        default_queryset = self.model.chapters.filter(lambda x: not x.draft)
+        if not user or not user.is_authenticated:
+            return default_queryset
+        if user.is_staff or self.is_contributor(user):
+            return self.model.chapters
+        return default_queryset
 
     def edit_contributors(self, contributors):
         from mini_fiction.models import Author, StoryContributor
@@ -568,9 +591,11 @@ class ChapterBL(BaseBL):
             title=data['title'],
             notes=data['notes'],
             text=data['text'],
+            draft=True,
             story_published=story.published,
         )
         chapter.order = (new_order or 0) + 1
+
         self._update_words_count(chapter)
         chapter.flush()
         chapter.bl.edit_log(editor, 'add', {})
@@ -643,8 +668,9 @@ class ChapterBL(BaseBL):
         new_words = len(Markup.striptags(chapter.text).split())
         if new_words != chapter.words:
             chapter.words = new_words
-            story = chapter.story
-            story.words = story.words - old_words + new_words
+            if not chapter.draft:
+                story = chapter.story
+                story.words = story.words - old_words + new_words
 
     def delete(self, editor):
         from mini_fiction.models import Chapter
@@ -660,6 +686,27 @@ class ChapterBL(BaseBL):
 
         for c in Chapter.select(lambda x: x.story == story and x.order > old_order):
             c.order = c.order - 1
+
+    def publish(self, user, published):
+        chapter = self.model
+        story = chapter.story
+        if published == (not chapter.draft):
+            return
+
+        chapter.draft = not published
+
+        if user:
+            self.edit_log(user, 'edit', {'draft': [not chapter.draft, chapter.draft]})
+
+        if chapter.draft:
+            story.words -= chapter.words
+        else:
+            story.words += chapter.words
+
+        if not story.draft and story.published and not chapter.first_published_at:
+            chapter.first_published_at = datetime.utcnow()
+
+        later(current_app.tasks['sphinx_update_chapter'].delay, chapter.id)
 
     def viewed(self, user):
         if not user.is_authenticated:
@@ -687,7 +734,7 @@ class ChapterBL(BaseBL):
             'notes': chapter.notes,
             'text': chapter.text,
             'story_id': chapter.story.id,
-            'published': chapter.story_published
+            'published': chapter.story_published and not chapter.draft,
         } for chapter in chapters]
 
         with current_app.sphinx as sphinx:

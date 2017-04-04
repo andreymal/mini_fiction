@@ -183,9 +183,9 @@ def get_editlog_extra_info(log_item, prepare_chapter_diff=False):
         edited_data = log_item.data
 
         if len(edited_data) == 1:
-            if 'draft' in edited_data and edited_data['draft'][1] is True:
+            if 'draft' in edited_data and edited_data['draft'][1] is False:
                 log_extra_item['label'] = pgettext('story_edit_log', 'published story')
-            elif 'draft' in edited_data and edited_data['draft'][1] is False:
+            elif 'draft' in edited_data and edited_data['draft'][1] is True:
                 log_extra_item['label'] = pgettext('story_edit_log', 'sent to drafts story')
             elif 'approved' in edited_data and edited_data['approved'][1] is True:
                 log_extra_item['label'] = pgettext('story_edit_log', 'approved story')
@@ -200,15 +200,25 @@ def get_editlog_extra_info(log_item, prepare_chapter_diff=False):
         # Изменение главы
         log_extra_item = {
             'mode': 'chapter',
-            'list_items': bool(log_item.data),
+            'list_items': False,
             'label': pgettext('story_edit_log', 'edited chapter'),
             'diff_html_available': False,
             'diff_html': None,
         }
+        edited_data = log_item.data
+
         if log_item.chapter_action == 'add':
             log_extra_item['label'] = pgettext('story_edit_log', 'added chapter')
         elif log_item.chapter_action == 'delete':
             log_extra_item['label'] = pgettext('story_edit_log', 'deleted chapter')
+        elif len(edited_data) == 1 and 'draft' in edited_data:
+            if edited_data['draft'][1]:
+                log_extra_item['label'] = pgettext('story_edit_log', 'sent to drafts chapter')
+            else:
+                log_extra_item['label'] = pgettext('story_edit_log', 'published chapter')
+        elif edited_data:
+            log_extra_item['list_items'] = True
+
         if log_item.chapter and log_item.chapter_text_diff:
             log_extra_item['diff_html_available'] = True
 

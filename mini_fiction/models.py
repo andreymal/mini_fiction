@@ -328,10 +328,13 @@ class Chapter(db.Entity):
     text = orm.Optional(orm.LongStr)
     updated = orm.Required(datetime, 6, default=datetime.utcnow)
     words = orm.Required(int, default=0)
+    # Глава опубликована только при draft=False и story_published=True
+    draft = orm.Required(bool, default=True)
     story_published = orm.Required(bool)  # optimization of stream pages
+    first_published_at = orm.Optional(datetime, 6)
     edit_log = orm.Set('StoryLog')
 
-    orm.composite_index(date, story_published)
+    orm.composite_index(first_published_at, order)
 
     bl = Resource('bl.chapter')
 
@@ -344,17 +347,17 @@ class Chapter(db.Entity):
     def get_absolute_url(self):
         return url_for('chapter.view_single', story_id=self.story.id, order=self.order)
 
-    def get_prev_chapter(self):
-        order = self.order - 1
-        return orm.select(x for x in Chapter if x.story == self.story and x.order == order).first()
+    def get_prev_chapter(self, allow_draft=False):
+        q = orm.select(x for x in Chapter if x.story == self.story and x.order < self.order).order_by(Chapter.order.desc())
+        if not allow_draft:
+            q = q.filter(lambda x: not x.draft)
+        return q.first()
 
-    def get_next_chapter(self):
-        order = self.order + 1
-        return orm.select(x for x in Chapter if x.story == self.story and x.order == order).first()
-
-    @property
-    def published(self):
-        return self.story.published
+    def get_next_chapter(self, allow_draft=False):
+        q = orm.select(x for x in Chapter if x.story == self.story and x.order > self.order).order_by(Chapter.order)
+        if not allow_draft:
+            q = q.filter(lambda x: not x.draft)
+        return q.first()
 
     # Количество просмотров
     @property

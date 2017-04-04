@@ -5,7 +5,7 @@
         <a title="Отложить на потом" href="{{ url_for('story.bookmark', pk=story.id) }}" class="story_bookmark scon bookmark{% if story.bookmarked(current_user.id) %} bookmarked{% endif %}"></a>
     {% endif %}
     {% if not story.finished %}
-        <a title="Подписаться на новые главы по RSS" href="{{ url_for('feeds.stories', story_id=story.id) }}" class="scon feed" data-noajax="1"></a>
+        <a title="Подписаться на новые главы по RSS" href="{{ url_for('feeds.story', story_id=story.id) }}" class="scon feed" data-noajax="1"></a>
     {% endif %}
 
     {% if prev_chapter or next_chapter %}

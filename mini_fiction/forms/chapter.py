@@ -37,8 +37,3 @@ class ChapterForm(Form):
         ],
         render_kw=dict(textarea_dict, placeholder='Текст новой главы', cols=40, rows=10, id='id_text'),
     )
-
-    button_submit = StringField(
-        widget=ServiceButtonWidget(),
-        render_kw={'class': 'btn btn-primary'},
-    )

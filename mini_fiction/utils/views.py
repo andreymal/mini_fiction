@@ -44,7 +44,7 @@ def paginate_view(template, objlist, page=None, objlistname='objects', endpoint=
 
 def cached_lists(story_ids):
     data = {
-        'chapters_count_cache': dict(orm.select((x.id, orm.count(x.chapters)) for x in models.Story if x.id in story_ids)),
+        'chapters_count_cache': dict(orm.select((x.id, orm.count(y for y in x.chapters if not y.draft)) for x in models.Story if x.id in story_ids)),
     }
     if not current_user.is_authenticated:
         data.update({

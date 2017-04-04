@@ -43,6 +43,8 @@ def view(pk, comments_page):
     last_viewed_comment = story.bl.last_viewed_comment_by(user)
 
     chapters = story.chapters.select().order_by(Chapter.order, Chapter.id)[:]
+    if not story.bl.is_contributor(user):
+        chapters = [x for x in chapters if not x.draft]
 
     if user.is_authenticated:
         story.bl.viewed(user)

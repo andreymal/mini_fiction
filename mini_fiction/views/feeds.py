@@ -45,8 +45,8 @@ def feed_chapters():
         url=request.url_root
     )
 
-    chapters = select(c for c in Chapter if c.story_published)
-    chapters = chapters.order_by(Chapter.date.desc())
+    chapters = select(c for c in Chapter if not c.draft and c.story_published)
+    chapters = chapters.order_by(Chapter.first_published_at.desc(), Chapter.order.desc())
     chapters = chapters.prefetch(Chapter.story)[:current_app.config['RSS']['chapters']]
 
     for chapter in chapters:
@@ -70,7 +70,7 @@ def feed_chapters():
 @bp.route('/story/<int:story_id>/', endpoint='story')
 @db_session
 def feed_story(story_id):
-    story = Story.select(lambda x: x.id == story_id).prefetch(Story.chapters).first()
+    story = Story.select_published().filter(lambda x: x.id == story_id).prefetch(Story.chapters).first()
     if not story:
         abort(404)
 
@@ -80,7 +80,9 @@ def feed_story(story_id):
         url=request.url_root
     )
 
-    chapters = sorted(story.chapters, key=lambda x: x.date, reverse=True)
+    chapters = [c for c in story.chapters if not c.draft]
+    chapters.sort(key=lambda x: (x.first_published_at, x.order), reverse=True)
+
     for chapter in chapters:
         data = Markup(chapter.text).striptags()[:251]
         if len(data) == 251:

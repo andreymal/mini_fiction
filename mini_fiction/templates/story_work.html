@@ -208,6 +208,9 @@
                                       <li id="chapter_{{ chapter.id }}" data-chapter="{{ chapter.id }}" class="btn btn-large">
                                         {{ chapter.title }}
                                         <div class="btn-group">
+                                            <a class="btn btn-mini js-btn-publish-chapter{% if chapter.draft %} btn-primary{% endif %}" href="{{ url_for('chapter.publish', pk=chapter.id) }}">
+                                                {{ 'опубликовать' if chapter.draft else 'в черновики' }}
+                                            </a>
                                             <a class="btn btn-warning btn-mini" href="{{ url_for('chapter.edit', pk=chapter.id) }}">править</a>
                                             <a class="btn btn-danger btn-mini chapter_delete" href="{{ url_for('chapter.delete', pk=chapter.id) }}">удалить</a>
                                         </div>

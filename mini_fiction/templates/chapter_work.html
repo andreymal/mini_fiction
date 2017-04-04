@@ -57,7 +57,23 @@
                       </div>
                 </div>
                 <div class="form-actions notop">
-                    {{ form.button_submit }}
+                {%- if not edit %}
+                    {% if not story.published %}
+                        <button type="submit" name="act" value="publish" class="btn btn-primary">{{ _('Add') }}</button>
+                    {% else %}
+                        <button type="submit" name="act" value="publish" class="btn btn-primary">
+                            {%- if unpublished_chapters_count > 0 -%}
+                                {{- ngettext('Add and publish %(num)s chapter', 'Add and publish %(num)s chapters', unpublished_chapters_count + 1) -}}
+                            {%- else -%}
+                                {{ _('Add and publish') }}
+                            {%- endif -%}
+                        </button>
+                        <button type="submit" name="act" value="draft" class="btn">{{ _('Add as draft') }}</button>
+                    {% endif %}
+
+                {%- else %}
+                    <button type="submit" name="act" value="save" class="btn btn-primary">{{ _('Save changes') }}</button>
+                {%- endif %}
                 </div>
             </fieldset>
         </form>

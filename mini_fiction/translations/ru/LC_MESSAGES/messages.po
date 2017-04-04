@@ -2,13 +2,13 @@
 # Copyright (C) 2017 andreymal
 # This file is distributed under the same license as the mini_fiction
 # project.
-# andreymal <andriyano-31@mail.ru>, 2016.
+# andreymal <andriyano-31@mail.ru>, 2017.
 #
 msgid ""
 msgstr ""
 "Project-Id-Version:  0.0.2\n"
 "Report-Msgid-Bugs-To: andriyano-31@mail.ru\n"
-"POT-Creation-Date: 2017-03-28 23:33+0300\n"
+"POT-Creation-Date: 2017-04-04 22:19+0300\n"
 "Last-Translator: andreymal <andriyano-31@mail.ru>\n"
 "Language: ru\n"
 "Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && "
@@ -31,7 +31,7 @@ msgid "User already exists"
 msgstr "Пользователь уже существует"
 
 #: mini_fiction/bl/authors.py:35 mini_fiction/views/auth.py:110
-#: mini_fiction/views/author.py:104
+#: mini_fiction/views/author.py:102
 msgid "Password is too bad, please change it"
 msgstr "Пароль слишком плохой, поменяйте его"
 
@@ -71,23 +71,23 @@ msgstr ""
 msgid "Account is disabled"
 msgstr "Аккаунт отключен"
 
-#: mini_fiction/bl/comments.py:85
+#: mini_fiction/bl/comments.py:86
 msgid "Parent comment not found"
 msgstr "Родительский комментарий не найден"
 
-#: mini_fiction/bl/comments.py:180
+#: mini_fiction/bl/comments.py:181
 msgid "Please log in to vote"
 msgstr "Авторизуйтесь, чтобы голосовать"
 
-#: mini_fiction/bl/comments.py:187
+#: mini_fiction/bl/comments.py:188
 msgid "You already voted"
 msgstr "Вы уже голосовали"
 
-#: mini_fiction/bl/comments.py:190
+#: mini_fiction/bl/comments.py:191
 msgid "You can't vote"
 msgstr "Вам нельзя голосовать"
 
-#: mini_fiction/bl/comments.py:193
+#: mini_fiction/bl/comments.py:194
 msgid "Invalid value"
 msgstr "Недопустимое значение"
 
@@ -333,7 +333,31 @@ msgstr[0] "%(num)d комментарий"
 msgstr[1] "%(num)d комментария"
 msgstr[2] "%(num)d комментариев"
 
-#: mini_fiction/templates/includes/story_control_buttons.html:28
+#: mini_fiction/templates/chapter_work.html:62
+msgid "Add"
+msgstr "Добавить"
+
+#: mini_fiction/templates/chapter_work.html:66
+#, python-format
+msgid "Add and publish %(num)s chapter"
+msgid_plural "Add and publish %(num)s chapters"
+msgstr[0] "Добавить и опубликовать %(num)s главу"
+msgstr[1] "Добавить и опубликовать %(num)s главы"
+msgstr[2] "Добавить и опубликовать %(num)s глав"
+
+#: mini_fiction/templates/chapter_work.html:68
+msgid "Add and publish"
+msgstr "Добавить и опубликовать"
+
+#: mini_fiction/templates/chapter_work.html:71
+msgid "Add as draft"
+msgstr "Добавить как черновик"
+
+#: mini_fiction/templates/chapter_work.html:75
+msgid "Save changes"
+msgstr "Сохранить изменения"
+
+#: mini_fiction/templates/includes/story_control_buttons.html:30
 #: mini_fiction/templates/index.html:20 mini_fiction/views/editlog.py:30
 #: mini_fiction/views/editlog.py:49
 msgid "Moderation log"
@@ -379,6 +403,12 @@ msgid_plural "%(num)d views"
 msgstr[0] "%(num)d просмотр"
 msgstr[1] "%(num)d просмотра"
 msgstr[2] "%(num)d просмотров"
+
+#: mini_fiction/templates/includes/chapter_single.html:2
+#: mini_fiction/templates/includes/stories.html:44
+#: mini_fiction/templates/story_view.html:91
+msgid "Draft"
+msgstr "Черновик"
 
 #: mini_fiction/templates/admin/index.html:11
 msgid "Categories (genres)"
@@ -643,7 +673,7 @@ msgstr "Закладки"
 msgid "Profile"
 msgstr "Профиль"
 
-#: mini_fiction/templates/includes/nav.html:32 mini_fiction/views/author.py:38
+#: mini_fiction/templates/includes/nav.html:32 mini_fiction/views/author.py:36
 msgid "My cabinet"
 msgstr "Мой кабинет"
 
@@ -726,17 +756,27 @@ msgctxt "story_edit_log"
 msgid "edited chapter"
 msgstr "отредактировал главу"
 
-#: mini_fiction/utils/misc.py:209
+#: mini_fiction/utils/misc.py:211
 msgctxt "story_edit_log"
 msgid "added chapter"
 msgstr "добавил главу"
 
-#: mini_fiction/utils/misc.py:211
+#: mini_fiction/utils/misc.py:213
 msgctxt "story_edit_log"
 msgid "deleted chapter"
 msgstr "удалил главу"
 
-#: mini_fiction/utils/misc.py:267
+#: mini_fiction/utils/misc.py:216
+msgctxt "story_edit_log"
+msgid "sent to drafts chapter"
+msgstr "отправил в черновики главу"
+
+#: mini_fiction/utils/misc.py:218
+msgctxt "story_edit_log"
+msgid "published chapter"
+msgstr "опубликовал главу"
+
+#: mini_fiction/utils/misc.py:280
 #, python-format
 msgid "Show %(num)s unchanged symbol"
 msgid_plural "Show %(num)s unchanged symbols"
@@ -883,19 +923,19 @@ msgstr "Регистрация закрыта"
 msgid "Registration in library"
 msgstr "Регистрация в библиотеке"
 
-#: mini_fiction/views/author.py:46
+#: mini_fiction/views/author.py:44
 msgid "Author: {author}"
 msgstr "Автор: {author}"
 
-#: mini_fiction/views/author.py:84
+#: mini_fiction/views/author.py:82
 msgid "Profile settings"
 msgstr "Настройки профиля"
 
-#: mini_fiction/views/author.py:102
+#: mini_fiction/views/author.py:100
 msgid "Old password is incorrect"
 msgstr "Старый пароль неверный"
 
-#: mini_fiction/views/author.py:129
+#: mini_fiction/views/author.py:127
 msgid "Password is incorrect"
 msgstr "Неверный пароль"
 
@@ -925,6 +965,6 @@ msgstr "Поиск рассказов"
 msgid "Search results"
 msgstr "Результаты поиска"
 
-#: mini_fiction/views/story.py:220
+#: mini_fiction/views/story.py:222
 msgid "New story"
 msgstr "Новый рассказ"

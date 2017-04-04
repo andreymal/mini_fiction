@@ -88,7 +88,7 @@
             {% include "includes/story_panel.html" %}
                 <ul id="story_chapters">
                 {% for chapter in chapters %}
-                    <li><h4><a href="{{ url_for('chapter.view', story_id=story.id, chapter_order=chapter.order) }}">{{ chapter.title }}</a></h4>
+                    <li><h4><a href="{{ url_for('chapter.view', story_id=story.id, chapter_order=chapter.order) }}">{{ chapter.title }}</a>{% if chapter.draft %} <sup class="draft">{{ _('Draft') }}</sup>{% endif %}</h4>
                       {{ ngettext("%(num)d word", "%(num)d words", chapter.words) }}, {{ ngettext("%(num)d view", "%(num)d views", chapter.views) }}<li>
                 {% endfor %}
                 </ul>

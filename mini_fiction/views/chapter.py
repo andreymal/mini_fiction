@@ -19,13 +19,17 @@ def view(story_id, chapter_order=None):
     story = get_story(story_id)
     user = current_user._get_current_object()
 
+    allow_draft = story.bl.is_contributor(user)
+
     if chapter_order is not None:
         chapter = Chapter.get(story=story_id, order=chapter_order)
         if not chapter:
             abort(404)
+        if chapter.draft and not allow_draft:
+            abort(404)
         page_title = chapter.title[:80] + ' : ' + story.title
-        prev_chapter = chapter.get_prev_chapter()
-        next_chapter = chapter.get_next_chapter()
+        prev_chapter = chapter.get_prev_chapter(allow_draft)
+        next_chapter = chapter.get_next_chapter(allow_draft)
         if user.is_authenticated:
             chapter.bl.viewed(user)
         data = {
@@ -37,7 +41,7 @@ def view(story_id, chapter_order=None):
             'allchapters': False
         }
     else:
-        chapters = story.chapters.select().order_by(Chapter.order, Chapter.id)[:]
+        chapters = story.bl.select_accessible_chapters(user).order_by(Chapter.order, Chapter.id)[:]
         page_title = story.title + ' – все главы'
         if user.is_authenticated:
             for c in chapters:
@@ -63,7 +67,7 @@ def add(story_id):
     if not story.bl.editable_by(user):
         abort(403)
 
-    form = ChapterForm(data={'button_submit': 'Добавить'})
+    form = ChapterForm()
     if form.validate_on_submit():
         chapter = Chapter.bl.create(
             story=story,
@@ -72,14 +76,17 @@ def add(story_id):
                 'title': form.title.data,
                 'notes': form.notes.data,
                 'text': form.text.data,
-            }
+            },
         )
+        if request.form.get('act') == 'publish':
+            story.bl.publish_all_chapters()
         return redirect(url_for('chapter.edit', pk=chapter.id))
 
     data = {
         'page_title': 'Добавление новой главы',
         'story': story,
-        'form': form
+        'form': form,
+        'unpublished_chapters_count': Chapter.select(lambda x: x.story == story and x.draft).count(),
     }
 
     return render_template('chapter_work.html', **data)
@@ -100,7 +107,6 @@ def edit(pk):
         'title': chapter.title,
         'notes': chapter.notes,
         'text': chapter.text,
-        'button_submit': 'Сохранить изменения',
     }
 
     form = ChapterForm(data=chapter_data)
@@ -117,8 +123,11 @@ def edit(pk):
 
     data = {
         'page_title': 'Редактирование главы «%s»' % chapter.title,
+        'story': chapter.story,
         'chapter': chapter,
-        'form': form
+        'form': form,
+        'edit': True,
+        'unpublished_chapters_count': Chapter.select(lambda x: x.story == chapter.story and x.draft).count(),
     }
 
     return render_template('chapter_work.html', **data)
@@ -153,6 +162,24 @@ def delete(pk):
         return jsonify({'page_content': {'modal': html, 'title': page_title}})
     else:
         return render_template('chapter_confirm_delete.html', **data)
+
+
+@bp.route('/chapter/<int:pk>/publish/', methods=('GET', 'POST',))
+@db_session
+@login_required
+def publish(pk):
+    chapter = Chapter.get(id=pk)
+    if not chapter:
+        abort(404)
+    user = current_user._get_current_object()
+    if not chapter.story.bl.editable_by(user):
+        abort(403)
+
+    chapter.bl.publish(user, chapter.draft)  # draft == not published
+    if g.is_ajax:
+        return jsonify({'success': True, 'story_id': chapter.story.id, 'chapter_id': chapter.id, 'published': not chapter.draft})
+    else:
+        return redirect(url_for('story.edit', pk=chapter.story.id))
 
 
 @bp.route('/story/<int:story_id>/sort/', methods=('POST',))

@@ -22,8 +22,8 @@ def index():
     stories = stories.prefetch(Story.characters, Story.categories, Story.contributors, StoryContributor.user)
     stories = stories[:current_app.config['STORIES_COUNT']['main']]
 
-    chapters = select(c for c in Chapter if c.story_published and c.order != 1)
-    chapters = chapters.order_by(Chapter.date.desc())
+    chapters = select(c for c in Chapter if not c.draft and c.story_published and c.order != 1)
+    chapters = chapters.order_by(Chapter.first_published_at.desc(), Chapter.order.desc())
     chapters = chapters[:current_app.config['CHAPTERS_COUNT']['main']]
 
     story_ids = [y.story.id for y in chapters]

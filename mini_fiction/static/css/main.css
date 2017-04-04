@@ -672,7 +672,7 @@ label.gen input {
     color: green;
 }
 
-.incomplete {
+.incomplete, .draft {
     color: #f2c200;
 }
 

@@ -938,6 +938,49 @@ p.meta .chapter-controls {
     font-size: 13px;
 }
 
+/* Author and contributing stories tabs */
+
+.tab-author-stories-input,
+.tab-contributing-stories-input {
+    display: none;
+}
+
+.tab-author-stories-input + label,
+.tab-contributing-stories-input + label {
+    display: inline-block;
+    font-family: 'Trebuchet MS', Arial, sans-serif;
+    font-size: 22px;
+    line-height: 30px;
+    margin-bottom: 6px;
+    color: #0086E5;
+    border-bottom: 1px dotted #0086E5;
+    cursor: pointer;
+}
+
+.tab-author-stories-input + label:hover,
+.tab-contributing-stories-input + label:hover {
+    color: #ff3368;
+    border-bottom: 1px dotted #ff3368;
+}
+
+.tab-author-stories-input:checked + label,
+.tab-contributing-stories-input:checked + label,
+.tab-author-stories-input:checked + label:hover,
+.tab-contributing-stories-input:checked + label:hover {
+    color: inherit;
+    border-bottom: 1px dotted transparent;
+}
+
+.tab-author-stories,
+.tab-contributing-stories {
+    display: none;
+}
+
+.tab-author-stories-input:checked ~ .tab-author-stories,
+.tab-contributing-stories-input:checked ~ .tab-contributing-stories {
+    display: block;
+}
+
 /* Search page and results */
 .search-results {
     margin-bottom: 100px;

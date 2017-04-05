@@ -77,6 +77,10 @@ class Author(db.Entity, UserMixin):
     bio_as_html = filtered_html_property('bio', filter_html)
 
     @property
+    def contributing_stories(self):
+        return orm.select(x.story for x in StoryContributor if x.user == self and not x.is_author).without_distinct()
+
+    @property
     def stories(self):
         return orm.select(x.story for x in StoryContributor if x.user == self and x.is_author).without_distinct()
 

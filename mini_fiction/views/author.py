@@ -30,6 +30,7 @@ def info(user_id=None, comments_page=1):
         comments_list = StoryComment.bl.select_by_story_author(author)
         comments_list = comments_list.order_by(StoryComment.id.desc())
         stories = author.stories.order_by(Story.first_published_at.desc(), Story.id.desc())
+        contributing_stories = author.contributing_stories.order_by(Story.first_published_at.desc(), Story.id.desc())
 
         data['all_views'] = Story.bl.get_all_views_for_author(author)
 
@@ -44,6 +45,7 @@ def info(user_id=None, comments_page=1):
         data['page_title'] = gettext('Author: {author}').format(author=author.username)
         stories = Story.bl.select_by_author(author, queryset=Story.bl.select_accessible(current_user))
         stories = stories.order_by(Story.first_published_at.desc(), Story.id.desc())
+        contributing_stories = None
         template = 'author_overview.html'
 
     comments_count = comments_list.count()
@@ -61,6 +63,7 @@ def info(user_id=None, comments_page=1):
     data.update({
         'author': author,
         'stories': stories,
+        'contributing_stories': contributing_stories,
         'series': series,
         'comments': comments,
         'page_current': comments_page,

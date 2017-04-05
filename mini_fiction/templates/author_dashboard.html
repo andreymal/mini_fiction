@@ -43,10 +43,21 @@
             <!-- Конец вывода сборников -->
         </div>
 
-        <h2>
-            Мои рассказы <a class="btn btn-success btn-small" href="{{ url_for('story.add') }}">Добавить рассказ</a>
-        </h2>
-        {% include "includes/stories.html" %}
+        <input type="radio" name="tab-stories" class="tab-author-stories-input" id="tab-author-stories-input" checked />
+        <label for="tab-author-stories-input">Мои рассказы ({{ stories|length }})</label>
+        &nbsp;&nbsp;
+        <input type="radio" name="tab-stories" class="tab-contributing-stories-input" id="tab-contributing-stories-input" />
+        <label for="tab-contributing-stories-input">Рассказы с моим вкладом ({{ contributing_stories|length }})</label>
+        &nbsp;&nbsp;
+        <a class="btn btn-success btn-small" href="{{ url_for('story.add') }}">Добавить рассказ</a>
+
+        <div class="tab-author-stories">
+            {% include "includes/stories.html" %}
+        </div>
+
+        <div class="tab-contributing-stories">{% with stories = contributing_stories %}
+            {% include "includes/stories.html" %}
+        {% endwith %}</div>
     </div>
 
     <div class="span4 top-list sidelist">

@@ -65,6 +65,8 @@ class Author(db.Entity, UserMixin):
     story_comments = orm.Set('StoryComment')
     story_comment_votes = orm.Set('StoryCommentVote')
     story_comment_edits = orm.Set('StoryCommentEdit')
+    story_local_comments = orm.Set('StoryLocalComment')
+    story_local_comment_edits = orm.Set('StoryLocalCommentEdit')
     notices = orm.Set('Notice')
     notice_comments = orm.Set('NoticeComment')
     notice_comment_votes = orm.Set('NoticeCommentVote')
@@ -242,6 +244,7 @@ class Story(db.Entity):
     activity = orm.Set('Activity')
     votes = orm.Set('Vote')
     comments = orm.Set('StoryComment')
+    local = orm.Optional('StoryLocalThread')
 
     orm.composite_index(approved, draft)
     orm.composite_index(approved, draft, first_published_at)
@@ -485,6 +488,70 @@ class StoryCommentVote(db.Entity):
     vote_value = orm.Required(int, default=0)
 
 
+class StoryLocalThread(db.Entity):
+    """ Временный костыль из-за ограниченной гибкости комментариев """
+    story = orm.Required(Story)
+    comments_count = orm.Required(int, size=16, unsigned=True, default=0)
+    comments = orm.Set('StoryLocalComment')
+
+    bl = Resource('bl.story_local_thread')
+
+
+class StoryLocalComment(db.Entity):
+    """ Модель комментария к рассказу """
+
+    id = orm.PrimaryKey(int, auto=True)
+    local_id = orm.Required(int)
+    parent = orm.Optional('StoryLocalComment', reverse='answers', nullable=True, default=None)
+    author = orm.Optional(Author, nullable=True, default=None)
+    author_username = orm.Optional(str, 64)  # На случай, если учётную запись автора удалят
+    date = orm.Required(datetime, 6, default=datetime.utcnow)
+    updated = orm.Required(datetime, 6, default=datetime.utcnow)
+    deleted = orm.Required(bool, default=False)
+    last_deleted_at = orm.Optional(datetime, 6)
+    local = orm.Required(StoryLocalThread)
+    text = orm.Required(orm.LongStr, lazy=False)
+    ip = orm.Required(str, 50, default=ipaddress.ip_address('::1').exploded)
+
+    # Optimizations
+    tree_depth = orm.Required(int, size=16, unsigned=True, default=0)
+    answers_count = orm.Required(int, size=16, unsigned=True, default=0)
+    edits_count = orm.Required(int, size=16, unsigned=True, default=0)
+    root_order = orm.Required(int, size=16, unsigned=True)  # for pagination
+    last_edited_at = orm.Optional(datetime, 6)  # only for text updates
+
+    edits = orm.Set('StoryLocalCommentEdit')
+    answers = orm.Set('StoryLocalComment', reverse='parent')
+
+    bl = Resource('bl.story_local_comment')
+
+    orm.composite_key(local, local_id)
+
+    @property
+    def brief_text(self):
+        text = self.text
+        if len(text) > current_app.config['BRIEF_COMMENT_LENGTH']:
+            text = text[:current_app.config['BRIEF_COMMENT_LENGTH']] + '...'
+        return text
+
+    text_as_html = filtered_html_property('text', filter_html)
+    brief_text_as_html = filtered_html_property('brief_text', filter_html)
+
+    def before_update(self):
+        self.updated = datetime.utcnow()
+
+
+class StoryLocalCommentEdit(db.Entity):
+    """ Модель с информацией о редактировании комментария к рассказу """
+
+    comment = orm.Required(StoryLocalComment)
+    editor = orm.Optional(Author)
+    date = orm.Required(datetime, 6, default=datetime.utcnow)
+    old_text = orm.Optional(orm.LongStr, lazy=False)
+    new_text = orm.Optional(orm.LongStr, lazy=False)
+    ip = orm.Required(str, 50, default=ipaddress.ip_address('::1').exploded)
+
+
 class Vote(db.Entity):
     """ Модель голосований """
 
@@ -530,9 +597,11 @@ class Activity(db.Entity):
     story = orm.Optional(Story)
     last_views = orm.Required(int, default=0)
     last_comments = orm.Required(int, default=0)
+    last_local_comments = orm.Required(int, default=0)
     last_vote_average = orm.Required(float, default=3)
     last_vote_stddev = orm.Required(float, default=0)
     last_comment_id = orm.Required(int, default=0)
+    last_local_comment_id = orm.Required(int, default=0)
 
 
 class StoryLog(db.Entity):

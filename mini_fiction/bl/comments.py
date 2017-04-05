@@ -210,6 +210,10 @@ class StoryCommentBL(BaseCommentBL):
         return target.bl.has_access(author)
 
     def can_comment_by(self, target, author=None):
+        if author and author.is_staff:
+            return True
+        if not target.published:
+            return False
         if (not author or not author.is_authenticated) and not current_app.config['STORY_COMMENTS_BY_GUEST']:
             return False
         return target.bl.has_access(author)
@@ -252,6 +256,46 @@ class StoryCommentBL(BaseCommentBL):
         return self.model.select(
             lambda x: not x.deleted and x.story in orm.select(y.story for y in StoryContributor if y.user.id == user.id and y.is_author)
         )
+
+
+class StoryLocalCommentBL(BaseCommentBL):
+    target_attr = 'local'
+    can_update = True
+    can_vote = False
+    schema = STORY_COMMENT
+
+    def has_comments_access(self, target, author=None):
+        return target.story.bl.is_contributor(author)
+
+    def can_comment_by(self, target, author=None):
+        return target.story.bl.is_contributor(author)
+
+    def get_permalink(self):
+        c = self.model
+        # root_order starts from 0
+        page = c.root_order // current_app.config['COMMENTS_COUNT']['page'] + 1
+        return url_for('story_local_comment.view', story_id=c.local.story.id, comments_page=page) + '#' + str(c.local_id)
+
+    def get_tree_link(self):
+        return url_for('story_local_comment.ajax_tree', story_id=self.model.local.story.id, local_id=self.model.local_id)
+
+    def get_answer_link(self):
+        return url_for('story_local_comment.add', story_id=self.model.local.story.id, parent=self.model.local_id)
+
+    def get_update_link(self):
+        return url_for('story_local_comment.edit', story_id=self.model.local.story.id, local_id=self.model.local_id)
+
+    def get_delete_link(self):
+        return url_for('story_local_comment.delete', story_id=self.model.local.story.id, local_id=self.model.local_id)
+
+    def get_restore_link(self):
+        return url_for('story_local_comment.restore', story_id=self.model.local.story.id, local_id=self.model.local_id)
+
+    def get_vote_link(self):
+        raise ValueError('Not available')
+
+    def create(self, *args, **kwargs):
+        return super().create(*args, **kwargs)
 
 
 class NoticeCommentBL(BaseCommentBL):

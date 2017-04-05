@@ -7,8 +7,10 @@ def init_bl():
 
     registry.register('bl.author', authors.AuthorBL)
     registry.register('bl.story', stories.StoryBL)
+    registry.register('bl.story_local_thread', stories.StoryLocalThreadBL)
     registry.register('bl.chapter', stories.ChapterBL)
     registry.register('bl.story_comment', comments.StoryCommentBL)
+    registry.register('bl.story_local_comment', comments.StoryLocalCommentBL)
     registry.register('bl.htmlblock', htmlblocks.HtmlBlockBL)
     registry.register('bl.staticpage', staticpages.StaticPageBL)
     registry.register('bl.notice', notices.NoticeBL)

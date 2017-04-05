@@ -530,22 +530,7 @@ class StoryBL(BaseBL, Commentable):
 
         return raw_result, result
 
-    # misc
-
-    def get_random(self, count=10):
-        # это быстрее, чем RAND() в MySQL
-        from mini_fiction.models import Story, Character, Category
-        Story = self.model
-        ids = current_app.cache.get('all_story_ids')
-        if not ids:
-            ids = orm.select((x.id, x.date) for x in Story if x.approved and not x.draft).order_by(2)
-            ids = [x[0] for x in ids]
-            current_app.cache.set('all_story_ids', ids, 300)
-        if len(ids) > count:
-            ids = random.sample(ids, count)
-        stories = Story.select(lambda x: x.id in ids).prefetch(Story.characters, Story.categories)[:]
-        random.shuffle(stories)
-        return stories
+    # comments
 
     def has_comments_access(self, author=None):
         from mini_fiction.models import StoryComment
@@ -578,6 +563,80 @@ class StoryBL(BaseBL, Commentable):
             return act.last_comment_id if act else None
         else:
             return None
+
+    # local comments (through StoriesLocalThread)
+
+    def get_or_create_local_thread(self):
+        from mini_fiction.models import StoryLocalThread
+
+        story = self.model
+        if story.local:
+            return story.local
+
+        local = StoryLocalThread(story=story)
+        local.flush()
+        assert story.local == local
+        return local
+
+    def viewed_localcomments(self, user):
+        if not user or not user.is_authenticated:
+            return
+
+        from mini_fiction.models import Activity
+
+        act = Activity.get(story=self.model, author=user)
+        if not act:
+            return
+
+        local = self.get_or_create_local_thread()
+
+        act.last_local_comments = local.comments_count
+        last_comment = local.bl.select_comments().order_by('-c.id').first()
+        act.last_local_comment_id = last_comment.id if last_comment else 0
+
+        return act
+
+    def last_viewed_local_comment_by(self, author):
+        if author and author.is_authenticated:
+            act = self.model.activity.select(lambda x: x.author.id == author.id).first()
+            return act.last_local_comment_id if act else None
+        else:
+            return None
+
+    # misc
+
+    def get_random(self, count=10):
+        # это быстрее, чем RAND() в MySQL
+        from mini_fiction.models import Story, Character, Category
+        Story = self.model
+        ids = current_app.cache.get('all_story_ids')
+        if not ids:
+            ids = orm.select((x.id, x.date) for x in Story if x.approved and not x.draft).order_by(2)
+            ids = [x[0] for x in ids]
+            current_app.cache.set('all_story_ids', ids, 300)
+        if len(ids) > count:
+            ids = random.sample(ids, count)
+        stories = Story.select(lambda x: x.id in ids).prefetch(Story.characters, Story.categories)[:]
+        random.shuffle(stories)
+        return stories
+
+
+class StoryLocalThreadBL(BaseBL, Commentable):
+    def has_comments_access(self, author=None):
+        from mini_fiction.models import StoryLocalComment
+        return StoryLocalComment.bl.has_comments_access(self.model, author)
+
+    def can_comment_by(self, author=None):
+        from mini_fiction.models import StoryLocalComment
+        return StoryLocalComment.bl.can_comment_by(self.model, author)
+
+    def create_comment(self, author, ip, data):
+        from mini_fiction.models import StoryLocalComment
+        return StoryLocalComment.bl.create(self.model, author, ip, data)
+
+    def select_comments(self):
+        from mini_fiction.models import StoryLocalComment
+        return orm.select(c for c in StoryLocalComment if c.local == self.model)
 
 
 class ChapterBL(BaseBL):

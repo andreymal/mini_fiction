@@ -41,7 +41,7 @@
 {% endmacro %}
 
 
-{% macro comment_form_content(form, objtype, objid, parent=None) %}
+{% macro comment_form_content(form, objtype=None, objid=None, parent=None) %}
     <div class="comment-form-content">
     {{ form.csrf_token() }}
     <input type="hidden" name="parent" value="{{ parent or '0' }}" />
@@ -73,7 +73,7 @@
             Комментарий был отправлен на Луну
         </div>
     {%- else -%}
-        {% if with_vote %}
+        {% if with_vote and comment.bl.can_vote %}
         <div class="comment-vote-area" data-href="{{ comment.bl.get_vote_link() }}">
             {% include 'includes/comment_vote.html' %}
         </div>
@@ -85,7 +85,7 @@
         {%- if comment_spoiler_threshold is not defined -%}
             {%- set comment_spoiler_threshold = get_comment_threshold() -%}
         {%- endif -%}
-        {% if comment.vote_total <= comment_spoiler_threshold %}
+        {% if comment.bl.can_vote and comment.vote_total <= comment_spoiler_threshold %}
         <button class="btn btn-collapse btn-small" data-toggle="collapse" data-target="#comment_text_{{ comment.id }}">Показать скрытый комментарий</button>
         <div id="comment_text_{{ comment.id }}" class="collapse comment-text{{ ' comment-text-short' if short else '' }}">
             {%- if not short %}{{ comment.text_as_html|safe }}{% else %}{{ comment.brief_text_as_html|safe }}{% endif -%}

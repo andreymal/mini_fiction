@@ -1,0 +1,26 @@
+{% extends base %}
+{% from 'macro.html' import breadcrumbs with context %}
+{% from 'macro.html' import comment_html with context %}
+{% block content %}
+<div class="row">
+    <div class="span8">
+    {{- breadcrumbs([[url_for('story_local_comment.view', story_id=local.story.id), local.story.title]]) }}
+    <h1>{{ page_title }}</h1>
+
+
+    <div class="comment-item" id="{{ comment.local_id }}">
+    {{ comment_html(comment, with_controls=False, with_vote=False) }}
+    </div>
+
+    <form method="POST" enctype="multipart/form-data">
+          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+          <div class="control-group">
+            <div class="controls">
+                <input type="submit" class="btn btn-danger" value="Восстановить комментарий">
+            </div>
+        </div>
+    </form>
+    {{- breadcrumbs([[url_for('story_local_comment.view', story_id=local.story.id), local.story.title]]) }}
+    </div>
+</div>
+{% endblock %}

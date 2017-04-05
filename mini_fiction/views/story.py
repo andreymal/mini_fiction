@@ -11,7 +11,7 @@ from pony.orm import db_session
 
 from mini_fiction.forms.story import StoryForm
 from mini_fiction.forms.comment import CommentForm
-from mini_fiction.models import Author, Story, Chapter, Rating, StoryLog, Favorites, Bookmark
+from mini_fiction.models import Author, Story, Chapter, Rating, StoryLog, Favorites, Bookmark, Activity
 from mini_fiction.validation import ValidationError
 from mini_fiction.utils.misc import calc_maxdepth
 
@@ -42,6 +42,14 @@ def view(pk, comments_page):
         abort(404)
     last_viewed_comment = story.bl.last_viewed_comment_by(user)
 
+    act = None
+    if user.is_authenticated:
+        act = Activity.get(story=story, author=user)
+    new_local_comments_count = (
+        (story.bl.get_or_create_local_thread().comments_count - act.last_local_comments)
+        if act else 0
+    )
+
     chapters = story.chapters.select().order_by(Chapter.order, Chapter.id)[:]
     if not story.bl.is_contributor(user):
         chapters = [x for x in chapters if not x.draft]
@@ -67,6 +75,7 @@ def view(pk, comments_page):
         'comments_count': comments_count,
         'comment_votes_cache': comment_votes_cache,
         'last_viewed_comment': last_viewed_comment,
+        'new_local_comments_count': new_local_comments_count,
         'chapters': chapters,
         'num_pages': paged.num_pages,
         'page_current': comments_page,

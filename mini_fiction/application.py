@@ -119,7 +119,7 @@ def configure_error_handlers(app):
 
 def configure_views(app):
     from mini_fiction.views import index, auth, story, chapter, editlog, search, author, stream, object_lists
-    from mini_fiction.views import story_comment, feeds, staticpages, notices, notice_comment
+    from mini_fiction.views import story_comment, story_local_comment, feeds, staticpages, notices, notice_comment
     from mini_fiction.views import notifications
     from mini_fiction.views import misc
     app.register_blueprint(index.bp)
@@ -133,6 +133,7 @@ def configure_views(app):
     app.register_blueprint(stream.bp, url_prefix='/stream')
     app.register_blueprint(object_lists.bp)
     app.register_blueprint(story_comment.bp)
+    app.register_blueprint(story_local_comment.bp)
     app.register_blueprint(feeds.bp, url_prefix='/feeds')
     app.register_blueprint(staticpages.bp)
     app.register_blueprint(notices.bp, url_prefix='/notice')

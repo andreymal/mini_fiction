@@ -26,8 +26,8 @@
             {% if story.bl.deletable_by(current_user) %}
                 <li><a class="story_delete" href="{{ url_for('story.delete', pk=story.id) }}">Удалить</a></li>
             {% endif %}
-            {% if current_user.is_staff %}
-                <li><a href="{{ url_for('story.edit_log', pk=story.id) }}">{{ _('Moderation log') }}</a></li>
+            {% if story.bl.can_view_editlog(current_user) %}
+                <li><a href="{{ url_for('story.edit_log', pk=story.id) }}">{{ _('Edit log') }}</a></li>
             {% endif %}
             </ul>
         </div>

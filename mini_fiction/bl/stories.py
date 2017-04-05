@@ -399,6 +399,11 @@ class StoryBL(BaseBL, Commentable):
     def can_edit_contributors(self, user):
         return user and (user.is_staff or self.is_editor(user) and self.is_author(user))
 
+    def can_view_editlog(self, user):
+        if user and user.is_staff:
+            return True
+        return self.is_contributor(user)
+
     def deletable_by(self, user):
         allowed_user = None
         for c in self.get_contributors():

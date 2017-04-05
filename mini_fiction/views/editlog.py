@@ -36,17 +36,16 @@ def index(page):
 @bp.route('/<int:editlog_id>/')
 @db_session
 def show(editlog_id):
-    if not current_user.is_staff:
-        abort(403)
-
     edit_log = StoryLog.select(lambda x: x.id ==editlog_id).prefetch(StoryLog.story).first()
     if not edit_log:
         abort(404)
+    if not edit_log.story.bl.can_view_editlog(current_user._get_current_object()):
+        abort(403)
 
     extra = get_editlog_extra_info(edit_log, prepare_chapter_diff=True)
 
     data = {
-        'page_title': _('Moderation log'),
+        'page_title': _('Edit log'),
         'item': edit_log,
         'extra': extra,
     }

@@ -198,16 +198,16 @@ def vote(pk, value):
 @db_session
 def edit_log(pk):
     user = current_user._get_current_object()
-    if not user.is_staff:
-        abort(403)
 
     story = Story.get(id=pk)
     if not story:
         abort(404)
+    if not story.bl.can_view_editlog(user):
+        abort(403)
 
     data = dict(
         edit_log=story.edit_log.select().order_by(StoryLog.created_at.desc()).prefetch(StoryLog.user),
-        page_title="История редактирования рассказа \"{}\"".format(story.title),
+        page_title='История редактирования рассказа «{}»'.format(story.title),
         story=story,
     )
     return render_template('story_edit_log.html', **data)

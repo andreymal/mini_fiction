@@ -294,9 +294,6 @@ class StoryLocalCommentBL(BaseCommentBL):
     def get_vote_link(self):
         raise ValueError('Not available')
 
-    def create(self, *args, **kwargs):
-        return super().create(*args, **kwargs)
-
 
 class NoticeCommentBL(BaseCommentBL):
     target_attr = 'notice'

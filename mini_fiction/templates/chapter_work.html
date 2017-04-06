@@ -9,13 +9,15 @@
         ]) }}
     </div>
     <div class="span12">
-        {% if story %}
-{{ html_block('chapter_add') }}
-        {% else %}
+        {% if not chapter -%}
+            {{ html_block('chapter_add') }}
+        {%- else -%}
             <h1>Редактирование главы «{{ chapter.title }}»</h1>
-        {% endif %}
+        {%- endif %}
         <form method="POST" enctype="multipart/form-data" name="search" id="searchform" class="form-horizontal">
-        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+            {% if saved %}<div class="alert-mini green">Изменения сохранены</div><br/>{% endif %}
+            {% if not_saved %}<div class="alert-mini alert-error">Изменения не сохранены, проверьте форму</div><br/>{% endif %}
             <fieldset>
                 <!-- Название -->
                 <div class="control-group{% if form.title.errors %} error{% endif %}">

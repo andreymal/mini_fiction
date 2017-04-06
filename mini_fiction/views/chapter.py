@@ -67,6 +67,8 @@ def add(story_id):
     if not story.bl.editable_by(user):
         abort(403)
 
+    not_saved = False
+
     form = ChapterForm()
     if form.validate_on_submit():
         chapter = Chapter.bl.create(
@@ -81,11 +83,16 @@ def add(story_id):
         if request.form.get('act') == 'publish':
             story.bl.publish_all_chapters()
         return redirect(url_for('chapter.edit', pk=chapter.id))
+    elif request.method == 'POST':
+        not_saved = True
 
     data = {
         'page_title': 'Добавление новой главы',
         'story': story,
+        'chapter': None,
         'form': form,
+        'saved': False,
+        'not_saved': not_saved,
         'unpublished_chapters_count': Chapter.select(lambda x: x.story == story and x.draft).count(),
     }
 
@@ -109,6 +116,9 @@ def edit(pk):
         'text': chapter.text,
     }
 
+    saved = False
+    not_saved = False
+
     form = ChapterForm(data=chapter_data)
     if form.validate_on_submit():
         chapter.bl.update(
@@ -119,7 +129,9 @@ def edit(pk):
                 'text': form.text.data,
             }
         )
-        return redirect(url_for('chapter.edit', pk=chapter.id))
+        saved = True
+    elif request.method == 'POST':
+        not_saved = True
 
     data = {
         'page_title': 'Редактирование главы «%s»' % chapter.title,
@@ -127,6 +139,8 @@ def edit(pk):
         'chapter': chapter,
         'form': form,
         'edit': True,
+        'saved': saved,
+        'not_saved': not_saved,
         'unpublished_chapters_count': Chapter.select(lambda x: x.story == chapter.story and x.draft).count(),
     }
 

@@ -224,20 +224,8 @@ def get_editlog_extra_info(log_item, prepare_chapter_diff=False):
 
         if prepare_chapter_diff and log_extra_item['diff_html_available']:
             # Для отображения диффа пользователю его надо разжать, получив старый текст
-            from pony import orm
-            from mini_fiction.models import StoryLog
-
-            logs = orm.select(
-                (x.created_at, x.chapter_text_diff) for x in StoryLog
-                if x.chapter == log_item.chapter and x.created_at >= log_item.created_at
-            ).order_by(-1)[:]
-
-            chapter_text = log_item.chapter.text
-            # Последовательно откатываем более новые изменения у нового текста, получая таким образом старый
-            for x in logs:
-                if not x[1]:
-                    continue
-                chapter_text = utils_diff.revert_diff(chapter_text, json.loads(x[1]))
+            chapter_text = log_item.chapter.bl.get_version(log_item=log_item)
+            chapter_text = utils_diff.revert_diff(chapter_text, json.loads(log_item.chapter_text_diff))
 
             # Теперь у нас есть старый текст, и можно отрисовать данный дифф к нему
             log_extra_item['diff_html'] = diff2html(chapter_text, json.loads(log_item.chapter_text_diff))

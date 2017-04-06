@@ -333,6 +333,7 @@ class Chapter(db.Entity):
     order = orm.Required(int, size=16, unsigned=True, default=1)
     title = orm.Required(str, 512)
     text = orm.Optional(orm.LongStr)
+    text_md5 = orm.Required(str, 32, default='d41d8cd98f00b204e9800998ecf8427e')
     updated = orm.Required(datetime, 6, default=datetime.utcnow)
     words = orm.Required(int, default=0)
     # Глава опубликована только при draft=False и story_published=True
@@ -622,8 +623,10 @@ class StoryLog(db.Entity):
 
     # [["=", длина], ["-", "удалённый кусок"], ["+", "добавленный кусок"]]
     chapter_text_diff = orm.Optional(orm.LongStr, lazy=False)
+    chapter_md5 = orm.Optional(str, 32)
 
     orm.composite_index(story, created_at)
+    orm.composite_index(chapter, chapter_md5)
     orm.composite_index(by_staff, created_at)
 
     @property

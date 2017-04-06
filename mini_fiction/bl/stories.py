@@ -6,6 +6,7 @@
 import json
 import random
 import ipaddress
+from hashlib import md5
 from datetime import datetime
 from statistics import mean, pstdev
 
@@ -15,6 +16,7 @@ from flask import Markup, current_app
 from mini_fiction.bl.utils import BaseBL
 from mini_fiction.bl.commentable import Commentable
 from mini_fiction.utils.misc import call_after_request as later
+from mini_fiction.utils import diff as utils_diff
 from mini_fiction.validation import Validator
 from mini_fiction.validation.stories import STORY
 
@@ -655,6 +657,7 @@ class ChapterBL(BaseBL):
             title=data['title'],
             notes=data['notes'],
             text=data['text'],
+            text_md5=md5(data['text'].encode('utf-8')).hexdigest(),
             draft=True,
             story_published=story.published,
         )
@@ -662,11 +665,11 @@ class ChapterBL(BaseBL):
 
         self._update_words_count(chapter)
         chapter.flush()
-        chapter.bl.edit_log(editor, 'add', {})
+        chapter.bl.edit_log(editor, 'add', {}, text_md5=chapter.text_md5)
         later(current_app.tasks['sphinx_update_chapter'].delay, chapter.id)
         return chapter
 
-    def edit_log(self, editor, action, data, chapter_text_diff=None):
+    def edit_log(self, editor, action, data, chapter_text_diff=None, text_md5=None):
         from mini_fiction.models import StoryLog
 
         chapter = self.model
@@ -686,6 +689,7 @@ class ChapterBL(BaseBL):
             by_staff=editor.is_staff,
             data_json=json.dumps(data, ensure_ascii=False),
             chapter_text_diff=json.dumps(chapter_text_diff, ensure_ascii=False) if chapter_text_diff is not None else '',
+            chapter_md5=text_md5 or '',
         )
 
         return sl
@@ -704,8 +708,6 @@ class ChapterBL(BaseBL):
             chapter.notes = data['notes']
 
         if 'text' in data and data['text'] != chapter.text:
-            from mini_fiction.utils import diff as utils_diff
-
             if len(chapter.text) <= current_app.config['MAX_SIZE_FOR_DIFF'] and len(data['text']) <= current_app.config['MAX_SIZE_FOR_DIFF']:
                 # Для небольших текстов используем дифф на питоне, который красивый, но не быстрый
                 chapter_text_diff = utils_diff.get_diff_default(chapter.text, data['text'])
@@ -720,9 +722,10 @@ class ChapterBL(BaseBL):
                     chapter_text_diff = utils_diff.get_diff_google(chapter.text, data['text'])
 
             chapter.text = data['text']
+            chapter.text_md5 = md5(data['text'].encode('utf-8')).hexdigest()
             self._update_words_count(chapter)
 
-        chapter.bl.edit_log(editor, 'edit', edited_data, chapter_text_diff=chapter_text_diff)
+        chapter.bl.edit_log(editor, 'edit', edited_data, chapter_text_diff=chapter_text_diff, text_md5=chapter.text_md5)
 
         later(current_app.tasks['sphinx_update_chapter'].delay, chapter.id)
         return chapter
@@ -750,6 +753,69 @@ class ChapterBL(BaseBL):
 
         for c in Chapter.select(lambda x: x.story == story and x.order > old_order):
             c.order = c.order - 1
+
+    def get_version(self, text_md5=None, log_item=None):
+        from mini_fiction.models import StoryLog
+
+        chapter = self.model
+
+        if bool(text_md5) == bool(log_item):
+            raise ValueError('Please set text_md5 or log_item')
+
+        if text_md5:
+            log_item = StoryLog.select(lambda x: x.chapter == chapter and x.chapter_md5 == text_md5)
+            log_item = log_item.order_by(StoryLog.id.desc()).first()
+            if not log_item:
+                return None
+        else:
+            text_md5 = log_item.chapter_md5
+            if not text_md5:
+                raise ValueError('This log_item has no chapter md5')
+
+        # Если md5 совпадает с текущим текстом, то его и возвращаем
+        if chapter.text_md5 == text_md5:
+            return chapter.text
+
+        # Если не совпало, то собираем диффы с логов для отката с новой версии на старую
+        logs = orm.select(
+            (x.created_at, x.chapter_text_diff) for x in StoryLog
+            if x.chapter == chapter and x.created_at >= log_item.created_at
+        ).order_by(-1)[:]
+
+        chapter_text = chapter.text
+        # Последовательно откатываем более новые изменения у нового текста, получая таким образом старый
+        for x in logs[:-1]:
+            if not x[1]:
+                continue
+            chapter_text = utils_diff.revert_diff(chapter_text, json.loads(x[1]))
+
+        # И в итоге получаем требуемый старый текст
+        assert md5(chapter_text.encode('utf-8')).hexdigest() == text_md5
+        return chapter_text
+
+    def get_diff_from_older_version(self, older_md5):
+        chapter = self.model
+        if chapter.text_md5 == older_md5:
+            return chapter.text, []
+
+        older_text = self.get_version(text_md5=older_md5)
+        if older_text is None:
+            return None, []
+
+        if len(older_text) <= current_app.config['MAX_SIZE_FOR_DIFF'] and len(chapter.text) <= current_app.config['MAX_SIZE_FOR_DIFF']:
+            # Для небольших текстов используем дифф на питоне, который красивый, но не быстрый
+            chapter_text_diff = utils_diff.get_diff_default(older_text, chapter.text)
+        else:
+            try:
+                # Для больших текстов используем библиотеку на C++, которая даёт диффы быстро, но не очень красиво
+                import diff_match_patch  # pylint: disable=W0612
+            except ImportError:
+                # Если библиотеки нет, то и дифф не получился
+                chapter_text_diff = [('-', older_text), ('+', chapter.text)]
+            else:
+                chapter_text_diff = utils_diff.get_diff_google(older_text, chapter.text)
+
+        return older_text, chapter_text_diff
 
     def publish(self, user, published):
         chapter = self.model

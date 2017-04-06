@@ -42,8 +42,9 @@
             </li>
         {% endfor %}
         </ul>
-    {% elif not extra.diff_html and extra.diff_html_available %}
-        <br/>&nbsp;<a href="{{ url_for('editlog.show', editlog_id=item.id) }}" class="editlog-changes-link">{{ _('Show changes') }}</a>
+    {% endif %}
+    {% if not extra.diff_html and extra.diff_html_available %}
+        {% if not extra.list_items %}<br/>{% endif %}&nbsp;<a href="{{ url_for('editlog.show', editlog_id=item.id) }}" class="editlog-changes-link">{{ _('Show changes') }}</a>
     {% endif %}
 
 {%- else %}???{% endif %}

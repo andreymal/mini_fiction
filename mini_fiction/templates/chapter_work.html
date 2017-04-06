@@ -16,6 +16,7 @@
         {%- endif %}
         <form method="POST" enctype="multipart/form-data" name="search" id="searchform" class="form-horizontal">
             <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+            <input type="hidden" name="older_md5" value="{{ chapter.text_md5 }}" />
             {% if saved %}<div class="alert-mini green">Изменения сохранены</div><br/>{% endif %}
             {% if not_saved %}<div class="alert-mini alert-error">Изменения не сохранены, проверьте форму</div><br/>{% endif %}
             <fieldset>
@@ -55,6 +56,9 @@
                             {% endfor %}
                         {% else %}
                             <!--<span class="help-inline small">-->{{ form.text.description }}<!--</span>-->
+                        {% endif %}
+                        {% if diff_html %}
+                            <pre class="editlog-chapter-diff">{{ diff_html|safe }}</pre>
                         {% endif %}
                       </div>
                 </div>

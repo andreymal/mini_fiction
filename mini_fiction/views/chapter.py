@@ -7,6 +7,7 @@ from pony.orm import db_session
 
 from mini_fiction.forms.chapter import ChapterForm
 from mini_fiction.models import Story, Chapter
+from mini_fiction.utils.misc import diff2html
 from .story import get_story
 
 bp = Blueprint('chapter', __name__)
@@ -118,18 +119,30 @@ def edit(pk):
 
     saved = False
     not_saved = False
+    older_text = None
+    chapter_text_diff = []
 
     form = ChapterForm(data=chapter_data)
     if form.validate_on_submit():
-        chapter.bl.update(
-            editor=user,
-            data={
-                'title': form.title.data,
-                'notes': form.notes.data,
-                'text': form.text.data,
-            }
-        )
-        saved = True
+        if request.form.get('older_md5'):
+            older_text, chapter_text_diff = chapter.bl.get_diff_from_older_version(request.form['older_md5'])
+        if not chapter_text_diff:
+            chapter.bl.update(
+                editor=user,
+                data={
+                    'title': form.title.data,
+                    'notes': form.notes.data,
+                    'text': form.text.data,
+                }
+            )
+            saved = True
+        else:
+            form.text.errors.append(
+                'Пока вы редактировали главу, её отредактировал кто-то другой. Ниже представлен '
+                'список изменений, которые вы пропустили. Перенесите их в свой текст и сохраните '
+                'главу ещё раз.'
+            )
+            not_saved = True
     elif request.method == 'POST':
         not_saved = True
 
@@ -141,6 +154,8 @@ def edit(pk):
         'edit': True,
         'saved': saved,
         'not_saved': not_saved,
+        'chapter_text_diff': chapter_text_diff,
+        'diff_html': diff2html(older_text, chapter_text_diff) if chapter_text_diff else None,
         'unpublished_chapters_count': Chapter.select(lambda x: x.story == chapter.story and x.draft).count(),
     }
 

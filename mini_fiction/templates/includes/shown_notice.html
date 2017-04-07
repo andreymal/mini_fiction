@@ -1,7 +1,0 @@
-{%- set notice = shown_notice() -%}
-{%- if notice %}
-    <div class="alert alert-warning" style="margin-top: 20px">
-        <a href="#" class="close" id="close-shown-notice" data-id="{{ notice.id }}" data-dismiss="alert" aria-label="close" style="text-decoration: none" title="close">×</a>
-        Объявление: <a href="{{ url_for('notices.show', name=notice.name) }}" style="color: inherit;">{{ notice.title }}</a>
-    </div>
-{%- endif -%}

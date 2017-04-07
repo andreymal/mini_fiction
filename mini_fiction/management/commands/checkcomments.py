@@ -3,7 +3,7 @@
 
 from pony import orm
 
-from mini_fiction.models import Story, Notice
+from mini_fiction.models import Story, NewsItem
 
 
 def check_comments_tree(tree, depth=0, root_order=0, parent_id=None):
@@ -107,18 +107,18 @@ def checkstorycomments():
         story_id = story.id + 1
 
 
-def checknoticecomments():
-    first_notice = orm.select(orm.min(x.id) for x in Notice).first()
-    last_notice = orm.select(orm.max(x.id) for x in Notice).first()
+def checknewscomments():
+    first_newsitem = orm.select(orm.min(x.id) for x in NewsItem).first()
+    last_newsitem = orm.select(orm.max(x.id) for x in NewsItem).first()
 
-    notice_id = first_notice
+    newsitem_id = first_newsitem
     while True:
-        notice = Notice.select(lambda x: x.id >= notice_id and x.id <= last_notice).first()
-        if not notice:
+        newsitem = NewsItem.select(lambda x: x.id >= newsitem_id and x.id <= last_newsitem).first()
+        if not newsitem:
             break
 
-        print('Notice {} ({})'.format(notice.id, notice.name))
-        comments_list = notice.bl.select_comments().order_by('c.date, c.id')
-        check_comments_for(notice, comments_list)
+        print('News item {} ({})'.format(newsitem.id, newsitem.name))
+        comments_list = newsitem.bl.select_comments().order_by('c.date, c.id')
+        check_comments_for(newsitem, comments_list)
 
-        notice_id = notice.id + 1
+        newsitem_id = newsitem.id + 1

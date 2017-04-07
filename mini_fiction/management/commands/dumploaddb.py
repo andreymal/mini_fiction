@@ -20,14 +20,14 @@ dumpdb_params = {
     'author': {'exclude': (
         'activity', 'edit_log',
         'favorites', 'bookmarks', 'contributing', 'coauthorseries',
-        'notices', 'votes', 'views',
-        'notice_comments', 'notice_comment_edits', 'notice_comment_votes',
+        'news', 'votes', 'views',
+        'news_comments', 'news_comment_edits', 'news_comment_votes',
         'story_comments', 'story_comment_edits', 'story_comment_votes',
     )},
     'storycomment': {'exclude': (
         'answers', 'edits', 'votes',
     )},
-    'noticecomment': {'exclude': (
+    'newscomment': {'exclude': (
         'answers', 'edits', 'votes',
     )},
     'category': {'exclude': (
@@ -60,8 +60,8 @@ restoredb_order = (
     'inseriespermissions',
     'coauthorsseries',
 
-    'notice',
-    'noticecomment',
+    'newsitem',
+    'newsitemcomment',
 )
 
 

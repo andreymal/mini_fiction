@@ -7,13 +7,13 @@ var common = {
     menuState: false,
 
     init: function() {
-        // Кнопка закрытия объявления, если таковое присутствует
-        var btn = document.getElementById('close-shown-notice');
+        // Кнопка закрытия новости, если таковая присутствует
+        var btn = document.getElementById('close-shown-newsitem');
         if (btn) {
             btn.addEventListener('click', function() {
                 var expiration_date = new Date();
                 expiration_date.setFullYear(expiration_date.getFullYear() + 10);
-                document.cookie = 'last_notice=' + parseInt(btn.getAttribute('data-id')) + '; path=/; expires=' + expiration_date.toGMTString();
+                document.cookie = 'last_newsitem=' + parseInt(btn.getAttribute('data-id')) + '; path=/; expires=' + expiration_date.toGMTString();
             });
         }
     },

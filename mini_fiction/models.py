@@ -67,10 +67,10 @@ class Author(db.Entity, UserMixin):
     story_comment_edits = orm.Set('StoryCommentEdit')
     story_local_comments = orm.Set('StoryLocalComment')
     story_local_comment_edits = orm.Set('StoryLocalCommentEdit')
-    notices = orm.Set('Notice')
-    notice_comments = orm.Set('NoticeComment')
-    notice_comment_votes = orm.Set('NoticeCommentVote')
-    notice_comment_edits = orm.Set('NoticeCommentEdit')
+    news = orm.Set('NewsItem')
+    news_comments = orm.Set('NewsComment')
+    news_comment_votes = orm.Set('NewsCommentVote')
+    news_comment_edits = orm.Set('NewsCommentEdit')
 
     bl = Resource('bl.author')
 
@@ -634,8 +634,8 @@ class StoryLog(db.Entity):
         return json.loads(self.data_json)
 
 
-class Notice(db.Entity):
-    """ Модель объявления """
+class NewsItem(db.Entity):
+    """ Модель новости """
 
     name = orm.Required(str, 64, index=True, unique=True)
     show = orm.Required(bool, default=False, index=True)
@@ -647,27 +647,27 @@ class Notice(db.Entity):
     updated = orm.Required(datetime, 6, default=datetime.utcnow)
 
     comments_count = orm.Required(int, size=16, unsigned=True, default=0)
-    comments = orm.Set('NoticeComment')
+    comments = orm.Set('NewsComment')
 
-    bl = Resource('bl.notice')
+    bl = Resource('bl.newsitem')
 
     def before_update(self):
         self.updated = datetime.utcnow()
 
 
-class NoticeComment(db.Entity):
-    """ Модель комментария к объявлению """
+class NewsComment(db.Entity):
+    """ Модель комментария к новости """
 
     id = orm.PrimaryKey(int, auto=True)
     local_id = orm.Required(int)
-    parent = orm.Optional('NoticeComment', reverse='answers', nullable=True, default=None)
+    parent = orm.Optional('NewsComment', reverse='answers', nullable=True, default=None)
     author = orm.Optional(Author, nullable=True, default=None)
     author_username = orm.Optional(str, 64)
     date = orm.Required(datetime, 6, default=datetime.utcnow)
     updated = orm.Required(datetime, 6, default=datetime.utcnow)
     deleted = orm.Required(bool, default=False)
     last_deleted_at = orm.Optional(datetime, 6)
-    notice = orm.Required(Notice)
+    newsitem = orm.Required(NewsItem)
     text = orm.Required(orm.LongStr, lazy=False)
     ip = orm.Required(str, 50, default=ipaddress.ip_address('::1').exploded)
     vote_count = orm.Required(int, size=16, unsigned=True, default=0)
@@ -680,14 +680,14 @@ class NoticeComment(db.Entity):
     root_order = orm.Required(int, size=16, unsigned=True)  # for pagination
     last_edited_at = orm.Optional(datetime, 6)  # only for text updates
 
-    votes = orm.Set('NoticeCommentVote')
-    edits = orm.Set('NoticeCommentEdit')
-    answers = orm.Set('NoticeComment', reverse='parent')
+    votes = orm.Set('NewsCommentVote')
+    edits = orm.Set('NewsCommentEdit')
+    answers = orm.Set('NewsComment', reverse='parent')
 
-    bl = Resource('bl.notice_comment')
+    bl = Resource('bl.news_comment')
 
-    orm.composite_key(notice, local_id)
-    orm.composite_index(notice, root_order, tree_depth)
+    orm.composite_key(newsitem, local_id)
+    orm.composite_index(newsitem, root_order, tree_depth)
 
     @property
     def brief_text(self):
@@ -703,10 +703,10 @@ class NoticeComment(db.Entity):
         self.updated = datetime.utcnow()
 
 
-class NoticeCommentEdit(db.Entity):
-    """ Модель с информацией о редактировании комментария к объявлению """
+class NewsCommentEdit(db.Entity):
+    """ Модель с информацией о редактировании комментария к новости """
 
-    comment = orm.Required(NoticeComment)
+    comment = orm.Required(NewsComment)
     editor = orm.Optional(Author)
     date = orm.Required(datetime, 6, default=datetime.utcnow)
     old_text = orm.Optional(orm.LongStr, lazy=False)
@@ -714,10 +714,10 @@ class NoticeCommentEdit(db.Entity):
     ip = orm.Required(str, 50, default=ipaddress.ip_address('::1').exploded)
 
 
-class NoticeCommentVote(db.Entity):
-    """ Модель голосования за комментарий к объявлению """
+class NewsCommentVote(db.Entity):
+    """ Модель голосования за комментарий к новости """
 
-    comment = orm.Required(NoticeComment)
+    comment = orm.Required(NewsComment)
     author = orm.Optional(Author)
     date = orm.Required(datetime, 6, default=datetime.utcnow)
     vote_value = orm.Required(int, default=0)

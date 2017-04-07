@@ -4,7 +4,7 @@
 from mini_fiction.validation.utils import bool_coerce
 
 
-NOTICE = {
+NEWS_ITEM = {
     'name': {
         'type': 'string',
         'required': True,

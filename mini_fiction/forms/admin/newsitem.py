@@ -7,7 +7,7 @@ from wtforms import BooleanField, TextField, TextAreaField
 from mini_fiction.forms.form import Form
 
 
-class NoticeForm(Form):
+class NewsItemForm(Form):
     attrs_dict = {'class': 'input-xxlarge'}
     attrs_markitup_dict = {'class': 'input-xxlarge with-markitup'}
 

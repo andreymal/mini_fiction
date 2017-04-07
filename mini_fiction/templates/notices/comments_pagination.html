@@ -1,6 +1,0 @@
-{% if page_obj.num_pages != 1 %}
-    <a href="{{ url_for('notices.show', name=notice.name, comments_page=page_obj.number - 1) }}" data-ajax-href="{{ url_for('notice_comment.ajax', notice_id=notice.id, page=page_obj.number - 1) }}" id="ajax_prev_comment" class="btn{% if not page_obj.has_previous() %} hidden{% endif %}">← Старые</a>
-    <span id="ajax_pages_comment" class="btn btn-primary">{{ page_obj.number }} / {{ page_obj.num_pages }}</span>
-    <a href="{{ url_for('notices.show', name=notice.name, comments_page=page_obj.number + 1) }}" data-ajax-href="{{ url_for('notice_comment.ajax', notice_id=notice.id, page=page_obj.number + 1) }}" id="ajax_next_comment" class="btn{% if not page_obj.has_next() %} hidden{% endif %}">Новые →</a>
-    <input type="hidden" id="num_pages" value="{{ page_obj.num_pages }}">
-{% endif %}

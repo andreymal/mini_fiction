@@ -8,11 +8,11 @@ from pony.orm import db_session
 
 from mini_fiction.utils.views import admin_required
 from mini_fiction.validation import ValidationError
-from mini_fiction.forms.admin.notice import NoticeForm
-from mini_fiction.models import Notice
+from mini_fiction.forms.admin.newsitem import NewsItemForm
+from mini_fiction.models import NewsItem
 from mini_fiction.utils.views import paginate_view
 
-bp = Blueprint('admin_notices', __name__)
+bp = Blueprint('admin_news', __name__)
 
 
 @bp.route('/page/last/', defaults={'page': -1})
@@ -21,14 +21,14 @@ bp = Blueprint('admin_notices', __name__)
 @db_session
 @admin_required
 def index(page):
-    objects = Notice.select().order_by(Notice.id.desc())
+    objects = NewsItem.select().order_by(NewsItem.id.desc())
 
     return paginate_view(
-        'admin/notices/index.html',
+        'admin/news/index.html',
         objects,
         count=objects.count(),
-        page_title=gettext('Notices'),
-        objlistname='notices',
+        page_title=gettext('News'),
+        objlistname='news',
         per_page=100,
     )
 
@@ -37,21 +37,21 @@ def index(page):
 @db_session
 @admin_required
 def create():
-    form = NoticeForm()
+    form = NewsItemForm()
 
     if not current_user.is_superuser:
         del form.is_template
 
     if form.validate_on_submit():
         try:
-            notice = Notice.bl.create(current_user._get_current_object(), form.data)
+            newsitem = NewsItem.bl.create(current_user._get_current_object(), form.data)
         except ValidationError as exc:
             form.set_errors(exc.errors)
         else:
-            return redirect(url_for('admin_notices.update', pk=notice.id))
+            return redirect(url_for('admin_news.update', pk=newsitem.id))
 
     return render_template(
-        'admin/notices/work.html',
+        'admin/news/work.html',
         page_title=gettext('Create'),
         form=form,
         edit=False,
@@ -62,37 +62,37 @@ def create():
 @db_session
 @admin_required
 def update(pk):
-    notice = Notice.get(id=pk)
-    if not notice:
+    newsitem = NewsItem.get(id=pk)
+    if not newsitem:
         abort(404)
 
-    form = NoticeForm(data={
-        'name': notice.name,
-        'title': notice.title,
-        'is_template': notice.is_template,
-        'show': notice.show,
-        'content': notice.content,
+    form = NewsItemForm(data={
+        'name': newsitem.name,
+        'title': newsitem.title,
+        'is_template': newsitem.is_template,
+        'show': newsitem.show,
+        'content': newsitem.content,
     })
 
     saved = False
     can_edit = True
     if not current_user.is_superuser:
-        if notice.is_template:
+        if newsitem.is_template:
             can_edit = False
         del form.is_template
 
     if can_edit and form.validate_on_submit():
         try:
-            notice.bl.update(current_user._get_current_object(), form.data)
+            newsitem.bl.update(current_user._get_current_object(), form.data)
         except ValidationError as exc:
             form.set_errors(exc.errors)
         else:
             saved = True
 
     return render_template(
-        'admin/notices/work.html',
-        page_title='{} — {}'.format(notice.name, notice.title or notice.name),
-        notice=notice,
+        'admin/news/work.html',
+        page_title='{} — {}'.format(newsitem.name, newsitem.title or newsitem.name),
+        newsitem=newsitem,
         form=form,
         can_edit=can_edit,
         edit=True,
@@ -104,24 +104,24 @@ def update(pk):
 @db_session
 @admin_required
 def delete(pk):
-    notice = Notice.get(id=pk)
-    if not notice:
+    newsitem = NewsItem.get(id=pk)
+    if not newsitem:
         abort(404)
 
     if not current_user.is_superuser:
-        if notice.is_template:
+        if newsitem.is_template:
             abort(403)
 
     if request.method == 'POST':
         try:
-            notice.bl.delete(current_user._get_current_object())
+            newsitem.bl.delete(current_user._get_current_object())
         except ValidationError:
             abort(403)
         else:
-            return redirect(url_for('admin_notices.index'))
+            return redirect(url_for('admin_news.index'))
 
     return render_template(
-        'admin/notices/delete.html',
+        'admin/news/delete.html',
         page_title=gettext('Delete'),
-        notice=notice,
+        newsitem=newsitem,
     )

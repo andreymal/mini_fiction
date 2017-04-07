@@ -4,7 +4,7 @@
 {% block content %}
 <div class="row">
     <div class="span12">
-    {{- breadcrumbs([[url_for('notices.show', name=notice.name), notice.title]]) }}
+    {{- breadcrumbs([[url_for('news.show', name=newsitem.name), newsitem.title]]) }}
 
     <h1>{{ page_title }}</h1>
 
@@ -20,10 +20,10 @@
 
     <form class="comment-form" method="POST" enctype="multipart/form-data" action="">
     {% from 'macro.html' import comment_form_content %}
-    {{ comment_form_content(form, 'notice', notice.id, parent_comment.local_id if parent_comment else None) }}
+    {{ comment_form_content(form, 'newsitem', newsitem.id, parent_comment.local_id if parent_comment else None) }}
     </form>
 
-    {{- breadcrumbs([[url_for('notices.show', name=notice.name), notice.title]]) }}
+    {{- breadcrumbs([[url_for('news.show', name=newsitem.name), newsitem.title]]) }}
     </div>
 </div>
 {% endblock %}

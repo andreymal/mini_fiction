@@ -1,0 +1,51 @@
+{% extends base %}
+{% from 'macro.html' import breadcrumbs with context %}
+{% block content %}
+<div class="row">
+    <div class="span12">
+        {{- breadcrumbs([[url_for('news.index'), _('News')]]) }}
+
+        <div class="newsitem newsitem-listitem" id="newsitem_{{ newsitem.id }}">
+            <span class="newsitem-title-link">{{ newsitem.title }}</span>
+            {% if current_user.is_staff -%}
+                <a class="btn btn-warning btn-mini" href="{{ url_for('admin_news.update', pk=newsitem.id) }}">{{ _('Edit') }}</a>
+            {%- endif %}
+            <br/>
+            <time datetime="{{ newsitem.date.strftime('%Y-%m-%dT%H:%M:%SZ') }}" class="newsitem-date">
+                {{- newsitem.date|datetimeformat('d.MM.Y') -}}
+            </time>
+            <div class="newsitem-content">{{ content }}</div>
+        </div>
+
+        <!-- Вывод комментариев: начало -->
+        {% if comments_count > 0 %}
+        <div id="comments">
+            <h3>Комментарии (<span id="comments-count">{{ comments_count }}</span>)</h3>
+            <div id="comments-tree" class="comments-tree">
+                {% include 'includes/comments_tree.html' %}
+            </div>
+
+            <div id="comments-pagination" class="pagination center">
+            {% include 'news/comments_pagination.html' %}
+            </div>
+        </div>
+        {% endif %}
+
+        {% if newsitem.bl.can_comment_by(current_user) %}
+            <a href="{{ url_for('news_comment.add', news_id=newsitem.id) }}" id="comment-add-link" class="comment-add-link">Добавить новый комментарий</a>
+
+            <form id="comment-form" class="comment-form" method="POST" enctype="multipart/form-data" action="{{- url_for('news_comment.add', news_id=newsitem.id) -}}">
+            {% from 'macro.html' import comment_form_content %}
+            {{ comment_form_content(comment_form) }}
+            </form>
+        {% elif current_user.is_authenticated %}
+        <h3 id="banned">К сожалению, Вы не можете добавлять комментарии</h3>
+        {% else %}
+        <a href="{{ url_for('auth.login', next=url_for('news.show', name=newsitem.name)) }}">Авторизуйтесь</a> для отправки комментария.
+        {% endif %}
+        <!-- Вывод комментариев: конец -->
+
+        {{- breadcrumbs([[url_for('news.index'), _('News')]]) }}
+    </div>
+</div>
+{% endblock %}

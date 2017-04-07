@@ -1664,23 +1664,23 @@ ul.editlog .editlog-item:nth-child(2n+1) {
 }
 
 
-/* notice pages */
+/* news */
 
-.notice {
+.newsitem {
     margin: 0 0 10px -12px;
     padding: 10px 12px 6px;
 }
 
-.notice-item:nth-child(2n+1) {
+.newsitem-listitem:nth-child(2n+1) {
     background-color: #fefefe;
 }
 
-.notice-title, .notice-title-link {
+.newsitem-title, .newsitem-title-link {
     font-size: 20px;
     font-family: 'Trebuchet MS', Arial, sans-serif;
 }
 
-.notice-date {
+.newsitem-date {
     font-size: 10px;
     color: #555;
 }

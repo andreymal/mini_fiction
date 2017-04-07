@@ -78,8 +78,8 @@ def checkstorycomments():
 
 
 @manager.command
-def checknoticecomments():
-    from mini_fiction.management.commands.checkcomments import checknoticecomments as cmd
+def checknewscomments():
+    from mini_fiction.management.commands.checkcomments import checknewscomments as cmd
     orm.sql_debug(False)
     with db_session:
         cmd()

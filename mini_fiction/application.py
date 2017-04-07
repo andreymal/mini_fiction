@@ -119,7 +119,7 @@ def configure_error_handlers(app):
 
 def configure_views(app):
     from mini_fiction.views import index, auth, story, chapter, editlog, search, author, stream, object_lists
-    from mini_fiction.views import story_comment, story_local_comment, feeds, staticpages, notices, notice_comment
+    from mini_fiction.views import story_comment, story_local_comment, feeds, staticpages, news, news_comment
     from mini_fiction.views import notifications
     from mini_fiction.views import misc
     app.register_blueprint(index.bp)
@@ -136,8 +136,8 @@ def configure_views(app):
     app.register_blueprint(story_local_comment.bp)
     app.register_blueprint(feeds.bp, url_prefix='/feeds')
     app.register_blueprint(staticpages.bp)
-    app.register_blueprint(notices.bp, url_prefix='/notice')
-    app.register_blueprint(notice_comment.bp)
+    app.register_blueprint(news.bp, url_prefix='/news')
+    app.register_blueprint(news_comment.bp)
     app.register_blueprint(notifications.bp, url_prefix='/notifications')
 
     app.add_url_rule('/media/<path:filename>', 'media', misc.media)
@@ -153,7 +153,7 @@ def configure_views(app):
 
 def configure_admin_views(app):
     from mini_fiction.views.admin import index, categories, characters, charactergroups, classifications
-    from mini_fiction.views.admin import htmlblocks, staticpages, authors, notices
+    from mini_fiction.views.admin import htmlblocks, staticpages, authors, news
     app.register_blueprint(index.bp, url_prefix='/admin')
     app.register_blueprint(htmlblocks.bp, url_prefix='/admin/htmlblocks')
     app.register_blueprint(categories.bp, url_prefix='/admin/categories')
@@ -162,7 +162,7 @@ def configure_admin_views(app):
     app.register_blueprint(classifications.bp, url_prefix='/admin/classifications')
     app.register_blueprint(staticpages.bp, url_prefix='/admin/staticpages')
     app.register_blueprint(authors.bp, url_prefix='/admin/authors')
-    app.register_blueprint(notices.bp, url_prefix='/admin/notices')
+    app.register_blueprint(news.bp, url_prefix='/admin/news')
 
 
 def configure_ajax(app):
@@ -228,7 +228,7 @@ def configure_errorpages(app):
 
 def configure_templates(app):
     from mini_fiction.templatetags import random_stories, random_logo, submitted_stories_count
-    from mini_fiction.templatetags import story_comments_delta, html_block, hook, shown_notice
+    from mini_fiction.templatetags import story_comments_delta, html_block, hook, shown_newsitem
     from mini_fiction.templatetags import get_comment_threshold, misc
     from mini_fiction.templatetags import i18n
     from mini_fiction.templatetags import registry

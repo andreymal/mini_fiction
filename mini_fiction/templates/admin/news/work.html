@@ -7,11 +7,11 @@
     <div class="span12">
         {{- breadcrumbs([
             [url_for('admin_index.index'), _('Administration')],
-            [url_for('admin_notices.index'), _('Notices')]
+            [url_for('admin_news.index'), _('News')]
         ]) }}
         <h1>{{ page_title }}</h1>
 
-        {% if edit %}<p><a href="{{ url_for('notices.show', name=notice.name) }}" target="_blank">{{ url_for('notices.show', name=notice.name, _external=True) }}</a></p>{% endif %}
+        {% if edit %}<p><a href="{{ url_for('news.show', name=newsitem.name) }}" target="_blank">{{ url_for('news.show', name=newsitem.name, _external=True) }}</a></p>{% endif %}
 
         {% if saved %}<div class="alert-mini green">{{ _('Saved!') }}</div>{% endif %}
 
@@ -20,7 +20,7 @@
         <div class="controls">
             {% if not edit or can_edit %}
             <input type="submit" value="{{ _('Save') }}" class="btn btn-primary" />
-            {% if edit %}<a href="{{ url_for('admin_notices.delete', pk=notice.id) }}" class="btn">{{ _('Delete') }}</a>{% endif %}
+            {% if edit %}<a href="{{ url_for('admin_news.delete', pk=newsitem.id) }}" class="btn">{{ _('Delete') }}</a>{% endif %}
             {% else %}
             {{ _("You don't have access to edit this Jinja2 template.") }}
             {% endif %}
@@ -29,7 +29,7 @@
 
         {{- breadcrumbs([
             [url_for('admin_index.index'), _('Administration')],
-            [url_for('admin_notices.index'), _('Notices')]
+            [url_for('admin_news.index'), _('News')]
         ]) }}
     </div>
 </div>

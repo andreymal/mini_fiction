@@ -17,7 +17,7 @@ STORY_COMMENT = {
 }
 
 
-NOTICE_COMMENT = {
+NEWS_COMMENT = {
     'parent': {
         'type': 'integer',
         'coerce': int,

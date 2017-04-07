@@ -15,7 +15,8 @@ from mini_fiction.database import db
 dumpdb_params = {
     'story': {'exclude': (
         'edit_log', 'story_views_set', 'votes', 'favorites', 'bookmarks',
-        'comments', 'activity',
+        'comments', 'activity', 'local', 'in_series_permissions',
+        'contributors',
     )},
     'author': {'exclude': (
         'activity', 'edit_log',
@@ -23,9 +24,20 @@ dumpdb_params = {
         'news', 'votes', 'views',
         'news_comments', 'news_comment_edits', 'news_comment_votes',
         'story_comments', 'story_comment_edits', 'story_comment_votes',
+        'story_local_comments', 'story_local_comment_edits',
+        'contacts',
+    )},
+    'chapter': {'exclude': (
+        'edit_log', 'chapter_views_set',
     )},
     'storycomment': {'exclude': (
         'answers', 'edits', 'votes',
+    )},
+    'storylocalcomment': {'exclude': (
+        'answers', 'edits',
+    )},
+    'newsitem': {'exclude': (
+        'comments',
     )},
     'newscomment': {'exclude': (
         'answers', 'edits', 'votes',
@@ -55,6 +67,8 @@ restoredb_order = (
     'chapter',
     'storycontributor',
     'storycomment',
+    'storylocalthread',
+    'storylocalcomment',
 
     'series',
     'inseriespermissions',

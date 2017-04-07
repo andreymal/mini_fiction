@@ -736,7 +736,7 @@ class ChapterBL(BaseBL):
 
     def _update_words_count(self, chapter):
         old_words = chapter.words
-        new_words = len(Markup.striptags(chapter.text).split())
+        new_words = len(Markup.striptags(chapter.text.replace('<', ' <')).split())
         if new_words != chapter.words:
             chapter.words = new_words
             if not chapter.draft:

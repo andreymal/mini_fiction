@@ -1671,6 +1671,10 @@ ul.editlog .editlog-item:nth-child(2n+1) {
     padding: 10px 12px 6px;
 }
 
+.news-list-short .newsitem {
+    margin-bottom: 0;
+}
+
 .newsitem-listitem:nth-child(2n+1) {
     background-color: #fefefe;
 }
@@ -1678,6 +1682,10 @@ ul.editlog .editlog-item:nth-child(2n+1) {
 .newsitem-title, .newsitem-title-link {
     font-size: 20px;
     font-family: 'Trebuchet MS', Arial, sans-serif;
+}
+
+.news-list-short .newsitem-title-link {
+    font-size: 16px;
 }
 
 .newsitem-date {

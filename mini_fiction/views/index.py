@@ -5,7 +5,7 @@ from flask import Blueprint, current_app, render_template
 from flask_babel import gettext
 from pony.orm import select, db_session
 
-from mini_fiction.models import Story, StoryContributor, Category, Chapter, StoryComment
+from mini_fiction.models import Story, StoryContributor, Category, Chapter, StoryComment, NewsItem
 from mini_fiction.utils.views import cached_lists
 
 bp = Blueprint('index', __name__)
@@ -34,12 +34,15 @@ def index():
     comments = StoryComment.select(lambda x: x.story_published and not x.deleted).order_by(StoryComment.id.desc())
     comments = comments[:current_app.config['COMMENTS_COUNT']['main']]
 
+    news = NewsItem.select().order_by(NewsItem.id.desc())[:3]
+
     data = {
         'categories': categories,
         'stories': stories,
         'chapters': chapters,
         'comments': comments,
         'comments_short': True,
+        'news': news,
         'page_title': page_title,
     }
     data.update(cached_lists([x.id for x in stories]))

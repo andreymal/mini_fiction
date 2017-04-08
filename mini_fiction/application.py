@@ -29,8 +29,13 @@ __all__ = ['create_app']
 
 
 def create_app():
+    if os.path.isfile(os.path.join(os.getcwd(), 'local_settings.py')):
+        os.environ.setdefault('MINIFICTION_SETTINGS', 'local_settings.Local')
+    else:
+        os.environ.setdefault('MINIFICTION_SETTINGS', 'mini_fiction.settings.Development')
+
     app = Flask(__name__)
-    app.config.from_object(os.environ.get('MINIFICTION_SETTINGS', 'mini_fiction.settings.Development'))
+    app.config.from_object(os.environ.get('MINIFICTION_SETTINGS'))
     app.static_folder = app.config['STATIC_ROOT']
     init_bl()
 

@@ -4,9 +4,10 @@
 ## tl;dr (для тех, кто в теме)
 
 * `cd mini_fiction`
-* `virtualenv --no-site-packages env`
+* `virtualenv env`
 * `. env/bin/activate`
 * `make develop`
+* `mkdir media`
 * `mini_fiction seed`
 * `mini_fiction createsuperuser`
 * `mini_fiction runserver`
@@ -28,7 +29,7 @@ cd mini_fiction
   выполнив команду:
 
 ```
-virtualenv --no-site-packages env
+virtualenv env
 ```
 
 * Входим в созданное окружение командой `. env/bin/activate` (*sh) или
@@ -87,15 +88,10 @@ from mini_fiction.settings import Development
 class Local(Development):
     SECRET_KEY = 'some-random-string'
     ...  # здесь и далее все ваши настройки
-```
 
-* Прописываем созданные нами настройки в переменную окружения. Учтите,
-  что созданный вами модуль должен быть доступен для импорта (например,
-  с помощью `export PYTHONPATH=.`):
-
-```
-export MINIFICTION_SETTINGS = local_settings.Local
-```
+* Запускаем `mini_fiction runserver` (или gunicorn или любой другой
+  wsgi-сервер) в том же каталоге, в котором находится `local_settings.py`:
+  сайт его найдёт и автоматически подхватит.
 
 Для боевого (production) окружения наследуйте класс с настройками от
 модуля `mini_fiction.settings.Config` вместо `Development`. Это важно,
@@ -105,6 +101,19 @@ export MINIFICTION_SETTINGS = local_settings.Local
 
 Все настройки, предлагаемые к изменению ниже, прописываются в этом файле
 (не забудьте про отступ в четыре пробела — см. `local_settings.example.py`).
+```
+
+Вы также можете переопределить модуль с настройками через переменную окружения
+`MINIFICTION_SETTINGS`. Например, если вы создали файл настроек
+`my_settings.py` с классом настроек `SuperProd`, пропишите следующую
+переменную окружения:
+
+```
+export MINIFICTION_SETTINGS=my_settings.SuperProd
+```
+
+Файл `my_settings.py` может располагаться везде, откуда его сможет
+импортировать Python.
 
 
 ## Установка дополнительных плюшек

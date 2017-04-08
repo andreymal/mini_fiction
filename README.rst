@@ -37,14 +37,8 @@ Website will be available at ``http://localhost:5000/``, administration page is
 Configuration file
 ------------------
 
-Save ``local_settings.example.py`` as ``local_settings.py`` and enable it:
-
-.. code::
-
-    PYTHONPATH=.; export PYTHONPATH
-    MINIFICTION_SETTINGS=local_settings.Local; export MINIFICTION_SETTINGS
-
-Then ``mini_fiction runserver`` in the same directory with this file.
+Just copy ``local_settings.example.py`` to ``local_settings.py`` and edit it.
+Then run ``mini_fiction runserver`` in the same directory with this file.
 
 You can run ``mini_fiction status`` to check some configuration variables.
 

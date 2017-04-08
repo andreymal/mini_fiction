@@ -75,6 +75,7 @@ install: clean
 develop:
 	pip3 install -r requirements.txt
 	pip3 install -r dev-requirements.txt
+	pip3 install -r test-requirements.txt
 	python3 setup.py develop
 	pybabel compile -d mini_fiction/translations
 

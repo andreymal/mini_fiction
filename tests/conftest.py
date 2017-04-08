@@ -43,7 +43,7 @@ def factories():
 def wait_ajax(selenium):
     def wait():
         i = 0
-        while i < 20 and selenium.execute_script('return window.core && window.core.state.current !== null;'):
+        while i < 20 and selenium.execute_script('return window.amajaxify && window.amajaxify.state.current !== null;'):
             time.sleep(0.15)
             i += 1
     return wait

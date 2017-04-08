@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 from wtforms import FormField, FieldList
-from flask_wtf import Form as BaseForm
+from flask_wtf import FlaskForm as BaseForm
 
 
 class Form(BaseForm):

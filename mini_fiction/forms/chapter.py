@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-from flask_wtf import Form
 from wtforms import TextField, TextAreaField, StringField, validators
 
+from mini_fiction.forms.form import Form
 from mini_fiction.widgets import ServiceButtonWidget
 
 

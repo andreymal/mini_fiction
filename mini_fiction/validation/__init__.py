@@ -135,6 +135,7 @@ class Validator(cerberus.Validator):
         return result
 
     def _validate_allowed_func(self, allowed_func, field, value):
+        """ {'nullable': False} """
         if allowed_func not in self._allowed_func_caches:
             self._allowed_func_caches[allowed_func] = allowed_func()
         choices = self._allowed_func_caches[allowed_func]

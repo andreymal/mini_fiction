@@ -104,6 +104,22 @@ var story = {
                 }).catch(core.handleError);
         });
 
+        // Закрепление на главной
+        core.bind('#content .story_pin', 'click', function(event) {
+            event.stopImmediatePropagation();
+            event.preventDefault();
+            var url = this.href;
+            core.ajax.post(url)
+                .then(function(response) {
+                    return response.json();
+                })
+                .then(function(response) {
+                    if (core.handleResponse(response, url)) {
+                        return;
+                    }
+                }).catch(core.handleError);
+        });
+
         // Добавление в избранное
         core.bind('#content .story_favorite', 'click', function(event) {
             event.stopImmediatePropagation();

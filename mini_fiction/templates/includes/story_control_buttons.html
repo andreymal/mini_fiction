@@ -23,6 +23,9 @@
             {% if not story_edit and current_user.is_staff %}
                 <li><a href="{{ url_for('story.edit', pk=story.id) }}">Редактировать</a></li>
             {% endif %}
+            {% if current_user.is_staff %}
+                <li><a href="{{ url_for('story.pin', pk=story.id) }}" class="story_pin">{{ 'Открепить' if story.pinned else 'Закрепить на главной' }}</a></li>
+            {% endif %}
             {% if story.bl.deletable_by(current_user) %}
                 <li><a class="story_delete" href="{{ url_for('story.delete', pk=story.id) }}">Удалить</a></li>
             {% endif %}

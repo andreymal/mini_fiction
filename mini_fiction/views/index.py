@@ -18,9 +18,13 @@ def index():
 
     categories = Category.select()[:]
 
-    stories = Story.select_published().order_by(Story.first_published_at.desc(), Story.id.desc())
+    pinned_stories = list(
+        Story.select_published().filter(lambda x: x.pinned).order_by(Story.first_published_at.desc())
+    )
+
+    stories = Story.select_published().filter(lambda x: not x.pinned).order_by(Story.first_published_at.desc())
     stories = stories.prefetch(Story.characters, Story.categories, Story.contributors, StoryContributor.user)
-    stories = stories[:current_app.config['STORIES_COUNT']['main']]
+    stories = pinned_stories + stories[:max(1, current_app.config['STORIES_COUNT']['main'] - len(pinned_stories))]
 
     chapters = select(c for c in Chapter if not c.draft and c.story_published and c.order != 1)
     chapters = chapters.order_by(Chapter.first_published_at.desc(), Chapter.order.desc())

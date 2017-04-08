@@ -106,6 +106,24 @@ def approve(pk):
         return redirect(url_for('story.view', pk=story.id))
 
 
+@bp.route('/<int:pk>/pin/', methods=('POST',))
+@db_session
+@login_required
+def pin(pk):
+    user = current_user._get_current_object()
+    if not user.is_staff:
+        abort(403)  # TODO: refactor exceptions and move to bl
+    story = Story.get(id=pk)
+    if not story:
+        abort(404)
+    story.pinned = not story.pinned
+
+    url = request.headers.get('Referer') or url_for('story.view', pk=story.id)
+    if g.is_ajax:
+        return jsonify({'page_content': {'redirect': url}})
+    return redirect(url)
+
+
 @bp.route('/<int:pk>/publish/', methods=('POST',))
 @db_session
 @login_required

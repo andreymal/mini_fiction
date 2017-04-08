@@ -4,6 +4,9 @@
     <div class="story-item" id="story_{{ story.id }}">
         <h3>
             <a href="{{ url_for('story.view', pk=story.id) }}">{{ story.title }}</a>
+            {% if story.pinned -%}
+                <img class="story-pin" src="{{ url_for('static', filename='i/fa-pin-45.png') }}" alt="Pin" title="Этот рассказ закреплён на главной странице" />
+            {%- endif %}
             {% include 'includes/story_header_info.html' with context %}
             {% if not story.original %} <sup class="translation">Перевод</sup>{% endif %}
             {%if not story.finished %}

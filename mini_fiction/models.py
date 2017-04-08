@@ -242,6 +242,7 @@ class Story(db.Entity):
     comments_count = orm.Required(int, size=16, unsigned=True, default=0)
     source_link = orm.Optional(str, 255)
     source_title = orm.Optional(str, 255)
+    pinned = orm.Required(bool, default=False)
 
     in_series_permissions = orm.Set(InSeriesPermissions)
     chapters = orm.Set('Chapter')
@@ -254,6 +255,7 @@ class Story(db.Entity):
 
     orm.composite_index(approved, draft)
     orm.composite_index(approved, draft, first_published_at)
+    orm.composite_index(approved, draft, pinned, first_published_at)
     orm.composite_index(approved, draft, vote_average_index)
 
     bl = Resource('bl.story')

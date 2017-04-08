@@ -51,7 +51,7 @@ class AuthorBL(BaseBL):
 
     def update(self, data):
         user = self.model
-        for field in ('bio', 'email'):
+        for field in ('bio', 'email', 'premoderation_mode'):
             if field in data:
                 setattr(user, field, data[field])
         if 'excluded_categories' in data:

@@ -40,6 +40,8 @@ class Author(db.Entity, UserMixin):
     is_active = orm.Required(bool, default=True)
     date_joined = orm.Required(datetime, 6, default=datetime.utcnow)
 
+    premoderation_mode = orm.Optional(str, 8, py_check=lambda x: x in {'', 'off', 'on'})
+
     bio = orm.Optional(orm.LongStr)
     excluded_categories = orm.Optional(str, 200)  # TODO: use it on index page
     detail_view = orm.Required(bool, default=False)

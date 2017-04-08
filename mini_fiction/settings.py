@@ -171,6 +171,7 @@ class Config(object):
         'font': ['size', 'color'],
     }
 
+    PREMODERATION = True
     PUBLISH_SIZE_LIMIT = 1000  # words
     MAX_SIZE_FOR_DIFF = 75000  # chars
     DIFF_CONTEXT_SIZE = 150  # chars

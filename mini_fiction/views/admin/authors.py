@@ -49,6 +49,7 @@ def update(pk):
         'is_active': author.is_active,
         'is_staff': author.is_staff,
         'is_superuser': author.is_superuser,
+        'premoderation_mode': author.premoderation_mode,
     })
 
     saved = False

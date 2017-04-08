@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version:  0.0.2\n"
 "Report-Msgid-Bugs-To: andriyano-31@mail.ru\n"
-"POT-Creation-Date: 2017-04-08 20:11+0300\n"
+"POT-Creation-Date: 2017-04-08 21:48+0300\n"
 "Last-Translator: andreymal <andriyano-31@mail.ru>\n"
 "Language: ru\n"
 "Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && "
@@ -200,33 +200,49 @@ msgstr "Имя пользователя"
 msgid "Password"
 msgstr "Пароль"
 
-#: mini_fiction/forms/admin/authors.py:14
+#: mini_fiction/forms/admin/authors.py:16
 msgid "Email"
 msgstr "Электропочта"
 
-#: mini_fiction/forms/admin/authors.py:19
+#: mini_fiction/forms/admin/authors.py:21
 msgid "Is active"
 msgstr "Активен"
 
-#: mini_fiction/forms/admin/authors.py:21
+#: mini_fiction/forms/admin/authors.py:23
 msgid "Inactive users can't log in"
 msgstr "Неактивные пользователи не могут войти"
 
-#: mini_fiction/forms/admin/authors.py:25
+#: mini_fiction/forms/admin/authors.py:27
 msgid "Is staff"
 msgstr "Персонал"
 
-#: mini_fiction/forms/admin/authors.py:27
+#: mini_fiction/forms/admin/authors.py:29
 msgid "Staff can approve stories and partially administer the site"
 msgstr "Персонал может подтверждать рассказы и частично администрировать сайт"
 
-#: mini_fiction/forms/admin/authors.py:31
+#: mini_fiction/forms/admin/authors.py:33
 msgid "Is superuser"
 msgstr "Суперпользователь"
 
-#: mini_fiction/forms/admin/authors.py:33
+#: mini_fiction/forms/admin/authors.py:35
 msgid "Superuser can fully administer the site"
 msgstr "Суперпользователь может целиком администрировать сайт"
+
+#: mini_fiction/forms/admin/authors.py:39
+msgid "Premoderation mode"
+msgstr "Режим премодерации"
+
+#: mini_fiction/forms/admin/authors.py:41
+msgid "Default"
+msgstr "По умолчанию"
+
+#: mini_fiction/forms/admin/authors.py:42
+msgid "Enable premoderation"
+msgstr "Включить премодерацию"
+
+#: mini_fiction/forms/admin/authors.py:43
+msgid "Disable premoration (verified author)"
+msgstr "Отключить премодерацию (проверенный автор)"
 
 #: mini_fiction/forms/admin/htmlblock.py:15
 #: mini_fiction/forms/admin/newsitem.py:15

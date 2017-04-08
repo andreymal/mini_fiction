@@ -1,8 +1,10 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
+from __future__ import unicode_literals
+
 from flask_babel import lazy_gettext
-from wtforms import BooleanField, TextField
+from wtforms import BooleanField, TextField, SelectField
 
 from mini_fiction.forms.form import Form
 
@@ -31,4 +33,13 @@ class AdminAuthorForm(Form):
         lazy_gettext('Is superuser'),
         render_kw=attrs_dict,
         description=lazy_gettext('Superuser can fully administer the site'),
+    )
+
+    premoderation_mode = SelectField(
+        lazy_gettext('Premoderation mode'),
+        choices=[
+            ('', lazy_gettext('Default')),
+            ('on', lazy_gettext('Enable premoderation')),
+            ('off', lazy_gettext('Disable premoration (verified author)')),
+        ]
     )

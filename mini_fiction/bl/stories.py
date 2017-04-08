@@ -40,6 +40,12 @@ class StoryBL(BaseBL, Commentable):
 
         data = Validator(STORY).validated(data)
 
+        approved = not current_app.config['PREMODERATION']
+        if authors[0].premoderation_mode == 'on':
+            approved = False
+        elif authors[0].premoderation_mode == 'off':
+            approved = True
+
         story = self.model(
             title=data['title'],
             summary=data['summary'],
@@ -50,6 +56,8 @@ class StoryBL(BaseBL, Commentable):
             source_title=data['source_title'],
             finished=data['finished'],
             notes=data['notes'],
+            draft=True,
+            approved=approved,
         )
         story.flush()
         story.categories.add(Category.select(lambda x: x.id in data['categories'])[:])

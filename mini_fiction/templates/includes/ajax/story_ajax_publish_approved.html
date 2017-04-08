@@ -1,0 +1,21 @@
+<div class="modal-header">
+    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+    <h3>{{ page_title }}</h3>
+</div>
+<div class="modal-body">
+    <div class="story-item">
+        <p>Рассказ <strong>«{{ story.title }}»</strong> теперь доступен читателям.</p>
+        {% if unpublished_chapters_count > 0 %}
+        <p>
+            {{ ngettext(
+                'Note that %(num)s chapter is draft and will not be visible to the readers until you publish it separately.',
+                'Note that %(num)s chapters are drafts and will not be visible to the readers until you publish them separately.',
+                unpublished_chapters_count
+            ) }}
+        </p>
+        {% endif %}
+    </div>
+</div>
+<div class="modal-footer">
+    <button class="btn" data-dismiss="modal" aria-hidden="true">Вернуться</button>
+</div>

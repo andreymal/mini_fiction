@@ -63,6 +63,9 @@ var story = {
                         return;
                     }
                     story.setPublished(response.story_id, response.published);
+                    if (response.modal) {
+                        core.modal(response.modal);
+                    }
                 }).catch(core.handleError);
         });
 

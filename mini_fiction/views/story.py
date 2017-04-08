@@ -118,22 +118,31 @@ def publish(pk):
     if not user.is_staff and not story.bl.publishable_by(user):
         abort(403)
 
-    if story.bl.publish(user, story.draft):  # draft == not published
-        if g.is_ajax:
-            return jsonify({'success': True, 'story_id': story.id, 'published': not story.draft})
+    modal = None
+
+    data = {
+        'story': story,
+        'need_words': current_app.config['PUBLISH_SIZE_LIMIT'],
+        'unpublished_chapters_count': Chapter.select(lambda x: x.story == story and x.draft).count(),
+    }
+
+    if not story.bl.publish(user, story.draft):  # draft == not published
+        data['page_title'] = 'Неудачная попытка публикации'
+        modal = render_template('includes/ajax/story_ajax_publish_warning.html', **data)
+
+    elif not story.draft:
+        if story.approved:
+            data['page_title'] = 'Рассказ опубликован'
+            modal = render_template('includes/ajax/story_ajax_publish_approved.html', **data)
         else:
-            return redirect(url_for('story.view', pk=story.id))
-    else:
-        data = {
-            'page_title': 'Неудачная попытка публикации',
-            'story': story,
-            'need_words': current_app.config['PUBLISH_SIZE_LIMIT']
-        }
-        html = render_template('includes/ajax/story_ajax_publish_warning.html', **data)
-        if g.is_ajax:
-            return jsonify({'success': False, 'page_content': {'modal': html}})
-        else:
-            return redirect(url_for('story.view', pk=story.id))  # TODO: add warning here too
+            data['page_title'] = 'Рассказ отправлен на модерацию'
+            modal = render_template('includes/ajax/story_ajax_publish_unapproved.html', **data)
+
+    if g.is_ajax:
+        return jsonify({'success': True, 'story_id': story.id, 'published': not story.draft, 'modal': modal})
+    return redirect(url_for('story.view', pk=story.id))  # TODO: add warning here too
+
+
 
 
 @bp.route('/<int:pk>/favorite/', methods=('POST',))

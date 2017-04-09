@@ -20,7 +20,7 @@ def view(story_id, chapter_order=None):
     story = get_story(story_id)
     user = current_user._get_current_object()
 
-    allow_draft = story.bl.is_contributor(user)
+    allow_draft = user.is_staff or story.bl.is_contributor(user)
 
     if chapter_order is not None:
         chapter = Chapter.get(story=story_id, order=chapter_order)

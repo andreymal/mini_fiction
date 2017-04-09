@@ -27,7 +27,7 @@ def view(story_id, comments_page):
     user = current_user._get_current_object()
     local = get_local_thread(story_id, user)
     story = local.story
-    if not story.bl.is_contributor(user):
+    if not user.is_staff and not story.bl.is_contributor(user):
         abort(403)
 
     per_page = current_app.config['COMMENTS_COUNT']['page']
@@ -37,7 +37,6 @@ def view(story_id, comments_page):
     if not comments_tree_list and paged.number != 1:
         abort(404)
     last_viewed_comment = story.bl.last_viewed_local_comment_by(user)
-    print(last_viewed_comment)
 
     if comments_page < 0 or comments_page == paged.num_pages:
         story.bl.viewed_localcomments(user)

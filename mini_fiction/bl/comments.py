@@ -265,10 +265,10 @@ class StoryLocalCommentBL(BaseCommentBL):
     schema = STORY_COMMENT
 
     def has_comments_access(self, target, author=None):
-        return target.story.bl.is_contributor(author)
+        return author and author.is_staff or target.story.bl.is_contributor(author)
 
     def can_comment_by(self, target, author=None):
-        return target.story.bl.is_contributor(author)
+        return author and author.is_staff or target.story.bl.is_contributor(author)
 
     def get_permalink(self):
         c = self.model

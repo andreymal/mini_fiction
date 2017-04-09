@@ -5,13 +5,13 @@
 
 <div id="nav-main-profile" class="nav-main-profile">
 {%- if current_user.is_authenticated %}
-    <div class="nav-icon nav-icon-bell" title="{{ _('Notifications') }}">
+    {# <div class="nav-icon nav-icon-bell" title="{{ _('Notifications') }}">
         <a id="nav-icon-bell" class="nav-icon-bell-link" href="{{ url_for('notifications.index') }}" data-ajax="{{ url_for('notifications.index', popup='1') }}"></a>
         <span class="new-count" style="display: none"></span>
         <div class="bell-popup" id="bell-popup" style="display: none;">
             <div class="bell-popup-content" id="bell-popup-content">test</div>
         </div>
-    </div>
+    </div> #}
     <a href="{{ url_for('story.add') }}" class="nav-icon nav-icon-add{% if is_current_endpoint('story.add') %} active{% endif %}" title="{{ _('Add story') }}"></a>
     <div class="nav-profile-menu">
     <div class="nav-profile-menu-header" id="nav-profile-menu-header">

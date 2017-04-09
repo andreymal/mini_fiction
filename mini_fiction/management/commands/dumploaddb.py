@@ -261,6 +261,9 @@ def loaddb_entity(data, entity, restore_queue):
 
 
 def loaddb(pathlist, force=False):
+    print('Reading information about files...', end=' ')
+    sys.stdout.flush()
+
     files = []
     for x in pathlist:
         if os.path.isdir(x):
@@ -281,6 +284,8 @@ def loaddb(pathlist, force=False):
         if data[:5] != 'dump:' or data[5:-1] not in files_by_model or newline != '\n':
             raise ValueError('Invalid file {}'.format(f))
         files_by_model[data[5:-1]].append(f)
+
+    print('Done.')
 
     restore_queue = [x for x in restoredb_order if files_by_model.get(x)]
     restore_queue.extend(sorted([x for x in files_by_model if files_by_model.get(x) and x not in restore_queue]))
@@ -322,6 +327,8 @@ def loaddb(pathlist, force=False):
                         break
                     if line and line != '\n':
                         cache += line
+                        continue
+                    if not line.strip() and not cache:
                         continue
                     loaddb_entity(json.loads(cache), entity, restore_queue)
                     cache = ''

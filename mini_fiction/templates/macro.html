@@ -8,11 +8,11 @@
         </ul>
 {% endmacro %}
 
-{% macro nav_item(title, link, match_endpoint=None, matched=None, right=False) -%}
+{% macro nav_item(title, link, match_endpoint=None, matched=None, right=False, noajax=False) -%}
     {%- if matched == None -%}
         {%- set matched = match_endpoint != None and request.endpoint != None and (request.endpoint == match_endpoint or match_endpoint.endswith('.') and request.endpoint.startswith(match_endpoint)) -%}
     {%- endif -%}
-    <li class="{{ 'active ' if matched else '' }}{{ 'right ' if right else '' }}"><a href="{{ link }}">{{ title }}</a></li>
+    <li class="{{ 'active ' if matched else '' }}{{ 'right ' if right else '' }}"><a href="{{ link }}"{% if noajax %} data-noajax="1"{% endif %}>{{ title }}</a></li>
 {%- endmacro %}
 
 

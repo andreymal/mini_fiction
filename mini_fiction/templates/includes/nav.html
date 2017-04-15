@@ -40,7 +40,7 @@
                 'admin_index.index',
             ) }}
         {% endif %}
-        {{ nav_item(_('Log out'), url_for('auth.logout', next=next_url)) }}
+        {{ nav_item(_('Log out'), url_for('auth.logout', next=next_url), noajax=True) }}
     </ul>
     </div><!-- /nav-profile-menu -->
 {%- else -%}

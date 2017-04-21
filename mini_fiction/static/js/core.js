@@ -8,7 +8,6 @@ var core = {
 
     modalShow: false,
     modalClosing: false,
-    modalPageLoaded: false,
     modalElement: null,
     modalBackgr: null,
     loadingIcon: null,
@@ -297,9 +296,8 @@ var core = {
 
         if (event.detail.toModal) {
             if (event.detail.content.modal_content) {
-                console.warn('modal_content is not available on modal page; look like backend bug');
+                console.warn('modal_content is not available on modal page; looks like backend bug');
             }
-            this.modalPageLoaded = true;
             for (i = 0; i < this.loadModalCallbacks.length; i++) {
                 this.loadModalCallbacks[i](this.modalElement);
             }
@@ -317,12 +315,11 @@ var core = {
 
     _ajaxUnloadEvent: function(event) {
         var i;
-        // Если текущая страница — модальное окно, выгружаем его
-        if (this.modalPageLoaded) {
+        // Если текущая страница — модальное окно, выгружаем его
+        if (window.amajaxify.isModalNow()) {
             for (i = 0; i < this.unloadModalCallbacks.length; i++) {
                 this.unloadCallbacks[i](this.modalElement);
             }
-            this.modalPageLoaded = false;
         }
 
         // Если следующая страница не будет всплывающим окном, то выгружаем текущую

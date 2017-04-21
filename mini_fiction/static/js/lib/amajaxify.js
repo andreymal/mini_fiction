@@ -36,6 +36,9 @@
  * События beginrequest и endrequest появляются только в случае отправки
  * запроса самим amajaxify; если был вызван handlePageData напрямую, то
  * остаются только события unload/prepare/load.
+ *
+ * В случае закрытия модального окна без перезагрузки основного контента
+ * страницы ничего кроме updateModalFunc(null) не вызывается.
  */
 
 
@@ -54,6 +57,7 @@ var amajaxify = {
     },
     modalSupport: false,
     allowScriptTags: false,
+    scrollToTopFrom: 400,
 
     customFetch: null,
     updateModalFunc: null,
@@ -80,6 +84,12 @@ var amajaxify = {
         // Иногда бывает надобно присылать в HTML-коде скрипты (какие-нибудь яндекс-карты, например)
         this.allowScriptTags = options.allowScriptTags ? true : false;
 
+        // После обновления страницы она прокручивается до верха; данная опция позволяет не делать этого,
+        // если страница прокручена вниз совсем чуть-чуть
+        if (options.scrollToTopFrom !== undefined && options.scrollToTopFrom !== null) {
+            this.scrollToTopFrom = options.scrollToTopFrom;
+        }
+
         this.customFetch = options.customFetch;
 
         if (options.updateModalFunc) {
@@ -91,6 +101,10 @@ var amajaxify = {
         if (window.FormData) {
             window.addEventListener('submit', this._submitEvent.bind(this));
         }
+
+        // Если страница — модальное окно, но её открыли не через AJAX, а напрямую по ссылке,
+        // позволяем уведомить нас об этом во время инициализации
+        this.state.isModalNow = options.isModalNow || false;
 
         // Нужно сохранить изначальный state в истории
         this.updatePageState(null, null, true);
@@ -453,7 +467,8 @@ var amajaxify = {
             history.replaceState(state, '', url);
         }
 
-        if (!options.noScroll && !this.state.isModalNow && window.scrollY > 400) {
+        var scrollTop = window.pageYOffset || document.documentElement.scrollTop || document.body.scrollTop;
+        if (!options.noScroll && !this.state.isModalNow && scrollTop >= this.scrollToTopFrom) {
             window.scrollTo(0, 0);
         }
     },

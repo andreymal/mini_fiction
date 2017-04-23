@@ -391,43 +391,52 @@ var story = {
 
     panelStuff: function() {
         // Плавающая панелька при чтении рассказа
-        var panel = $("#story_panel");
-        if (panel.length != 1) {
+        var panelElem = document.getElementById('story_panel');
+        if (!panelElem) {
             return;
         }
-        panel = panel;
-        var comments = $('#comments');
-        this.panel = {
-            positionY: panel.position().top,
-            maxPositionY: comments.length ? (comments.position().top - panel.outerHeight()) : null,
-            panelWidth: panel.width(),
-            isFixed: false,
-            event: function() {
-                this._panelEvent.call(window, this.panel);
-            }.bind(this)
-        };
-        window.addEventListener('scroll', this.panel.event);
-        this.panel.event(); // init
 
-        // Кнопка прокрутки наверх
-        var scrollDiv = $('#toTop');
-        scrollDiv.hide().removeAttr("href");
-        if (this.panel.isFixed){
-            scrollDiv.fadeIn("fast");
+        // Проверяем поддержку position: sticky
+        var sticky = false;
+        panelElem.style.position = 'sticky';
+        if (panelElem.style.position == 'sticky') {
+            sticky = true;
+        } else {
+            panelElem.style.position = '';
+            panelElem.classList.remove('story-panel-sticky');
+            sticky = false;
         }
 
-        this.panel.eventToTop = function() {
-            if (!this.panel.isFixed) {
-                scrollDiv.fadeOut('fast');
-            } else {
-                scrollDiv.fadeIn('fast');
-            }
-        }.bind(this);
+        this.panel = {
+            dom: panelElem,
+            stub: document.createElement('div'),
+            sticky: sticky,
+            isFixed: false,
 
-        window.addEventListener('scroll', this.panel.eventToTop);
-        scrollDiv.click(function() {
-            $("html, body").animate({scrollTop: 0}, "slow");
-        });
+            positionY: 0,
+            maxPositionY: 0,
+            panelWidth: 0,
+
+            event: this._panelEvent.bind(this),
+            eventResize: this.recalcPanelGeometry.bind(this),
+            eventToTop: function(event) {
+                event.preventDefault();
+                window.scrollTo(0, 0);
+                return false;
+            },
+        };
+        if (panelElem.nextSibling) {
+            panelElem.parentNode.insertBefore(this.panel.stub, panelElem.nextSibling);
+        } else {
+            panelElem.parentNode.appendChild(this.panel.stub);
+        }
+        window.addEventListener('scroll', this.panel.event);
+        window.addEventListener('resize', this.panel.eventResize);
+        this.recalcPanelGeometry();
+
+        // Кнопка прокрутки наверх
+        var scrollDiv = document.getElementById('toTop');
+        scrollDiv.addEventListener('click', this.panel.eventToTop);
 
         // Переключение размера и типа шрифта
         var font_selector = $('.select-font');
@@ -449,31 +458,82 @@ var story = {
             else if (size_selector.val() == '3')
                 chapter_text.removeClass('small-font').addClass('big-font');
         });
+
+        panelElem.classList.remove('no-js');
     },
 
     removePanel: function() {
         if (!this.panel) {
             return;
         }
-        window.removeEventListener('scroll', this.panel.eventToTop);
+
+        var scrollDiv = document.getElementById('toTop');
+        scrollDiv.removeEventListener('click', this.panel.eventToTop);
+
+        window.removeEventListener('resize', this.panel.eventResize);
         window.removeEventListener('scroll', this.panel.event);
+        this.panel.stub.parentNode.removeChild(this.panel.stub);
         this.panel = null;
     },
 
-    _panelEvent: function(panel) {
-        if (
-            this.pageYOffset > (panel.positionY) &&
-            (!panel.maxPositionY || this.pageYOffset < panel.maxPositionY)
-        ) {
-            if (!panel.isFixed) {
-                panel.isFixed = true;
-                $("#story_panel").css('position', 'fixed').css('top', 0).css('z-index', 10).css('width', panel.panelWidth).css('border-top-right-radius', 0).css('border-top-left-radius', 0);
-                $("#wrapper").css('height', $("#story_panel").outerHeight() + 10); // margin-bottom: 10px
+    recalcPanelGeometry: function() {
+        if (this.panel.sticky) {
+            // При position: sticky браузер делает всё сам
+            this.panel.event();
+            return;
+        }
+
+        // Весь код ниже нужен только при отсутствии поддержки sticky
+        this.panel.dom.style.position = 'static';
+        this.panel.dom.classList.remove('story-panel-floating');
+        this.panel.dom.style.width = '';
+        this.panel.dom.style.top = '';
+        this.panel.stub.style.height = '0px';
+        this.panel.isFixed = false;
+
+        var panelRect = this.panel.dom.getBoundingClientRect();
+        var contRect = this.panel.dom.parentNode.getBoundingClientRect();
+
+        var scrollTop = window.pageYOffset || document.documentElement.scrollTop || document.body.scrollTop;
+        var h = panelRect.bottom - panelRect.top;
+
+        this.panel.positionY = scrollTop + panelRect.top;
+        this.panel.maxPositionY = scrollTop + contRect.bottom - h;
+        this.panel.panelWidth = panelRect.right - panelRect.left;
+
+        this.panel.stub.style.height = h + 'px';
+
+        this.panel.dom.style.position = 'absolute';
+        this.panel.dom.style.width = this.panel.panelWidth + 'px';
+        this.panel.event();
+    },
+
+    _panelEvent: function() {
+        var scrollTop = window.pageYOffset || document.documentElement.scrollTop || document.body.scrollTop;
+        var newIsFixed;
+        if (this.panel.sticky) {
+            newIsFixed = this.panel.dom.getBoundingClientRect().top === 0;
+        } else {
+            newIsFixed = scrollTop >= this.panel.positionY && scrollTop < this.panel.maxPositionY;
+        }
+        if (this.panel.isFixed === newIsFixed) {
+            return;
+        }
+
+        if (newIsFixed) {
+            if (!this.panel.sticky) {
+                this.panel.dom.style.position = 'fixed';
+                this.panel.dom.style.top = '0px';
             }
-        } else if (panel.isFixed) {
-            panel.isFixed = false;
-            $("#story_panel").css('position', 'static').css('top', 0).css('z-index', 10).css('width', panel.panelWidth).css('border-top-right-radius', 10).css('border-top-left-radius', 10);
-            $("#wrapper").css('height', 0);
+            this.panel.dom.classList.add('story-panel-floating');
+            this.panel.isFixed = true;
+        } else {
+            if (!this.panel.sticky) {
+                this.panel.dom.style.position = 'absolute';
+                this.panel.dom.style.top = '';
+            }
+            this.panel.dom.classList.remove('story-panel-floating');
+            this.panel.isFixed = false;
         }
     },
 

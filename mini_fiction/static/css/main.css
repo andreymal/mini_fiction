@@ -792,14 +792,42 @@ label.gen input {
 
 /* Storypanel */
 .story-panel {
-    width: 100%;
     margin-left: -12px;
+    margin-right: -12px;
     background-color: #fff;
     padding: 10px 10px 10px 14px;
     border-radius: 10px;
-    margin-bottom: 10px;
     line-height: 16px;
     font-size: 12px;
+    box-sizing: border-box;
+    z-index: 10;
+}
+
+.story-panel-sticky {
+    position: sticky;
+    top: 0;
+}
+
+.story-panel.no-js .js-required {
+    display: none;
+}
+
+.story-panel .scon.up {
+    transition: opacity;
+    transition-duration: 250ms;
+    opacity: 0;
+    pointer-events: none;
+}
+
+.story-panel.story-panel-floating {
+    border-top-left-radius: 0;
+    border-top-right-radius: 0;
+}
+
+.story-panel.no-js .scon.up,
+.story-panel.story-panel-floating .scon.up {
+    opacity: 1;
+    pointer-events: auto;
 }
 
 .story-panel select {

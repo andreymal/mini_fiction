@@ -790,6 +790,11 @@ label.gen input {
 
 }
 
+hr {
+    border-top: 1px solid #aaa;
+    border-bottom: 1px solid #ddd;
+}
+
 /* Storypanel */
 .story-panel {
     margin-left: -12px;

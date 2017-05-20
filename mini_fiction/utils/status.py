@@ -119,10 +119,10 @@ class ProjectStatus(Status):
             if self.app.config['ERROR_EMAIL_HANDLER_PARAMS'].get('mailhost') != self.app.config['EMAIL_HOST']:
                 return self._fail('email', 'ERROR_EMAIL_HANDLER_PARAMS["mailhost"] must be equal to EMAIL_HOST')
 
-        from mini_fiction.utils.misc import connectmail
+        from mini_fiction.utils.mail import smtp_connect
 
         try:
-            s = connectmail()
+            s = smtp_connect()
             s.quit()
         except Exception as exc:
             return self._fail('email', 'failed: ' + str(exc))

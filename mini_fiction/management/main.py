@@ -70,6 +70,15 @@ def createsuperuser():
 
 
 @manager.command
+@manager.option('-e', '--eager', dest='eager', help='Don\'t use Celery for delayed sending', action='store_true')
+def sendtestemail(recipients, eager=False):
+    from mini_fiction.management.commands.sendtestemail import sendtestemail as cmd
+    orm.sql_debug(False)
+    with db_session:
+        cmd(recipients, eager)
+
+
+@manager.command
 def checkstorycomments():
     from mini_fiction.management.commands.checkcomments import checkstorycomments as cmd
     orm.sql_debug(False)

@@ -1,0 +1,10 @@
+{% extends 'email/base.html' %}
+{% block body %}
+Кто-то, может, даже вы, зарегистрировался на сайте <a href="{{ config['SITE_URL'] }}/" target="_blank">{{ config['SITE_URL'] }}/</a>, указав этот почтовый адрес.<br/>
+<br/>
+Для активации вашего аккаунта необходимо перейти по ссылке:<br/>
+<br/>
+<a href="{{ config.SITE_URL }}{{ url_for('auth.registration_activate', activation_key=activation_key) }}" target="_blank">{{ config.SITE_URL }}{{ url_for('auth.registration_activate', activation_key=activation_key) }}</a><br/>
+<br/>
+Если это были не вы — смело удаляйте это письмо.
+{% endblock %}

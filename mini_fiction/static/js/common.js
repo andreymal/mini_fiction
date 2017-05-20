@@ -16,6 +16,17 @@ var common = {
                 document.cookie = 'last_newsitem=' + parseInt(btn.getAttribute('data-id')) + '; path=/; expires=' + expiration_date.toGMTString();
             });
         }
+
+        // Кнопка закрытия уведомления об отсутствующей почте
+        btn = document.getElementById('close-email-notice');
+        if (btn && document.cookie.indexOf('hide_email_notice=1') >= 0) {
+            btn.parentNode.parentNode.removeChild(btn.parentNode);
+            btn = null;
+        } else if (btn) {
+            btn.addEventListener('click', function() {
+                document.cookie = 'hide_email_notice=1; path=/; expires=';
+            });
+        }
     },
 
     load: function(content) {

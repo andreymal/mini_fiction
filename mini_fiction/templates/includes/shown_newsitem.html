@@ -1,7 +1,0 @@
-{%- set newsitem = shown_newsitem() -%}
-{%- if newsitem %}
-    <div class="alert alert-warning" style="margin-top: 20px">
-        <a href="#" class="close" id="close-shown-newsitem" data-id="{{ newsitem.id }}" data-dismiss="alert" aria-label="close" style="text-decoration: none" title="close">×</a>
-        Новость: <a href="{{ url_for('news.show', name=newsitem.name) }}" style="color: inherit;">{{ newsitem.title }}</a>
-    </div>
-{%- endif -%}

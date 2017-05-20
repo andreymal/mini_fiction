@@ -1,0 +1,10 @@
+{% extends 'email/base.html' %}
+{% block body %}
+Для аккаунта <a href="{{ config['SITE_URL'] }}{{ url_for('author.info', user_id=user.id) }}" target="_blank" style="color: #999999; font-weight: bold;">{{ user.username }}</a> на сайте <a href="{{ config['SITE_URL'] }}/" target="_blank">{{ config['SITE_URL'] }}/</a> был указан новый почтовый адрес, на который прислано данное письмо.<br/>
+<br/>
+Для сохранения нового адреса необходимо перейти по ссылке:<br/>
+<br/>
+<a href="{{ config.SITE_URL }}{{ url_for('auth.new_email_activate', activation_key=activation_key) }}" target="_blank">{{ config.SITE_URL }}{{ url_for('auth.new_email_activate', activation_key=activation_key) }}</a><br/>
+<br/>
+Если вы ничего такого не делали — смело удаляйте это письмо.
+{% endblock %}

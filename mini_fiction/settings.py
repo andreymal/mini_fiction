@@ -136,6 +136,8 @@ class Config(object):
         'default': 'stories',
         'registration': 'stories_reg',
         'reset_password': 'stories_pwd',
+        'change_email': 'stories_chmail',
+        'change_email_warning': 'stories_chmail_warn',
     }
     DEFAULT_FROM_EMAIL = ('Библиотека', 'minifiction@localhost.com')
 

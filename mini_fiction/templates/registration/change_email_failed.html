@@ -1,0 +1,19 @@
+{% extends base %}
+{% from 'macro.html' import breadcrumbs with context %}
+{% block content %}
+<div class="row">
+    <div class="span12">
+        {{- breadcrumbs() }}
+    </div>
+
+    <div class="span12 reg-complete">
+    <h1>Почтовый адрес не изменён</h1>
+    <p>Приветствуем!</p>
+    <p>Изменение почтового адреса пошло не совсем так, как планировалось. Возможно, ссылка слишком старая. Если вы думаете, что это проблема с сайтом, <a href="{{ config.SITE_FEEDBACK }}">свяжитесь</a> с нами, указав свой почтовый адрес для регистрации, логин и время.</p>
+  </div>
+
+    <div class="span12">
+        {{- breadcrumbs() }}
+    </div>
+</div>
+{% endblock %}

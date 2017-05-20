@@ -1,0 +1,6 @@
+{% extends 'email/base.html' %}
+{% block body %}
+Для аккаунта <a href="{{ config['SITE_URL'] }}{{ url_for('author.info', user_id=user.id) }}" target="_blank" style="color: #999999; font-weight: bold;">{{ user.username }}</a> на сайте <a href="{{ config['SITE_URL'] }}/" target="_blank">{{ config['SITE_URL'] }}/</a> был указан новый почтовый адрес <b>{{ new_email }}</b> вместо данного.<br/>
+<br/>
+Если вы не меняли его, срочно смените пароль и установите старую почту обратно.
+{% endblock %}

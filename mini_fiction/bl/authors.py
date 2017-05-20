@@ -50,8 +50,15 @@ class AuthorBL(BaseBL):
         return user
 
     def update(self, data):
+        from mini_fiction.models import ChangeEmailProfile
+
         user = self.model
-        for field in ('bio', 'email', 'premoderation_mode'):
+        if 'email' in data:
+            user.email = data['email']
+            cep = ChangeEmailProfile.get(user=user)
+            if cep:
+                cep.delete()
+        for field in ('bio', 'premoderation_mode'):
             if field in data:
                 setattr(user, field, data[field])
         if 'excluded_categories' in data:
@@ -134,6 +141,61 @@ class AuthorBL(BaseBL):
             else:
                 with image:
                     self.validate_and_set_avatar(image, image_data)
+
+    def update_email_with_confirmation(self, email):
+        from mini_fiction.models import Author, ChangeEmailProfile
+
+        user = self.model
+
+        cep = ChangeEmailProfile.get(user=user)
+        cep_expired = not cep or cep.date + timedelta(days=current_app.config['ACCOUNT_ACTIVATION_DAYS']) < datetime.utcnow()
+
+        if email.lower() == user.email.lower():
+            if cep:
+                # Отмена установки новой почты
+                cep.delete()
+            return False
+
+        if Author.bl.is_email_busy(email):
+            raise ValidationError({'email': [lazy_gettext('Email address is already in use')]})
+
+        data = {
+            'date': datetime.utcnow(),
+            'activation_key': ''.join(random.choice(string.ascii_letters + string.digits) for _ in range(40)),
+            'user': user,
+            'email': email,
+        }
+
+        if not cep:
+            cep = ChangeEmailProfile(**data)
+        elif cep_expired or email.lower() != cep.email.lower():
+            for k, v in data.items():
+                setattr(cep, k, v)
+
+        later(
+            current_app.tasks['sendmail'].delay,
+            cep.email,
+            render_template('email/change_email_subject.txt'),
+            body={
+                'plain': render_template('email/change_email.txt', activation_key=cep.activation_key, user=user),
+                'html': render_template('email/change_email.html', activation_key=cep.activation_key, user=user),
+            },
+            headers={'X-Postmaster-Msgtype': current_app.config['EMAIL_MSGTYPES']['change_email']},
+        )
+
+        if user.email:
+            later(
+                current_app.tasks['sendmail'].delay,
+                user.email,
+                render_template('email/change_email_warning_subject.txt'),
+                body={
+                    'plain': render_template('email/change_email_warning.txt', user=user, new_email=email),
+                    'html': render_template('email/change_email_warning.html', user=user, new_email=email),
+                },
+                headers={'X-Postmaster-Msgtype': current_app.config['EMAIL_MSGTYPES']['change_email_warning']},
+            )
+
+        return True
 
     def delete_avatar(self):
         user = self.model
@@ -350,6 +412,23 @@ class AuthorBL(BaseBL):
             return
         rp.activated = True
         user.is_active = True
+        return user
+
+    def activate_changed_email(self, activation_key):
+        from mini_fiction.models import ChangeEmailProfile
+
+        cep = ChangeEmailProfile.get(activation_key=activation_key)
+        if not cep:
+            return
+        user = cep.user
+
+        if not user.is_active or cep.date + timedelta(days=current_app.config['ACCOUNT_ACTIVATION_DAYS']) < datetime.utcnow():
+            cep.delete()
+            return
+
+        user.email = cep.email
+        del cep
+        ChangeEmailProfile.select(lambda x: x.email.lower() == user.email.lower()).delete(bulk=True)
         return user
 
     def authenticate(self, password):

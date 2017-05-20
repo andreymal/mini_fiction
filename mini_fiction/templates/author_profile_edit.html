@@ -45,7 +45,11 @@
                     <form id="mail" action="#mail" method="POST" enctype="multipart/form-data" class="form-horizontal">
                         <fieldset>
                         <legend>Почта</legend>
-                          {% if email_ok %}<div class="alert-mini green">Адрес электронной почты успешно обновлен</div>{% endif %}
+                          {% if email_changed %}
+                            <div class="alert-mini green">На новый адрес электронной почты отправлена ссылка с кодом. Перейдите по ней для сохранения нового адреса.</div>
+                          {% elif email_ok %}
+                            <div class="alert-mini green">Адрес электронной почты успешно обновлен</div>
+                          {% endif %}
                             {% for field in email_form %}
                                 {% if field.widget.input_type == 'hidden' %}{{ field }}{% else %}
                                 <div class="control-group{% if field.errors %} error{% endif %}">
@@ -57,7 +61,12 @@
                                                 <span class="help-inline">{{ error }}</span>
                                             {% endfor %}
                                         {% else %}
-                                            <span class="help-inline small">{{ field.description }}</span>
+                                            <span class="help-inline small">
+                                            {% if field.name == 'email' and new_email -%}
+                                                Ожидает подтверждения. Сохраните ещё раз, чтобы повторить отправку ссылки
+                                            {%- else -%}
+                                                {{- field.description -}}
+                                            {%- endif %}</span>
                                         {% endif %}
                                     </div>
                                 </div>

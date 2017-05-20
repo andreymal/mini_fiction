@@ -6,7 +6,7 @@ from flask_babel import gettext
 from flask_login import current_user, login_required, logout_user
 from pony.orm import db_session
 
-from mini_fiction.models import Author, Story, StoryComment, Contact
+from mini_fiction.models import Author, Story, StoryComment, Contact, ChangeEmailProfile
 from mini_fiction.utils.misc import Paginator
 from mini_fiction.utils.views import cached_lists
 from mini_fiction.forms.author import AuthorEditEmailForm, AuthorEditPasswordForm, AuthorEditProfileForm, AuthorEditPrefsForm
@@ -82,6 +82,10 @@ def info(user_id=None, comments_page=1):
 @login_required
 def edit():
     author = current_user._get_current_object()
+
+    cep = ChangeEmailProfile.get(user=author)
+    new_email = cep.email if cep else None
+
     data = {'page_title': gettext('Profile settings'), 'user': author}
 
     has_avatar = bool(author.avatar_small or author.avatar_medium or author.avatar_large)
@@ -129,8 +133,11 @@ def edit():
                 if not author.bl.authenticate(email_form.password.data):
                     email_form_errors.append(gettext('Password is incorrect'))
                 else:
-                    author.bl.update({'email': email_form.email.data})
-                    data['email_ok'] = True
+                    try:
+                        data['email_changed'] = author.bl.update_email_with_confirmation(email_form.email.data)
+                        data['email_ok'] = True
+                    except ValidationError as exc:
+                        email_form.set_errors(exc.errors)
 
         if 'save_prefs' in request.form:
             prefs_form = AuthorEditPrefsForm()
@@ -152,7 +159,7 @@ def edit():
         if not avatar_uploading:
             del profile_form.avatar
     if not email_form:
-        email_form = AuthorEditEmailForm(formdata=None, data={'email': author.email})
+        email_form = AuthorEditEmailForm(formdata=None, data={'email': new_email or author.email})
     if not password_form:
         password_form = AuthorEditPasswordForm(formdata=None)
     if not prefs_form:
@@ -175,6 +182,7 @@ def edit():
     data.update({
         'profile_form': profile_form,
         'email_form': email_form,
+        'new_email': new_email,
         'password_form': password_form,
         'prefs_form': prefs_form,
         'profile_form_errors': [],

@@ -1,0 +1,11 @@
+{% autoescape false -%}
+Для аккаунта {{ user.username }} на сайте {{ config['SITE_URL'] }}/ был указан новый почтовый адрес, на который прислано данное письмо.
+
+Для сохранения нового адреса необходимо перейти по ссылке:
+
+{{ config.SITE_URL }}{{ url_for('auth.new_email_activate', activation_key=activation_key) }}
+
+Если вы ничего такого не делали — смело удаляйте это письмо.
+
+{{ SITE_NAME }}
+{%- endautoescape %}

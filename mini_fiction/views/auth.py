@@ -123,6 +123,18 @@ def password_reset_complete():
     return render_template('registration/password_reset_complete.html', page_title=page_title)
 
 
+@bp.route('/changemail/<activation_key>/', methods=('GET',))
+@db_session
+def new_email_activate(activation_key):
+    user = Author.bl.activate_changed_email(activation_key)
+    if user:
+        if current_app.config['REGISTRATION_AUTO_LOGIN']:
+            login_user(user, remember=True)
+        return render_template('registration/change_email_complete.html')
+    else:
+        return render_template('registration/change_email_failed.html')
+
+
 @bp.route('/logout/', methods=('GET',))
 @db_session
 def logout():

@@ -55,6 +55,7 @@ class Author(db.Entity, UserMixin):
 
     registration_profile = orm.Optional('RegistrationProfile')
     password_reset_profiles = orm.Set('PasswordResetProfile')
+    change_email_profiles = orm.Set('ChangeEmailProfile')
     contacts = orm.Set('Contact')
     contributing = orm.Set('StoryContributor')
     coauthorseries = orm.Set('CoAuthorsSeries')
@@ -106,6 +107,13 @@ class PasswordResetProfile(db.Entity):
     activation_key = orm.Required(str, 40, unique=True)
     user = orm.Required(Author)
     activated = orm.Required(bool, default=False)
+
+
+class ChangeEmailProfile(db.Entity):
+    date = orm.Required(datetime, 6, default=datetime.utcnow)
+    activation_key = orm.Required(str, 40, unique=True)
+    user = orm.Required(Author, unique=True)
+    email = orm.Required(str, 254, index=True)
 
 
 class Contact(db.Entity):

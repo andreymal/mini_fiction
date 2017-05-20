@@ -264,6 +264,7 @@ class AuthorBL(BaseBL):
             data['email'],
             render_template('registration/activation_email_subject.txt'),
             render_template('registration/activation_email.txt', activation_key=rp.activation_key),
+            headers={'X-Postmaster-Msgtype': current_app.config['EMAIL_MSGTYPES']['registration']},
         )
 
         return user
@@ -296,6 +297,7 @@ class AuthorBL(BaseBL):
             user.email,
             render_template('registration/password_reset_email_subject.txt'),
             render_template('registration/password_reset_email.txt', activation_key=prp.activation_key, user=user),
+            headers={'X-Postmaster-Msgtype': current_app.config['EMAIL_MSGTYPES']['reset_password']},
         )
 
         return prp

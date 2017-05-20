@@ -131,7 +131,13 @@ class Config(object):
     EMAIL_USE_TLS = False
     EMAIL_SSL_KEYFILE = None
     EMAIL_SSL_CERTFILE = None
-    DEFAULT_FROM_EMAIL = 'minifiction@localhost.com'
+    EMAIL_TIMEOUT = 10
+    EMAIL_MSGTYPES = {
+        'default': 'stories',
+        'registration': 'stories_reg',
+        'reset_password': 'stories_pwd',
+    }
+    DEFAULT_FROM_EMAIL = ('Библиотека', 'minifiction@localhost.com')
 
     ACCOUNT_ACTIVATION_DAYS = 5
     REGISTRATION_AUTO_LOGIN = True

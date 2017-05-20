@@ -36,11 +36,11 @@ def apply_for_app(app):
         app.tasks[name] = app.celery.task(**kwargs)(f)
 
 
-@task()
+@task(rate_limit='30/m')
 @db_session
-def sendmail(to, subject, body, fro=None, config=None):
-    from mini_fiction.utils import misc
-    misc.sendmail(to, subject, body, fro=fro, config=config)
+def sendmail(to, subject, body, fro=None, headers=None, config=None):
+    from mini_fiction.utils import mail
+    mail.sendmail(to, subject, body, fro=fro, headers=headers, config=config)
 
 
 @task_sphinx_retrying

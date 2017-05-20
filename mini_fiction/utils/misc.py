@@ -3,10 +3,6 @@
 
 import json
 import math
-import smtplib
-from base64 import b64encode
-from email.mime.text import MIMEText
-from email.mime.multipart import MIMEMultipart
 
 from flask import current_app, g, escape
 from flask_babel import pgettext, ngettext
@@ -69,83 +65,6 @@ class Paginator(object):
         # last pages
         for page in range(end_begin, self.num_pages + 1):
             yield page
-
-
-def connectmail(config=None):
-    if config is None:
-        config = current_app.config
-
-    if config.get('EMAIL_USE_SSL'):
-        s = smtplib.SMTP_SSL(
-            config['EMAIL_HOST'],
-            config['EMAIL_PORT'],
-            timeout=10,
-            keyfile=config['EMAIL_SSL_KEYFILE'],
-            certfile=config['EMAIL_SSL_CERTFILE'],
-        )
-    else:
-        s = smtplib.SMTP(
-            config['EMAIL_HOST'],
-            config['EMAIL_PORT'],
-            timeout=10,
-        )
-
-    if not config.get('EMAIL_USE_SSL') and config.get('EMAIL_USE_TLS'):
-        s.ehlo()
-        s.starttls(keyfile=config['EMAIL_SSL_KEYFILE'], certfile=config['EMAIL_SSL_CERTFILE'])
-        s.ehlo()
-
-    if config.get('EMAIL_HOST_USER'):
-        s.login(config['EMAIL_HOST_USER'], config['EMAIL_HOST_PASSWORD'])
-
-    return s
-
-
-def sendmail(to, subject, body, fro=None, config=None):
-    if config is None:
-        config = current_app.config
-
-    if not config.get('EMAIL_HOST'):
-        return False
-
-    if not body:
-        return False
-    if fro is None:
-        fro = config['DEFAULT_FROM_EMAIL']
-
-    if isinstance(subject, str):
-        subject = subject.encode("utf-8")
-    if isinstance(body, str):
-        body = body.encode("utf-8")
-
-    if isinstance(body, bytes):
-        msg = MIMEText(body, 'plain', 'utf-8')
-    elif len(body) == 1:
-        msg = body[0]
-    else:
-        msg = MIMEMultipart()
-        for x in body:
-            msg.attach(x)
-
-    msg['From'] = fro
-    msg['To'] = to
-
-    subject_b64 = b64encode(subject)
-    if isinstance(subject_b64, bytes):
-        subject_b64 = subject_b64.decode('ascii')
-    subject_b64 = "=?UTF-8?B?" + subject_b64 + "?="
-    msg['Subject'] = subject_b64
-
-    try:
-        s = connectmail(config)
-        s.sendmail(fro, to, msg.as_string().encode('utf-8'))
-        s.quit()
-    except Exception:
-        import traceback
-        traceback.print_exc()  # we can't use flask.logger, because it uses sendmail :)
-        return False
-
-    return True
 
 
 def sitename():

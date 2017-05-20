@@ -474,11 +474,11 @@ var amajaxify = {
         }
 
         var scrollTop = window.pageYOffset || document.documentElement.scrollTop || document.body.scrollTop;
-        if (!options.noScroll && !this.state.isModalNow && scrollTop >= this.scrollToTopFrom) {
+        if (!options.noScroll && !this.state.isModalNow) {
             var elem = options.hash ? document.getElementById(options.hash) : null;
             if (elem && elem.scrollIntoView) {
                 elem.scrollIntoView();
-            } else {
+            } else if (scrollTop >= this.scrollToTopFrom) {
                 window.scrollTo(0, 0);
             }
         }

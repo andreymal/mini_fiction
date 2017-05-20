@@ -1,5 +1,5 @@
 /*!
- * amajaxify.js (2017-04)
+ * amajaxify.js (2017-05)
  * License: MIT
  * Библиотека для загрузки загрузки страниц и отправки форм с помощью
  * ES6 fetch и HTML5 History API для разных ништяков.
@@ -323,6 +323,8 @@ var amajaxify = {
           в истории, а не добавлять новую
         - noScroll (true/false) — не прокручивать страницу вверх после
           обновления страницы
+        - hash — какой установить location.hash после загрузки контента
+          (игнорируется для модального окна; # в начале писать не надо)
 
         */
 
@@ -447,6 +449,10 @@ var amajaxify = {
             url = location.toString();
         }
 
+        if (options.hash && url.indexOf('#') < 0) {
+            url = url + '#' + options.hash;
+        }
+
         var state = {
             amajaxify: true,
             isModalNow: this.state.isModalNow,
@@ -461,7 +467,7 @@ var amajaxify = {
             url = url.substring(url.indexOf('://') + 1);
         }
 
-        if (!options.replaceState) {
+        if (!options.replaceState && location.href !== url) {
             history.pushState(state, '', url);
         } else {
             history.replaceState(state, '', url);
@@ -469,7 +475,12 @@ var amajaxify = {
 
         var scrollTop = window.pageYOffset || document.documentElement.scrollTop || document.body.scrollTop;
         if (!options.noScroll && !this.state.isModalNow && scrollTop >= this.scrollToTopFrom) {
-            window.scrollTo(0, 0);
+            var elem = options.hash ? document.getElementById(options.hash) : null;
+            if (elem && elem.scrollIntoView) {
+                elem.scrollIntoView();
+            } else {
+                window.scrollTo(0, 0);
+            }
         }
     },
 

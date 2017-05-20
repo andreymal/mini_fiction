@@ -262,8 +262,8 @@ class AuthorBL(BaseBL):
         later(
             current_app.tasks['sendmail'].delay,
             data['email'],
-            render_template('registration/activation_email_subject.txt'),
-            render_template('registration/activation_email.txt', activation_key=rp.activation_key),
+            render_template('email/activation_subject.txt'),
+            render_template('email/activation.txt', activation_key=rp.activation_key),
             headers={'X-Postmaster-Msgtype': current_app.config['EMAIL_MSGTYPES']['registration']},
         )
 
@@ -295,8 +295,8 @@ class AuthorBL(BaseBL):
         later(
             current_app.tasks['sendmail'].delay,
             user.email,
-            render_template('registration/password_reset_email_subject.txt'),
-            render_template('registration/password_reset_email.txt', activation_key=prp.activation_key, user=user),
+            render_template('email/password_reset_subject.txt'),
+            render_template('email/password_reset.txt', activation_key=prp.activation_key, user=user),
             headers={'X-Postmaster-Msgtype': current_app.config['EMAIL_MSGTYPES']['reset_password']},
         )
 

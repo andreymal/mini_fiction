@@ -1,9 +1,0 @@
-{% autoescape false -%}
-Регистрация на сайте
-
-Для активации вашего аккаунта необходимо перейти по ссылке:
-{{ config.SITE_URL }}/accounts/activate/{{ activation_key }}/
-Спасибо!
-
-{{ SITE_NAME }}
-{%- endautoescape %}

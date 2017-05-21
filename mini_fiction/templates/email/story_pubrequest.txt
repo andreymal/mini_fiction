@@ -1,0 +1,7 @@
+{% autoescape false -%}
+Пользователь {{ author.username }} на сайте {{ url_for('index.index', _external=True) }} опубликовал рассказ «{{ story.title }}», но он ещё не был одобрен модераторами. Перейдите к рассказу и одобрите его или отправьте обратно в черновики.
+
+{{ url_for('story.view', pk=story.id, _external=True) }}
+
+{{ SITE_NAME }}
+{%- endautoescape %}

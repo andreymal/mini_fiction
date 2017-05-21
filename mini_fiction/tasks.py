@@ -3,9 +3,12 @@
 
 from functools import wraps
 
+from flask import current_app
 from pony.orm import db_session
 
+from mini_fiction import models
 from mini_fiction.models import Story, Chapter
+from mini_fiction.utils.misc import render_nonrequest_template
 
 
 tasks = {}
@@ -36,11 +39,17 @@ def apply_for_app(app):
         app.tasks[name] = app.celery.task(**kwargs)(f)
 
 
+# common tasks
+
+
 @task(rate_limit='30/m')
 @db_session
 def sendmail(to, subject, body, fro=None, headers=None, config=None):
     from mini_fiction.utils import mail
     mail.sendmail(to, subject, body, fro=fro, headers=headers, config=config)
+
+
+# search updating tasks
 
 
 @task_sphinx_retrying
@@ -88,3 +97,80 @@ def sphinx_delete_chapter(story_id, chapter_id):
         return
 
     story.bl.search_update(('words',))
+
+
+# tasks for notificaions
+
+
+@task()
+@db_session
+def notify_story_pubrequest(story_id, author_id):
+    story = models.Story.get(id=story_id)
+    if not story:
+        return
+    author = models.Author.get(id=author_id)
+    if not author:
+        return
+
+    staff = models.Author.select(lambda x: x.is_staff)
+    recipients = [u.email for u in staff if u.email and 'story_pubrequest' not in u.silent_email_list]
+    if not recipients:
+        return
+
+    ctx = {
+        'story': story,
+        'author': author,
+    }
+
+    kwargs = {
+        'to': recipients,
+        'subject': render_nonrequest_template('email/story_pubrequest_subject.txt', **ctx),
+        'body': {
+            'plain': render_nonrequest_template('email/story_pubrequest.txt', **ctx),
+            'html': render_nonrequest_template('email/story_pubrequest.html', **ctx),
+        },
+    }
+
+    current_app.tasks['sendmail'].delay(**kwargs)
+
+
+@task()
+@db_session
+def notify_story_publish_draft(story_id, staff_id, draft):
+    story = models.Story.get(id=story_id)
+    if not story:
+        return
+    author = story.published_by_author
+    if not author:
+        return
+    staff = models.Author.get(id=staff_id)
+    if not staff:
+        return
+
+    typ = 'story_draft' if draft else 'story_publish'
+
+    if typ not in author.silent_tracker_list:
+        models.Notification(
+            user=author,
+            type=typ,
+            target_id=story.id,
+            caused_by_user=staff,
+        )
+
+    if author.email and typ not in author.silent_email_list:
+        ctx = {
+            'story': story,
+            'author': author,
+            'staff': staff,
+        }
+
+        kwargs = {
+            'to': [author.email],
+            'subject': render_nonrequest_template('email/{}_subject.txt'.format(typ), **ctx),
+            'body': {
+                'plain': render_nonrequest_template('email/{}.txt'.format(typ), **ctx),
+                'html': render_nonrequest_template('email/{}.html'.format(typ), **ctx),
+            },
+        }
+
+        current_app.tasks['sendmail'].delay(**kwargs)

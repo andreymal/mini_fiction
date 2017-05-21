@@ -7,7 +7,7 @@ import json
 import random
 import ipaddress
 from hashlib import md5
-from datetime import datetime
+from datetime import datetime, timedelta
 from statistics import mean, pstdev
 
 from pony import orm
@@ -159,6 +159,17 @@ class StoryBL(BaseBL, Commentable):
         if user:
             self.edit_log(user, {'approved': [old_approved, story.approved]})
 
+        notify = user and user.is_staff and not story.draft
+        notify = notify and (
+            not story.last_author_notification_at or
+            story.last_author_notification_at + timedelta(seconds=current_app.config['STORY_NOTIFICATIONS_INTERVAL']) < datetime.utcnow()
+        )
+        if notify:
+            # Уведомляем автора об изменении состояния рассказа
+            story.last_author_notification_at = datetime.utcnow()
+            story.last_staff_notification_at = None
+            later(current_app.tasks['notify_story_publish_draft'].delay, story.id, user.id, not story.published)
+
         if old_published != story.published:
             if story.published and not story.first_published_at:
                 story.first_published_at = datetime.utcnow()
@@ -184,6 +195,30 @@ class StoryBL(BaseBL, Commentable):
 
             if user:
                 self.edit_log(user, {'draft': [old_draft, story.draft]})
+
+            if not story.draft and user and not user.is_staff:
+                story.published_by_author = user
+
+            notify = user and not story.draft and not story.approved and not user.is_staff
+            notify = notify and (
+                not story.last_staff_notification_at or
+                story.last_staff_notification_at + timedelta(seconds=current_app.config['STORY_NOTIFICATIONS_INTERVAL']) < datetime.utcnow()
+            )
+
+            if notify:
+                # Автор запросил публикацию рассказа, сообщаем модераторам по E-mail
+                story.last_staff_notification_at = datetime.utcnow()
+                story.last_author_notification_at = None
+                later(current_app.tasks['notify_story_pubrequest'].delay, story.id, user.id)
+
+            if user and user.is_staff and old_published != story.published and (
+                not story.last_author_notification_at or
+                story.last_author_notification_at + timedelta(seconds=current_app.config['STORY_NOTIFICATIONS_INTERVAL']) < datetime.utcnow()
+            ):
+                # Или это модератор убрал рассказ в черновики, уведомляем автора
+                story.last_author_notification_at = datetime.utcnow()
+                story.last_staff_notification_at = None
+                later(current_app.tasks['notify_story_publish_draft'].delay, story.id, user.id, not story.published)
 
             if old_published != story.published:
                 if story.published and not story.first_published_at:

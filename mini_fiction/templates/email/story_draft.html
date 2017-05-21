@@ -1,0 +1,4 @@
+{% extends 'email/base.html' %}
+{% block body %}
+Ваш рассказ <a href="{{ url_for('story.view', pk=story.id, _external=True) }}" target="_blank">«{{ story.title }}»</a> был убран в черновики модератором <a href="{{ url_for('author.info', user_id=staff.id, _external=True) }}" target="_blank" style="color: #999999; font-weight: bold;">{{ staff.username }}</a> и теперь скрыт от читателей.
+{% endblock %}

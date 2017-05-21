@@ -1,0 +1,4 @@
+{% extends 'email/base.html' %}
+{% block body %}
+Пользователь <a href="{{ url_for('author.info', user_id=author.id, _external=True) }}" target="_blank" style="color: #999999; font-weight: bold;">{{ author.username }}</a> опубликовал рассказ <a href="{{ url_for('story.view', pk=story.id, _external=True) }}" target="_blank">«{{ story.title }}»</a>, но он ещё не был одобрен модераторами. Перейдите к рассказу и одобрите его или отправьте обратно в черновики.
+{% endblock %}

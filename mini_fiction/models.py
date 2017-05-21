@@ -49,6 +49,12 @@ class Author(db.Entity, UserMixin):
     comments_maxdepth = orm.Optional(int, size=16, unsigned=True, nullable=True, default=None)
     comment_spoiler_threshold = orm.Optional(int, size=16, nullable=True, default=None)
 
+    # Если хранить подписки наизнанку, проще регистрировать народ и добавлять
+    # новые типы подписок
+    silent_email = orm.Optional(orm.LongStr, lazy=False)
+    silent_tracker = orm.Optional(orm.LongStr, lazy=False)
+    last_viewed_notification_id = orm.Required(int, default=0)
+
     avatar_small = orm.Optional(str, 255)
     avatar_medium = orm.Optional(str, 255)
     avatar_large = orm.Optional(str, 255)
@@ -59,6 +65,7 @@ class Author(db.Entity, UserMixin):
     contacts = orm.Set('Contact')
     contributing = orm.Set('StoryContributor')
     coauthorseries = orm.Set('CoAuthorsSeries')
+    published_stories = orm.Set('Story', reverse='published_by_author')
     favorites = orm.Set('Favorites')
     bookmarks = orm.Set('Bookmark')
     edit_log = orm.Set('StoryLog')
@@ -74,6 +81,8 @@ class Author(db.Entity, UserMixin):
     news_comments = orm.Set('NewsComment')
     news_comment_votes = orm.Set('NewsCommentVote')
     news_comment_edits = orm.Set('NewsCommentEdit')
+    notifications = orm.Set('Notification', reverse='user')
+    created_notifications = orm.Set('Notification', reverse='caused_by_user')
 
     bl = Resource('bl.author')
 
@@ -94,6 +103,14 @@ class Author(db.Entity, UserMixin):
     @property
     def excluded_categories_list(self):
         return [int(x) for x in self.excluded_categories.split(',') if x]
+
+    @property
+    def silent_email_list(self):
+        return self.silent_email.split(',')
+
+    @property
+    def silent_tracker_list(self):
+        return self.silent_tracker.split(',')
 
 
 class RegistrationProfile(db.Entity):
@@ -251,6 +268,9 @@ class Story(db.Entity):
     source_link = orm.Optional(str, 255)
     source_title = orm.Optional(str, 255)
     pinned = orm.Required(bool, default=False)
+    published_by_author = orm.Optional(Author)  # Ему будет отправлено уведомление о публикации
+    last_author_notification_at = orm.Optional(datetime, 6)  # Во избежание слишком частых уведомлений
+    last_staff_notification_at = orm.Optional(datetime, 6)
 
     in_series_permissions = orm.Set(InSeriesPermissions)
     chapters = orm.Set('Chapter')
@@ -766,3 +786,20 @@ class HtmlBlock(db.Entity):
 
     def before_update(self):
         self.updated = datetime.utcnow()
+
+
+class Notification(db.Entity):
+    """Модель уведомления о каком-то событии на сайте.
+
+    Шпаргалка по ныне существующим событиям (в скобках тип, на который
+    указывает target_id):
+
+    - story_publish (Story): модератор опубликовал рассказ
+    - story_draft (Story): модератор отклонил рассказ
+    """
+    user = orm.Required(Author)
+    created_at = orm.Required(datetime, 6, default=datetime.utcnow)
+    type = orm.Required(str, 24, index=True)
+    target_id = orm.Optional(int)
+    caused_by_user = orm.Optional(Author)
+    extra = orm.Required(orm.LongStr, lazy=False, default='{}')

@@ -149,6 +149,8 @@ class Config(object):
     REGISTRATION_OPEN = True
     AVATARS_UPLOADING = False
 
+    STORY_NOTIFICATIONS_INTERVAL = 3600
+
     ALLOWED_TAGS = [
         'b', 'i', 'strong', 'em', 's', 'u',
         'p', 'br', 'hr',

@@ -1,23 +1,21 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-from flask import current_app, render_template
+from flask import current_app
 
 from mini_fiction.utils.mail import sendmail
+from mini_fiction.utils.misc import render_nonrequest_template
 
 
 def sendtestemail(recipients, eager=False):
-    with current_app.test_request_context():
-        current_app.preprocess_request()  # fills g.locale
-
-        kwargs = {
-            'to': recipients,
-            'subject': render_template('email/test_subject.txt'),
-            'body': {
-                'plain': render_template('email/test.txt'),
-                'html': render_template('email/test.html'),
-            },
-        }
+    kwargs = {
+        'to': recipients,
+        'subject': render_nonrequest_template('email/test_subject.txt'),
+        'body': {
+            'plain': render_nonrequest_template('email/test.txt'),
+            'html': render_nonrequest_template('email/test.html'),
+        },
+    }
 
     if eager:
         sendmail(**kwargs)

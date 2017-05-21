@@ -4,7 +4,7 @@
 import json
 import math
 
-from flask import current_app, g, escape
+from flask import current_app, g, escape, render_template
 from flask_babel import pgettext, ngettext
 
 from mini_fiction.utils import diff as utils_diff
@@ -203,3 +203,18 @@ def diff2html(s, diff):
             offset += len(data)
 
     return ''.join(result)
+
+
+def render_nonrequest_template(*args, **kwargs):
+    '''Обёртка над flask.request_template, просто добавляет некоторые нужные
+    переменные в ``flask.g``.
+    '''
+    if not hasattr(g, 'locale'):
+        g.locale = current_app.extensions['babel'].default_locale
+    if not hasattr(g, 'is_ajax'):
+        g.is_ajax = False
+    if not hasattr(g, 'current_user'):
+        from mini_fiction.models import AnonymousUser
+        g.current_user = AnonymousUser()
+
+    return render_template(*args, **kwargs)

@@ -105,7 +105,7 @@ def templates_context():
     context.update(current_app.templatetags)
     context.update({
         'SITE_NAME': sitename(),
-        'base': current_app.jinja_env.get_template('base.json' if g.is_ajax else 'base.html'),
+        'base': current_app.jinja_env.get_template('base.json' if getattr(g, 'is_ajax', False) else 'base.html'),
         'contact_types': {x['name']: x for x in current_app.config['CONTACTS']},
     })
     return context

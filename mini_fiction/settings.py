@@ -59,7 +59,8 @@ class Config(object):
 
     PASSWORD_HASHER = 'pbkdf2'  # or 'bcrypt' or 'scrypt'
 
-    SITE_URL = 'http://localhost:5000'
+    SERVER_NAME = 'localhost:5000'
+    PREFERRED_URL_SCHEME = 'http'
     SITE_NAME = {
         'default': 'Library',
         'ru': 'Библиотека'

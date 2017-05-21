@@ -16,7 +16,8 @@ class Local(Development):
     #     'db': 'fanfics',
     # }
 
-    # SITE_URL = 'http://example.org'
+    # SERVER_NAME = 'example.org'
+    # PREFERRED_URL_SCHEME = 'http'
 
     # LOGGER_LEVEL = logging.DEBUG
 

@@ -217,4 +217,20 @@ def render_nonrequest_template(*args, **kwargs):
         from mini_fiction.models import AnonymousUser
         g.current_user = AnonymousUser()
 
-    return render_template(*args, **kwargs)
+    # Некоторые сволочи типа Flask-Script запускают код в контексте фейкового
+    # запроса, что меняет поведение url_for, а это нам нафиг не надо.
+    # Костыляем контекст, возвращая нужное поведение. Ну а ещё это позволяет
+    # рисовать шаблоны для почты в контексте настоящего запроса, тоже полезно
+    from flask.globals import _request_ctx_stack, _app_ctx_stack
+    appctx = _app_ctx_stack.top
+    reqctx = _request_ctx_stack.top
+    old_adapter = None
+    if reqctx and reqctx.url_adapter:
+        old_adapter = reqctx.url_adapter
+        reqctx.url_adapter = appctx.url_adapter
+
+    try:
+        return render_template(*args, **kwargs)
+    finally:
+        if old_adapter is not None:
+            reqctx.url_adapter = old_adapter

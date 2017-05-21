@@ -18,12 +18,12 @@ var common = {
         }
 
         // Кнопка закрытия уведомления об отсутствующей почте
-        btn = document.getElementById('close-email-notice');
-        if (btn && document.cookie.indexOf('hide_email_notice=1') >= 0) {
-            btn.parentNode.parentNode.removeChild(btn.parentNode);
-            btn = null;
-        } else if (btn) {
-            btn.addEventListener('click', function() {
+        var nbtn = document.getElementById('close-email-notice');
+        if (nbtn && document.cookie.indexOf('hide_email_notice=1') >= 0) {
+            nbtn.parentNode.parentNode.removeChild(nbtn.parentNode);
+            nbtn = null;
+        } else if (nbtn) {
+            nbtn.addEventListener('click', function() {
                 document.cookie = 'hide_email_notice=1; path=/; expires=';
             });
         }

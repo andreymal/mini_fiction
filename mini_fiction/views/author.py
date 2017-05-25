@@ -43,7 +43,7 @@ def info(user_id=None, comments_page=1):
         comments_list = StoryComment.select(lambda x: x.author == author and not x.deleted and x.story_published)
         comments_list = comments_list.order_by(StoryComment.id.desc())
         data['page_title'] = gettext('Author: {author}').format(author=author.username)
-        stories = Story.bl.select_by_author(author, queryset=Story.bl.select_accessible(current_user))
+        stories = Story.bl.select_by_author(author, for_user=current_user)
         stories = stories.order_by(Story.first_published_at.desc(), Story.id.desc())
         contributing_stories = None
         template = 'author_overview.html'

@@ -361,12 +361,13 @@ class StoryBL(BaseBL, Commentable):
         else:
             return default_queryset
 
-    def select_by_author(self, author, queryset=None):
+    def select_by_author(self, author, for_user=None):
         from mini_fiction.models import StoryContributor
 
-        if not queryset:
-            queryset = self.model.select()
-        return queryset.filter(lambda x: x in orm.select(y.story for y in StoryContributor if y.user == author and y.is_author))
+        if not for_user or not for_user.is_authenticated or not for_user.is_staff:
+            return orm.select(y.story for y in StoryContributor if y.user == author and y.is_author and not y.story.draft and y.story.approved)
+
+        return orm.select(y.story for y in StoryContributor if y.user == author and y.is_author)
 
     def select_accessible_chapters(self, user):
         default_queryset = self.model.chapters.filter(lambda x: not x.draft)

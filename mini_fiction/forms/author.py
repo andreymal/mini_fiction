@@ -170,3 +170,13 @@ class AuthorEditPasswordForm(Form):
         render_kw=dict(attrs_dict, placeholder='****************'),
         description='Повторите новый пароль, чтобы не забыть',
     )
+
+
+class AuthorEditSubscriptionsForm(Form):
+    attrs_dict = {'class': 'input-xlarge'}
+
+    email_story_publish = BooleanField()
+    tracker_story_publish = BooleanField()
+
+    email_story_draft = BooleanField()
+    tracker_story_draft = BooleanField()

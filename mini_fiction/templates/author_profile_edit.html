@@ -154,6 +154,38 @@
                             </div>
                         </fieldset>
                     </form>
+
+                    <form id="subscriptions" action="#subscriptions" method="POST" enctype="multipart/form-data" class="form-horizontal">
+                        <fieldset>
+                            <legend>Настройки уведомлений</legend>
+                          {% if subs_ok %}<div class="alert-mini green">Настройки уведомлений сохранены</div>{% endif %}
+                            <div class="control-group"><div class="controls">
+                                <em>Выберите, где какие уведомления вы желаете получать</em><br/><br/>
+
+                                <p>
+                                    <strong>Публикация вашего рассказа:</strong>
+                                    <label style="display: inline-block;">{{ subs_form.email_story_publish }} почта</label>
+                                    <label style="display: inline-block;">{{ subs_form.tracker_story_publish }} сайт</label>
+                                </p>
+                                <p>
+                                    <strong>Отправка в черновики вашего рассказа:</strong>
+                                    <label style="display: inline-block;">{{ subs_form.email_story_draft }} почта</label>
+                                    <label style="display: inline-block;">{{ subs_form.tracker_story_draft }} сайт</label>
+                                </p>
+
+                            </div></div>
+                            {% if subs_form_errors %}
+                                <div class="control-group error">
+                                    {% for error in subs_form_errors %}
+                                        <span class="help-inline">{{ error }}</span>
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                            <div class="form-actions">
+                                <input class="btn btn-primary" type="submit" name="save_subs" value="Сохранить"/>
+                            </div>
+                        </fieldset>
+                    </form>
     </div>
 
     <div class="span12">

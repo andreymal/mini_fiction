@@ -23,6 +23,12 @@ from mini_fiction.validation.auth import REGISTRATION, LOGIN
 __all__ = ['AuthorBL']
 
 
+allowed_subscriptions = {
+    'story_publish',
+    'story_draft',
+}
+
+
 class AuthorBL(BaseBL):
     def create(self, data):
         if 'username' not in data or 'password' not in data:
@@ -141,6 +147,54 @@ class AuthorBL(BaseBL):
             else:
                 with image:
                     self.validate_and_set_avatar(image, image_data)
+
+    def update_email_subscriptions(self, subs):
+        user = self.model
+
+        silent = user.silent_email_list
+        modified = []
+
+        for sub in allowed_subscriptions:
+            allowed = subs.get(sub)
+            if allowed is None:
+                continue
+
+            old_allowed = sub not in silent
+            if old_allowed != allowed:
+                modified.append(sub)
+                if allowed:
+                    silent.remove(sub)
+                else:
+                    silent.append(sub)
+
+        if modified:
+            user.silent_email = ','.join(silent)
+        return modified
+
+    def update_tracker_subscriptions(self, subs):
+        user = self.model
+
+        silent = user.silent_tracker_list
+        modified = []
+
+        for sub in allowed_subscriptions:
+            allowed = subs.get(sub)
+            if allowed is None:
+                continue
+
+            old_allowed = sub not in silent
+            if old_allowed != allowed:
+                modified.append(sub)
+                if allowed:
+                    silent.remove(sub)
+                else:
+                    silent.append(sub)
+
+        if modified:
+            user.silent_tracker = ','.join(silent)
+        return modified
+
+
 
     def update_email_with_confirmation(self, email):
         from mini_fiction.models import Author, ChangeEmailProfile

@@ -9,7 +9,8 @@ from pony.orm import db_session
 from mini_fiction.models import Author, Story, StoryComment, Contact, ChangeEmailProfile
 from mini_fiction.utils.misc import Paginator
 from mini_fiction.utils.views import cached_lists
-from mini_fiction.forms.author import AuthorEditEmailForm, AuthorEditPasswordForm, AuthorEditProfileForm, AuthorEditPrefsForm
+from mini_fiction.forms.author import AuthorEditEmailForm, AuthorEditPasswordForm
+from mini_fiction.forms.author import AuthorEditProfileForm, AuthorEditPrefsForm, AuthorEditSubscriptionsForm
 from mini_fiction.validation import ValidationError
 
 bp = Blueprint('author', __name__)
@@ -95,6 +96,7 @@ def edit():
     email_form = None
     password_form = None
     prefs_form = None
+    subs_form = None
 
     password_form_errors = []
     email_form_errors = []
@@ -145,6 +147,19 @@ def edit():
                 author.bl.update(prefs_form.data)
                 data['prefs_ok'] = True
 
+        if 'save_subs' in request.form:
+            prefs_form = AuthorEditSubscriptionsForm()
+            if prefs_form.validate_on_submit():
+                author.bl.update_email_subscriptions({
+                    'story_publish': prefs_form.email_story_publish.data,
+                    'story_draft': prefs_form.email_story_draft.data,
+                })
+                author.bl.update_tracker_subscriptions({
+                    'story_publish': prefs_form.tracker_story_publish.data,
+                    'story_draft': prefs_form.tracker_story_draft.data,
+                })
+                data['subs_ok'] = True
+
     if not profile_form:
         contacts = Contact.select(lambda x: x.author == author).order_by(Contact.id)[:]
         profile_form = AuthorEditProfileForm(formdata=None, data={
@@ -179,12 +194,23 @@ def edit():
                 )
             }
         )
+    if not subs_form:
+        silent_email = author.silent_email_list
+        silent_tracker = author.silent_tracker_list
+        subs_form = AuthorEditSubscriptionsForm(formdata=None, data={
+            'email_story_publish': 'story_publish' not in silent_email,
+            'tracker_story_publish': 'story_publish' not in silent_tracker,
+
+            'email_story_draft': 'story_draft' not in silent_email,
+            'tracker_story_draft': 'story_draft' not in silent_tracker,
+        })
     data.update({
         'profile_form': profile_form,
         'email_form': email_form,
         'new_email': new_email,
         'password_form': password_form,
         'prefs_form': prefs_form,
+        'subs_form': subs_form,
         'profile_form_errors': [],
         'email_form_errors': email_form_errors,
         'password_form_errors': password_form_errors,

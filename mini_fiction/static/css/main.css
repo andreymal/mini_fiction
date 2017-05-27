@@ -205,18 +205,19 @@ ul.nav-main-links {
 
 .nav-icon-bell > .new-count {
     position: absolute;
-    top: 15%;
-    right: 15%;
+    top: 10%;
+    right: 10%;
     display: block;
     background-color: #d00;
     border-radius: 50%;
-    font-size: 9px;
+    font-size: 10px;
     color: white;
     line-height: 1em;
     min-width: 1em;
     min-height: 1em;
     text-align: center;
     padding: 2px;
+    pointer-events: none;
 }
 
 .nav-icon-bell-link {

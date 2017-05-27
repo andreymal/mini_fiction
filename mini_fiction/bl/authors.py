@@ -4,6 +4,7 @@
 # pylint: disable=unexpected-keyword-arg,no-value-for-parameter
 
 import os
+import json
 import time
 import random
 import string
@@ -589,3 +590,7 @@ class AuthorBL(BaseBL):
             return url_for(default_userpic.pop('endpoint'), **default_userpic)
         else:
             return default_userpic['url']
+
+    def get_unread_notifications_count(self):
+        user = self.model
+        return user.notifications.filter(lambda x: x.id > user.last_viewed_notification_id).count()

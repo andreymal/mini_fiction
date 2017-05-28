@@ -1,0 +1,19 @@
+{% extends base %}
+{% from 'macro.html' import breadcrumbs with context %}
+{% block content %}
+<div class="row">
+    <div class="span8">
+        {{- breadcrumbs() }}
+        <h1>{{ page_title }}</h1>
+        <div class="notifications notifications-page" id="notifications">
+            {% include "includes/notifications.html" %}
+        </div>
+
+        {% if show_older_link %}
+            <div class="notifications-older-link"><a href="{{ url_for('notifications.index', older=notifications[-1].id, last_viewed_id=last_viewed_id) }}">{{ _('Show older') }}</a></div>
+        {% endif %}
+
+        {{- breadcrumbs() }}
+    </div>
+</div>
+{% endblock %}

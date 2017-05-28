@@ -1,0 +1,5 @@
+{% include 'includes/notifications.html' %}
+
+{% if show_older_link %}
+    <div class="notifications-older-link"><a href="{{ url_for('notifications.index', older=notifications[-1].id, last_viewed_id=last_viewed_id) }}">{{ _('Show older') }}</a></div>
+{% endif %}

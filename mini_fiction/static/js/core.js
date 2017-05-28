@@ -39,7 +39,7 @@ var core = {
         this.modalBackgr = document.getElementById('modal-bg');
         this.modalBackgr.addEventListener('click', this._modalHideEvent.bind(this));
         this.loadingIcon = document.getElementById('loading-icon');
-        this.notifications = document.getElementById('notifications');
+        this.notifications = document.getElementById('popup-notifications');
 
         var i;
 
@@ -112,7 +112,7 @@ var core = {
 
     /** Отображает переданный HTML-элемент как ошибку */
     putNotification: function(not) {
-        not.classList.add('notification');
+        not.classList.add('popup-notification');
         not.classList.add('notice-hidden');
         not.addEventListener('click', function(e) {
             e.preventDefault();
@@ -135,7 +135,7 @@ var core = {
         not.classList.add('notice-hidden');
         setTimeout(function() {
             this.notifications.removeChild(not);
-        }, 300);
+        }.bind(this), 300);
         return true;
     },
 

@@ -51,7 +51,7 @@
     <div class="modal hide fade" id="modal">{% block modal %}{% endblock %}</div>
     <img id="loading-icon" src="{{ url_for('static', filename='i/ajax-loader.gif') }}" alt="..." class="loader loader-hidden" />
 
-    <div id="notifications"></div>
+    <div class="popup-notifications" id="popup-notifications"></div>
 {% include 'base_body_scripts.html' %}
 </body>
 </html>

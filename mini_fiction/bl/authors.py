@@ -594,3 +594,57 @@ class AuthorBL(BaseBL):
     def get_unread_notifications_count(self):
         user = self.model
         return user.notifications.filter(lambda x: x.id > user.last_viewed_notification_id).count()
+
+    def get_notifications(self, older=None, offset=0, count=100):
+        from mini_fiction.models import Notification, Story
+
+        user = self.model
+
+        result = []
+
+        # Забираем уведомления
+        items = user.notifications.filter(lambda x: x.id < older) if older is not None else user.notifications
+        items = items.order_by(Notification.id.desc()).prefetch(Notification.caused_by_user)[offset:offset + count]
+
+        # Группируем таргеты по типам, чтобы брать их одним sql-запросом
+        story_ids = set()
+        for n in items:
+            if n.type in ('story_publish', 'story_draft'):
+                story_ids.add(n.target_id)
+
+        # И забираем все эти таргеты
+        stories = {x.id: x for x in Story.select(lambda x: x.id in story_ids)} if story_ids else {}
+
+        for n in items:
+            item = {
+                'id': n.id,
+                'created_at': n.created_at,
+                'type': n.type,
+                'viewed': n.id <= user.last_viewed_notification_id,
+                'user': {
+                    'id': n.caused_by_user.id,
+                    'username': n.caused_by_user.username,
+                    'is_staff': n.caused_by_user.is_staff,
+                },
+                'extra': json.loads(n.extra or '{}'),
+            }
+            if n.type in ('story_publish', 'story_draft'):
+                item['story'] = {'id': n.target_id, 'title': stories[n.target_id].title}
+            result.append(item)
+
+        return result
+
+    def set_last_viewed_notification_id(self, nid):
+        from mini_fiction.models import Notification
+
+        user = self.model
+
+        last_item = user.notifications.select().order_by(Notification.id.desc()).first()
+        if last_item:
+            if nid > last_item.id:
+                nid = last_item.id
+        else:
+            nid = 0
+
+        if nid > user.last_viewed_notification_id:
+            user.last_viewed_notification_id = nid

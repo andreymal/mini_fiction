@@ -1,0 +1,42 @@
+{% if not notifications -%}
+    <h3>Здесь пока ничего нет</h3>
+{%- endif -%}
+
+{% for item in notifications -%}
+{%- if item.show_viewed_line -%}
+<div class="notification-viewed-line"><div>{{ _('Viewed notifications') }}</div></div>
+{%- endif -%}
+
+<div class="notification" data-type="{{ item.type }}" id="notification{{ item.id }}">
+{% if item.type == 'story_publish' or item.type == 'story_draft' %}
+    {% if item.user.is_staff %}
+        {{- pgettext('notify_story_publish_draft', 'Moderator') -}}
+    {% else %}
+        {{- pgettext('notify_story_publish_draft', 'User') -}}
+    {% endif %} <a class="authorlink" href="{{ url_for('author.info', user_id=item.user.id) }}">{{ item.user.username -}}
+    </a>
+
+    {% if item.type == 'story_publish' -%}
+        одобрил рассказ
+    {%- else -%}
+        отправил в черновики рассказ
+    {%- endif %}
+
+    <a href="{{ url_for('story.view', pk=item.story.id) }}">«{{ item.story.title }}»</a>
+
+    <div class="notification-meta">
+        <time class="notification-time" datetime="{{ item.created_at.strftime('%Y-%m-%dT%H:%M:%SZ') }}">
+            {{ item.created_at|datetimeformat('d MMMM Y, HH:mm') }}
+        </time>
+    </div>
+
+{%- else %}
+    {{ item }}
+    <div class="notification-meta">
+        <time class="notification-time" datetime="{{ item.created_at.strftime('%Y-%m-%dT%H:%M:%SZ') }}">
+            {{ item.created_at|datetimeformat('d MMMM Y, HH:mm') }}
+        </time>
+    </div>
+{% endif %}
+</div>
+{%- endfor %}

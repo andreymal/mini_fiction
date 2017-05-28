@@ -233,19 +233,18 @@ ul.nav-main-links {
     right: 0;
     background-color: #F6F6F6;
     top: 35px;
-    width: 17em;
-    width: calc(15em + 40px + 40px);
+    width: 370px;
     overflow: visible;
     box-shadow: 0 0 6px rgba(0, 0, 0, 0.3);
+    z-index: 1;
 }
 
 .bell-popup-content {
     min-height: 3em;
-    max-height: 10em;
+    max-height: 25em;
     overflow: auto;
     cursor: auto;
     text-align: left;
-    padding: 5px;
 }
 
 .bell-popup:before {
@@ -1730,7 +1729,57 @@ ul.editlog .editlog-item:nth-child(2n+1) {
 
 /* notifications */
 
-#notifications {
+.notification {
+    font-size: 12px;
+    line-height: 22px;
+    padding: 0 5px;
+}
+
+.notification:nth-child(2n+1) {
+    background-color: #fefefe;
+}
+
+.notification-meta {
+    color: #999;
+    margin-bottom: 4px;
+}
+
+.notification-viewed-line {
+    position: relative;
+    font-size: 12px;
+    height: 22px;
+    line-height: 22px;
+    text-align: center;
+}
+
+.notification-viewed-line > div {
+    position: relative;
+    display: inline-block;
+    z-index: 1;
+    background-color: #f6f6f6;
+    padding: 0 1em;
+}
+
+.notification-viewed-line:before {
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 11px;
+    height: 1px;
+    background-color: #999;
+    z-index: 0;
+    content: '';
+}
+
+.notifications-older-link {
+    text-align: center;
+    font-size: 12px;
+}
+
+
+/* popup notifications */
+
+.popup-notifications {
     position: fixed;
     top: 3%;
     right: 3%;
@@ -1740,7 +1789,7 @@ ul.editlog .editlog-item:nth-child(2n+1) {
     z-index: 15;
 }
 
-.notification {
+.popup-notification {
     background-color: rgba(0, 140, 0, 0.9);
     margin-bottom: 1em;
     padding: 0.5em;
@@ -1755,12 +1804,12 @@ ul.editlog .editlog-item:nth-child(2n+1) {
     opacity: 1.0;
 }
 
-.notification.notice-hidden {
+.popup-notification.notice-hidden {
     transform: translateY(-1em);
     opacity: 0.0;
 }
 
-.notification.notice-error {
+.popup-notification.notice-error {
     background-color: rgba(140, 0, 0, 0.9);
     box-shadow: 0 0 0.2em rgba(70, 0, 0, 0.8);
 }

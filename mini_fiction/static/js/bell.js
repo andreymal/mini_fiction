@@ -4,11 +4,23 @@
 
 
 var bell = {
+    _updaterInterval: null,
+
     load: function() {
+
         var link = document.getElementById('nav-icon-bell');
         if (!link) {
+            if (this._updaterInterval !== null) {
+                clearInterval(this._updaterInterval);
+                this._updaterInterval = null;
+            }
             return;
         }
+
+        if (this._updaterInterval === null) {
+            this._updaterInterval = setInterval(this.reloadUnreadCount.bind(this), 30000);
+        }
+
         link.addEventListener('click', function(event) {
             if (window.innerWidth <= 640) {
                 return; // На узких экранах просто открываем страницу с уведомлениями
@@ -47,6 +59,7 @@ var bell = {
                     return;
                 }
                 content.innerHTML = data.popup;
+                bell.setViewed(data.last_id);
             }).then(null, function(exc) {
                 bell.hidePopup();
                 core.handleError(exc);
@@ -60,6 +73,58 @@ var bell = {
         var popup = document.getElementById('bell-popup');
         popup.style.display = 'none';
         link.parentNode.classList.remove('active');
+    },
+
+    reloadUnreadCount: function() {
+        core.ajax.fetch('/notifications/unread_count/')
+            .then(function(response) {
+                return response.json();
+
+            }).then(function(data) {
+                if (!data.success) {
+                    console.error(data);
+                    return;
+                }
+                bell.setUnreadCount(data.unread_count);
+
+            }).then(null, function(err) {
+                console.error(err);
+            });
+        },
+
+    setUnreadCount: function(count) {
+        var link = document.getElementById('nav-icon-bell');
+        if (!link) {
+            return;
+        }
+        var cntitem = link.parentNode.getElementsByClassName('js-notifications-count')[0];
+        if (!cntitem) {
+            return;
+        }
+
+        cntitem.textContent = count.toString();
+        cntitem.style.display = count > 0 ? '' : 'none';
+    },
+
+    setViewed: function(lastId) {
+        if (!lastId) {
+            return;
+        }
+
+        core.ajax.post('/notifications/' + lastId + '/set_viewed/')
+            .then(function(response) {
+                return response.json();
+
+            }).then(function(data) {
+                if (!data.success) {
+                    console.error(data);
+                    return;
+                }
+                bell.setUnreadCount(data.unread_count);
+
+            }).then(null, function(err) {
+                console.error(err);
+            });
     }
 };
 

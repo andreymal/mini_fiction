@@ -8,7 +8,7 @@
     <div class="nav-icon nav-icon-bell" title="{{ _('Notifications') }}">
         <a id="nav-icon-bell" class="nav-icon-bell-link" href="{{ url_for('notifications.index') }}" data-ajax="{{ url_for('notifications.index', popup='1') }}"></a>
         {% set notifications_count = get_unread_notifications_count() %}
-        <span class="new-count js-notifications-count"{% if notifications_count < 0 %} style="display: none"{% endif %}>{{ notifications_count }}</span>
+        <span class="new-count js-notifications-count"{% if notifications_count < 1 %} style="display: none"{% endif %}>{{ notifications_count }}</span>
         <div class="bell-popup" id="bell-popup" style="display: none;">
             <div class="bell-popup-content" id="bell-popup-content">test</div>
         </div>

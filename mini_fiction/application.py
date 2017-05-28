@@ -68,6 +68,10 @@ def configure_i18n(app):
 
     @babel.localeselector
     def get_locale():
+        if not request:
+            if hasattr(g, 'locale'):
+                return g.locale
+            raise RuntimeError('Babel is used outside of request context, please set g.locale')
         locales = app.config['LOCALES'].keys()
         locale = request.cookies.get('locale')
         if locale in locales:

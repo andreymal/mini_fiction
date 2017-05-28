@@ -796,6 +796,7 @@ class Notification(db.Entity):
 
     - story_publish (Story): модератор опубликовал рассказ
     - story_draft (Story): модератор отклонил рассказ
+    - story_reply (StoryComment): ответ на комментарий к рассказу
     """
     user = orm.Required(Author)
     created_at = orm.Required(datetime, 6, default=datetime.utcnow)

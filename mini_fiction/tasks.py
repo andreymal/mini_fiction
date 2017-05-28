@@ -174,3 +174,41 @@ def notify_story_publish_draft(story_id, staff_id, draft):
         }
 
         current_app.tasks['sendmail'].delay(**kwargs)
+
+
+@task()
+@db_session
+def notify_story_comment(comment_id):
+    comment = models.StoryComment.get(id=comment_id)
+    if not comment:
+        return
+    story = comment.story
+    parent = comment.parent
+
+    ctx = {
+        'story': story,
+        'comment': comment,
+        'parent': parent,
+    }
+
+    if parent and parent.author and (not comment.author or parent.author.id != comment.author.id):
+        # Уведомляем автора родительского комментария, что ему ответили
+        if 'story_reply' not in parent.author.silent_tracker_list:
+            models.Notification(
+                user=parent.author,
+                type='story_reply',
+                target_id=comment.id,
+                caused_by_user=comment.author,
+            )
+
+        if 'story_reply' not in parent.author.silent_email_list and parent.author.email:
+            kwargs = {
+                'to': [parent.author.email],
+                'subject': render_nonrequest_template('email/story_reply_subject.txt', **ctx),
+                'body': {
+                    'plain': render_nonrequest_template('email/story_reply.txt', **ctx),
+                    'html': render_nonrequest_template('email/story_reply.html', **ctx),
+                },
+            }
+
+            current_app.tasks['sendmail'].delay(**kwargs)

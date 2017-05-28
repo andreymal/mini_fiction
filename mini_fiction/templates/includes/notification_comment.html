@@ -1,0 +1,46 @@
+{% macro notification_comment_html(comment) %}
+
+{%- if comment.deleted and not comment.brief_text_as_html -%}
+    <div class="comment-text comment-text-deleted">
+        Комментарий был отправлен на Луну <a href="{{ comment.permalink }}">#</a>
+    </div>
+{%- else -%}
+    {%- if comment_spoiler_threshold is not defined -%}
+        {%- set comment_spoiler_threshold = get_comment_threshold() -%}
+    {%- endif -%}
+    {% if comment.can_vote and comment.vote_total <= comment_spoiler_threshold %}
+    <button class="btn btn-collapse btn-small" data-toggle="collapse" data-target="#popup_comment_text_{{ comment.id }}">Показать скрытый комментарий</button>
+    <div id="popup_comment_text_{{ comment.id }}" class="collapse comment-text comment-text-short">
+        {{ comment.brief_text_as_html|safe }}
+    </div>
+    {% else %}
+    <div class="comment-text comment-text-short">
+        {{ comment.brief_text_as_html|safe }}
+    </div>
+    {% endif %}
+
+    {% if comment.deleted -%}
+    <div class="comment-text comment-text-deleted">
+        Комментарий был отправлен на Луну
+    </div>
+    {%- endif %}
+
+    <div class="comment-meta">
+        <span class="comment-author">
+        {%- if comment.author.id -%}
+            <a class="authorlink" href="{{ url_for('author.info', user_id=comment.author.id) }}">{{ comment.author.username }}</a>
+        {%- else %}
+            <span class="userlink-guest">{{ comment.author.username or 'Гость' }}</span>
+        {%- endif %}
+        </span>
+
+        <time class="comment-time" datetime="{{ comment.date.strftime('%Y-%m-%dT%H:%M:%SZ') }}">
+            {{ comment.date|datetimeformat('d MMMM Y, HH:mm') }}
+        </time>
+
+        {{ caller() if caller else '' }}
+        <a class="comment-link" href="{{ comment.permalink }}">#</a>
+    </div>
+{%- endif -%}
+
+{% endmacro %}

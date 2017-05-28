@@ -471,6 +471,11 @@ h4 {
     background-color: #fefefe;
 }
 
+.notification .comment-item:nth-child(2n+1) {
+    background-color: transparent;
+    padding: 0;
+}
+
 .sidelist.top-list .story-item {
     padding: 8px 12px 10px;
     margin-bottom: 6px;
@@ -1316,6 +1321,10 @@ a.btn {
     border-left: 0.2em solid #ddd;
 }
 
+.comment-item.comment-item-short {
+    border: 0;
+}
+
 .comment-item.comment-new {
     border-left: 0.2em solid #9e9;
     background-color: rgba(180, 255, 180, 0.3);
@@ -1732,7 +1741,7 @@ ul.editlog .editlog-item:nth-child(2n+1) {
 .notification {
     font-size: 12px;
     line-height: 22px;
-    padding: 0 5px;
+    padding: 8px 10px;
 }
 
 .notification:nth-child(2n+1) {

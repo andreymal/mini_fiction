@@ -20,25 +20,25 @@ class BaseCommentBL(BaseBL):
     can_vote = False
     schema = None
 
-    def get_permalink(self):
+    def get_permalink(self, _external=False):
         raise NotImplementedError
 
-    def get_tree_link(self):
+    def get_tree_link(self, _external=False):
         raise NotImplementedError
 
-    def get_answer_link(self):
+    def get_answer_link(self, _external=False):
         raise NotImplementedError
 
-    def get_update_link(self):
+    def get_update_link(self, _external=False):
         raise NotImplementedError
 
-    def get_delete_link(self):
+    def get_delete_link(self, _external=False):
         raise NotImplementedError
 
-    def get_restore_link(self):
+    def get_restore_link(self, _external=False):
         raise NotImplementedError
 
-    def get_vote_link(self):
+    def get_vote_link(self, _external=False):
         raise NotImplementedError
 
     def has_comments_access(self, target, author=None):
@@ -218,35 +218,36 @@ class StoryCommentBL(BaseCommentBL):
             return False
         return target.bl.has_access(author)
 
-    def get_permalink(self):
+    def get_permalink(self, _external=False):
         c = self.model
         # root_order starts from 0
         page = c.root_order // current_app.config['COMMENTS_COUNT']['page'] + 1
-        return url_for('story.view', pk=c.story.id, comments_page=page) + '#' + str(c.local_id)
+        return url_for('story.view', pk=c.story.id, comments_page=page, _external=_external) + '#' + str(c.local_id)
 
-    def get_tree_link(self):
-        return url_for('story_comment.ajax_tree', story_id=self.model.story.id, local_id=self.model.local_id)
+    def get_tree_link(self, _external=False):
+        return url_for('story_comment.ajax_tree', story_id=self.model.story.id, local_id=self.model.local_id, _external=_external)
 
-    def get_answer_link(self):
-        return url_for('story_comment.add', story_id=self.model.story.id, parent=self.model.local_id)
+    def get_answer_link(self, _external=False):
+        return url_for('story_comment.add', story_id=self.model.story.id, parent=self.model.local_id, _external=_external)
 
-    def get_update_link(self):
-        return url_for('story_comment.edit', story_id=self.model.story.id, local_id=self.model.local_id)
+    def get_update_link(self, _external=False):
+        return url_for('story_comment.edit', story_id=self.model.story.id, local_id=self.model.local_id, _external=_external)
 
-    def get_delete_link(self):
-        return url_for('story_comment.delete', story_id=self.model.story.id, local_id=self.model.local_id)
+    def get_delete_link(self, _external=False):
+        return url_for('story_comment.delete', story_id=self.model.story.id, local_id=self.model.local_id, _external=_external)
 
-    def get_restore_link(self):
-        return url_for('story_comment.restore', story_id=self.model.story.id, local_id=self.model.local_id)
+    def get_restore_link(self, _external=False):
+        return url_for('story_comment.restore', story_id=self.model.story.id, local_id=self.model.local_id, _external=_external)
 
-    def get_vote_link(self):
-        return url_for('story_comment.vote', story_id=self.model.story.id, local_id=self.model.local_id)
+    def get_vote_link(self, _external=False):
+        return url_for('story_comment.vote', story_id=self.model.story.id, local_id=self.model.local_id, _external=_external)
 
     def _attributes_for(self, data):
         return {'story_published': data['story'].published}
 
     def create(self, *args, **kwargs):
         comment = super().create(*args, **kwargs)
+        later(current_app.tasks['notify_story_comment'].delay, comment.id)
         later(current_app.tasks['sphinx_update_comments_count'].delay, comment.story.id)
         return comment
 
@@ -270,28 +271,28 @@ class StoryLocalCommentBL(BaseCommentBL):
     def can_comment_by(self, target, author=None):
         return author and author.is_staff or target.story.bl.is_contributor(author)
 
-    def get_permalink(self):
+    def get_permalink(self, _external=False):
         c = self.model
         # root_order starts from 0
         page = c.root_order // current_app.config['COMMENTS_COUNT']['page'] + 1
-        return url_for('story_local_comment.view', story_id=c.local.story.id, comments_page=page) + '#' + str(c.local_id)
+        return url_for('story_local_comment.view', story_id=c.local.story.id, comments_page=page, _external=_external) + '#' + str(c.local_id)
 
-    def get_tree_link(self):
-        return url_for('story_local_comment.ajax_tree', story_id=self.model.local.story.id, local_id=self.model.local_id)
+    def get_tree_link(self, _external=False):
+        return url_for('story_local_comment.ajax_tree', story_id=self.model.local.story.id, local_id=self.model.local_id, _external=_external)
 
-    def get_answer_link(self):
-        return url_for('story_local_comment.add', story_id=self.model.local.story.id, parent=self.model.local_id)
+    def get_answer_link(self, _external=False):
+        return url_for('story_local_comment.add', story_id=self.model.local.story.id, parent=self.model.local_id, _external=_external)
 
-    def get_update_link(self):
-        return url_for('story_local_comment.edit', story_id=self.model.local.story.id, local_id=self.model.local_id)
+    def get_update_link(self, _external=False):
+        return url_for('story_local_comment.edit', story_id=self.model.local.story.id, local_id=self.model.local_id, _external=_external)
 
-    def get_delete_link(self):
-        return url_for('story_local_comment.delete', story_id=self.model.local.story.id, local_id=self.model.local_id)
+    def get_delete_link(self, _external=False):
+        return url_for('story_local_comment.delete', story_id=self.model.local.story.id, local_id=self.model.local_id, _external=_external)
 
-    def get_restore_link(self):
-        return url_for('story_local_comment.restore', story_id=self.model.local.story.id, local_id=self.model.local_id)
+    def get_restore_link(self, _external=False):
+        return url_for('story_local_comment.restore', story_id=self.model.local.story.id, local_id=self.model.local_id, _external=_external)
 
-    def get_vote_link(self):
+    def get_vote_link(self, _external=False):
         raise ValueError('Not available')
 
 
@@ -306,26 +307,26 @@ class NewsCommentBL(BaseCommentBL):
             return False
         return True
 
-    def get_permalink(self):
+    def get_permalink(self, _external=False):
         c = self.model
         # root_order starts from 0
         page = c.root_order // current_app.config['COMMENTS_COUNT']['page'] + 1
-        return url_for('news.show', name=c.newsitem.name, comments_page=page) + '#' + str(c.local_id)
+        return url_for('news.show', name=c.newsitem.name, comments_page=page, _external=_external) + '#' + str(c.local_id)
 
-    def get_tree_link(self):
-        return url_for('news_comment.ajax_tree', news_id=self.model.newsitem.id, local_id=self.model.local_id)
+    def get_tree_link(self, _external=False):
+        return url_for('news_comment.ajax_tree', news_id=self.model.newsitem.id, local_id=self.model.local_id, _external=_external)
 
-    def get_answer_link(self):
-        return url_for('news_comment.add', news_id=self.model.newsitem.id, parent=self.model.local_id)
+    def get_answer_link(self, _external=False):
+        return url_for('news_comment.add', news_id=self.model.newsitem.id, parent=self.model.local_id, _external=_external)
 
-    def get_update_link(self):
-        return url_for('news_comment.edit', news_id=self.model.newsitem.id, local_id=self.model.local_id)
+    def get_update_link(self, _external=False):
+        return url_for('news_comment.edit', news_id=self.model.newsitem.id, local_id=self.model.local_id, _external=_external)
 
-    def get_delete_link(self):
-        return url_for('news_comment.delete', news_id=self.model.newsitem.id, local_id=self.model.local_id)
+    def get_delete_link(self, _external=False):
+        return url_for('news_comment.delete', news_id=self.model.newsitem.id, local_id=self.model.local_id, _external=_external)
 
-    def get_restore_link(self):
-        return url_for('news_comment.restore', news_id=self.model.newsitem.id, local_id=self.model.local_id)
+    def get_restore_link(self, _external=False):
+        return url_for('news_comment.restore', news_id=self.model.newsitem.id, local_id=self.model.local_id, _external=_external)
 
-    def get_vote_link(self):
-        return url_for('news_comment.vote', news_id=self.model.newsitem.id, local_id=self.model.local_id)
+    def get_vote_link(self, _external=False):
+        return url_for('news_comment.vote', news_id=self.model.newsitem.id, local_id=self.model.local_id, _external=_external)

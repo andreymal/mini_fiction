@@ -1,3 +1,5 @@
+{%- import 'includes/notification_comment.html' as nc with context -%}
+
 {% if not notifications -%}
     <h3>Здесь пока ничего нет</h3>
 {%- endif -%}
@@ -8,7 +10,17 @@
 {%- endif -%}
 
 <div class="notification" data-type="{{ item.type }}" id="notification{{ item.id }}">
-{% if item.type == 'story_publish' or item.type == 'story_draft' %}
+{% if item.broken %}
+    <em>Удалено</em>
+    {% if item.created_at %}
+    <div class="notification-meta">
+        <time class="notification-time" datetime="{{ item.created_at.strftime('%Y-%m-%dT%H:%M:%SZ') }}">
+            {{ item.created_at|datetimeformat('d MMMM Y, HH:mm') }}
+        </time>
+    </div>
+    {% endif %}
+
+{%- elif item.type == 'story_publish' or item.type == 'story_draft' %}
     {% if item.user.is_staff %}
         {{- pgettext('notify_story_publish_draft', 'Moderator') -}}
     {% else %}
@@ -29,6 +41,16 @@
             {{ item.created_at|datetimeformat('d MMMM Y, HH:mm') }}
         </time>
     </div>
+
+{%- elif item.type == 'story_reply' %}
+<div class="comment-item comment-item-short">
+    {% call nc.notification_comment_html(item.comment) %}
+        <span class="comment-story-link">
+        в ответ на ваш комментарий к рассказу
+        <a href="{{ url_for('story.view', pk=item.story.id) }}"><b>{{ item.story.title }}</b></a>
+        </span>
+    {% endcall %}
+</div>
 
 {%- else %}
     {{ item }}

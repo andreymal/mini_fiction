@@ -82,8 +82,26 @@ def view(pk, comments_page):
         'page_title': story.title,
         'comment_form': CommentForm(),
         'page_obj': paged,
+        'sub_comments': story.bl.get_comments_subscription(user),
     }
     return render_template('story_view.html', **data)
+
+
+@bp.route('/<int:pk>/comments/subscribe/', methods=('POST',))
+@db_session
+@login_required
+def comments_subscribe(pk):
+    user = current_user._get_current_object()
+    story = get_story(pk)
+    story.bl.subscribe_to_comments(
+        user,
+        email=request.form.get('email') == '1',
+        tracker=request.form.get('tracker') == '1',
+    )
+
+    if request.form.get('short') == '1':
+        return jsonify(success=True)
+    return redirect(url_for('story.view', pk=story.id))
 
 
 # this is for ajax links

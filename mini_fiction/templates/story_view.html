@@ -110,6 +110,15 @@
         {% if comments_count > 0 %}
         <div id="comments">
             <h3>Комментарии (<span id="comments-count">{{ comments_count }}</span>)</h3>
+            {% if current_user.is_authenticated %}
+                <form method="POST" action="{{ url_for('story.comments_subscribe', pk=story.id) }}" class="subscription-form js-subscription-form">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+                    Получать новые:
+                    <label><input type="checkbox" name="email" value="1"{% if sub_comments.email %} checked{% endif %} /> в почте</label>
+                    <label><input type="checkbox" name="tracker" value="1"{% if sub_comments.tracker %} checked{% endif %} /> на сайте</label>
+                    <button type="submit" class="btn btn-mini js-subscription-form-submit">Сохранить</button>
+                </form>
+            {% endif %}
             <div id="comments-tree" class="comments-tree">
                 {% include 'includes/comments_tree.html' %}
             </div>

@@ -5,6 +5,8 @@
 
 var common = {
     menuState: false,
+    subforms: [],
+    _subformSubmitBinded: null,
 
     init: function() {
         // Кнопка закрытия новости, если таковая присутствует
@@ -27,6 +29,8 @@ var common = {
                 document.cookie = 'hide_email_notice=1; path=/; expires=';
             });
         }
+
+        this._subformSubmitBinded = this._subformSubmitEvent.bind(this);
     },
 
     load: function(content) {
@@ -59,6 +63,13 @@ var common = {
                 return false;
             });
         }
+
+        // Формы подписки
+        var subforms = document.getElementsByClassName('js-subscription-form');
+        for (var i = 0; i < subforms.length; i++) {
+            this.initSubscriptionForm(subforms[i]);
+            this.subforms.push(subforms[i]);
+        }
     },
 
     loadModal: function(content) {
@@ -68,11 +79,67 @@ var common = {
     },
 
     unload: function(content) {
+        for (var i = this.subforms.length - 1; i >= 0; i--) {
+            this.destroySubscriptionForm(this.subforms[i]);
+        }
+        this.subforms = [];
         this.markitupDestroy(content);
     },
 
     unloadModal: function(content) {
         this.markitupDestroy(content);
+    },
+
+    initSubscriptionForm: function(form) {
+        form.addEventListener('submit', this._subformSubmitBinded);
+        var inputs = form.getElementsByTagName('input');
+        for (var i = 0; i < inputs.length; i++) {
+            inputs[i].addEventListener('change', this._subformSubmitBinded);
+        }
+        var btn = form.getElementsByClassName('js-subscription-form-submit')[0];
+        if (btn) {
+            btn.style.display = 'none';
+        }
+    },
+
+    destroySubscriptionForm: function(form) {
+        var btn = form.getElementsByClassName('js-subscription-form-submit')[0];
+        if (btn) {
+            btn.style.display = '';
+        }
+        var inputs = form.getElementsByTagName('input');
+        for (var i = 0; i < inputs.length; i++) {
+            inputs[i].removeEventListener('change', this._subformSubmitBinded);
+        }
+        form.removeEventListener('submit', this._subformSubmitBinded);
+    },
+
+    _subformSubmitEvent: function(event) {
+        var form = event.target;
+        if (form.tagName.toLowerCase() != 'form') {
+            form = form.form;
+        }
+        event.preventDefault();
+
+        var data = new FormData(form);
+        data.append('short', '1');
+
+        core.ajax.post(form.action, data)
+            .then(function(response) {
+                return response.json();
+
+            }).then(function(data) {
+                if (core.handleResponse(data, form.action)) {
+                    return;
+                }
+                core.notify('Изменение подписки прошло успешно');
+
+            }).then(null, function(err) {
+                console.error(err);
+                core.notifyError(err);
+            });
+
+        return false;
     },
 
     bindContactsAdd: function() {

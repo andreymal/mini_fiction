@@ -613,7 +613,7 @@ class AuthorBL(BaseBL):
         for n in items:
             if n.type in ('story_publish', 'story_draft'):
                 story_ids.add(n.target_id)
-            elif n.type in ('story_reply',):
+            elif n.type in ('story_reply', 'story_comment'):
                 story_comment_ids.add(n.target_id)
 
         # И забираем все эти таргеты
@@ -641,7 +641,7 @@ class AuthorBL(BaseBL):
                     continue
                 item['story'] = {'id': n.target_id, 'title': stories[n.target_id].title}
 
-            elif n.type in ('story_reply',):
+            elif n.type in ('story_reply', 'story_comment'):
                 c = story_comments.get(n.target_id)
                 if not c:
                     item['broken'] = True
@@ -691,3 +691,48 @@ class AuthorBL(BaseBL):
 
         if nid > user.last_viewed_notification_id:
             user.last_viewed_notification_id = nid
+
+    def get_subscription(self, typ, target_id):
+        from mini_fiction.models import Subscription
+
+        user = self.model
+
+        sub = Subscription.get(user=user, type=typ, target_id=target_id)
+        if not sub:
+            return {'email': False, 'tracker': False}
+        return {'email': sub.to_email, 'tracker': sub.to_tracker}
+
+    def edit_subscription(self, typ, target_id, email=None, tracker=None):
+        from mini_fiction.models import Subscription
+
+        user = self.model
+
+        sub = Subscription.get(user=user, type=typ, target_id=target_id)
+        if sub:
+            old_email = sub.to_email
+            old_tracker = sub.to_tracker
+        else:
+            old_email = False
+            old_tracker = False
+
+        new_email = bool(email) if email is not None else old_email
+        new_tracker = bool(tracker) if tracker is not None else old_tracker
+
+        if not new_email and not new_tracker:
+            if sub:
+                sub.delete()
+            return True
+
+        if not sub:
+            sub = Subscription(
+                user=user,
+                type=typ,
+                target_id=target_id,
+                to_email=new_email,
+                to_tracker=new_tracker,
+            )
+        else:
+            sub.to_email = new_email
+            sub.to_tracker = new_tracker
+
+        return True

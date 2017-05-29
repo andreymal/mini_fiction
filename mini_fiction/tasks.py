@@ -4,7 +4,7 @@
 from functools import wraps
 
 from flask import current_app
-from pony.orm import db_session
+from pony.orm import select, db_session
 
 from mini_fiction import models
 from mini_fiction.models import Story, Chapter
@@ -191,6 +191,8 @@ def notify_story_comment(comment_id):
         'parent': parent,
     }
 
+    reply_sent_email = False
+    reply_sent_tracker = False
     if parent and parent.author and (not comment.author or parent.author.id != comment.author.id):
         # Уведомляем автора родительского комментария, что ему ответили
         if 'story_reply' not in parent.author.silent_tracker_list:
@@ -200,6 +202,7 @@ def notify_story_comment(comment_id):
                 target_id=comment.id,
                 caused_by_user=comment.author,
             )
+            reply_sent_tracker = True
 
         if 'story_reply' not in parent.author.silent_email_list and parent.author.email:
             kwargs = {
@@ -212,3 +215,42 @@ def notify_story_comment(comment_id):
             }
 
             current_app.tasks['sendmail'].delay(**kwargs)
+            reply_sent_email = True
+
+    # Уведомляем остальных подписчиков о появлении нового комментария
+    subs = {x[0]: x[1:] for x in select(
+        (x.user.id, x.user.email, x.to_email, x.to_tracker) for x in models.Subscription if x.type == 'story_comment' and x.target_id == story.id
+    )}
+
+    if comment.author:
+        subs.pop(comment.author.id, None)
+
+    sendto = set()
+    for user_id, data in subs.items():
+        user_email, to_email, to_tracker = data
+
+        if to_tracker:
+            if not parent or not parent.author or parent.author.id != user_id or not reply_sent_tracker:
+                models.Notification(
+                    user=user_id,
+                    type='story_comment',
+                    target_id=comment.id,
+                    caused_by_user=comment.author,
+                )
+
+
+        if to_email:
+            if not parent or not parent.author or parent.author.id != user_id or not reply_sent_email:
+                sendto.add(user_email)
+
+    if sendto:
+        kwargs = {
+            'to': list(sendto),
+            'subject': render_nonrequest_template('email/story_comment_subject.txt', **ctx),
+            'body': {
+                'plain': render_nonrequest_template('email/story_comment.txt', **ctx),
+                'html': render_nonrequest_template('email/story_comment.html', **ctx),
+            },
+        }
+
+        current_app.tasks['sendmail'].delay(**kwargs)

@@ -52,6 +52,16 @@
     {% endcall %}
 </div>
 
+{%- elif item.type == 'story_comment' %}
+<div class="comment-item comment-item-short">
+    {% call nc.notification_comment_html(item.comment) %}
+        <span class="comment-story-link">
+        к рассказу
+        <a href="{{ url_for('story.view', pk=item.story.id) }}"><b>{{ item.story.title }}</b></a>
+        </span>
+    {% endcall %}
+</div>
+
 {%- else %}
     {{ item }}
     <div class="notification-meta">

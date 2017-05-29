@@ -616,6 +616,18 @@ class StoryBL(BaseBL, Commentable):
         else:
             return None
 
+    def get_comments_subscription(self, user):
+        if not user or not user.is_authenticated:
+            return False
+        story = self.model
+        return user.bl.get_subscription('story_comment', story.id)
+
+    def subscribe_to_comments(self, user, email=None, tracker=None):
+        if not user or not user.is_authenticated:
+            return False
+        story = self.model
+        return user.bl.edit_subscription('story_comment', story.id, email=email, tracker=tracker)
+
     # local comments (through StoriesLocalThread)
 
     def get_or_create_local_thread(self):

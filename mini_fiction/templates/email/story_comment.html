@@ -1,0 +1,16 @@
+{% extends 'email/base.html' %}
+{% block body %}
+В рассказе <a href="{{ url_for('story.view', pk=story.id, _external=True) }}" target="_blank">«{{ story.title }}»</a> добавлен новый комментарий:<br/>
+
+<div style="padding: 8px 12px 8px; border-left: 0.2em solid #dddddd;">
+    <div>{{ comment.text_as_html|safe }}</div>
+    <div style="color: #999999;">
+        {% if comment.author %}<a href="{{ url_for('author.info', user_id=comment.author.id, _external=True) }}" target="_blank" style="color: #999999; font-weight: bold;">{{ comment.author.username }}</a>{% else %}Гость{% endif %}
+        <span>{{ comment.date|datetimeformat('d MMMM Y, HH:mm') }}</span>
+        <a href="{{ comment.bl.get_permalink(_external=True) }}" target="_blank">#{{ comment.local_id }}</a>
+        {%- if comment.bl.can_answer_by(parent.author) %}
+            <a href="{{ comment.bl.get_answer_link(_external=True) }}" target="_blank">Ответить</a>
+        {%- endif %}
+    </div>
+</div>
+{%- endblock %}

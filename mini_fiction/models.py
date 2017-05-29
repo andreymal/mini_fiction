@@ -83,6 +83,7 @@ class Author(db.Entity, UserMixin):
     news_comment_edits = orm.Set('NewsCommentEdit')
     notifications = orm.Set('Notification', reverse='user')
     created_notifications = orm.Set('Notification', reverse='caused_by_user')
+    subscriptions = orm.Set('Subscription')
 
     bl = Resource('bl.author')
 
@@ -804,3 +805,18 @@ class Notification(db.Entity):
     target_id = orm.Optional(int)
     caused_by_user = orm.Optional(Author)
     extra = orm.Required(orm.LongStr, lazy=False, default='{}')
+
+
+class Subscription(db.Entity):
+    """Модель с информацией о подписке на уведомления.
+
+    Куда указывает target_id:
+    - story_comment: Story
+    """
+    user = orm.Required(Author)
+    type = orm.Required(str, 24, index=True)
+    target_id = orm.Optional(int)
+    to_email = orm.Required(bool, default=True)
+    to_tracker = orm.Required(bool, default=True)
+
+    orm.composite_key(type, target_id)

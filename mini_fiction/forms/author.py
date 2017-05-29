@@ -185,3 +185,6 @@ class AuthorEditSubscriptionsForm(Form):
 
     email_story_reply = BooleanField()
     tracker_story_reply = BooleanField()
+
+    email_story_lreply = BooleanField()
+    tracker_story_lreply = BooleanField()

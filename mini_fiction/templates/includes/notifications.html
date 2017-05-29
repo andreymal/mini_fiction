@@ -62,6 +62,44 @@
     {% endcall %}
 </div>
 
+{%- elif item.type == 'story_lreply' %}
+<div class="comment-item comment-item-short">
+    <div class="comment-item-notify-label">Комментарий от {% if item.extra.is_staff -%}
+        модератора
+    {%- elif item.extra.is_author -%}
+        автора
+    {%- elif item.extra.is_editor -%}
+        редактора
+    {%- else -%}
+        бета-читателя
+    {%- endif -%}:</div>
+    {% call nc.notification_comment_html(item.comment) %}
+        <span class="comment-story-link">
+        в ответ на ваш комментарий к редакторской рассказа
+        <a href="{{ url_for('story.view', pk=item.story.id) }}"><b>{{ item.story.title }}</b></a>
+        </span>
+    {% endcall %}
+</div>
+
+{%- elif item.type == 'story_lcomment' %}
+<div class="comment-item comment-item-short">
+    <div class="comment-item-notify-label">Комментарий от {% if item.extra.is_staff -%}
+        модератора
+    {%- elif item.extra.is_author -%}
+        автора
+    {%- elif item.extra.is_editor -%}
+        редактора
+    {%- else -%}
+        бета-читателя
+    {%- endif -%}:</div>
+    {% call nc.notification_comment_html(item.comment) %}
+        <span class="comment-story-link">
+        в редакторской рассказа
+        <a href="{{ url_for('story.view', pk=item.story.id) }}"><b>{{ item.story.title }}</b></a>
+        </span>
+    {% endcall %}
+</div>
+
 {%- else %}
     {{ item }}
     <div class="notification-meta">

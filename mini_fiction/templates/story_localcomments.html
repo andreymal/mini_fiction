@@ -13,17 +13,26 @@
           </h1>
 
         <!-- Вывод комментариев: начало -->
-        {% if comments_count > 0 %}
         <div id="comments">
             <h3>Комментарии бета-читателей и редакторов (<span id="comments-count">{{ comments_count }}</span>)</h3>
+            <form method="POST" action="{{ url_for('story.local_comments_subscribe', pk=story.id) }}" class="subscription-form js-subscription-form">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+                Получать новые:
+                <label><input type="checkbox" name="email" value="1"{% if sub_comments.email %} checked{% endif %} /> в почте</label>
+                <label><input type="checkbox" name="tracker" value="1"{% if sub_comments.tracker %} checked{% endif %} /> на сайте</label>
+                <button type="submit" class="btn btn-mini js-subscription-form-submit">Сохранить</button>
+            </form>
             <div id="comments-tree" class="comments-tree">
-                {% include 'includes/comments_tree.html' %}
+                {% if comments_count > 0 %}
+                    {%- include 'includes/comments_tree.html' -%}
+                {% endif %}
             </div>
             <div id="comments-pagination" class="pagination center">
-                {%- include 'includes/comments_pagination_story_local.html' -%}
+                {%- if comments_count > 0 %}
+                    {%- include 'includes/comments_pagination_story_local.html' -%}
+                {% endif -%}
             </div>
         </div>
-        {% endif %}
 
         {% if local.bl.can_comment_by(current_user) %}
             <a href="{{ url_for('story_local_comment.add', story_id=story.id) }}" id="comment-add-link" class="comment-add-link">Добавить новый комментарий</a>

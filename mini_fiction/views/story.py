@@ -104,6 +104,26 @@ def comments_subscribe(pk):
     return redirect(url_for('story.view', pk=story.id))
 
 
+@bp.route('/<int:pk>/localcomments/subscribe/', methods=('POST',))
+@db_session
+@login_required
+def local_comments_subscribe(pk):
+    user = current_user._get_current_object()
+    story = get_story(pk)
+    if not user.is_staff and not story.bl.is_contributor(user):
+        abort(403)
+
+    story.bl.subscribe_to_local_comments(
+        user,
+        email=request.form.get('email') == '1',
+        tracker=request.form.get('tracker') == '1',
+    )
+
+    if request.form.get('short') == '1':
+        return jsonify(success=True)
+    return redirect(url_for('story_local_comment.view', story_id=story.id))
+
+
 # this is for ajax links
 
 

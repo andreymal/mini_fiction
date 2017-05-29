@@ -1334,6 +1334,12 @@ a.btn {
     background-color: rgba(192, 255, 192, 0.7);
 }
 
+.comment-item-notify-label {
+    font-size: 11px;
+    line-height: 12px;
+    color: #888;
+}
+
 /* index page */
 .sidelist .comment-item {
     margin-left: -12px;

@@ -29,6 +29,7 @@ allowed_subscriptions = {
     'story_publish',
     'story_draft',
     'story_reply',
+    'story_lreply',
 }
 
 
@@ -598,7 +599,7 @@ class AuthorBL(BaseBL):
         return user.notifications.filter(lambda x: x.id > user.last_viewed_notification_id).count()
 
     def get_notifications(self, older=None, offset=0, count=100):
-        from mini_fiction.models import Notification, Story, StoryComment
+        from mini_fiction.models import Notification, Story, StoryComment, StoryLocalThread, StoryLocalComment
 
         user = self.model
 
@@ -611,16 +612,35 @@ class AuthorBL(BaseBL):
         # Группируем таргеты по типам, чтобы брать их одним sql-запросом
         story_ids = set()
         story_comment_ids = set()
+        local_comment_ids = set()
         for n in items:
             if n.type in ('story_publish', 'story_draft'):
                 story_ids.add(n.target_id)
             elif n.type in ('story_reply', 'story_comment'):
                 story_comment_ids.add(n.target_id)
+            elif n.type in ('story_lreply', 'story_lcomment'):
+                local_comment_ids.add(n.target_id)
 
         # И забираем все эти таргеты
-        stories = {x.id: x for x in Story.select(lambda x: x.id in story_ids)} if story_ids else {}
-        story_comments = {x.id: x for x in StoryComment.select(lambda x: x.id in story_comment_ids).prefetch(StoryComment.story)} if story_comment_ids else {}
+        stories = {
+            x.id: x for x in Story.select(
+                lambda x: x.id in story_ids
+            )
+        } if story_ids else {}
 
+        story_comments = {
+            x.id: x for x in StoryComment.select(
+                lambda x: x.id in story_comment_ids
+            ).prefetch(StoryComment.story)
+        } if story_comment_ids else {}
+
+        local_comments = {
+            x.id: x for x in StoryLocalComment.select(
+                lambda x: x.id in local_comment_ids
+            ).prefetch(StoryLocalComment.local, StoryLocalThread.story)
+        } if local_comment_ids else {}
+
+        # Преобразуем каждое уведомление в json-совместимый формат со всеми дополнениями
         for n in items:
             item = {
                 'id': n.id,
@@ -642,8 +662,12 @@ class AuthorBL(BaseBL):
                     continue
                 item['story'] = {'id': n.target_id, 'title': stories[n.target_id].title}
 
-            elif n.type in ('story_reply', 'story_comment'):
-                c = story_comments.get(n.target_id)
+            elif n.type in ('story_reply', 'story_comment', 'story_lreply', 'story_lcomment'):
+                if n.type in ('story_reply', 'story_comment'):
+                    c = story_comments.get(n.target_id)
+                elif n.type in ('story_lreply', 'story_lcomment'):
+                    c = local_comments.get(n.target_id)
+
                 if not c:
                     item['broken'] = True
                     result.append(item)
@@ -654,7 +678,7 @@ class AuthorBL(BaseBL):
                         'id': c.id,
                         'local_id': c.local_id,
                         'permalink': c.bl.get_permalink(),
-                        'can_vote': True,
+                        'can_vote': c.bl.can_vote,
                         'deleted': True,
                     }
                 else:
@@ -664,15 +688,20 @@ class AuthorBL(BaseBL):
                         'permalink': c.bl.get_permalink(),
                         'date': c.date,
                         'brief_text_as_html': str(c.brief_text_as_html),
-                        'vote_total': c.vote_total,
-                        'can_vote': True,
+                        'can_vote': c.bl.can_vote,
                         'deleted': c.deleted,
                         'author': {
                             'id': c.author.id if c.author else None,
                             'username': c.author.username if c.author else c.author_username,
                         }
                     }
-                item['story'] = {'id': c.story.id, 'title': c.story.title}
+                    if hasattr(c, 'vote_total'):
+                        item['comment']['vote_total'] = c.vote_total
+
+                if n.type in ('story_reply', 'story_comment'):
+                    item['story'] = {'id': c.story.id, 'title': c.story.title}
+                elif n.type in ('story_lreply', 'story_lcomment'):
+                    item['story'] = {'id': c.local.story.id, 'title': c.local.story.title}
 
             result.append(item)
 

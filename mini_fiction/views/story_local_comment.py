@@ -52,6 +52,7 @@ def view(story_id, comments_page):
         'page_title': 'Обсуждение «{}»'.format(story.title),
         'comment_form': CommentForm(),
         'page_obj': paged,
+        'sub_comments': story.bl.get_local_comments_subscription(user),
     }
     return render_template('story_localcomments.html', **data)
 

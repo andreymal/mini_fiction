@@ -295,6 +295,10 @@ class StoryLocalCommentBL(BaseCommentBL):
     def get_vote_link(self, _external=False):
         raise ValueError('Not available')
 
+    def create(self, *args, **kwargs):
+        comment = super().create(*args, **kwargs)
+        later(current_app.tasks['notify_story_lcomment'].delay, comment.id)
+        return comment
 
 class NewsCommentBL(BaseCommentBL):
     target_attr = 'newsitem'

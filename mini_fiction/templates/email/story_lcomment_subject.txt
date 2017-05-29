@@ -1,0 +1,1 @@
+{{ (comment.author_username or 'Гость')|safe }} добавил комментарий в редакторской рассказа «{{ story.title|safe }}» — {{ SITE_NAME }}

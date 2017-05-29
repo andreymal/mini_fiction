@@ -155,11 +155,13 @@ def edit():
                     'story_publish': prefs_form.email_story_publish.data,
                     'story_draft': prefs_form.email_story_draft.data,
                     'story_reply': prefs_form.email_story_reply.data,
+                    'story_lreply': prefs_form.email_story_lreply.data,
                 })
                 author.bl.update_tracker_subscriptions({
                     'story_publish': prefs_form.tracker_story_publish.data,
                     'story_draft': prefs_form.tracker_story_draft.data,
                     'story_reply': prefs_form.tracker_story_reply.data,
+                    'story_lreply': prefs_form.tracker_story_lreply.data,
                 })
                 data['subs_ok'] = True
 
@@ -211,6 +213,9 @@ def edit():
 
             'email_story_reply': 'story_reply' not in silent_email,
             'tracker_story_reply': 'story_reply' not in silent_tracker,
+
+            'email_story_lreply': 'story_lreply' not in silent_email,
+            'tracker_story_lreply': 'story_lreply' not in silent_tracker,
         })
     data.update({
         'profile_form': profile_form,

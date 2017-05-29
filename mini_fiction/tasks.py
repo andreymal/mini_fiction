@@ -3,8 +3,9 @@
 
 from functools import wraps
 
+import json
 from flask import current_app
-from pony.orm import select, db_session
+from pony.orm import db_session
 
 from mini_fiction import models
 from mini_fiction.models import Story, Chapter
@@ -119,7 +120,7 @@ def _sendmail_notify(to, typ, ctx):
     return current_app.tasks['sendmail'].delay(**kwargs)
 
 
-def _notify(to, typ, target, by=None):
+def _notify(to, typ, target, by=None, extra=None):
     if not to:
         return []
     if not isinstance(to, (list, set, tuple)):
@@ -132,6 +133,7 @@ def _notify(to, typ, target, by=None):
             type=typ,
             target_id=target.id,
             caused_by_user=by,
+            extra=json.dumps(extra or {}, ensure_ascii=False, sort_keys=True),
         ))
     return result
 
@@ -218,3 +220,61 @@ def notify_story_comment(comment_id):
                 sendto.add(user.email)
 
     _sendmail_notify(sendto, 'story_comment', ctx)
+
+
+@task()
+@db_session
+def notify_story_lcomment(comment_id):
+    comment = models.StoryLocalComment.get(id=comment_id)
+    if not comment:
+        return
+    story = comment.local.story
+    parent = comment.parent
+
+    ctx = {'story': story, 'comment': comment, 'parent': parent}
+
+    # Достаём информацию, кем является автор комментария
+    contributor = story.contributors.select(lambda x: x.user == comment.author).first()
+    if contributor:
+        extra = {'is_editor': contributor.is_editor, 'is_author': contributor.is_author, 'is_staff': comment.author.is_staff}
+    elif comment.author and comment.author.is_staff:
+        extra = {'is_editor': False, 'is_author': False, 'is_staff': True}
+    else:
+        extra = {'is_editor': False, 'is_author': False, 'is_staff': False, 'unknown': True}
+    ctx.update(extra)
+
+    reply_sent_email = False
+    reply_sent_tracker = False
+
+    if parent and parent.author and (not comment.author or parent.author.id != comment.author.id):
+        # Уведомляем автора родительского комментария, что ему ответили
+        if 'story_lreply' not in parent.author.silent_tracker_list:
+            _notify(parent.author, 'story_lreply', comment, by=comment.author, extra=extra)
+            reply_sent_tracker = True
+
+        if 'story_lreply' not in parent.author.silent_email_list and parent.author.email:
+            _sendmail_notify([parent.author.email], 'story_lreply', ctx)
+            reply_sent_email = True
+
+    # Уведомляем остальных подписчиков о появлении нового комментария
+    subs = models.Subscription.select(lambda x: x.type == 'story_lcomment' and x.target_id == story.id)[:]
+
+    sendto = set()
+    for sub in subs:
+        user = sub.user
+        if user.id == comment.author.id:
+            continue
+
+        # Не забываем про проверку доступа
+        if not user.is_staff and not story.bl.is_contributor(user):
+            continue
+
+        if sub.to_tracker:
+            if not parent or not parent.author or parent.author.id != user.id or not reply_sent_tracker:
+                _notify(user, 'story_lcomment', comment, by=comment.author, extra=extra)
+
+        if sub.to_email and user.email:
+            if not parent or not parent.author or parent.author.id != user.id or not reply_sent_email:
+                sendto.add(user.email)
+
+    _sendmail_notify(sendto, 'story_lcomment', ctx)

@@ -15,7 +15,7 @@
             {%- endif %}
             <br/>
             <time datetime="{{ newsitem.date.strftime('%Y-%m-%dT%H:%M:%SZ') }}" class="newsitem-date">
-                {{- newsitem.date|datetimeformat('d.MM.Y') -}}
+                {{- newsitem.date|datetimeformat('d MMMM Y') -}}, {{ ngettext("%(num)d comment", "%(num)d comments", newsitem.comments_count) }}
             </time>
         </div>
         {% endfor %}

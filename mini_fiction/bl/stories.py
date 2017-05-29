@@ -211,7 +211,7 @@ class StoryBL(BaseBL, Commentable):
                 story.last_author_notification_at = None
                 later(current_app.tasks['notify_story_pubrequest'].delay, story.id, user.id)
 
-            if user and user.is_staff and old_published != story.published and (
+            if user and user.is_staff and (story.published or not old_draft) and (
                 not story.last_author_notification_at or
                 story.last_author_notification_at + timedelta(seconds=current_app.config['STORY_NOTIFICATIONS_INTERVAL']) < datetime.utcnow()
             ):

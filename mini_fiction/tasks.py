@@ -43,7 +43,6 @@ def apply_for_app(app):
 
 
 @task(rate_limit='30/m')
-@db_session
 def sendmail(to, subject, body, fro=None, headers=None, config=None):
     from mini_fiction.utils import mail
     mail.sendmail(to, subject, body, fro=fro, headers=headers, config=config)
@@ -102,6 +101,41 @@ def sphinx_delete_chapter(story_id, chapter_id):
 # tasks for notificaions
 
 
+def _sendmail_notify(to, typ, ctx):
+    if not to:
+        return
+    if not isinstance(to, (list, set, tuple)):
+        to = [to]
+
+    kwargs = {
+        'to': list(to),
+        'subject': render_nonrequest_template('email/{}_subject.txt'.format(typ), **ctx),
+        'body': {
+            'plain': render_nonrequest_template('email/{}.txt'.format(typ), **ctx),
+            'html': render_nonrequest_template('email/{}.html'.format(typ), **ctx),
+        },
+    }
+
+    return current_app.tasks['sendmail'].delay(**kwargs)
+
+
+def _notify(to, typ, target, by=None):
+    if not to:
+        return []
+    if not isinstance(to, (list, set, tuple)):
+        to = [to]
+
+    result = []
+    for x in to:
+        result.append(models.Notification(
+            user=x,
+            type=typ,
+            target_id=target.id,
+            caused_by_user=by,
+        ))
+    return result
+
+
 @task()
 @db_session
 def notify_story_pubrequest(story_id, author_id):
@@ -114,24 +148,7 @@ def notify_story_pubrequest(story_id, author_id):
 
     staff = models.Author.select(lambda x: x.is_staff)
     recipients = [u.email for u in staff if u.email and 'story_pubrequest' not in u.silent_email_list]
-    if not recipients:
-        return
-
-    ctx = {
-        'story': story,
-        'author': author,
-    }
-
-    kwargs = {
-        'to': recipients,
-        'subject': render_nonrequest_template('email/story_pubrequest_subject.txt', **ctx),
-        'body': {
-            'plain': render_nonrequest_template('email/story_pubrequest.txt', **ctx),
-            'html': render_nonrequest_template('email/story_pubrequest.html', **ctx),
-        },
-    }
-
-    current_app.tasks['sendmail'].delay(**kwargs)
+    _sendmail_notify(recipients, 'story_pubrequest', {'story': story, 'author': author})
 
 
 @task()
@@ -140,40 +157,19 @@ def notify_story_publish_draft(story_id, staff_id, draft):
     story = models.Story.get(id=story_id)
     if not story:
         return
+
     author = story.published_by_author
-    if not author:
-        return
     staff = models.Author.get(id=staff_id)
-    if not staff:
+    if not author or not staff:
         return
 
     typ = 'story_draft' if draft else 'story_publish'
 
     if typ not in author.silent_tracker_list:
-        models.Notification(
-            user=author,
-            type=typ,
-            target_id=story.id,
-            caused_by_user=staff,
-        )
+        _notify(author, typ, story, by=staff)
 
     if author.email and typ not in author.silent_email_list:
-        ctx = {
-            'story': story,
-            'author': author,
-            'staff': staff,
-        }
-
-        kwargs = {
-            'to': [author.email],
-            'subject': render_nonrequest_template('email/{}_subject.txt'.format(typ), **ctx),
-            'body': {
-                'plain': render_nonrequest_template('email/{}.txt'.format(typ), **ctx),
-                'html': render_nonrequest_template('email/{}.html'.format(typ), **ctx),
-            },
-        }
-
-        current_app.tasks['sendmail'].delay(**kwargs)
+        _sendmail_notify([author.email], typ, {'story': story, 'author': author, 'staff': staff})
 
 
 @task()
@@ -185,72 +181,40 @@ def notify_story_comment(comment_id):
     story = comment.story
     parent = comment.parent
 
-    ctx = {
-        'story': story,
-        'comment': comment,
-        'parent': parent,
-    }
+    ctx = {'story': story, 'comment': comment, 'parent': parent}
 
     reply_sent_email = False
     reply_sent_tracker = False
+
     if parent and parent.author and (not comment.author or parent.author.id != comment.author.id):
         # Уведомляем автора родительского комментария, что ему ответили
         if 'story_reply' not in parent.author.silent_tracker_list:
-            models.Notification(
-                user=parent.author,
-                type='story_reply',
-                target_id=comment.id,
-                caused_by_user=comment.author,
-            )
+            _notify(parent.author, 'story_reply', comment, by=comment.author)
             reply_sent_tracker = True
 
         if 'story_reply' not in parent.author.silent_email_list and parent.author.email:
-            kwargs = {
-                'to': [parent.author.email],
-                'subject': render_nonrequest_template('email/story_reply_subject.txt', **ctx),
-                'body': {
-                    'plain': render_nonrequest_template('email/story_reply.txt', **ctx),
-                    'html': render_nonrequest_template('email/story_reply.html', **ctx),
-                },
-            }
-
-            current_app.tasks['sendmail'].delay(**kwargs)
+            _sendmail_notify([parent.author.email], 'story_reply', ctx)
             reply_sent_email = True
 
     # Уведомляем остальных подписчиков о появлении нового комментария
-    subs = {x[0]: x[1:] for x in select(
-        (x.user.id, x.user.email, x.to_email, x.to_tracker) for x in models.Subscription if x.type == 'story_comment' and x.target_id == story.id
-    )}
-
-    if comment.author:
-        subs.pop(comment.author.id, None)
+    subs = models.Subscription.select(lambda x: x.type == 'story_comment' and x.target_id == story.id)[:]
 
     sendto = set()
-    for user_id, data in subs.items():
-        user_email, to_email, to_tracker = data
+    for sub in subs:
+        user = sub.user
+        if user.id == comment.author.id:
+            continue
 
-        if to_tracker:
-            if not parent or not parent.author or parent.author.id != user_id or not reply_sent_tracker:
-                models.Notification(
-                    user=user_id,
-                    type='story_comment',
-                    target_id=comment.id,
-                    caused_by_user=comment.author,
-                )
+        # Не забываем про проверку доступа
+        if not story.bl.has_access(user):
+            continue
 
+        if sub.to_tracker:
+            if not parent or not parent.author or parent.author.id != user.id or not reply_sent_tracker:
+                _notify(user, 'story_comment', comment, by=comment.author)
 
-        if to_email:
-            if not parent or not parent.author or parent.author.id != user_id or not reply_sent_email:
-                sendto.add(user_email)
+        if sub.to_email and user.email:
+            if not parent or not parent.author or parent.author.id != user.id or not reply_sent_email:
+                sendto.add(user.email)
 
-    if sendto:
-        kwargs = {
-            'to': list(sendto),
-            'subject': render_nonrequest_template('email/story_comment_subject.txt', **ctx),
-            'body': {
-                'plain': render_nonrequest_template('email/story_comment.txt', **ctx),
-                'html': render_nonrequest_template('email/story_comment.html', **ctx),
-            },
-        }
-
-        current_app.tasks['sendmail'].delay(**kwargs)
+    _sendmail_notify(sendto, 'story_comment', ctx)

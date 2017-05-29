@@ -819,4 +819,4 @@ class Subscription(db.Entity):
     to_email = orm.Required(bool, default=True)
     to_tracker = orm.Required(bool, default=True)
 
-    orm.composite_key(type, target_id)
+    orm.composite_index(type, target_id)

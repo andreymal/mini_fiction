@@ -151,6 +151,7 @@ def edit():
             prefs_form = AuthorEditSubscriptionsForm()
             if prefs_form.validate_on_submit():
                 author.bl.update_email_subscriptions({
+                    'story_pubrequest': prefs_form.email_story_pubrequest.data,
                     'story_publish': prefs_form.email_story_publish.data,
                     'story_draft': prefs_form.email_story_draft.data,
                     'story_reply': prefs_form.email_story_reply.data,
@@ -200,6 +201,8 @@ def edit():
         silent_email = author.silent_email_list
         silent_tracker = author.silent_tracker_list
         subs_form = AuthorEditSubscriptionsForm(formdata=None, data={
+            'email_story_pubrequest': 'story_pubrequest' not in silent_email,
+
             'email_story_publish': 'story_publish' not in silent_email,
             'tracker_story_publish': 'story_publish' not in silent_tracker,
 

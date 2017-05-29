@@ -1,4 +1,6 @@
 {% extends 'email/base.html' %}
+{% import 'email/macro.html' as macro %}
+
 {% block body %}
-Ваш рассказ <a href="{{ url_for('story.view', pk=story.id, _external=True) }}" target="_blank">«{{ story.title }}»</a> был убран в черновики модератором <a href="{{ url_for('author.info', user_id=staff.id, _external=True) }}" target="_blank" style="color: #999999; font-weight: bold;">{{ staff.username }}</a> и теперь скрыт от читателей.
+Ваш рассказ {{ macro.storylink(story.id, story.title) }} был убран в черновики модератором {{ macro.userlink(staff.id, staff.username) }} и теперь скрыт от читателей.
 {% endblock %}

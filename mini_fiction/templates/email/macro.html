@@ -1,0 +1,28 @@
+{% macro userlink(id, name) -%}
+    {%- if id and name -%}
+        <a href="{{ url_for('author.info', user_id=id, _external=True) }}" target="_blank" style="color: #999999; font-weight: bold;">{{ name or id }}</a>
+    {%- else -%}
+        <span style="color: #999999; font-weight: bold;">{{ name or 'Гость' }}</span>
+    {%- endif -%}
+{%- endmacro %}
+
+
+{% macro storylink(id, title) -%}
+    <a href="{{ url_for('story.view', pk=id, _external=True) }}" target="_blank"><b>{{ title }}</b></a>
+{%- endmacro %}
+
+
+{% macro comment(comment) -%}
+<div style="padding: 8px 12px 8px; border-left: 0.2em solid #dddddd;">
+    <div>{{ comment.text_as_html|safe }}</div>
+    <div style="color: #999999;">
+        {% if comment.author %}
+            {{- userlink(comment.author.id, comment.author.username) -}}
+        {% else %}
+            {{- userlink(None, None) -}}
+        {% endif %}
+        <span>{{ comment.date|datetimeformat('d MMMM Y, HH:mm') }}</span>
+        {{ caller() if caller else '' }}
+    </div>
+</div>
+{%- endmacro %}

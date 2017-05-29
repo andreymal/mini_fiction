@@ -25,6 +25,7 @@ __all__ = ['AuthorBL']
 
 
 allowed_subscriptions = {
+    'story_pubrequest',
     'story_publish',
     'story_draft',
     'story_reply',

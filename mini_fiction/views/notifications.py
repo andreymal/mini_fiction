@@ -60,8 +60,9 @@ def index():
 
 @bp.route('/unread_count/', methods=['GET'])
 @db_session
-@login_required
 def unread_count():
+    if not current_user.is_authenticated:
+        return jsonify(success=True, unread_count=0, please_login=True)
     return jsonify(success=True, unread_count=current_user.bl.get_unread_notifications_count())
 
 

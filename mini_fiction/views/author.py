@@ -148,22 +148,22 @@ def edit():
                 data['prefs_ok'] = True
 
         if 'save_subs' in request.form:
-            prefs_form = AuthorEditSubscriptionsForm()
-            if prefs_form.validate_on_submit():
+            subs_form = AuthorEditSubscriptionsForm()
+            if subs_form.validate_on_submit():
                 author.bl.update_email_subscriptions({
-                    'story_pubrequest': prefs_form.email_story_pubrequest.data,
-                    'story_publish': prefs_form.email_story_publish.data,
-                    'story_draft': prefs_form.email_story_draft.data,
-                    'story_reply': prefs_form.email_story_reply.data,
-                    'story_lreply': prefs_form.email_story_lreply.data,
-                    'news_reply': prefs_form.email_news_reply.data,
+                    'story_pubrequest': subs_form.email_story_pubrequest.data,
+                    'story_publish': subs_form.email_story_publish.data,
+                    'story_draft': subs_form.email_story_draft.data,
+                    'story_reply': subs_form.email_story_reply.data,
+                    'story_lreply': subs_form.email_story_lreply.data,
+                    'news_reply': subs_form.email_news_reply.data,
                 })
                 author.bl.update_tracker_subscriptions({
-                    'story_publish': prefs_form.tracker_story_publish.data,
-                    'story_draft': prefs_form.tracker_story_draft.data,
-                    'story_reply': prefs_form.tracker_story_reply.data,
-                    'story_lreply': prefs_form.tracker_story_lreply.data,
-                    'news_reply': prefs_form.tracker_news_reply.data,
+                    'story_publish': subs_form.tracker_story_publish.data,
+                    'story_draft': subs_form.tracker_story_draft.data,
+                    'story_reply': subs_form.tracker_story_reply.data,
+                    'story_lreply': subs_form.tracker_story_lreply.data,
+                    'news_reply': subs_form.tracker_news_reply.data,
                 })
                 data['subs_ok'] = True
 

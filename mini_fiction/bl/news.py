@@ -116,3 +116,15 @@ class NewsItemBL(BaseBL, Commentable):
         )[:]
         votes = dict(votes)
         return {i: votes.get(i, 0) for i in comment_ids}
+
+    def get_comments_subscription(self, user):
+        if not user or not user.is_authenticated:
+            return False
+        newsitem = self.model
+        return user.bl.get_subscription('news_comment', newsitem.id)
+
+    def subscribe_to_comments(self, user, email=None, tracker=None):
+        if not user or not user.is_authenticated:
+            return False
+        newsitem = self.model
+        return user.bl.edit_subscription('news_comment', newsitem.id, email=email, tracker=tracker)

@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-from flask import Blueprint, Markup, current_app, render_template, abort, request
+from flask import Blueprint, Markup, current_app, render_template, abort, request, jsonify, redirect, url_for
 from flask_babel import gettext
-from flask_login import current_user
+from flask_login import current_user, login_required
 from pony.orm import db_session
 
 from mini_fiction.models import NewsItem
@@ -68,6 +68,27 @@ def show(name, comments_page):
         'comments_tree_list': comments_tree_list,
         'comment_form': CommentForm(),
         'comment_votes_cache': comment_votes_cache,
+        'sub_comments': newsitem.bl.get_comments_subscription(current_user._get_current_object()),
     }
 
     return render_template('news/show.html', **data)
+
+
+@bp.route('/<name>/comments/subscribe/', methods=('POST',))
+@db_session
+@login_required
+def comments_subscribe(name):
+    user = current_user._get_current_object()
+    newsitem = NewsItem.get(name=name)
+    if not newsitem:
+        abort(404)
+
+    newsitem.bl.subscribe_to_comments(
+        user,
+        email=request.form.get('email') == '1',
+        tracker=request.form.get('tracker') == '1',
+    )
+
+    if request.form.get('short') == '1':
+        return jsonify(success=True)
+    return redirect(url_for('newsitem.show', name=newsitem.name))

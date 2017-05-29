@@ -1,0 +1,7 @@
+{% autoescape false -%}
+{% if comment.author %}Пользователь {{ comment.author_username }}{% else %}Гость{% endif %} в новости «{{ newsitem.title }}» на сайте {{ url_for('index.index', _external=True) }} добавил новый комментарий:
+
+{{ comment.text_as_html }}
+
+{{ SITE_NAME }}
+{%- endautoescape %}

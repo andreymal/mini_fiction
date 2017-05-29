@@ -278,3 +278,47 @@ def notify_story_lcomment(comment_id):
                 sendto.add(user.email)
 
     _sendmail_notify(sendto, 'story_lcomment', ctx)
+
+
+@task()
+@db_session
+def notify_news_comment(comment_id):
+    comment = models.NewsComment.get(id=comment_id)
+    if not comment:
+        return
+    newsitem = comment.newsitem
+    parent = comment.parent
+
+    ctx = {'newsitem': newsitem, 'comment': comment, 'parent': parent}
+
+    reply_sent_email = False
+    reply_sent_tracker = False
+
+    if parent and parent.author and (not comment.author or parent.author.id != comment.author.id):
+        # Уведомляем автора родительского комментария, что ему ответили
+        if 'news_reply' not in parent.author.silent_tracker_list:
+            _notify(parent.author, 'news_reply', comment, by=comment.author)
+            reply_sent_tracker = True
+
+        if 'news_reply' not in parent.author.silent_email_list and parent.author.email:
+            _sendmail_notify([parent.author.email], 'news_reply', ctx)
+            reply_sent_email = True
+
+    # Уведомляем остальных подписчиков о появлении нового комментария
+    subs = models.Subscription.select(lambda x: x.type == 'news_comment' and x.target_id == newsitem.id)[:]
+
+    sendto = set()
+    for sub in subs:
+        user = sub.user
+        if user.id == comment.author.id:
+            continue
+
+        if sub.to_tracker:
+            if not parent or not parent.author or parent.author.id != user.id or not reply_sent_tracker:
+                _notify(user, 'news_comment', comment, by=comment.author)
+
+        if sub.to_email and user.email:
+            if not parent or not parent.author or parent.author.id != user.id or not reply_sent_email:
+                sendto.add(user.email)
+
+    _sendmail_notify(sendto, 'news_comment', ctx)

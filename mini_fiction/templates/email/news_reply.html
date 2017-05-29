@@ -1,0 +1,19 @@
+{% extends 'email/base.html' %}
+{% import 'email/macro.html' as macro %}
+
+{% block body %}
+В новости <a href="{{ url_for('news.show', name=newsitem.name) }}" target="_blank"><b>{{ newsitem.title }}</b></a> добавлен новый комментарий:<br/>
+
+{% call macro.comment(comment) %}
+    <a href="{{ comment.bl.get_permalink(_external=True) }}" target="_blank">#{{ comment.local_id }}</a>
+    {%- if comment.bl.can_answer_by(parent.author) %}
+        <a href="{{ comment.bl.get_answer_link(_external=True) }}" target="_blank">Ответить</a>
+    {%- endif %}
+{% endcall %}<br/>
+
+Он является ответом на ваш комментарий:<br/>
+
+{% call macro.comment(parent) %}
+    <a href="{{ parent.bl.get_permalink(_external=True) }}" target="_blank">#{{ parent.local_id }}</a>
+{% endcall %}
+{%- endblock %}

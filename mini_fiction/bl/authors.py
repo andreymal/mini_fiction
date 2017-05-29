@@ -30,6 +30,7 @@ allowed_subscriptions = {
     'story_draft',
     'story_reply',
     'story_lreply',
+    'news_reply',
 }
 
 
@@ -599,7 +600,7 @@ class AuthorBL(BaseBL):
         return user.notifications.filter(lambda x: x.id > user.last_viewed_notification_id).count()
 
     def get_notifications(self, older=None, offset=0, count=100):
-        from mini_fiction.models import Notification, Story, StoryComment, StoryLocalThread, StoryLocalComment
+        from mini_fiction.models import Notification, Story, StoryComment, StoryLocalThread, StoryLocalComment, NewsComment
 
         user = self.model
 
@@ -613,6 +614,7 @@ class AuthorBL(BaseBL):
         story_ids = set()
         story_comment_ids = set()
         local_comment_ids = set()
+        news_comment_ids = set()
         for n in items:
             if n.type in ('story_publish', 'story_draft'):
                 story_ids.add(n.target_id)
@@ -620,6 +622,8 @@ class AuthorBL(BaseBL):
                 story_comment_ids.add(n.target_id)
             elif n.type in ('story_lreply', 'story_lcomment'):
                 local_comment_ids.add(n.target_id)
+            elif n.type in ('news_reply', 'news_comment'):
+                news_comment_ids.add(n.target_id)
 
         # И забираем все эти таргеты
         stories = {
@@ -639,6 +643,12 @@ class AuthorBL(BaseBL):
                 lambda x: x.id in local_comment_ids
             ).prefetch(StoryLocalComment.local, StoryLocalThread.story)
         } if local_comment_ids else {}
+
+        news_comments = {
+            x.id: x for x in NewsComment.select(
+                lambda x: x.id in news_comment_ids
+            ).prefetch(NewsComment.newsitem)
+        } if news_comment_ids else {}
 
         # Преобразуем каждое уведомление в json-совместимый формат со всеми дополнениями
         for n in items:
@@ -662,11 +672,13 @@ class AuthorBL(BaseBL):
                     continue
                 item['story'] = {'id': n.target_id, 'title': stories[n.target_id].title}
 
-            elif n.type in ('story_reply', 'story_comment', 'story_lreply', 'story_lcomment'):
+            elif n.type in ('story_reply', 'story_comment', 'story_lreply', 'story_lcomment', 'news_reply', 'news_comment'):
                 if n.type in ('story_reply', 'story_comment'):
                     c = story_comments.get(n.target_id)
                 elif n.type in ('story_lreply', 'story_lcomment'):
                     c = local_comments.get(n.target_id)
+                elif n.type in ('news_reply', 'news_comment'):
+                    c = news_comments.get(n.target_id)
 
                 if not c:
                     item['broken'] = True
@@ -702,6 +714,8 @@ class AuthorBL(BaseBL):
                     item['story'] = {'id': c.story.id, 'title': c.story.title}
                 elif n.type in ('story_lreply', 'story_lcomment'):
                     item['story'] = {'id': c.local.story.id, 'title': c.local.story.title}
+                elif n.type in ('news_reply', 'news_comment'):
+                    item['newsitem'] = {'id': c.newsitem.id, 'name': c.newsitem.name, 'title': c.newsitem.title}
 
             result.append(item)
 

@@ -801,6 +801,8 @@ class Notification(db.Entity):
     - story_comment (StoryComment): не ответ, просто новый комментарий
     - story_lreply (StoryLocalComment): ответ на комментарий в редакторской
     - story_lcomment (StoryLocalComment): новый комментарий в редакторской
+    - news_reply (NewsComment): ответ на комментарий к новости
+    - news_comment (NewsComment): просто новый комментарий
     """
     user = orm.Required(Author)
     created_at = orm.Required(datetime, 6, default=datetime.utcnow)
@@ -816,6 +818,7 @@ class Subscription(db.Entity):
     Куда указывает target_id:
     - story_comment: Story
     - story_lcomment: Story
+    - news_comment: NewsItem
     """
     user = orm.Required(Author)
     type = orm.Required(str, 24, index=True)

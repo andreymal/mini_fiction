@@ -334,3 +334,8 @@ class NewsCommentBL(BaseCommentBL):
 
     def get_vote_link(self, _external=False):
         return url_for('news_comment.vote', news_id=self.model.newsitem.id, local_id=self.model.local_id, _external=_external)
+
+    def create(self, *args, **kwargs):
+        comment = super().create(*args, **kwargs)
+        later(current_app.tasks['notify_news_comment'].delay, comment.id)
+        return comment

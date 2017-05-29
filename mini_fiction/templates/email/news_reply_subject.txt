@@ -1,0 +1,1 @@
+{{ (comment.author_username or 'Гость')|safe }} ответил на ваш комментарий к новости «{{ newsitem.title|safe }}» — {{ SITE_NAME }}

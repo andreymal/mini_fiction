@@ -18,18 +18,29 @@
         </div>
 
         <!-- Вывод комментариев: начало -->
-        {% if comments_count > 0 %}
         <div id="comments">
             <h3>Комментарии (<span id="comments-count">{{ comments_count }}</span>)</h3>
+            {% if current_user.is_authenticated %}
+                <form method="POST" action="{{ url_for('news.comments_subscribe', name=newsitem.name) }}" class="subscription-form js-subscription-form">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+                    Получать новые:
+                    <label><input type="checkbox" name="email" value="1"{% if sub_comments.email %} checked{% endif %} /> в почте</label>
+                    <label><input type="checkbox" name="tracker" value="1"{% if sub_comments.tracker %} checked{% endif %} /> на сайте</label>
+                    <button type="submit" class="btn btn-mini js-subscription-form-submit">Сохранить</button>
+                </form>
+            {% endif %}
             <div id="comments-tree" class="comments-tree">
-                {% include 'includes/comments_tree.html' %}
+                {% if comments_count > 0 %}
+                    {%- include 'includes/comments_tree.html' -%}
+                {% endif %}
             </div>
 
             <div id="comments-pagination" class="pagination center">
-            {% include 'news/comments_pagination.html' %}
+            {% if comments_count > 0 %}
+                {%- include 'news/comments_pagination.html' -%}
+            {% endif %}
             </div>
         </div>
-        {% endif %}
 
         {% if newsitem.bl.can_comment_by(current_user) %}
             <a href="{{ url_for('news_comment.add', news_id=newsitem.id) }}" id="comment-add-link" class="comment-add-link">Добавить новый комментарий</a>

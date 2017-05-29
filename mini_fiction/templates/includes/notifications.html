@@ -100,6 +100,26 @@
     {% endcall %}
 </div>
 
+{%- elif item.type == 'news_reply' %}
+<div class="comment-item comment-item-short">
+    {% call nc.notification_comment_html(item.comment) %}
+        <span class="comment-newsitem-link">
+        в ответ на ваш комментарий к новости
+        <a href="{{ url_for('news.show', name=item.newsitem.name) }}"><b>{{ item.newsitem.title }}</b></a>
+        </span>
+    {% endcall %}
+</div>
+
+{%- elif item.type == 'news_comment' %}
+<div class="comment-item comment-item-short">
+    {% call nc.notification_comment_html(item.comment) %}
+        <span class="comment-newsitem-link">
+        к новости
+        <a href="{{ url_for('news.show', name=item.newsitem.name) }}"><b>{{ item.newsitem.title }}</b></a>
+        </span>
+    {% endcall %}
+</div>
+
 {%- else %}
     {{ item }}
     <div class="notification-meta">

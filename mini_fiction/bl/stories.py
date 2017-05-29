@@ -71,6 +71,9 @@ class StoryBL(BaseBL, Commentable):
                 is_author=True,
             ).flush()
 
+        story.bl.subscribe_to_comments(authors[0], email=True, tracker=True)
+        story.bl.subscribe_to_local_comments(authors[0], email=True, tracker=True)
+
         later(current_app.tasks['sphinx_update_story'].delay, story.id, ())
         return story
 

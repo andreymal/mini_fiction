@@ -398,11 +398,13 @@ class StoryBL(BaseBL, Commentable):
                 objs[user_id] = StoryContributor(
                     story=self.model,
                     user=user,
+                    visible=acc['is_author'] or acc.get('visible', False),
                     is_editor=acc['is_editor'],
                     is_author=acc['is_author'],
                 )
                 objs[user_id].flush()
             else:
+                objs[user_id].visible = acc['is_author'] or acc.get('visible', False)
                 objs[user_id].is_editor = acc['is_editor']
                 objs[user_id].is_author = acc['is_author']
 
@@ -412,9 +414,30 @@ class StoryBL(BaseBL, Commentable):
     # access control
 
     def get_contributors(self):
+        from mini_fiction.models import StoryContributor
+
         if self._contributors is None:
-            self._contributors = sorted(self.model.contributors, key=lambda x: x.id)
+            self._contributors = sorted(self.model.contributors.select().prefetch(StoryContributor.user), key=lambda x: x.id)
         return self._contributors
+
+    def get_contributors_for_view(self):
+        result = {
+            'betas': [],
+            'editors': [],
+            'authors': [],
+        }
+
+        for x in self.get_contributors():
+            if not x.visible and not x.is_author:
+                continue
+            if x.is_author:
+                result['authors'].append(x.user)
+            elif x.is_editor:
+                result['editors'].append(x.user)
+            else:
+                result['betas'].append(x.user)
+
+        return result
 
     def get_authors(self):
         return [x.user for x in self.get_contributors() if x.is_author]

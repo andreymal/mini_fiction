@@ -70,6 +70,7 @@ def view(pk, comments_page):
 
     data = {
         'story': story,
+        'contributors': story.bl.get_contributors_for_view(),
         'vote': user_vote,
         'comments_tree_list': comments_tree_list,
         'comments_count': comments_count,
@@ -363,11 +364,13 @@ def edit(pk):
                 if not acc_user:
                     error = 'Пользователь с ником {} не найден'.format(request.form.get('access_new_user') or 'N/A')
                     break
+                visible = request.form.get('visible_new') == '1'
             elif k.isdigit():
                 acc_user = Author.get(id=int(k))
                 if not acc_user:
                     error = 'Пользователь с id {} не найден'.format(k)
                     break
+                visible = request.form.get('visible_' + k) == '1'
             else:
                 continue
 
@@ -377,14 +380,14 @@ def edit(pk):
             if not v:
                 access[acc_user.id] = None
             elif v == 'beta':
-                access[acc_user.id] = {'is_editor': False, 'is_author': False}
+                access[acc_user.id] = {'is_editor': False, 'is_author': False, 'visible': visible}
             elif v == 'editor':
-                access[acc_user.id] = {'is_editor': True, 'is_author': False}
+                access[acc_user.id] = {'is_editor': True, 'is_author': False, 'visible': visible}
             elif v == 'author':
-                access[acc_user.id] = {'is_editor': True, 'is_author': True}
+                access[acc_user.id] = {'is_editor': True, 'is_author': True, 'visible': visible}
             elif v == 'author_readonly':
                 if current_user.is_staff:
-                    access[acc_user.id] = {'is_editor': False, 'is_author': True}
+                    access[acc_user.id] = {'is_editor': False, 'is_author': True, 'visible': visible}
             else:
                 error = 'Некорректное значение доступа {}'.format(v)
                 break

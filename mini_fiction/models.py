@@ -438,6 +438,7 @@ class StoryContributor(db.Entity):
 
     story = orm.Required(Story)
     user = orm.Required(Author)
+    visible = orm.Required(bool, default=False)  # На авторов не влияет, у них всегда True
     is_editor = orm.Required(bool, default=False)
     is_author = orm.Required(bool, default=False)
     created_at = orm.Required(datetime, 6, default=datetime.utcnow)

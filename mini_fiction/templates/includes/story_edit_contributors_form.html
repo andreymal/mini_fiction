@@ -21,13 +21,16 @@
                 <a class="authorlink" href="{{ url_for('author.info', user_id=contributor.user.id) }}">{{ contributor.user.username }}</a>
             </span>
             <span class="controls-contributors-access">
-                <select name="access_{{ contributor.user.id }}"{% if not current_user.is_staff and contributor.user.id == current_user.id %} disabled{% endif %}>
+                <select class="js-access-selector" name="access_{{ contributor.user.id }}"{% if not current_user.is_staff and contributor.user.id == current_user.id %} disabled{% endif %}>
                     <option value="">Нет доступа</option>
                     <option value="beta"{% if not contributor.is_editor and not contributor.is_author %} selected{% endif %}>Бета-читатель</option>
                     <option value="editor"{% if contributor.is_editor and not contributor.is_author %} selected{% endif %}>Редактор</option>
                     <option value="author"{% if contributor.is_editor and contributor.is_author %} selected{% endif %}>Автор (соавтор)</option>
                     {% if not contributor.is_editor and contributor.is_author %}<option value="author_readonly" selected>Автор (без доступа к редактированию)</option>{% endif %}
                 </select>
+            </span>
+            <span class="controls-contributors-visible">
+                <label><input class="js-visible-selector" type="checkbox" name="visible_{{ contributor.user.id }}" value="1"{% if contributor.visible %} checked{% endif %} /> Отображать в описании</label>
             </span>
         </div>{% endfor %}
 
@@ -36,11 +39,14 @@
                 <input type="text" name="access_new_user" placeholder="Ник пользователя" />
             </span>
             <span class="controls-contributors-access">
-                <select name="access_new">
+                <select class="js-access-selector" name="access_new">
                     <option value="beta" selected>Бета-читатель</option>
                     <option value="editor">Редактор</option>
                     <option value="author">Автор (соавтор)</option>
                 </select>
+            </span>
+            <span class="controls-contributors-visible">
+                <label><input class="js-visible-selector" type="checkbox" name="visible_new" value="1" /> Отображать в описании</label>
             </span>
         </div>
 

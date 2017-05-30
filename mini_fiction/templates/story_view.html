@@ -45,6 +45,16 @@
             </p>
 
         <p>Написал: {% include 'includes/story_authors_list.html' %}</p>
+        {% if contributors.editors -%}
+            <p>Редакторы: {% for u in contributors.editors -%}
+                <a class="authorlink" href="{{ url_for('author.info', user_id=u.id) }}">{{ u.username }}</a>{% if not loop.last %}, {% endif -%}
+            {% endfor %}</p>
+        {%- endif %}
+        {% if contributors.betas -%}
+            <p>Бета-читатели: {% for u in contributors.betas -%}
+                <a class="authorlink" href="{{ url_for('author.info', user_id=u.id) }}">{{ u.username }}</a>{% if not loop.last %}, {% endif -%}
+            {% endfor %}</p>
+        {%- endif %}
 
         <div class="story-description">{{ story.summary_as_html }}</div>
 

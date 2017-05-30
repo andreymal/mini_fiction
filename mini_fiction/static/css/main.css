@@ -1636,6 +1636,10 @@ a.btn {
     width: auto;
 }
 
+.controls-contributors-visible {
+    display: inline-block;
+}
+
 .controls-contributors-addlabel {
     width: 100px;
     margin-left: -100px;

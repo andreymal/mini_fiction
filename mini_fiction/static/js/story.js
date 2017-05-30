@@ -7,6 +7,7 @@ var story = {
     panel: null,
     contributorsForm: null,
     _contributorsSendEventBinded: null,
+    _contributorsChangeEventBinded: null,
 
     init: function() {
         // Каруселька со случайными рассказами
@@ -182,7 +183,12 @@ var story = {
 
     unload: function() {
         if (this.contributorsForm) {
+            var selects = this.contributorsForm.getElementsByClassName('js-access-selector');
+            for (var i = 0; i < selects.length; i++) {
+                selects[i].removeEventListener('change', this._contributorsChangeEventBinded);
+            }
             this.contributorsForm.removeEventListener('submit', this._contributorsSendEventBinded);
+            this._contributorsChangeEventBinded = null;
             this._contributorsSendEventBinded = null;
             this.contributorsForm = null;
         }
@@ -351,6 +357,13 @@ var story = {
 
         this._contributorsSendEventBinded = this._contributorsSendEvent.bind(this);
         this.contributorsForm.addEventListener('submit', this._contributorsSendEventBinded);
+
+        this._contributorsChangeEventBinded = this._contributorsChangeEvent.bind(this);
+        var selects = this.contributorsForm.getElementsByClassName('js-access-selector');
+        for (var i = 0; i < selects.length; i++) {
+            selects[i].addEventListener('change', this._contributorsChangeEventBinded);
+            this._updateContributorsSelect(selects[i]);
+        }
     },
 
     _contributorsSendEvent: function(event) {
@@ -381,12 +394,36 @@ var story = {
                 this.contributorsForm = newForm;
                 newForm.addEventListener('submit', this._contributorsSendEventBinded);
 
+                var selects = this.contributorsForm.getElementsByClassName('js-access-selector');
+                for (var i = 0; i < selects.length; i++) {
+                    selects[i].addEventListener('change', this._contributorsChangeEventBinded);
+                    this._updateContributorsSelect(selects[i]);
+                }
+
             }.bind(this)).then(null, function(err) {
                 this.contributorsForm.act.disabled = false;
                 core.handleError(err);
             }.bind(this));
 
         return false;
+    },
+
+    _contributorsChangeEvent: function(event) {
+        this._updateContributorsSelect(event.target);
+    },
+
+    _updateContributorsSelect: function(select) {
+        var field = select.parentNode.parentNode;
+        var visibleCheckbox = field.getElementsByClassName('js-visible-selector')[0];
+        if (!visibleCheckbox) {
+            return false;
+        }
+        if (select.value == 'author' || select.value === '') {
+            visibleCheckbox.parentNode.style.display = 'none';
+        } else {
+            visibleCheckbox.parentNode.style.display = '';
+        }
+        return true;
     },
 
     panelStuff: function() {

@@ -24,7 +24,13 @@
             url_for('object_lists.favorites', user_id=current_user.id),
             matched=is_current_endpoint('object_lists.favorites', user_id=current_user.id)
         ) }}
-        {{ nav_item(_('Bookmarks'), url_for('object_lists.bookmarks'), 'object_lists.bookmarks') }}{{ nav_item(
+        {{ nav_item(_('Bookmarks'), url_for('object_lists.bookmarks'), 'object_lists.bookmarks') }}
+        {{ nav_item(
+            _('Settings'),
+            url_for('author.edit'),
+            matched=is_current_endpoint('author.edit'),
+        ) }}
+        {{ nav_item(
             _('Profile'),
             url_for('author.info', user_id=current_user.id),
             matched=is_current_endpoint('author.info', user_id=current_user.id),

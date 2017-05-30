@@ -290,7 +290,6 @@ class Story(db.Entity):
     bl = Resource('bl.story')
 
     def before_update(self):
-        self.updated = datetime.utcnow()
         vote_average_index = round(self.vote_average * 100)
         if vote_average_index != self.vote_average_index:
             self.vote_average_index = vote_average_index
@@ -380,10 +379,6 @@ class Chapter(db.Entity):
     bl = Resource('bl.chapter')
 
     chapter_views_set = orm.Set('StoryView')
-
-    def before_update(self):
-        self.updated = datetime.utcnow()
-        self.story.updated = datetime.utcnow()  # for downloading
 
     def get_absolute_url(self):
         return url_for('chapter.view_single', story_id=self.story.id, order=self.order)

@@ -139,6 +139,8 @@ class StoryBL(BaseBL, Commentable):
                 story.classifications.clear()
                 story.classifications.add(Classifier.select(lambda x: x.id in data['classifications'])[:])
 
+        if edited_data:
+            story.updated = datetime.utcnow()
         if editor and edited_data:
             self.edit_log(editor, edited_data)
 
@@ -763,6 +765,7 @@ class ChapterBL(BaseBL):
         self._update_words_count(chapter)
         chapter.flush()
         chapter.bl.edit_log(editor, 'add', {}, text_md5=chapter.text_md5)
+        story.updated = datetime.utcnow()
         later(current_app.tasks['sphinx_update_chapter'].delay, chapter.id)
         return chapter
 
@@ -824,7 +827,10 @@ class ChapterBL(BaseBL):
             chapter.text_md5 = md5(text.encode('utf-8')).hexdigest()
             self._update_words_count(chapter)
 
-        chapter.bl.edit_log(editor, 'edit', edited_data, chapter_text_diff=chapter_text_diff, text_md5=chapter.text_md5)
+        if edited_data or chapter_text_diff:
+            chapter.updated = datetime.utcnow()
+            chapter.story.updated = datetime.utcnow()
+            chapter.bl.edit_log(editor, 'edit', edited_data, chapter_text_diff=chapter_text_diff, text_md5=chapter.text_md5)
 
         later(current_app.tasks['sphinx_update_chapter'].delay, chapter.id)
         return chapter
@@ -852,6 +858,8 @@ class ChapterBL(BaseBL):
 
         for c in Chapter.select(lambda x: x.story == story and x.order > old_order):
             c.order = c.order - 1
+
+        story.updated = datetime.utcnow()
 
     def get_version(self, text_md5=None, log_item=None):
         from mini_fiction.models import StoryLog
@@ -934,6 +942,9 @@ class ChapterBL(BaseBL):
 
         if not story.draft and story.published and not chapter.first_published_at:
             chapter.first_published_at = datetime.utcnow()
+
+        # Это необходимо, пока архивы для скачивания рассказа обновляются по этой дате
+        story.updated = datetime.utcnow()
 
         later(current_app.tasks['sphinx_update_chapter'].delay, chapter.id)
 

@@ -677,6 +677,10 @@ label.gen input {
     color: green;
 }
 
+.on-moderation {
+    color: #ff7700;
+}
+
 .incomplete, .draft {
     color: #f2c200;
 }

@@ -15,7 +15,7 @@ def build_comment_tree_response(comment, target_attr, target):
         'includes/comments_tree.html',
         **{
             target_attr: target,
-            'comments_tree_list': [[comment, False]]
+            'comments_tree_list': [[comment, False, 0, 0]]
         }
     )
     return jsonify({
@@ -234,7 +234,7 @@ def ajax(target_attr, target, link, page, per_page, template_pagination, last_vi
 
     maxdepth = None if request.args.get('fulltree') == '1' else calc_maxdepth(current_user)
 
-    comments_count, paged, comments_tree_list = target.bl.paginate_comments(page, per_page, maxdepth)
+    comments_count, paged, comments_tree_list = target.bl.paginate_comments(page, per_page, maxdepth, last_viewed_comment=last_viewed_comment)
     if not comments_tree_list and paged.number != 1:
         abort(404)
 
@@ -273,6 +273,7 @@ def ajax_tree(target_attr, comment, target=None, last_viewed_comment=None):
         maxdepth=None,
         root_offset=comment.root_order,
         root_count=1,
+        last_viewed_comment=last_viewed_comment,
     )
 
     # Ищем начало нужной ветки

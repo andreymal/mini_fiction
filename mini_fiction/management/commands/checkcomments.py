@@ -8,7 +8,7 @@ from mini_fiction.models import Story, NewsItem
 
 def check_comments_tree(tree, depth=0, root_order=0, parent_id=None):
     for i, x in enumerate(tree):
-        comment, childtree = x
+        comment, childtree, _, _ = x
         # Проверка корректности работы get_comments_tree() на всякий случай
         if depth == 0:
             assert comment.parent is None

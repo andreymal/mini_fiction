@@ -36,13 +36,27 @@ class Commentable(object):
         result = result.order_by('c.id')
         return result[:]
 
-    def get_comments_tree(self, maxdepth=None, root_offset=None, root_count=None):
+    def get_comments_tree(self, maxdepth=None, root_offset=None, root_count=None, last_viewed_comment=None):
         tree = []
         comments_dict = {}
-        comments = self.get_comments_list(maxdepth, root_offset, root_count)
+        comments = self.get_comments_list(None, root_offset, root_count)  # maxdepth=None для подсчёта числа вложенных комментов
 
         for c in comments:
-            item = [c, []]
+            # Проставляем счётчики вложенных комментов по всей ветке выше
+            p = c.parent
+            while p:
+                if p.id in comments_dict:
+                    comments_dict[p.id][2] += 1
+                    if last_viewed_comment is not None and last_viewed_comment < c.id:
+                        comments_dict[p.id][3] += 1
+                p = p.parent
+            del p
+
+            # Если столь глубокий коммент у нас не просили, не добавляем его в ветку
+            if maxdepth is not None and c.tree_depth > maxdepth:
+                continue
+
+            item = [c, [], 0, 0]  # [сам коммент, ответы, число всех вложенных комментов, число вложенных непросмотренных]
             comments_dict[c.id] = item
             if c.parent is None or c.parent.id not in comments_dict:
                 tree.append(item)
@@ -51,10 +65,10 @@ class Commentable(object):
 
         return tree
 
-    def get_comments_tree_list(self, maxdepth=None, root_offset=None, root_count=None):
-        return self._comments_tree_iter(self.get_comments_tree(maxdepth, root_offset, root_count))
+    def get_comments_tree_list(self, maxdepth=None, root_offset=None, root_count=None, last_viewed_comment=None):
+        return self._comments_tree_iter(self.get_comments_tree(maxdepth, root_offset, root_count, last_viewed_comment=last_viewed_comment))
 
-    def paginate_comments(self, comments_page=1, per_page=25, maxdepth=None):
+    def paginate_comments(self, comments_page=1, per_page=25, maxdepth=None, last_viewed_comment=None):
         target = self.model  # pylint: disable=e1101
 
         comments_count = target.comments.select().count()
@@ -72,7 +86,8 @@ class Commentable(object):
         comments_tree_list = target.bl.get_comments_tree_list(
             maxdepth=maxdepth,
             root_offset=per_page * (paged.number - 1),
-            root_count=per_page
+            root_count=per_page,
+            last_viewed_comment=last_viewed_comment,
         )
 
         return comments_count, paged, comments_tree_list
@@ -80,7 +95,7 @@ class Commentable(object):
     def _comments_tree_iter(self, tree):
         result = []
         for x in tree:
-            result.append((x[0], len(x[1]) > 0))
+            result.append((x[0], len(x[1]) > 0, x[2], x[3]))
             if x[1]:
                 result.extend(self._comments_tree_iter(x[1]))
         return result

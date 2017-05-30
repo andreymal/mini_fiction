@@ -1,5 +1,5 @@
 {% from 'macro.html' import comment_html with context %}
-{% for comment, has_next_tree in comments_tree_list %}
+{% for comment, has_next_tree, nested_cnt, new_nested_cnt in comments_tree_list %}
     <div id="{{ comment.local_id -}}
         " data-global-id="{{ comment.id -}}
         " data-parent="{{ comment.parent.local_id if comment.parent else '' -}}
@@ -17,7 +17,7 @@
 
     {% if comment.answers_count > 0 and not has_next_tree %}
         <div class="comment-tree-loader" id="comment_tree_{{ comment.local_id }}" style="margin-left: {{ comment.tree_depth + 1 }}%" data-ajax-href="{{ comment.bl.get_tree_link() }}{{ '?last_comment={}'.format(last_viewed_comment) if last_viewed_comment else '' }}">
-            <a href="?fulltree=1#{{ comment.local_id }}" data-for="{{ comment.local_id }}" class="comment-tree-loader-link">Загрузить ветку</a>
+            <a href="?fulltree=1#{{ comment.local_id }}" data-for="{{ comment.local_id }}" class="comment-tree-loader-link">Загрузить ветку ({{ nested_cnt }}{% if new_nested_cnt > 0 %}+{{ new_nested_cnt }}{% endif %})</a>
         </div>
     {% endif %}
 {% else %}

@@ -37,10 +37,10 @@ def view(pk, comments_page):
     per_page = current_app.config['COMMENTS_COUNT']['page']
     maxdepth = None if request.args.get('fulltree') == '1' else calc_maxdepth(current_user)
 
-    comments_count, paged, comments_tree_list = story.bl.paginate_comments(comments_page, per_page, maxdepth)
+    last_viewed_comment = story.bl.last_viewed_comment_by(user)
+    comments_count, paged, comments_tree_list = story.bl.paginate_comments(comments_page, per_page, maxdepth, last_viewed_comment=last_viewed_comment)
     if not comments_tree_list and paged.number != 1:
         abort(404)
-    last_viewed_comment = story.bl.last_viewed_comment_by(user)
 
     act = None
     if user.is_authenticated:

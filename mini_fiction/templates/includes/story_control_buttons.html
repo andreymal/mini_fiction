@@ -27,7 +27,10 @@
                 <li><a href="{{ url_for('story.pin', pk=story.id) }}" class="story_pin">{{ 'Открепить' if story.pinned else 'Закрепить на главной' }}</a></li>
             {% endif %}
             {% if story.bl.deletable_by(current_user) %}
+                {#
                 <li><a class="story_delete" href="{{ url_for('story.delete', pk=story.id) }}">Удалить</a></li>
+                #}
+                <li><a class="story_delete" href="{{ url_for('story.view', pk=story.id) }}">Удаления нет, но вы держитесь</a></li>
             {% endif %}
             {% if story.bl.can_view_editlog(current_user) %}
                 <li><a href="{{ url_for('story.edit_log', pk=story.id) }}">{{ _('Edit log') }}</a></li>

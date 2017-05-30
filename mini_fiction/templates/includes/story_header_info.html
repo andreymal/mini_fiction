@@ -1,3 +1,3 @@
-<span class="starblock" title="{% if story.bl.can_show_stars() %}Средняя оценка: {{ '{:.1f}'.format(story.vote_average) }}{% else %}Голосов ещё мало{% endif %}">
+<span class="starblock" title="{% if story.bl.can_show_stars() %}Средняя оценка: {{ '{:.1f}'.format(story.vote_average) }}; {{ ngettext('%(num)d vote', '%(num)d votes', story.vote_total) }}{% else %}Голосов ещё мало{% endif %}">
     {% for star in story.bl.stars() %}<span class="starvote star-{{ star }}"></span>{% endfor %}
 </span>

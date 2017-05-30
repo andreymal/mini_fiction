@@ -364,7 +364,7 @@ class Chapter(db.Entity):
     notes = orm.Optional(orm.LongStr)
     order = orm.Required(int, size=16, unsigned=True, default=1)
     title = orm.Required(str, 512)
-    text = orm.Optional(orm.LongStr)
+    text = orm.Optional(orm.LongStr, autostrip=False)
     text_md5 = orm.Required(str, 32, default='d41d8cd98f00b204e9800998ecf8427e')
     updated = orm.Required(datetime, 6, default=datetime.utcnow)
     words = orm.Required(int, default=0)

@@ -749,7 +749,7 @@ class ChapterBL(BaseBL):
 
         new_order = orm.select(orm.max(x.order) for x in Chapter if x.story == story).first()
 
-        text = data['text'].replace('\r', '')
+        text = data['text'].replace('\r', '').strip()
 
         chapter = self.model(
             story=story,
@@ -807,7 +807,7 @@ class ChapterBL(BaseBL):
             edited_data['notes'] = [chapter.notes, data['notes']]
             chapter.notes = data['notes']
 
-        text = data['text'].replace('\r', '') if 'text' in data else None
+        text = data['text'].replace('\r', '').strip() if 'text' in data else None
 
         if 'text' in data and text != chapter.text:
             if len(chapter.text) <= current_app.config['MAX_SIZE_FOR_DIFF'] and len(text) <= current_app.config['MAX_SIZE_FOR_DIFF']:

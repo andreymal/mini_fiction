@@ -66,16 +66,16 @@
 
                 {% if not story.first_published_at or current_user.is_staff or story.bl.is_contributor(current_user) %}
                     Создан: <time datetime="{{ story.date.strftime('%Y-%m-%dT%H:%M:%SZ') }}">
-                        {{- story.date|datetimeformat('d.MM.Y') -}}
+                        {{- story.date|datetimeformat('d MMMM Y') -}}
                     </time>
-                    {%- if not story.first_published_at %}, последнее изменение – <time datetime="{{ story.updated.strftime('%Y-%m-%dT%H:%M:%SZ') }}">
+                    {%- if not story.first_published_at %}, последнее изменение – <time datetime="{{ story.updated.strftime('%Y-%m-%dT%H:%M:%SZ') }}" title="{{ story.updated|datetimeformat('d MMMM Y, HH:mm') }}">
                         {{- story.updated|timedeltaformat }} назад
                     </time>{% endif %}<br/>
                 {% endif %}
                 {% if story.first_published_at %}
                     Опубликован: <time datetime="{{ story.first_published_at.strftime('%Y-%m-%dT%H:%M:%SZ') }}">
-                        {{- story.first_published_at|datetimeformat('d.MM.Y') -}}
-                    </time>, последнее изменение – <time datetime="{{ story.updated.strftime('%Y-%m-%dT%H:%M:%SZ') }}">
+                        {{- story.first_published_at|datetimeformat('d MMMM Y') -}}
+                    </time>, последнее изменение – <time datetime="{{ story.updated.strftime('%Y-%m-%dT%H:%M:%SZ') }}" title="{{ story.updated|datetimeformat('d MMMM Y, HH:mm') }}">
                         {{- story.updated|timedeltaformat }} назад
                     </time><br/>
                 {%- endif -%}

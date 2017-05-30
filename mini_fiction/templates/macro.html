@@ -114,7 +114,7 @@
             </span>
 
             <time class="comment-time" datetime="{{ comment.date.strftime('%Y-%m-%dT%H:%M:%SZ') }}">
-                {{ comment.date|timedeltaformat }} назад
+                {{ comment.date|datetimeformat('d MMMM Y, HH:mm') }}
             </time>
 
             {% if not short %}

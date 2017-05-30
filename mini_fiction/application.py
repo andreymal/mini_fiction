@@ -6,6 +6,7 @@
 import os
 import logging
 import importlib
+from datetime import datetime
 from logging.handlers import SMTPHandler
 
 import jinja2
@@ -101,7 +102,15 @@ def configure_users(app):
 
     @app.login_manager.user_loader
     def load_user(user_id):
-        return models.Author.get(id=int(user_id), is_active=1)
+        user = models.Author.get(id=int(user_id), is_active=1)
+        if not user:
+            return
+
+        tm = datetime.utcnow()
+        if not user.last_visit or (tm - user.last_visit).total_seconds() >= 60:
+            user.last_visit = tm
+
+        return user
 
 
 def templates_context():

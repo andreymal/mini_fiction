@@ -1,6 +1,8 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
+from datetime import datetime
+
 from flask import Blueprint, current_app, request, render_template, redirect, url_for, flash
 from flask_babel import gettext
 from flask_login import login_user, logout_user
@@ -29,6 +31,7 @@ def login():
         except ValidationError as exc:
             form.set_errors(exc.errors)
         else:
+            user.last_visit = datetime.utcnow()
             next_url = request.args.get('next')
             if not next_url or len(next_url) < 2 or next_url[0] != '/' or next_url.startswith('//'):
                 next_url = url_for('index.index')

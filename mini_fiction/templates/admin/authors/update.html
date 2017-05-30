@@ -19,6 +19,22 @@
         {% endif %}
 
         <form class="form-horizontal" method="POST" enctype="multipart/form-data">
+        <div class="control-group">
+            <label class="control-label">{{ _('Registered at') }}</label>
+            <div class="controls">
+                <span style="display: inline-block; padding-top: 5px;">{% if author.date_joined %}<time datetime="{{ author.date_joined.strftime('%Y-%m-%dT%H:%M:%SZ') }}">
+                    {{ author.date_joined|datetimeformat('d MMMM Y, HH:mm') }}
+                </time>{% else %}N/A{% endif %}</span>
+            </div>
+        </div>
+        <div class="control-group">
+            <label class="control-label">{{ _('Last visit') }}</label>
+            <div class="controls">
+                <span style="display: inline-block; padding-top: 5px;">{% if author.last_visit %}<time datetime="{{ author.last_visit.strftime('%Y-%m-%dT%H:%M:%SZ') }}">
+                    {{ author.last_visit|datetimeformat('d MMMM Y, HH:mm') }}
+                </time>{% else %}N/A{% endif %}</span>
+            </div>
+        </div>
         {{ form_fields(form) }}
         <div class="controls">
             <input type="submit" value="{{ _('Save') }}" class="btn btn-primary" />

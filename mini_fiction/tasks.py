@@ -204,7 +204,7 @@ def notify_story_comment(comment_id):
     sendto = set()
     for sub in subs:
         user = sub.user
-        if user.id == comment.author.id:
+        if comment.author and user.id == comment.author.id:
             continue
 
         # Не забываем про проверку доступа
@@ -262,7 +262,7 @@ def notify_story_lcomment(comment_id):
     sendto = set()
     for sub in subs:
         user = sub.user
-        if user.id == comment.author.id:
+        if comment.author and user.id == comment.author.id:
             continue
 
         # Не забываем про проверку доступа
@@ -310,7 +310,7 @@ def notify_news_comment(comment_id):
     sendto = set()
     for sub in subs:
         user = sub.user
-        if user.id == comment.author.id:
+        if comment.author and user.id == comment.author.id:
             continue
 
         if sub.to_tracker:

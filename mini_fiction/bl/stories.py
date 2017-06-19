@@ -419,7 +419,7 @@ class StoryBL(BaseBL, Commentable):
         from mini_fiction.models import StoryContributor
 
         if self._contributors is None:
-            self._contributors = sorted(self.model.contributors.select().prefetch(StoryContributor.user), key=lambda x: x.id)
+            self._contributors = sorted(self.model.contributors, key=lambda x: x.id)
         return self._contributors
 
     def get_contributors_for_view(self):

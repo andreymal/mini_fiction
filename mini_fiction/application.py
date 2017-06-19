@@ -35,6 +35,8 @@ def create_app():
     else:
         os.environ.setdefault('MINIFICTION_SETTINGS', 'mini_fiction.settings.Development')
 
+    logging.basicConfig(level=logging.INFO, format='%(message)s')
+
     app = Flask(__name__)
     app.config.from_object(os.environ.get('MINIFICTION_SETTINGS'))
     app.static_folder = app.config['STATIC_ROOT']

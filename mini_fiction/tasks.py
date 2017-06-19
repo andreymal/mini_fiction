@@ -135,6 +135,7 @@ def _notify(to, typ, target, by=None, extra=None):
             caused_by_user=by,
             extra=json.dumps(extra or {}, ensure_ascii=False, sort_keys=True),
         ))
+        current_app.cache.delete('bell_{}'.format(x.id))
     return result
 
 

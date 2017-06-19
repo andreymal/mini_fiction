@@ -597,7 +597,12 @@ class AuthorBL(BaseBL):
 
     def get_unread_notifications_count(self):
         user = self.model
-        return user.notifications.filter(lambda x: x.id > user.last_viewed_notification_id).count()
+        cnt = current_app.cache.get('bell_{}'.format(user.id))
+        if cnt is not None:
+            return cnt
+        cnt = user.notifications.filter(lambda x: x.id > user.last_viewed_notification_id).count()
+        current_app.cache.set('bell_{}'.format(user.id), cnt, 600)
+        return cnt
 
     def get_notifications(self, older=None, offset=0, count=100):
         from mini_fiction.models import Notification, Story, StoryComment, StoryLocalThread, StoryLocalComment, NewsComment
@@ -735,6 +740,8 @@ class AuthorBL(BaseBL):
 
         if nid > user.last_viewed_notification_id:
             user.last_viewed_notification_id = nid
+
+        current_app.cache.delete('bell_{}'.format(user.id))
 
     def get_subscription(self, typ, target_id):
         from mini_fiction.models import Subscription

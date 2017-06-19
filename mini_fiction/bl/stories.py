@@ -956,13 +956,19 @@ class ChapterBL(BaseBL):
 
         chapter = self.model
         story = chapter.story
+
+        story_view = view = StoryView.select(lambda x: x.story == story and x.author == user).first()
         view = StoryView.get(story=story, chapter=chapter, author=user)
+
         if not view:
             view = StoryView(
                 story=story,
                 chapter=chapter,
                 author=user,
             )
+            chapter.views += 1
+            if not story_view:
+                story.views += 1
         return view
 
     def add_chapters_to_search(self, chapters):

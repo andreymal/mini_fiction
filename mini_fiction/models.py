@@ -261,6 +261,7 @@ class Story(db.Entity):
     summary = orm.Required(orm.LongStr, lazy=False)
     updated = orm.Required(datetime, 6, default=datetime.utcnow)
     words = orm.Required(int, default=0)
+    views = orm.Required(int, default=0)
     vote_total = orm.Required(int, unsigned=True, default=0)
     vote_average = orm.Required(float, default=3)
     vote_average_index = orm.Required(int, size=16, unsigned=True, default=300)  # float can't be used with composite_index
@@ -305,13 +306,6 @@ class Story(db.Entity):
     @property
     def published(self):
         return bool(self.approved and not self.draft)
-
-    # Количество просмотров
-    @property
-    def views(self):
-        # orm.count() uses DISTINCT
-        # TODO: refactor to field
-        return orm.select(orm.count(x.author) for x in StoryView if x.story == self).first()
 
     @classmethod
     def select_published(cls):
@@ -368,6 +362,7 @@ class Chapter(db.Entity):
     text_md5 = orm.Required(str, 32, default='d41d8cd98f00b204e9800998ecf8427e')
     updated = orm.Required(datetime, 6, default=datetime.utcnow)
     words = orm.Required(int, default=0)
+    views = orm.Required(int, default=0)
     # Глава опубликована только при draft=False и story_published=True
     draft = orm.Required(bool, default=True)
     story_published = orm.Required(bool)  # optimization of stream pages
@@ -394,11 +389,6 @@ class Chapter(db.Entity):
         if not allow_draft:
             q = q.filter(lambda x: not x.draft)
         return q.first()
-
-    # Количество просмотров
-    @property
-    def views(self):
-        return orm.select(orm.count(x.author) for x in StoryView if x.story == self.story and x.chapter == self).first()
 
     notes_as_html = filtered_html_property('notes', filter_html)
 

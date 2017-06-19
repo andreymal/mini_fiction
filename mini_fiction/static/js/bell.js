@@ -4,9 +4,14 @@
 
 
 var bell = {
+    _storageEventBind: null,
     _updaterInterval: null,
 
     load: function() {
+        if (!this._storageEventBind) {
+            this._storageEventBind = this._storageEvent.bind(this);
+            window.addEventListener('storage', this._storageEventBind);
+        }
 
         var link = document.getElementById('nav-icon-bell');
         if (!link) {
@@ -18,7 +23,7 @@ var bell = {
         }
 
         if (this._updaterInterval === null) {
-            this._updaterInterval = setInterval(this.reloadUnreadCount.bind(this), 30000);
+            this._updaterInterval = setInterval(this.reloadUnreadCount.bind(this), 15000);
         }
 
         link.addEventListener('click', function(event) {
@@ -75,7 +80,15 @@ var bell = {
         link.parentNode.classList.remove('active');
     },
 
-    reloadUnreadCount: function() {
+    reloadUnreadCount: function(force) {
+        if (!force && window.localStorage) {
+            var tm = Date.now();
+            if (localStorage.mfBellLastRequest && (tm - parseInt(localStorage.mfBellLastRequest, 10)) < 14000) {
+                return false;
+            }
+            localStorage.mfBellLastRequest = tm.toString();
+        }
+
         core.ajax.fetch('/notifications/unread_count/')
             .then(function(response) {
                 return response.json();
@@ -90,9 +103,11 @@ var bell = {
             }).then(null, function(err) {
                 console.error(err);
             });
+
+        return true;
         },
 
-    setUnreadCount: function(count) {
+    setUnreadCount: function(count, noEmit) {
         var link = document.getElementById('nav-icon-bell');
         if (!link) {
             return;
@@ -104,6 +119,10 @@ var bell = {
 
         cntitem.textContent = count.toString();
         cntitem.style.display = count > 0 ? '' : 'none';
+
+        if (!noEmit && window.localStorage) {
+            localStorage.mfBellUnreadCount = count.toString();
+        }
     },
 
     setViewed: function(lastId) {
@@ -125,6 +144,15 @@ var bell = {
             }).then(null, function(err) {
                 console.error(err);
             });
+    },
+
+    _storageEvent: function(event) {
+        if (event.key != 'mfBellUnreadCount') {
+            return;
+        }
+        if (event.newValue !== null) {
+            this.setUnreadCount(parseInt(event.newValue, 10), true);
+        }
     }
 };
 

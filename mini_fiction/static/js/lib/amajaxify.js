@@ -1,50 +1,67 @@
 /*!
- * amajaxify.js (2017-05)
+ * amajaxify.js (2017-06)
  * License: MIT
  * Библиотека для загрузки загрузки страниц и отправки форм с помощью
  * ES6 fetch и HTML5 History API для разных ништяков.
  * В отличие от аналогов вроде PJAX требует изменений на сервере, но зато
  * немного экономит трафик, гибче и поддерживает модальные окна.
- *
- * Генерирует следующие события на объекте document:
- *
- * - amajaxify:beginrequest(detail={method, url})
- *   Непосредственно перед отправкой запроса на сервер
- *
- * - amajaxify:unload(detail={url, content, toModal})
- *   Перед удалением старого содержимого страницы и загрузкой нового.
- *   В объекте event.detail передаётся инфfормация о будущем контенте
- *
- * - amajaxify:prepare(detail={url, content, toModal, preparedContent})
- *   Вызывается после amajaxify:unload и перед amajaxify:load; позволяет
- *   пропатчить ответ сервера по необходимости. Обработчики должны записать
- *   новые значения page_content в объект preparedContent, а в объекте content
- *   хранится оригинальный ответ сервера, и его никто трогать не должен.
- *
- * - amajaxify:load(detail={url, content, toModal})
- *   После загрузки всего нового содержимого страницы
- *
- * - amajaxify:error(detail={url, response, exc})
- *   Вызывается при ошибке получения ответа от сервера (unload/prepare/load
- *   при этом не вызываются). Объект response является тем, что вернул fetch()
- *   и может отсутствовать.
- *
- * - amajaxify:endrequest(detail={method, url})
- *   После полного завершения обработки запроса, после всех остальных событий
- *   независимо от того, ошибка или нет
- *
- * События beginrequest и endrequest появляются только в случае отправки
- * запроса самим amajaxify; если был вызван handlePageData напрямую, то
- * остаются только события unload/prepare/load.
- *
- * В случае закрытия модального окна без перезагрузки основного контента
- * страницы ничего кроме updateModalFunc(null) не вызывается.
  */
 
 
 'use strict';
 
-
+/**
+ * Собственно главный и единственный модуль.
+ *
+ * Когда инициализирован, генерирует следующие события на объекте document:
+ *
+ * - `amajaxify:beginrequest(detail={method, url})`
+ *
+ *   Непосредственно перед отправкой запроса на сервер
+ *
+ * - `amajaxify:unload(detail={url, content, toModal})`
+ *
+ *   Перед удалением старого содержимого страницы и загрузкой нового.
+ *   В объекте event.detail передаётся инфfормация о будущем контенте.
+ *   toModal содержит будущее состояние модального окна; чтобы узнать текущее
+ *   состояние (отображается ли модальное окно прямо сейчас, ещё перед
+ *   выгрузкой старого содержимого), можно использовать метод isModalNow.
+ *
+ * - `amajaxify:prepare(detail={url, content, toModal, preparedContent})`
+ *
+ *   Вызывается после `amajaxify:unload` и перед `amajaxify:load;` позволяет
+ *   пропатчить ответ сервера по необходимости. Обработчики должны записать
+ *   новые значения page_content в объект preparedContent, а в объекте content
+ *   хранится оригинальный ответ сервера, и его никто трогать не должен.
+ *   На данный момент toModal всегда false; перед запуском события модальное
+ *   окно, если оно было, закрывается, поэтому метод isModalNow тоже всегда
+ *   возвращает false.
+ *
+ * - `amajaxify:load(detail={url, content, toModal})`
+ *
+ *   После загрузки всего нового содержимого страницы. toModal совпадает с
+ *   isModalNow
+ *
+ * - `amajaxify:error(detail={url, response, exc})`
+ *
+ *   Вызывается при ошибке получения ответа от сервера (unload/prepare/load
+ *   при этом не вызываются). Объект response является тем, что вернул fetch,
+ *   и может отсутствовать.
+ *
+ * - `amajaxify:endrequest(detail={method, url})`
+ *
+ *   После полного завершения обработки запроса, после всех остальных событий
+ *   независимо от того, ошибка или нет
+ *
+ * События `beginrequest` и `endrequest` появляются только в случае отправки
+ * запроса самим amajaxify; если был вызван `handlePageData` напрямую, то
+ * остаются только события unload/prepare/load.
+ *
+ * В случае закрытия модального окна без перезагрузки основного контента
+ * страницы ничего кроме `updateModalFunc(null)` не вызывается.
+ *
+ * @module
+ */
 var amajaxify = {
     state: {
         v: null,
@@ -55,14 +72,55 @@ var amajaxify = {
         loadedScripts: [],
         lastId: 0
     },
-    modalSupport: false,
     allowScriptTags: false,
     scrollToTopFrom: 400,
+    maxLifetime: 3600,
 
     customFetch: null,
     updateModalFunc: null,
 
+    archiveHosts: ['web.archive.org', 'archive.is', 'archive.today', 'archive.li', 'archive.fo', 'peeep.us'],
 
+    // костыль для Safari по вычислению активной кнопки формы
+    _clickedBtn: null,
+    _clickedBtnTimer: null,
+
+
+    /**
+     * Инициализирует amajaxify: вешает обработчики, вызывает replaceState,
+     * всё такое. Возвращает true при успехе.
+     *
+     * @param {Object} [options] - дополнительные опции
+     * @param {boolean} [options.force=false] - при true игнорирует некоторые
+     *   ситуации, в которых лучше не запускаться, например, веб-архивы
+     * @param {boolean} [options.allowScriptTags=false] - позволяет скриптам
+     *   из HTML-кода, который прислал сервер, запускаться
+     * @param {number} [options.scrollToTopFrom=400] - минимальная прокрутка
+     *   по вертикали, при которой прокручивать обратно наверх после замены
+     *   содержимого страницы
+     * @param {Function} [options.updateModalFunc] - функция, которая будет
+     *   вызываться для запихивания HTML-кода модального окна на страницу
+     *   (после события unload и перед prepare и load), должна принимать один
+     *   аргумент: HTML-код (null означает закрытие модального окна)
+     * @param {Function} [options.customFetch] - своя функция fetch, которая
+     *   будет использоваться вместо window.fetch (пригодится для добавления
+     *   CSRF-токенов и подобного)
+     * @param {boolean} [options.bindWithjQuery=false] - использовать jQuery
+     *   для события onclick (решает некоторые проблемы с bootstrap)
+     * @param {boolean} [options.withoutClickHandler=false] - не перехватывать
+     *   нажатия на ссылки
+     * @param {boolean} [options.withoutSubmitHandler=false] - не перехватывать
+     *   отправку форм
+     * @param {boolean} [options.isModalNow=false] - позволяет указать,
+     *   является ли текущая страница модальным окном
+     * @param {number} [options.maxLifetime=3600] - максимальное время жизни
+     *   страницы, при превышении которого amajaxify отключится и позволит
+     *   следующему клику по ссылке перезагрузить страницу целиком
+     *   (в секундах, 0 отключает данное поведение)
+     * @returns {boolean}
+     *
+     * @method init
+     */
     init: function(options) {
         options = options || {};
 
@@ -72,8 +130,7 @@ var amajaxify = {
         }
 
         if (!options.force) {
-            var archiveHosts = ['web.archive.org', 'archive.is', 'archive.today', 'archive.li', 'archive.fo', 'peeep.us'];
-            if (archiveHosts.indexOf(location.hostname.toLowerCase()) >= 0) {
+            if (this.archiveHosts.indexOf(location.hostname.toLowerCase()) >= 0) {
                 console.log('amajaxify: Wayback Machine detected, AJAX disabled');
                 return false;
             }
@@ -82,7 +139,7 @@ var amajaxify = {
         this.state.initAt = new Date().getTime();
 
         // Иногда бывает надобно присылать в HTML-коде скрипты (какие-нибудь яндекс-карты, например)
-        this.allowScriptTags = options.allowScriptTags ? true : false;
+        this.allowScriptTags = !!options.allowScriptTags;
 
         // После обновления страницы она прокручивается до верха; данная опция позволяет не делать этого,
         // если страница прокручена вниз совсем чуть-чуть
@@ -90,15 +147,18 @@ var amajaxify = {
             this.scrollToTopFrom = options.scrollToTopFrom;
         }
 
+        if (options.maxLifetime !== undefined && options.maxLifetime !== null) {
+            this.maxLifetime = options.maxLifetime;
+        }
+
         this.customFetch = options.customFetch;
 
         if (options.updateModalFunc) {
             this.updateModalFunc = options.updateModalFunc;
-            this.modalSupport = true;
         }
 
         window.addEventListener('popstate', this._popstateEvent.bind(this));
-        if (window.FormData) {
+        if (window.FormData && !options.withoutSubmitHandler) {
             window.addEventListener('submit', this._submitEvent.bind(this));
         }
 
@@ -134,11 +194,25 @@ var amajaxify = {
     },
 
 
+    /**
+     * Инициализирован ли amajaxify.
+     *
+     * @returns {boolean}
+     *
+     * @method isEnabled
+     */
     isEnabled: function() {
         return this.state.enabled;
     },
 
 
+    /**
+     * Является ли текущая страница модальным окном.
+     *
+     * @returns {boolean}
+     *
+     * @method isModalNow
+     */
     isModalNow: function() {
         return this.state.isModalNow;
     },
@@ -146,7 +220,17 @@ var amajaxify = {
 
     /**
      * Подгружает контент страницы по ajax со всеми необходимыми действиями:
-     * history.pushState, unload/load, вот это вот всё.
+     * history.pushState, unload/load, вот это вот всё. Возвращает true, если
+     * запрос отправился.
+     *
+     * @param {string} method - HTTP-метод для отправки запроса
+     * @param {string} link - ссылка на подгружаемую страницу
+     * @param body - тело HTTP-запроса (скармливается в fetch как есть)
+     * @param {Object} [options] - опции, которые будут переданы в
+     *   handlePageData
+     * @returns {boolean}
+     *
+     * @method goto
      */
     goto: function(method, link, body, options) {
         if (!this.state.enabled) {
@@ -204,7 +288,47 @@ var amajaxify = {
     },
 
     /**
-     * Перехват кликов по любым ссылкам на странице
+     * Костыль для всяких старых Safari. Чтобы узнать, какую кнопку кликнули
+     * для отправки формы, перехватываем событие onclick и из него вызываем
+     * этот метод, который запомнит нам кликнутую кнопку, которую мы потом
+     * достанем в _submitEvent.
+     *
+     * Если обработчик кликов отключен опцией withoutClickHandler и
+     * linkClickHandler тоже никто не вызывает, вызывайте этот метод
+     * самостоятельно.
+     *
+     * @param {HTMLElement} btn - кнопка формы
+     *
+     * @method handleSubmitBtnWorkaround
+     */
+    handleSubmitBtnWorkaround: function(btn) {
+        if (
+            !btn ||
+            btn.tagName.toLowerCase() !== 'input' && btn.tagName.toLowerCase() !== 'button' ||
+            (btn.getAttribute('type') || '').toLowerCase() != 'submit'
+        ) {
+            this._clickedBtn = null;
+            if (this._clickedBtnTimer) {
+                clearTimeout(this._clickedBtnTimer);
+                this._clickedBtnTimer = null;
+            }
+            return;
+        }
+        this._clickedBtn = btn;
+        this._clickedBtnTimer = setTimeout(function() {
+            this._clickedBtn = null;
+            this._clickedBtnTimer = null;
+        }.bind(this), 100);
+    },
+
+    /**
+     * Перехват кликов по любым ссылкам на странице. Если вы отключили
+     * перехват опцией withoutClickHandler, можно вызывать этот метод
+     * самостоятельно, передавая объект события onclick.
+     *
+     * @param {object} event - событие onclick
+     *
+     * @method linkClickHandler
      */
     linkClickHandler: function(event) {
         if (event.isDefaultPrevented !== undefined && event.isDefaultPrevented()) {
@@ -223,9 +347,13 @@ var amajaxify = {
         // Ищем ссылку, по которой кликнули
         var target = event.target || event.srcElement;
         while (target && target.tagName.toLowerCase() != 'a' && target !== document.body) {
+            if (target.tagName.toLowerCase() == 'input' || target.tagName.toLowerCase() == 'button') {
+                // Отвлекаемся на костыль для Safari: вычисление кнопки, которой отправляют форму
+                this.handleSubmitBtnWorkaround(target);
+            }
             target = target.parentNode || parent.srcElement;
         }
-        if (!target || target == document.body) {
+        if (!target || target === document.body) {
             return;
         }
 
@@ -277,57 +405,60 @@ var amajaxify = {
         this.handlePageData(this.state.current.response.url, content, this.state.current.options);
     },
 
+    /**
+     * Обрабатывает указанные данные, обновляя страницу и вызывая события
+     * unload/prepare/load.
+     *
+     * Формат объекта content:
+     *
+     *     {
+     *     // при изменении этого значения в одном из запросов будет
+     *     // принудительно обновлена страница при следующем клике
+     *     "v": any,
+
+     *     // при наличии будет произведён переход на указанную страницу
+     *     // средствами браузера без всяких ajax (текущая страница
+     *     // выгрузится)
+     *     "replace": "ссылка",
+     *
+     *     // при наличии будет немедленно отправлен ajax-запрос на указанный
+     *     // адрес, а data, modal и title будут проигнорированы
+     *     "redirect": "ссылка",
+     *
+     *     // при наличии будет отображено модальное окно, считающееся
+     *     // полноценной страницей, а data проигнорирован; при его закрытии
+     *     // будет изменена адресная строка
+     *     "modal": "html-код",
+     *
+     *     // что на что заменить на странице
+     *     "data": {"id элемента": "html-код", ...},
+     *
+     *     // элементы, которые добавить в head; будут удалены при выгрузке
+     *     "head": "html-код",
+     *
+     *     // заголовок страницы (да, именно html-код ради &mdash; и прочего)
+     *     "title": "html-код",
+     *
+     *     // список ссылок к скриптам, которые надобно выполнить строго один раз
+     *     // (для скриптов, запускаемых при каждой перезагрузке страницы,
+     *     // используйте обычный тег <script> в "data")
+     *     "scripts": ["/path/to/script.js", ...],
+     *
+     *     // плюс что угодно ещё для обработки сторонними обработчиками
+     *     }
+     *
+     * @param {string} url - ссылка на страницу, от которой это содержимое
+     *   (будет запихнуто в адресную строку)
+     * @param {Object} content - содержимое страницы
+     * @param {Object} [options] - дополнительные опции
+     * @param {boolean} [options.replaceState=false] - использовать
+        replaceState вместо pushState для запихивания ссылки
+     * @param {boolean} [options.noScroll=false] - не прокручивать страницу
+     *   вверх независимо от значения scrollToTopFrom
+     *
+     * @method handlePageData
+     */
     handlePageData: function(url, content, options) {
-        /* Обрабатывает указанные данные, обновляя страницу и вызывая события
-        unload/prepare/load.
-
-        Формат объекта content:
-        {
-            // при изменении этого значения в одном из запросов будет
-            // принудительно обновлена страница при следующем клике
-            "v": any,
-
-            // при наличии будет произведён переход на указанную страницу
-            // средствами браузера без всяких ajax (текущая страница
-            // выгрузится)
-            "replace": "ссылка",
-
-            // при наличии будет немедленно отправлен ajax-запрос на указанный
-            // адрес, а data, modal и title будут проигнорированы
-            "redirect": "ссылка",
-
-            // при наличии будет отображено модальное окно, считающееся
-            // полноценной страницей, а data проигнорирован; при его закрытии
-            // будет изменена адресная строка
-            "modal": "html-код",
-
-            // что на что заменить на странице
-            "data": {"id элемента": "html-код", ...},
-
-            // элементы, которые добавить в head; будут удалены при выгрузке
-            "head": "html-код",
-
-            // заголовок страницы (да, именно html-код ради &mdash; и прочего)
-            "title": "html-код",
-
-            // список ссылок к скриптам, которые надобно выполнить строго один раз
-            // (для скриптов, запускаемых при каждой перезагрузке страницы,
-            // используйте обычный тег <script> в "data")
-            "scripts": ["/path/to/script.js", ...],
-
-            // плюс что угодно ещё для обработки сторонними обработчиками
-        }
-
-        options может содержать:
-        - replaceState (true/false) — если нужно заменить текущую сслыку
-          в истории, а не добавлять новую
-        - noScroll (true/false) — не прокручивать страницу вверх после
-          обновления страницы
-        - hash — какой установить location.hash после загрузки контента
-          (игнорируется для модального окна; # в начале писать не надо)
-
-        */
-
         if (content.replace) {
             // Сервер нас просит открыть страницу без ajax
             window.location = content.replace;
@@ -348,17 +479,13 @@ var amajaxify = {
             return;
         }
 
-        var toModal = content.modal && this.modalSupport;
-
-        // TODO: здесь не забыть:
-        // - csrftoken
-        // - popup (как modal, но не полноценная страница)
+        var toModal = !!(content.modal && this.updateModalFunc);
 
         this._linkAjaxDisableIfNeeded(content);
 
         if (toModal) {
             // Установка модального окна
-            this._dispatchEvent('amajaxify:unload', {url: url, content: content, toModal: toModal});
+            this._dispatchEvent('amajaxify:unload', {url: url, content: content, toModal: true});
 
             this.updateModalFunc(content.modal);
             this.state.isModalNow = true;
@@ -367,7 +494,7 @@ var amajaxify = {
             }
             this.updatePageState(url, content.title, options);
 
-            this._dispatchEvent('amajaxify:load', {url: url, content: content, toModal: toModal});
+            this._dispatchEvent('amajaxify:load', {url: url, content: content, toModal: true});
 
         } else if (content.modal) {
             // Установка модального окна обломилась
@@ -375,9 +502,9 @@ var amajaxify = {
 
         } else {
             // Установка обычного контента страницы
-            this._dispatchEvent('amajaxify:unload', {url: url, content: content, toModal: toModal});
+            this._dispatchEvent('amajaxify:unload', {url: url, content: content, toModal: false});
 
-            if (this.modalSupport) {
+            if (this.updateModalFunc) {
                 this.updateModalFunc(null);
             }
             this.state.isModalNow = false;
@@ -406,7 +533,7 @@ var amajaxify = {
                 }
             }
 
-            this._dispatchEvent('amajaxify:load', {url: url, content: readyContent, toModal: toModal});
+            this._dispatchEvent('amajaxify:load', {url: url, content: readyContent, toModal: false});
         }
     },
 
@@ -449,17 +576,14 @@ var amajaxify = {
             url = location.toString();
         }
 
-        if (options.hash && url.indexOf('#') < 0) {
-            url = url + '#' + options.hash;
-        }
-
         var state = {
             amajaxify: true,
             isModalNow: this.state.isModalNow,
             title: title
         };
 
-        // Тут такое дело: бэкенд через проксю не всегда не может опеределить, что
+        // Тут такое дело: на некоторых криво настроенных серверах
+        // бэкенд через проксю не всегда может опеределить, что
         // идёт https-запрос, и в X-Request-URL пихает http-ссылку. А параноик
         // старый Safari (в котором используется полифилл к fetch) ругается на
         // несоответствие протоколов, так что для него мы его обрежем
@@ -474,13 +598,8 @@ var amajaxify = {
         }
 
         var scrollTop = window.pageYOffset || document.documentElement.scrollTop || document.body.scrollTop;
-        if (!options.noScroll && !this.state.isModalNow) {
-            var elem = options.hash ? document.getElementById(options.hash) : null;
-            if (elem && elem.scrollIntoView) {
-                elem.scrollIntoView();
-            } else if (scrollTop >= this.scrollToTopFrom) {
-                window.scrollTo(0, 0);
-            }
+        if (!options.noScroll && !this.state.isModalNow && scrollTop >= this.scrollToTopFrom) {
+            window.scrollTo(0, 0);
         }
     },
 
@@ -495,7 +614,7 @@ var amajaxify = {
         }
 
         // Да и через часик обновить тоже не будет лишним
-        if (new Date().getTime() - this.state.initAt > 3600000) {
+        if (this.maxLifetime > 0 && (new Date().getTime() - this.state.initAt) > (this.maxLifetime * 1000)) {
             this.state.enabled = false;
         }
     },
@@ -548,7 +667,7 @@ var amajaxify = {
             // FIXME: при нажатии «Вперёд» при модальном окне контент не совпадает с ссылкой,
             // но без сохранения старого location не починить
             return;
-        } else if (!this.state.isModalNow && this.modalSupport) {
+        } else if (!this.state.isModalNow && this.updateModalFunc) {
             // Но прятать окна, не являющиеся страницами, в любом случае надо (NSFW-предупреждение, например)
             this.updateModalFunc(null);
         }
@@ -558,28 +677,72 @@ var amajaxify = {
         }
     },
 
-    /*
+    /**
+     * Метод, пытающийся выковырять актуальный input type=submit
+     */
+    _getSubmitButton: function(form) {
+        // Простейший случай: в современных браузерах есть :focus по мышке
+        // FIXME: для <input form="formid" /> за пределами формы не работает, разумеется
+        var submitButton = form.querySelector('input[type="submit"]:focus, button[type="submit"]:focus');
+        if (!submitButton) {
+            // Костыль для Safari: мы, возможно, перехватили кнопку ранее
+            // в событии onclick
+            // (что интересно, onclick вызывается и при нажатии Enter, когда
+            // фокус на текстовом поле)
+            submitButton = this._clickedBtn;
+        }
+        if (!submitButton) {
+            // Если форму отправляют клавишей Enter и onclick нам не помог,
+            // то нужно брать первую попавшуюся кнопку
+            submitButton = form.querySelector('input[type="submit"], button[type="submit"]');
+        }
+        return submitButton;
+    },
+
+    /**
      * Перехват отправки любой формы
      */
     _submitEvent: function(event) {
-        var form = event.target || event.srcElement;
-        if (form.getAttribute('data-noajax') == '1' || !this.state.enabled || event.defaultPrevented) {
+        if (event.defaultPrevented) {
             return;
+        }
+        var form = event.target || event.srcElement;
+        if (this.submitForm(form)) {
+            event.preventDefault();
+            return false;
+        }
+    },
+
+    /**
+     * Отправляет указанную форму через метод goto.
+     *
+     * Возвращает true при успехе.
+     *
+     * @param {HTMLElement} form - собственно отправляемая форма
+     * @param {HTMLElement} [submitButton] - кнопка type=submit, которая
+     *   запустила отправку этой формы (если известна)
+     * @returns {boolean}
+     *
+     * @method submitForm
+     */
+    submitForm: function(form, submitButton) {
+        if (form.getAttribute('data-noajax') == '1' || !this.state.enabled) {
+            return false;
         }
 
         var href = form.action || location.toString();
         var host = (location.origin || (location.protocol + '//' + location.host)) + '/';
         if (href.indexOf(host) !== 0) {
-            return;
+            return false;
+        }
+
+        if (!window.FormData) {
+            console.warn('amajaxify: cannot send ajax form because FormData is not available');
+            return false;
         }
 
         var formData = new FormData(form);
-        // Нам не предоставили способа получить нажатую кнопочку отправки, костыляем
-        // FIXME: для <input form="formid" /> за пределами формы не работает, разумеется
-        var submitButton = form.querySelector('input[type="submit"]:focus, button[type="submit"]:focus');
-        // Если форму отправляют клавишей Enter, то нужно брать первую попавшуюся кнопку
-        submitButton = submitButton || form.querySelector('input[type="submit"], button[type="submit"]');
-
+        submitButton = submitButton || this._getSubmitButton(form);
         if (submitButton && submitButton.name) {
             formData.append(submitButton.name, submitButton.value || '');
         }
@@ -588,18 +751,16 @@ var amajaxify = {
         if (method == 'GET') {
             if (formData.entries === undefined) {
                 // Ждём реализации в других браузерах
-                return;
+                return false;
             }
-            var started = href.indexOf('?') > 0;
+            var started = href.indexOf('?') >= 0;
             var i, entry;
             for (i = formData.entries(); !(entry = i.next()).done;) {
                 href += (started ? '&' : '?') + encodeURIComponent(entry.value[0]) + '=' + encodeURIComponent(entry.value[1]);
                 started = true;
             }
         }
-        this.goto(form.method, href, method != 'GET' ? formData : undefined);
-        event.preventDefault();
-        return false;
+        return this.goto(form.method, href, method != 'GET' ? formData : undefined);
     },
 
     setHead: function(head, onload) {

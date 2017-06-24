@@ -28,7 +28,7 @@ def initsphinx():
             Story.characters,
             Story.categories,
             Story.classifications,
-        )[:500])
+        )[:100])
         if not stories:
             break
 
@@ -48,7 +48,7 @@ def initsphinx():
     chapters = None
     count = Chapter.select().count()
     while True:
-        chapters = tuple(Chapter.select(lambda x: x.id > pk)[:50])
+        chapters = tuple(Chapter.select(lambda x: x.id > pk)[:10])
         if not chapters:
             break
 

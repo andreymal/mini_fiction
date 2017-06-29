@@ -41,7 +41,8 @@ def info(user_id=None, comments_page=1):
         author = Author.get(id=user_id)
         if not author:
             abort(404)
-        comments_list = StoryComment.select(lambda x: x.author == author and not x.deleted and x.story_published)
+        author_id = author.id  # обход утечки памяти
+        comments_list = StoryComment.select(lambda x: x.author.id == author_id and not x.deleted and x.story_published)
         comments_list = comments_list.order_by(StoryComment.id.desc())
         data['page_title'] = gettext('Author: {author}').format(author=author.username)
         stories = Story.bl.select_by_author(author, for_user=current_user)

@@ -179,11 +179,18 @@ class StoryBL(BaseBL, Commentable):
             if story.published and not story.first_published_at:
                 story.first_published_at = datetime.utcnow()
             later(current_app.tasks['sphinx_update_story'].delay, story.id, ('approved',))
-            for c in story.chapters:
-                c.story_published = story.published  # TODO: update Chapter where story = story.id
+
+            published_chapter_ids = []
+            for c in sorted(story.chapters, key=lambda c: c.order):
+                c.story_published = story.published
                 if story.published and not c.draft and not c.first_published_at:
                     c.first_published_at = datetime.utcnow()
+                    published_chapter_ids.append(c.id)
                 later(current_app.tasks['sphinx_update_chapter'].delay, c.id)
+
+            if published_chapter_ids:
+                later(current_app.tasks['notify_story_chapters'].delay, published_chapter_ids, user.id if user else None)
+
             for c in story.comments:  # TODO: update StoryComment where story = story.id
                 c.story_published = story.published
 
@@ -229,19 +236,27 @@ class StoryBL(BaseBL, Commentable):
                 if story.published and not story.first_published_at:
                     story.first_published_at = datetime.utcnow()
                 later(current_app.tasks['sphinx_update_story'].delay, story.id, ('draft',))
+
+                published_chapter_ids = []
                 for c in sorted(story.chapters, key=lambda c: c.order):
                     c.story_published = story.published
                     if story.published and not c.draft and not c.first_published_at:
                         c.first_published_at = datetime.utcnow()
+                        published_chapter_ids.append(c.id)
                     later(current_app.tasks['sphinx_update_chapter'].delay, c.id)
+
+                if published_chapter_ids:
+                    later(current_app.tasks['notify_story_chapters'].delay, published_chapter_ids, user.id if user else None)
+
                 for c in story.comments:
                     c.story_published = story.published
             return True
 
         return False
 
-    def publish_all_chapters(self):
+    def publish_all_chapters(self, user=None):
         story = self.model
+        published_chapter_ids = []
         for c in sorted(story.chapters, key=lambda x: x.order):
             if not c.draft:
                 continue
@@ -250,6 +265,10 @@ class StoryBL(BaseBL, Commentable):
             later(current_app.tasks['sphinx_update_chapter'].delay, c.id)
             if story.published and not c.first_published_at:
                 c.first_published_at = datetime.utcnow()
+                published_chapter_ids.append(c.id)
+
+        if published_chapter_ids:
+            later(current_app.tasks['notify_story_chapters'].delay, published_chapter_ids, user.id if user else None)
 
     def delete(self):
         story = self.model
@@ -644,6 +663,18 @@ class StoryBL(BaseBL, Commentable):
         else:
             return None
 
+    def get_subscription(self, user):
+        if not user or not user.is_authenticated:
+            return False
+        story = self.model
+        return user.bl.get_subscription('story_chapter', story.id)
+
+    def subscribe(self, user, email=None, tracker=None):
+        if not user or not user.is_authenticated:
+            return False
+        story = self.model
+        return user.bl.edit_subscription('story_chapter', story.id, email=email, tracker=tracker)
+
     def get_comments_subscription(self, user):
         if not user or not user.is_authenticated:
             return False
@@ -942,6 +973,7 @@ class ChapterBL(BaseBL):
 
         if not story.draft and story.published and not chapter.first_published_at:
             chapter.first_published_at = datetime.utcnow()
+            later(current_app.tasks['notify_story_chapters'].delay, [chapter.id], user.id if user else None)
 
         # Это необходимо, пока архивы для скачивания рассказа обновляются по этой дате
         story.updated = datetime.utcnow()

@@ -42,6 +42,16 @@
         </time>
     </div>
 
+{%- elif item.type == 'story_chapter' %}
+    В рассказе <a href="{{ url_for('story.view', pk=item.story.id) }}">«{{ item.story.title }}»</a>
+    опубликована новая глава <a href="{{ url_for('chapter.view', story_id=item.story.id, chapter_order=item.chapter.order) }}">«{{ item.chapter.title }}»</a>
+
+    <div class="notification-meta">
+        <time class="notification-time" datetime="{{ item.created_at.strftime('%Y-%m-%dT%H:%M:%SZ') }}">
+            {{ item.created_at|datetimeformat('d MMMM Y, HH:mm') }}
+        </time>
+    </div>
+
 {%- elif item.type == 'story_reply' %}
 <div class="comment-item comment-item-short">
     {% call nc.notification_comment_html(item.comment) %}

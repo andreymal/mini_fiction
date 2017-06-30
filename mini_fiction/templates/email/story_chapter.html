@@ -1,0 +1,16 @@
+{% extends 'email/base.html' %}
+{% import 'email/macro.html' as macro %}
+
+{% block body %}
+В рассказе {{ macro.storylink(story.id, story.title) }} {% if chapters|length > 1 -%}
+    {{ ngettext('%(num)d chapter was published', '%(num)d chapters were published', chapters|length) }}
+{%- else -%}
+    была опубликована глава
+{%- endif -%}:<br/>
+<br/>
+<ul>
+{% for chapter in chapters -%}
+  <li><a href="{{ url_for('chapter.view', story_id=story.id, chapter_order=chapter.order) }}" target="_blank"><b>{{ chapter.title }}</b></a> ({{ ngettext("%(num)d word", "%(num)d words", chapter.words) }})</li>
+{% endfor %}
+</ul>
+{% endblock %}

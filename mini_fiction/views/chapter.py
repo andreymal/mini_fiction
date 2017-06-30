@@ -82,7 +82,7 @@ def add(story_id):
             },
         )
         if request.form.get('act') == 'publish':
-            story.bl.publish_all_chapters()
+            story.bl.publish_all_chapters(user)
         return redirect(url_for('chapter.edit', pk=chapter.id))
     elif request.method == 'POST':
         not_saved = True

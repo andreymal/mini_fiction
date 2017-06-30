@@ -605,7 +605,7 @@ class AuthorBL(BaseBL):
         return cnt
 
     def get_notifications(self, older=None, offset=0, count=100):
-        from mini_fiction.models import Notification, Story, StoryComment, StoryLocalThread, StoryLocalComment, NewsComment
+        from mini_fiction.models import Notification, Story, Chapter, StoryComment, StoryLocalThread, StoryLocalComment, NewsComment
 
         user = self.model
 
@@ -617,12 +617,15 @@ class AuthorBL(BaseBL):
 
         # Группируем таргеты по типам, чтобы брать их одним sql-запросом
         story_ids = set()
+        chapter_ids = set()
         story_comment_ids = set()
         local_comment_ids = set()
         news_comment_ids = set()
         for n in items:
             if n.type in ('story_publish', 'story_draft'):
                 story_ids.add(n.target_id)
+            elif n.type == 'story_chapter':
+                chapter_ids.add(n.target_id)
             elif n.type in ('story_reply', 'story_comment'):
                 story_comment_ids.add(n.target_id)
             elif n.type in ('story_lreply', 'story_lcomment'):
@@ -636,6 +639,12 @@ class AuthorBL(BaseBL):
                 lambda x: x.id in story_ids
             )
         } if story_ids else {}
+
+        chapters = {
+            x.id: x for x in Chapter.select(
+                lambda x: x.id in chapter_ids
+            )
+        } if chapter_ids else {}
 
         story_comments = {
             x.id: x for x in StoryComment.select(
@@ -676,6 +685,16 @@ class AuthorBL(BaseBL):
                     result.append(item)
                     continue
                 item['story'] = {'id': n.target_id, 'title': stories[n.target_id].title}
+
+            elif n.type == 'story_chapter':
+                c = chapters.get(n.target_id)
+                if not c:
+                    item['broken'] = True
+                    result.append(item)
+                    continue
+
+                item['story'] = {'id': c.story.id, 'title': c.story.title}
+                item['chapter'] = {'id': c.id, 'order': c.order, 'title': c.title, 'words': c.words}
 
             elif n.type in ('story_reply', 'story_comment', 'story_lreply', 'story_lcomment', 'news_reply', 'news_comment'):
                 if n.type in ('story_reply', 'story_comment'):

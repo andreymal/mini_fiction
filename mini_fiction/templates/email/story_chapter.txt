@@ -1,0 +1,13 @@
+{% autoescape false -%}
+В рассказе «{{ story.title }}» на сайте {{ url_for('index.index', _external=True) }} {% if chapters|length > 1 -%}
+    {{ ngettext('%(num)d chapter was published', '%(num)d chapters were published', chapters|length) }}
+{%- else -%}
+    была опубликована глава
+{%- endif -%}:
+
+{% for chapter in chapters -%}
+{{ chapter.title }} {{ url_for('chapter.view', story_id=story.id, chapter_order=chapter.order) }}
+{% endfor %}
+
+{{ SITE_NAME }}
+{%- endautoescape %}

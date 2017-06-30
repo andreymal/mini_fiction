@@ -83,9 +83,27 @@ def view(pk, comments_page):
         'page_title': story.title,
         'comment_form': CommentForm(),
         'page_obj': paged,
+        'sub': story.bl.get_subscription(user),
         'sub_comments': story.bl.get_comments_subscription(user),
     }
     return render_template('story_view.html', **data)
+
+
+@bp.route('/<int:pk>/subscribe/', methods=('POST',))
+@db_session
+@login_required
+def subscribe(pk):
+    user = current_user._get_current_object()
+    story = get_story(pk)
+    story.bl.subscribe(
+        user,
+        email=request.form.get('email') == '1',
+        tracker=request.form.get('tracker') == '1',
+    )
+
+    if request.form.get('short') == '1':
+        return jsonify(success=True)
+    return redirect(url_for('story.view', pk=story.id))
 
 
 @bp.route('/<int:pk>/comments/subscribe/', methods=('POST',))

@@ -91,6 +91,18 @@
                     </time><br/>
                 {%- endif -%}
           </p>
+
+          {% if current_user.is_authenticated -%}
+          <p>
+            <form method="POST" action="{{ url_for('story.subscribe', pk=story.id) }}" class="subscription-form js-subscription-form">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+                Подписаться на новые главы:
+                <label><input type="checkbox" name="email" value="1"{% if sub.email %} checked{% endif %} /> почта</label>
+                <label><input type="checkbox" name="tracker" value="1"{% if sub.tracker %} checked{% endif %} /> сайт</label>
+                <button type="submit" class="btn btn-mini js-subscription-form-submit">Сохранить</button>
+            </form>
+          </p>
+          {%- endif %}
       </blockquote>
 
         <div class="story-chapters">

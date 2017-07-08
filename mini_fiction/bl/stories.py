@@ -23,8 +23,8 @@ from mini_fiction.validation.stories import STORY
 
 class StoryBL(BaseBL, Commentable):
     sort_types = {
-        0: "weight() DESC, id DESC",
-        1: "id DESC",
+        0: "weight() DESC, first_published_at DESC",
+        1: "first_published_at DESC",
         2: "size DESC",
         3: "id ASC",  # TODO: rating DESC
         4: "comments DESC"
@@ -178,7 +178,7 @@ class StoryBL(BaseBL, Commentable):
         if old_published != story.published:
             if story.published and not story.first_published_at:
                 story.first_published_at = datetime.utcnow()
-            later(current_app.tasks['sphinx_update_story'].delay, story.id, ('approved',))
+            later(current_app.tasks['sphinx_update_story'].delay, story.id, ('approved', 'first_published_at'))
 
             published_chapter_ids = []
             for c in sorted(story.chapters, key=lambda c: c.order):
@@ -235,7 +235,7 @@ class StoryBL(BaseBL, Commentable):
             if old_published != story.published:
                 if story.published and not story.first_published_at:
                     story.first_published_at = datetime.utcnow()
-                later(current_app.tasks['sphinx_update_story'].delay, story.id, ('draft',))
+                later(current_app.tasks['sphinx_update_story'].delay, story.id, ('draft', 'first_published_at'))
 
                 published_chapter_ids = []
                 for c in sorted(story.chapters, key=lambda c: c.order):
@@ -531,6 +531,7 @@ class StoryBL(BaseBL, Commentable):
             'title': story.title,
             'summary': story.summary,
             'notes': story.notes,
+            'first_published_at': int(((story.first_published_at or story.date) - datetime(1970, 1, 1, 0, 0, 0)).total_seconds()),
             'rating_id': story.rating.id,
             'size': story.words,
             'comments': story.comments_count,
@@ -566,10 +567,11 @@ class StoryBL(BaseBL, Commentable):
         f = set(update_fields)
         if f and not f - {'vote_average', 'vote_stddev', 'vote_total'}:
             pass  # TODO: рейтинг
-        elif f and not f - {'date', 'draft', 'approved'}:
+        elif f and not f - {'date', 'first_published_at', 'draft', 'approved'}:
             with current_app.sphinx as sphinx:
-                sphinx.update('stories', fields={'published': int(story.published)}, id=story.id)
-                sphinx.update('chapters', fields={'published': int(story.published)}, id__in=[x.id for x in story.chapters])
+                timestamp = ((story.first_published_at or story.date) - datetime(1970, 1, 1, 0, 0, 0)).total_seconds()
+                sphinx.update('stories', fields={'first_published_at': int(timestamp), 'published': int(story.published)}, id=story.id)
+                sphinx.update('chapters', fields={'first_published_at': int(timestamp), 'published': int(story.published)}, id__in=[x.id for x in story.chapters])
         elif f == {'words'}:
             with current_app.sphinx as sphinx:
                 sphinx.update('stories', fields={'size': int(story.words)}, id=story.id)
@@ -1013,6 +1015,7 @@ class ChapterBL(BaseBL):
             'text': chapter.text,
             'story_id': chapter.story.id,
             'published': chapter.story_published and not chapter.draft,
+            'first_published_at': int(((chapter.first_published_at or chapter.date) - datetime(1970, 1, 1, 0, 0, 0)).total_seconds()),
         } for chapter in chapters]
 
         with current_app.sphinx as sphinx:

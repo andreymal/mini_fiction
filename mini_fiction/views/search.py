@@ -82,6 +82,7 @@ def search_action(postform):
             raw_result, result = Chapter.bl.search(
                 query,
                 limit,
+                # TODO: сортировка и для глав тоже
                 only_published=not current_user.is_authenticated or not current_user.is_staff,
             )
         except SphinxError as exc:

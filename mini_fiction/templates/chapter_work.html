@@ -86,7 +86,7 @@
     </div>
 
     {% if chapter %}
-        {% with story=chapter.story %}{% include "includes/chapter_single.html" %}{% endwith %}
+        {% with story=chapter.story, chapter_edit_mode=True %}{% include "includes/chapter_single.html" %}{% endwith %}
     {% endif %}
 
     <div class="span12">

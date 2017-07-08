@@ -1,14 +1,24 @@
 <div class="chapter-text" id="chapter{{ chapter.id }}">
     {% if chapter.title or chapter.order != 1 -%}
-        <h1>{{ chapter.autotitle }}{% if chapter.draft %} <sup class="draft">{{ _('Draft') }}</sup>{% endif %}</h1>
+        <h1>
+            {% if chapter_edit_mode %}<a href="{{ url_for('chapter.view', story_id=story.id, chapter_order=chapter.order) }}">{% endif %}{{ chapter.autotitle }}{% if chapter_edit_mode %}</a>{% endif %}
+            {% if chapter.draft %}<sup class="draft">{{ _('Draft') }}</sup>{% endif %}
+            {% if not chapter_edit_mode and story.bl.editable_by(current_user) %}
+                <a class="btn btn-warning btn-mini" href="{{ url_for('chapter.edit', pk=chapter.id) }}">Редактировать главу</a>
+            {% endif %}
+        </h1>
+    {%- elif not chapter_edit_mode and story.bl.editable_by(current_user) -%}
+        <h1><a class="btn btn-warning btn-mini" href="{{ url_for('chapter.edit', pk=chapter.id) }}">Редактировать главу</a></h1>
     {%- endif %}
     {% if chapter.notes %}
         <blockquote>{{ chapter.notes_as_html }}</blockquote>
     {% endif %}
     {{ chapter.text_as_html }}
+    {% if not chapter_edit_mode %}
     {% if next_chapter %}
         <p><a href="{{ url_for('chapter.view', story_id=story.id, chapter_order=next_chapter.order) }}">Читать дальше</a></p>
     {% elif not story.finished and not story.freezed and not allchapters %}
         <p><strong>Продолжение следует...</strong></p>
+    {% endif %}
     {% endif %}
 </div>

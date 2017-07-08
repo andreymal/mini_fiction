@@ -1,6 +1,6 @@
 {% filter safe %}{{ story.title|upper }}
 
-{{ chapter.title }}
+{{ chapter.autotitle }}
 
 
 {{ chapter.text|striptags }}

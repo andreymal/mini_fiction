@@ -25,9 +25,9 @@
     {% endwith %}
     {{ extra.label }}
     {% if item.chapter -%}
-        <a href="{{ url_for('chapter.view', story_id=item.story.id, chapter_order=item.chapter.order) }}">«{{ item.chapter_title }}»</a>
+        <a href="{{ url_for('chapter.view', story_id=item.story.id, chapter_order=item.chapter.order) }}">«{{ item.chapter_autotitle }}»</a>
     {%- else -%}
-        «{{ item.chapter_title }}»
+        «{{ item.chapter_autotitle }}»
     {%- endif %}
     {{ pgettext('story_edit_log', 'of story') }} <a href="{{ item.story.url }}">{{ item.story.title }}</a>
 

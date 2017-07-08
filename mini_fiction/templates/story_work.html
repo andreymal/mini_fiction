@@ -206,7 +206,7 @@
                             <ul id="sortable_chapters" class="chapters-control" data-story="{{ story.id }}">
                                 {% for chapter in chapters %}
                                       <li id="chapter_{{ chapter.id }}" data-chapter="{{ chapter.id }}" class="btn btn-large">
-                                        {{ chapter.title }}
+                                        {{ chapter.autotitle }}
                                         <div class="btn-group">
                                             <a class="btn btn-mini js-btn-publish-chapter{% if chapter.draft %} btn-primary{% endif %}" href="{{ url_for('chapter.publish', pk=chapter.id) }}">
                                                 {{ 'опубликовать' if chapter.draft else 'в черновики' }}

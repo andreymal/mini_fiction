@@ -694,7 +694,7 @@ class AuthorBL(BaseBL):
                     continue
 
                 item['story'] = {'id': c.story.id, 'title': c.story.title}
-                item['chapter'] = {'id': c.id, 'order': c.order, 'title': c.title, 'words': c.words}
+                item['chapter'] = {'id': c.id, 'order': c.order, 'title': c.title, 'autotitle': c.autotitle, 'words': c.words}
 
             elif n.type in ('story_reply', 'story_comment', 'story_lreply', 'story_lcomment', 'news_reply', 'news_comment'):
                 if n.type in ('story_reply', 'story_comment'):

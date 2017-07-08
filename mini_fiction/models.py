@@ -6,6 +6,7 @@ import ipaddress
 from datetime import datetime
 
 from pony import orm
+from flask_babel import gettext
 from flask import Markup, url_for, current_app
 from flask_login import AnonymousUserMixin, UserMixin
 
@@ -357,7 +358,7 @@ class Chapter(db.Entity):
     mark = orm.Required(int, size=16, unsigned=True, default=0)
     notes = orm.Optional(orm.LongStr)
     order = orm.Required(int, size=16, unsigned=True, default=1)
-    title = orm.Required(str, 512)
+    title = orm.Optional(str, 512)
     text = orm.Optional(orm.LongStr, autostrip=False)
     text_md5 = orm.Required(str, 32, default='d41d8cd98f00b204e9800998ecf8427e')
     updated = orm.Required(datetime, 6, default=datetime.utcnow)
@@ -403,6 +404,15 @@ class Chapter(db.Entity):
                 import traceback
                 return traceback.format_exc()
             return "#ERROR#"
+
+    @property
+    def autotitle(self):
+        # Если у главы нет заголовка, генерирует его
+        if self.title:
+            return self.title
+        if self.order == 1:
+            return self.story.title
+        return gettext('Chapter {}').format(self.order)
 
     def get_filtered_chapter_text(self):
         return filter_html(
@@ -647,6 +657,16 @@ class StoryLog(db.Entity):
     orm.composite_index(story, created_at)
     orm.composite_index(chapter, chapter_md5)
     orm.composite_index(by_staff, created_at)
+
+    @property
+    def chapter_autotitle(self):
+        if self.chapter_title:
+            return self.chapter_title
+        if not self.chapter:
+            return ''
+        if self.chapter.order == 1:
+            return self.story.title
+        return gettext('Chapter {}').format(self.chapter.order)
 
     @property
     def data(self):

@@ -6,7 +6,7 @@
 {%- endif -%}:
 
 {% for chapter in chapters -%}
-{{ chapter.title }} {{ url_for('chapter.view', story_id=story.id, chapter_order=chapter.order) }}
+{{ chapter.autotitle }} {{ url_for('chapter.view', story_id=story.id, chapter_order=chapter.order) }}
 {% endfor %}
 
 {{ SITE_NAME }}

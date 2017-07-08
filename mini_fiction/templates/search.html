@@ -102,7 +102,7 @@
             {% if result %}<div class="story-item"><h3>{{ ngettext("Found %(num)d chapter", "Found %(num)d chapters", total) }}</h3></div>{%elif error %}<h3>{{ error }}</h3>{% else %}<h3>Здесь пока ничего нет</h3>{% endif %}
             {% for chapter, excerpt in result %}
                 <div class="story-item">
-                    <h3><a href="{{ url_for('chapter.view', story_id=chapter.story.id, chapter_order=chapter.order) }}">{{ chapter.title }}</a></h3>
+                    <h3><a href="{{ url_for('chapter.view', story_id=chapter.story.id, chapter_order=chapter.order) }}">{{ chapter.autotitle }}</a></h3>
                     <p>{{ excerpt|safe }}</p>
                       <p class="meta">Глава из рассказа <b><a href="{{ url_for('story.view', pk=chapter.story.id) }}">{{ chapter.story.title }}</a></b> от <a class="authorlink" href="{{ url_for('author.info', user_id=chapter.story.authors[0].id) }}">{{ chapter.story.authors[0].username }}</a></p>
                 </div>

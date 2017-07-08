@@ -44,7 +44,7 @@
 
 {%- elif item.type == 'story_chapter' %}
     В рассказе <a href="{{ url_for('story.view', pk=item.story.id) }}">«{{ item.story.title }}»</a>
-    опубликована новая глава <a href="{{ url_for('chapter.view', story_id=item.story.id, chapter_order=item.chapter.order) }}">«{{ item.chapter.title }}»</a>
+    опубликована новая глава <a href="{{ url_for('chapter.view', story_id=item.story.id, chapter_order=item.chapter.order) }}">«{{ item.chapter.autotitle }}»</a>
 
     <div class="notification-meta">
         <time class="notification-time" datetime="{{ item.created_at.strftime('%Y-%m-%dT%H:%M:%SZ') }}">

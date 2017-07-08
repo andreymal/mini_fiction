@@ -56,7 +56,7 @@ def feed_chapters():
         if len(data) == 251:
             data = data[:-1] + '…'
         feed.add(
-            chapter.title,
+            chapter.autotitle,
             data,
             content_type='text',
             author=author.username,
@@ -88,7 +88,7 @@ def feed_story(story_id):
         if len(data) == 251:
             data = data[:-1] + '…'
         feed.add(
-            chapter.title,
+            chapter.autotitle,
             data,
             content_type='text',
             url=url_for('chapter.view', story_id=story.id, chapter_order=chapter.order, _external=True),

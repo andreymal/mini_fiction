@@ -1,5 +1,7 @@
-<div class="chapter-text">
-    <h1 id="chapter{{ chapter.id }}">{{ chapter.title }}{% if chapter.draft %} <sup class="draft">{{ _('Draft') }}</sup>{% endif %}</h1>
+<div class="chapter-text" id="chapter{{ chapter.id }}">
+    {% if chapter.title or chapter.order != 1 -%}
+        <h1>{{ chapter.autotitle }}{% if chapter.draft %} <sup class="draft">{{ _('Draft') }}</sup>{% endif %}</h1>
+    {%- endif %}
     {% if chapter.notes %}
         <blockquote>{{ chapter.notes_as_html }}</blockquote>
     {% endif %}

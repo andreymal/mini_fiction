@@ -15,7 +15,7 @@ class FB2Download(ZipFileDownloadFormat):
         from mini_fiction.models import Chapter
 
         chapters = story.chapters.select().order_by(Chapter.order, Chapter.id)
-        chapters = [fb2.html_to_fb2(c.get_filtered_chapter_text(), title=c.title) for c in chapters]
+        chapters = [fb2.html_to_fb2(c.get_filtered_chapter_text(), title=c.autotitle) for c in chapters]
         chapters = [self._get_annotation_doc(story)] + chapters
 
         doc = fb2.join_fb2_docs(

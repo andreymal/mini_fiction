@@ -5,7 +5,7 @@
     <div class="span12">
     {{- breadcrumbs(
         [[url_for('story.view', pk=story.id), story.title]],
-        current='Все главы' if allchapters else chapter.title
+        current='Все главы' if allchapters else chapter.autotitle
     ) }}
     </div>
     {% if allchapters %}
@@ -25,7 +25,7 @@
     <div class="span12">
     {{- breadcrumbs(
         [[url_for('story.view', pk=story.id), story.title]],
-        current='Все главы' if allchapters else chapter.title
+        current='Все главы' if allchapters else chapter.autotitle
     ) }}
     </div>
 </div>

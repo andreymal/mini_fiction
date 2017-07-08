@@ -59,7 +59,7 @@ class ZipFileDownloadFormat(BaseDownloadFormat):
                 story=story,
             ).encode(self.chapter_encoding)
 
-            name = slugify(chapter.title)
+            name = slugify(chapter.autotitle)
             num = str(i + 1).rjust(num_width, '0')
             arcname = str('%s/%s_%s.%s' % (filename, num, name, ext))
 

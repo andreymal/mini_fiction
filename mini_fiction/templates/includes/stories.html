@@ -45,7 +45,7 @@
                 <ul class="chapters-list">
                     {% for chapter in story.bl.select_accessible_chapters(current_user)|sort(attribute='order') %}
                         <li>
-                            <a class="chapter-title" href="{{ url_for('chapter.view', story_id=story.id, chapter_order=chapter.order) }}">{{ chapter.title }}</a>{% if chapter.draft %} <sup class="draft">{{ _('Draft') }}</sup>{% endif %}
+                            <a class="chapter-title" href="{{ url_for('chapter.view', story_id=story.id, chapter_order=chapter.order) }}">{{ chapter.autotitle }}</a>{% if chapter.draft %} <sup class="draft">{{ _('Draft') }}</sup>{% endif %}
                             {% if story.bl.editable_by(current_user) %}
                                 <sup><a class="edit-link" href="{{ url_for('chapter.edit', pk=chapter.id) }}">Редактировать</a></sup>
                             {% endif %}

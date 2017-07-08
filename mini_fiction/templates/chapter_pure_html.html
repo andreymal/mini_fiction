@@ -2,10 +2,10 @@
 <html>
 <head>
     <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
-    <title>{{ chapter.title }} — {{ story.title }}</title>
+    <title>{% if chapter.title or chapter.order != 1 %}{{ chapter.autotitle }} — {% endif %}{{ story.title }}</title>
 </head>
 <body>
-    <h2>{{ chapter.title }}</h2>
+    <h2>{{ chapter.autotitle }}</h2>
     {{ chapter.text_as_html }}
 </body>
 </html>

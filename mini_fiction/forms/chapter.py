@@ -15,10 +15,9 @@ class ChapterForm(Form):
     title = TextField(
         'Название',
         [
-            validators.Required('Пожалуйста, назовите новую главу вашего рассказа'),
-            validators.Length(min=1, max=512)
+            validators.Length(min=0, max=512)
         ],
-        render_kw=dict(attrs_dict, maxlength=512, placeholder='Заголовок новой главы')
+        render_kw=dict(attrs_dict, maxlength=512, placeholder='Заголовок главы (необязательно)')
     )
 
     notes = TextAreaField(

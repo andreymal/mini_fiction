@@ -1,1 +1,1 @@
-{% if chapters|length > 1 %}Новые главы{% else %}Новая глава «{{ chapters[0].title|safe }}»{% endif %} в рассказе «{{ story.title|safe }}» — {{ SITE_NAME }}
+{% if chapters|length > 1 %}Новые главы{% else %}Новая глава «{{ chapters[0].autotitle|safe }}»{% endif %} в рассказе «{{ story.title|safe }}» — {{ SITE_NAME }}

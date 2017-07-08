@@ -9,8 +9,8 @@
 
     {% if prev_chapter or next_chapter %}
     <span class="chapter-switch">
-        {% if prev_chapter %}← <a class="left" href="{{ url_for('chapter.view', story_id=story.id, chapter_order=prev_chapter.order) }}">{{ prev_chapter.title }}</a>{% endif %}
-        {% if next_chapter %}<a href="{{ url_for('chapter.view', story_id=story.id, chapter_order=next_chapter.order) }}">{{ next_chapter.title }}</a> →{% endif %}
+        {% if prev_chapter %}← <a class="left" href="{{ url_for('chapter.view', story_id=story.id, chapter_order=prev_chapter.order) }}">{{ prev_chapter.autotitle }}</a>{% endif %}
+        {% if next_chapter %}<a href="{{ url_for('chapter.view', story_id=story.id, chapter_order=next_chapter.order) }}">{{ next_chapter.autotitle }}</a> →{% endif %}
     </span>
     {% endif %}
     {% if not chapter and not allchapters %}

@@ -28,7 +28,7 @@ def view(story_id, chapter_order=None):
             abort(404)
         if chapter.draft and not allow_draft:
             abort(404)
-        page_title = chapter.title[:80] + ' : ' + story.title
+        page_title = chapter.autotitle[:80] + ' : ' + story.title
         prev_chapter = chapter.get_prev_chapter(allow_draft)
         next_chapter = chapter.get_next_chapter(allow_draft)
         if user.is_authenticated:
@@ -147,7 +147,7 @@ def edit(pk):
         not_saved = True
 
     data = {
-        'page_title': 'Редактирование главы «%s»' % chapter.title,
+        'page_title': 'Редактирование главы «%s»' % chapter.autotitle,
         'story': chapter.story,
         'chapter': chapter,
         'form': form,

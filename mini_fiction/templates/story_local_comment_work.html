@@ -19,7 +19,7 @@
     {%- endif %}
 
     <form class="comment-form" method="POST" enctype="multipart/form-data">
-    {% from 'macro.html' import comment_form_content %}
+    {% from 'macro.html' import comment_form_content with context %}
     {{ comment_form_content(form, parent=parent_comment.local_id if parent_comment else None, preview_html=preview_html) }}
     </form>
 

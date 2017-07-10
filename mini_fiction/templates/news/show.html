@@ -46,7 +46,7 @@
             <a href="{{ url_for('news_comment.add', news_id=newsitem.id) }}" id="comment-add-link" class="comment-add-link">Добавить новый комментарий</a>
 
             <form id="comment-form" class="comment-form" method="POST" enctype="multipart/form-data" action="{{- url_for('news_comment.add', news_id=newsitem.id) -}}">
-            {% from 'macro.html' import comment_form_content %}
+            {% from 'macro.html' import comment_form_content with context %}
             {{ comment_form_content(comment_form) }}
             </form>
         {% elif current_user.is_authenticated %}

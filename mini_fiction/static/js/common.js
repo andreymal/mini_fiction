@@ -518,6 +518,11 @@ common.allowedTags.p._node = function(parent, node, copyAttrs, options) {
 
         common.sanitizeHTML(parent, Array.prototype.slice.call(node.childNodes), options);
 
+        // Смотрим наперёд: если дальше span, то перед ним тоже пустая строка
+        if (node.nextSibling && node.nextSibling instanceof HTMLElement && node.nextSibling.tagName.toLowerCase() == 'span') {
+            parent.appendChild(document.createTextNode('\n\n'));
+        }
+
     } else {
         // Иначе создаём <p> как обычно
         // (за исключением случая, когда нужно выравнивание для табуна)
@@ -627,6 +632,7 @@ common.allowedTags.b._node = function(parent, node, copyAttrs, options) {
     var bolds = ['bold', 'bolder', '500', '600', '700', '800', '900'];
     if (style.fontWeight && bolds.indexOf(style.fontWeight) >= 0) {
         cont = document.createElement('strong');
+        parent.appendChild(cont);
     } else {
         // Да, так бывает! Google Docs идиот
         cont = parent;

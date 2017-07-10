@@ -9,6 +9,19 @@ var story = {
     _contributorsSendEventBinded: null,
     _contributorsChangeEventBinded: null,
 
+    _preview: {
+        btn: null,
+        btnEvent: null,
+        selectedBtn: null,
+        selectedBtnEvent: null,
+
+        area: null,
+
+        textInput: null,
+        textInputSelectEvent: null,
+        selection: null,
+    },
+
     init: function() {
         // Каруселька со случайными рассказами
         $("#slides").slidesjs({
@@ -47,6 +60,7 @@ var story = {
 
     load: function() {
         this.panelStuff();
+        this.chapterPreviewStuff();
 
         // Обработчики для кнопок работы с рассказом
 
@@ -192,6 +206,7 @@ var story = {
             this._contributorsSendEventBinded = null;
             this.contributorsForm = null;
         }
+        this.removeChapterPreviewStuff();
         this.removePanel();
     },
 
@@ -589,6 +604,140 @@ var story = {
             .then(function(response) {
                 core.handleResponse(response, url);
             }).catch(core.handleError);
+    },
+
+    chapterPreviewStuff: function() {
+        if (!window.FormData) {
+            return;
+        }
+
+        this._preview.btn = document.getElementById('chapter-preview-btn');
+        this._preview.selectedBtn = document.getElementById('chapter-preview-selected-btn');
+        this._preview.area = document.getElementById('chapter-preview');
+        if (this._preview.btn) {
+            this._preview.textInput = this._preview.btn.form.text;
+        }
+
+        if (!this._preview.btn || !this._preview.area || !this._preview.textInput) {
+            this._preview.btn = null;
+            this._preview.selectedBtn = null;
+            this._preview.area = null;
+            return;
+        }
+
+        this._preview.btnEvent = function(event) {
+            this.previewChapter(this._preview.btn.form, false);
+            event.preventDefault();
+            return false;
+        }.bind(this);
+
+        this._preview.btn.addEventListener('click', this._preview.btnEvent);
+
+        if (this._preview.selectedBtn) {
+            this._preview.selectedBtnEvent = function(event) {
+                this.previewChapter(this._preview.selectedBtn.form, true);
+                event.preventDefault();
+                return false;
+            }.bind(this);
+
+            this._preview.selectedBtn.addEventListener('click', this._preview.selectedBtnEvent);
+        }
+
+        this._preview.textInputSelectEvent = function(event) {
+            var textarea = this._preview.textInput;
+
+            if (textarea.selectionStart || textarea.selectionStart == '0') {
+                var startPos = textarea.selectionStart;
+                var endPos = textarea.selectionEnd;
+
+                var btn = this._preview.selectedBtn;
+
+                if (startPos !== endPos) {
+                    this._preview.selection = [startPos, endPos];
+                    if (btn) {
+                        btn.disabled = false;
+                    }
+                } else {
+                    this._preview.selection = null;
+                    if (btn) {
+                        btn.disabled = true;
+                    }
+                }
+            }
+        }.bind(this);
+
+        this._preview.textInput.addEventListener('select', this._preview.textInputSelectEvent);
+        // emulate "unselect" event (but "blur" event is not required here)
+        this._preview.textInput.addEventListener('click', this._preview.textInputSelectEvent);
+        this._preview.textInput.addEventListener('focus', this._preview.textInputSelectEvent);
+        this._preview.textInput.addEventListener('input', this._preview.textInputSelectEvent);
+        this._preview.textInput.addEventListener('change', this._preview.textInputSelectEvent);
+    },
+
+    removeChapterPreviewStuff: function() {
+        if (this._preview.textInputSelectEvent) {
+            this._preview.textInput.removeEventListener('select', this._preview.textInputSelectEvent);
+            this._preview.textInput.removeEventListener('click', this._preview.textInputSelectEvent);
+            this._preview.textInput.removeEventListener('focus', this._preview.textInputSelectEvent);
+            this._preview.textInput.removeEventListener('input', this._preview.textInputSelectEvent);
+            this._preview.textInput.removeEventListener('change', this._preview.textInputSelectEvent);
+            this._preview.textInputSelectEvent = null;
+        }
+        if (this._preview.btnEvent) {
+            this._preview.btn.removeEventListener('click', this._preview.btnEvent);
+            this._preview.btnEvent = null;
+        }
+        if (this._preview.selectedBtnEvent) {
+            this._preview.selectedBtn.removeEventListener('click', this._preview.selectedBtnEvent);
+            this._preview.selectedBtnEvent = null;
+        }
+
+        var loadingImg = document.getElementById('chapter-preview-loading-img');
+        if (loadingImg) {
+            loadingImg.style.display = 'none';
+        }
+
+        this._preview.selection = null;
+        this._preview.textInput = null;
+        this._preview.area = null;
+        this._preview.btn = null;
+        this._preview.selectedBtn = null;
+    },
+
+    previewChapter: function(form, onlySelected) {
+        var data = new FormData(form);
+        data.append('act', (onlySelected && this._preview.selection) ? 'preview_selected' : 'preview');
+        data.append('ajax', '1');
+        if (onlySelected && this._preview.selection) {
+            data.append('sel_start', this._preview.selection[0].toString());
+            data.append('sel_end', this._preview.selection[1].toString());
+        }
+
+        var loadingImg = document.getElementById('chapter-preview-loading-img');
+
+        var url = form.action || location.toString();
+        core.ajax.post(url, data)
+            .then(function(response) {
+                return response.json();
+            })
+            .then(function(data) {
+                if (loadingImg) {
+                    loadingImg.style.display = 'none';
+                }
+                if (core.handleResponse(data, url)) {
+                    return;
+                }
+                if (this._preview.area) {
+                    this._preview.area.innerHTML = data.html;
+                }
+            }.bind(this)).then(null, function(exc) {
+                if (loadingImg) {
+                    loadingImg.style.display = 'none';
+                }
+                core.handleError(exc);
+            });
+
+        loadingImg.style.display = '';
     }
 };
 

@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version:  0.0.2\n"
 "Report-Msgid-Bugs-To: andriyano-31@mail.ru\n"
-"POT-Creation-Date: 2017-07-08 16:13+0300\n"
+"POT-Creation-Date: 2017-07-09 23:49+0300\n"
 "Last-Translator: andreymal <andriyano-31@mail.ru>\n"
 "Language: ru\n"
 "Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && "
@@ -18,7 +18,7 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 2.4.0\n"
 
-#: mini_fiction/models.py:411 mini_fiction/models.py:663
+#: mini_fiction/models.py:411 mini_fiction/models.py:661
 msgid "Chapter {}"
 msgstr "Глава {}"
 
@@ -381,6 +381,14 @@ msgstr "Добавить как черновик"
 msgid "Save changes"
 msgstr "Сохранить изменения"
 
+#: mini_fiction/templates/chapter_work.html:84
+msgid "Preview"
+msgstr "Предпросмотр"
+
+#: mini_fiction/templates/chapter_work.html:85
+msgid "Preview selected"
+msgstr "Предпросмотр выделенного"
+
 #: mini_fiction/templates/index.html:20 mini_fiction/views/editlog.py:30
 msgid "Moderation log"
 msgstr "Лог модерации"
@@ -411,7 +419,7 @@ msgstr[2] "Всего нашли %(num)d глав"
 #: mini_fiction/templates/includes/stories.html:28
 #: mini_fiction/templates/includes/stories.html:53
 #: mini_fiction/templates/story_view.html:76
-#: mini_fiction/templates/story_view.html:115
+#: mini_fiction/templates/story_view.html:120
 #, python-format
 msgid "%(num)d word"
 msgid_plural "%(num)d words"
@@ -424,7 +432,7 @@ msgstr[2] "%(num)d слов"
 #: mini_fiction/templates/includes/stories.html:32
 #: mini_fiction/templates/includes/stories.html:53
 #: mini_fiction/templates/story_view.html:76
-#: mini_fiction/templates/story_view.html:115
+#: mini_fiction/templates/story_view.html:120
 #, python-format
 msgid "%(num)d view"
 msgid_plural "%(num)d views"
@@ -432,9 +440,9 @@ msgstr[0] "%(num)d просмотр"
 msgstr[1] "%(num)d просмотра"
 msgstr[2] "%(num)d просмотров"
 
-#: mini_fiction/templates/includes/chapter_single.html:2
+#: mini_fiction/templates/includes/chapter_single.html:5
 #: mini_fiction/templates/includes/stories.html:48
-#: mini_fiction/templates/story_view.html:114
+#: mini_fiction/templates/story_view.html:117
 msgid "Draft"
 msgstr "Черновик"
 
@@ -687,6 +695,10 @@ msgid_plural "%(num)d chapters were published"
 msgstr[0] "была опубликована %(num)d глава"
 msgstr[1] "были опубликованы %(num)d главы"
 msgstr[2] "были опубликованы %(num)d глав"
+
+#: mini_fiction/templates/includes/chapter_preview.html:2
+msgid "(preview)"
+msgstr "(предпросмотр)"
 
 #: mini_fiction/templates/includes/edit_log_item.html:32
 msgctxt "story_edit_log"
@@ -1034,6 +1046,10 @@ msgstr "Старый пароль неверный"
 msgid "Password is incorrect"
 msgstr "Неверный пароль"
 
+#: mini_fiction/views/chapter.py:123
+msgid "Chapter"
+msgstr "Глава"
+
 #: mini_fiction/views/common_comment.py:98
 msgid "Add new comment"
 msgstr "Добавить новый комментарий"
@@ -1052,7 +1068,7 @@ msgstr "Подтверждение восстановления коммента
 
 #: mini_fiction/views/search.py:21 mini_fiction/views/search.py:29
 #: mini_fiction/views/search.py:37 mini_fiction/views/search.py:75
-#: mini_fiction/views/search.py:88 mini_fiction/views/search.py:107
+#: mini_fiction/views/search.py:89 mini_fiction/views/search.py:108
 msgid "Search of stories"
 msgstr "Поиск рассказов"
 

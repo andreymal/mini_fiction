@@ -1,0 +1,9 @@
+<div class="chapter-text">
+    <h1>{% if chapter %}<a href="{{ url_for('chapter.view', story_id=story.id, chapter_order=chapter.order) }}">{% endif %}{{ preview_title }}{% if chapter %}</a>{% endif %} {{ _('(preview)') }}</h1>
+
+    {% if notes_preview_html %}
+        <blockquote>{{ notes_preview_html }}</blockquote>
+    {% endif %}
+
+    {{ preview_html }}
+</div>

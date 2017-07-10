@@ -391,19 +391,13 @@ class Chapter(db.Entity):
             q = q.filter(lambda x: not x.draft)
         return q.first()
 
-    notes_as_html = filtered_html_property('notes', filter_html)
+    @property
+    def notes_as_html(self):
+        return self.bl.notes2html(self.notes)
 
     @property
     def text_as_html(self):
-        try:
-            doc = self.get_filtered_chapter_text()
-            doc = footnotes_to_html(doc)
-            return Markup(html_doc_to_string(doc))
-        except:
-            if current_app.config['DEBUG']:
-                import traceback
-                return traceback.format_exc()
-            return "#ERROR#"
+        return self.bl.text2html(self.text)
 
     @property
     def autotitle(self):
@@ -415,11 +409,7 @@ class Chapter(db.Entity):
         return gettext('Chapter {}').format(self.order)
 
     def get_filtered_chapter_text(self):
-        return filter_html(
-            self.text,
-            tags=current_app.config['CHAPTER_ALLOWED_TAGS'],
-            attributes=current_app.config['CHAPTER_ALLOWED_ATTRIBUTES'],
-        )
+        return self.bl.filter_text(self.text)
 
 
 class StoryContributor(db.Entity):

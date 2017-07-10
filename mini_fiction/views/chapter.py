@@ -3,6 +3,7 @@
 
 from flask import Blueprint, request, render_template, abort, url_for, redirect, g, jsonify
 from flask_login import current_user, login_required
+from flask_babel import gettext
 from pony.orm import db_session
 
 from mini_fiction.forms.chapter import ChapterForm
@@ -57,6 +58,24 @@ def view(story_id, chapter_order=None):
     return render_template('chapter_view.html', **data)
 
 
+def _gen_preview(form, only_selected=False):
+    title = request.form.get('title') or gettext('Chapter')
+    sel_start = request.form.get('sel_start') or ''
+    sel_end = request.form.get('sel_end') or ''
+    notes_html = Chapter.bl.notes2html(request.form.get('notes', '')[:128000])
+
+    if only_selected and sel_start.isdigit() and sel_end.isdigit():
+        html = Chapter.bl.text2html(request.form.get('text', '')[:128000], start=int(sel_start), end=int(sel_end))
+    else:
+        html = Chapter.bl.text2html(request.form.get('text', '')[:128000])
+
+    return {
+        'preview_title': title,
+        'preview_html': html,
+        'notes_preview_html': notes_html,
+    }
+
+
 @bp.route('/story/<int:story_id>/chapter/add/', methods=('GET', 'POST'))
 @db_session
 @login_required
@@ -70,8 +89,25 @@ def add(story_id):
 
     not_saved = False
 
+    preview_data = {'preview_title': None, 'preview_html': None, 'notes_preview_html': None}
+
     form = ChapterForm()
-    if form.validate_on_submit():
+
+    if request.form.get('act') in ('preview', 'preview_selected'):
+        preview_data = _gen_preview(request.form, only_selected=request.form.get('act') == 'preview_selected')
+
+        if request.form.get('ajax') == '1':
+            return jsonify(
+                success=True,
+                html=render_template(
+                    'includes/chapter_preview.html',
+                    story=story,
+                    chapter=None,
+                    **preview_data
+                )
+            )
+
+    elif form.validate_on_submit():
         chapter = Chapter.bl.create(
             story=story,
             editor=user,
@@ -96,6 +132,7 @@ def add(story_id):
         'not_saved': not_saved,
         'unpublished_chapters_count': Chapter.select(lambda x: x.story == story and x.draft).count(),
     }
+    data.update(preview_data)
 
     return render_template('chapter_work.html', **data)
 
@@ -122,8 +159,25 @@ def edit(pk):
     older_text = None
     chapter_text_diff = []
 
+    preview_data = {'preview_title': None, 'preview_html': None, 'notes_preview_html': None}
+
     form = ChapterForm(data=chapter_data)
-    if form.validate_on_submit():
+
+    if request.form.get('act') in ('preview', 'preview_selected'):
+        preview_data = _gen_preview(request.form, only_selected=request.form.get('act') == 'preview_selected')
+
+        if request.form.get('ajax') == '1':
+            return jsonify(
+                success=True,
+                html=render_template(
+                    'includes/chapter_preview.html',
+                    story=chapter.story,
+                    chapter=chapter,
+                    **preview_data
+                )
+            )
+
+    elif form.validate_on_submit():
         if request.form.get('older_md5'):
             older_text, chapter_text_diff = chapter.bl.get_diff_from_older_version(request.form['older_md5'])
         if not chapter_text_diff:
@@ -158,6 +212,7 @@ def edit(pk):
         'diff_html': diff2html(older_text, chapter_text_diff) if chapter_text_diff else None,
         'unpublished_chapters_count': Chapter.select(lambda x: x.story == chapter.story and x.draft).count(),
     }
+    data.update(preview_data)
 
     return render_template('chapter_work.html', **data)
 

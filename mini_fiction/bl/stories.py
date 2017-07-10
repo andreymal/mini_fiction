@@ -3,6 +3,7 @@
 
 # pylint: disable=unexpected-keyword-arg,no-value-for-parameter
 
+import re
 import json
 import random
 import ipaddress
@@ -10,6 +11,8 @@ from hashlib import md5
 from datetime import datetime, timedelta
 from statistics import mean, pstdev
 
+import lxml.html
+import lxml.etree
 from pony import orm
 from flask import Markup, current_app
 
@@ -19,6 +22,9 @@ from mini_fiction.utils.misc import call_after_request as later
 from mini_fiction.utils import diff as utils_diff
 from mini_fiction.validation import Validator
 from mini_fiction.validation.stories import STORY
+from mini_fiction.filters import filter_html
+from mini_fiction.filters.base import html_doc_to_string
+from mini_fiction.filters.html import footnotes_to_html
 
 
 class StoryBL(BaseBL, Commentable):
@@ -893,6 +899,136 @@ class ChapterBL(BaseBL):
             c.order = c.order - 1
 
         story.updated = datetime.utcnow()
+
+    def notes2html(self, notes):
+        if not notes:
+            return Markup('')
+        try:
+            doc = filter_html(notes)
+            return Markup(html_doc_to_string(doc))
+        except Exception:
+            import sys
+            import traceback
+            print("filter_html_notes", file=sys.stderr)
+            traceback.print_exc()
+            return "#ERROR#"
+
+    def filter_text(self, text):
+        text = text.replace('\r', '')
+        return filter_html(
+            text,
+            tags=current_app.config['CHAPTER_ALLOWED_TAGS'],
+            attributes=current_app.config['CHAPTER_ALLOWED_ATTRIBUTES'],
+        )
+
+    def filter_text_for_preview(self, text, start, end):
+        text = text.replace('\r', '')
+
+        # Для качественного предпросмотра куска текста нужно учитывать все
+        # родительские теги, в которые вложен требуемый кусок. Для этого мы
+        # парсим весь текст целиком, но помечаем начало и конец специальными
+        # тегами, а потом в выводе берём только содержимое между этими тегами
+        # вместе с их родителями
+
+        buf = []
+
+        # Наш специальный тег будет случайным, чтобы клиент случайно или
+        # намеренно не мог воткнуть его сам
+        tag_prefix = 'preview-' + str(random.randrange(10 ** 9, 10 ** 10))
+        tag_start = '{0}-start'.format(tag_prefix)
+        tag_end = '{0}-end'.format(tag_prefix)
+
+        # Вставляем тег-начало
+        f1 = text.rfind('<', 0, start)
+        f2 = text.find('>', f1) if f1 >= 0 else -1
+
+        # Если начало внутри тега, то переносим его перед тегом
+        if f2 >= start:
+            start = f1
+
+        buf.append(text[:start])
+        buf.append('<{0}></{0}>'.format(tag_start))
+
+        # Вставляем тег-конец
+        f1 = text.rfind('<', start, end)
+        f2 = text.find('>', f1) if f1 >= 0 else -1
+
+        # Если конец внутри тега, то переносим его после тега
+        if f2 >= end:
+            end = f2 + 1
+        buf.append(text[start:end])
+        buf.append('<{0}></{0}>'.format(tag_end))
+        buf.append(text[end:])
+
+        prepared_text = ''.join(buf)
+
+        # Фильтруем HTML как обычно, но с нашими доп. тегами
+        doc = filter_html(
+            prepared_text,
+            tags=list(current_app.config['CHAPTER_ALLOWED_TAGS']) + [tag_start, tag_end],
+            attributes=current_app.config['CHAPTER_ALLOWED_ATTRIBUTES'],
+        )
+
+        # Достаём тег, с которого начинать, и делаем его чистую копию
+        # со всеми родителями — внутри него будет лежать кусок, нужный для
+        # предпросмотра
+        doc_part = None
+        x = doc.xpath('//' + tag_start)[0]
+        while x.getparent() is not None:
+            p = x.getparent()
+            x2 = lxml.html.Element(p.tag)
+            for k, v in p.attrib.items():
+                x2.set(k, v)
+            if doc_part is not None:
+                x2.append(doc_part)
+            doc_part = x2
+            del x2
+            x = p
+        assert doc_part is not None
+
+        # TODO: по-хорошему надо бы делать это через DOM, но обработка строки
+        # тупо проще пишется
+        html = lxml.html.tostring(doc, encoding='utf-8').decode('utf-8')
+
+        # Выдираем из HTML-кода кусок, нужный для предпросмотра
+        # (код прогнан через lxml и полностью валиден и предсказуем, так что
+        # так делать можно)
+        html_content = html.split('<{0}></{0}>'.format(tag_start), 1)[1]
+        html_content = html_content.split('<{0}></{0}>'.format(tag_end), 1)[0]
+
+        # Выдираем HTML-теги, которые запихнём перед тем куском
+        # <foo><bar></bar></foo> → <foo><bar>
+        html_before = lxml.html.tostring(doc_part, encoding='utf-8').decode('utf-8')
+        f = html_before.find('</')
+        f2 = html_before.find('/>')
+        if f < 0 or f2 >= 0 and f2 < f:
+            f = f2
+        assert f > 0
+        html_before = html_before[:f]
+
+        # Соединяем это всё и получаем готовый предпросмотр
+        # (закрывающие теги lxml добавит сам после парсинга)
+        html_part = html_before + html_content
+
+        return lxml.etree.HTML(html_part)
+
+    def text2html(self, text, start=None, end=None):
+        if not text:
+            return Markup('')
+        try:
+            if start is not None and end is not None and start < end and start >= 0 and start < len(text) - 1:
+                doc = self.filter_text_for_preview(text, start, end)
+            else:
+                doc = self.filter_text(text)
+            doc = footnotes_to_html(doc)
+            return Markup(html_doc_to_string(doc))
+        except Exception:
+            import traceback
+            if current_app.config['DEBUG']:
+                return traceback.format_exc()
+            else:
+                traceback.print_exc()
+            return "#ERROR#"
 
     def get_version(self, text_md5=None, log_item=None):
         from mini_fiction.models import StoryLog

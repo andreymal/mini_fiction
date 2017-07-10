@@ -1,0 +1,20 @@
+<div class="comment-item">
+    <div class="comment-text">{{ preview_html }}</div>
+    <div class="comment-meta">
+        <span class="comment-author">
+        {%- if comment and comment.author -%}
+            {% with user=comment.author %}
+                {% include 'includes/userlink.html' %}
+            {% endwith %}
+        {%- elif comment -%}
+            <span class="userlink-guest">{{ comment.author_username or 'Гость' }}</span>
+        {%- elif current_user.is_authenticated -%}
+            {% with user=current_user %}
+                {% include 'includes/userlink.html' %}
+            {% endwith %}
+        {%- else %}
+            <span class="userlink-guest">Гость</span>
+        {%- endif %}
+        </span>
+    </div>
+</div>

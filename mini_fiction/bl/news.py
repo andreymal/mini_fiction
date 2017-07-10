@@ -108,6 +108,10 @@ class NewsItemBL(BaseBL, Commentable):
         from mini_fiction.models import NewsComment
         return orm.select(c for c in NewsComment if c.newsitem == self.model)
 
+    def comment2html(self, text):
+        from mini_fiction.models import NewsComment
+        return NewsComment.bl.text2html(text)
+
     def select_comment_votes(self, author, comment_ids):
         from mini_fiction.models import NewsCommentVote
         votes = orm.select(

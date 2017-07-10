@@ -7,6 +7,10 @@ var comments = {
     addlink: null,
     form: null,
 
+    _previewBtn: null,
+    _previewArea: null,
+    __previewBtnEvent: null,
+
     load: function() {
         this.addlink = document.getElementById('comment-add-link');
         this.form = document.getElementById('comment-form');
@@ -22,6 +26,7 @@ var comments = {
         }
 
         this.loadPagination();
+        this.commentPreviewStuff();
     },
 
     loadCommentsContent: function() {
@@ -82,6 +87,7 @@ var comments = {
     },
 
     unload: function() {
+        this.removeCommentPreviewStuff();
         this.addlink = null;
         this.form = null;
     },
@@ -144,10 +150,13 @@ var comments = {
             }).then(null, core.handleError)
             .then(function() {
                 form.text.disabled = false;
-                form.querySelector('input[type="submit"]').disabled = false;
+                form.querySelector('.js-comment-submit-btn').disabled = false;
             });
         form.text.disabled = true;
-        form.querySelector('input[type="submit"]').disabled = true;
+        form.querySelector('.js-comment-submit-btn').disabled = true;
+        if (this._previewArea) {
+            this._previewArea.innerHTML = '';
+        }
         return false;
     },
 
@@ -333,8 +342,78 @@ var comments = {
                 voteArea.classList.remove('voting');
             });
         return true;
+    },
+
+    previewComment: function(form) {
+        if (!form.text.value) {
+            this._previewArea.innerHTML = '';
+            return;
+        }
+
+        var data = new FormData(form);
+        data.append('act', 'preview');
+        data.append('ajax', '1');
+
+        var loadingImg = document.getElementById('comment-preview-loading-img');
+
+        var url = form.action || location.toString();
+        core.ajax.post(url, data)
+            .then(function(response) {
+                return response.json();
+            })
+            .then(function(data) {
+                if (loadingImg) {
+                    loadingImg.style.display = 'none';
+                }
+                if (core.handleResponse(data, url)) {
+                    return;
+                }
+                if (this._previewArea) {
+                    this._previewArea.innerHTML = data.html;
+                }
+            }.bind(this)).then(null, function(exc) {
+                if (loadingImg) {
+                    loadingImg.style.display = 'none';
+                }
+                core.handleError(exc);
+            });
+
+        loadingImg.style.display = '';
+    },
+
+    commentPreviewStuff: function() {
+        if (!window.FormData) {
+            return;
+        }
+
+        this._previewBtn = document.getElementById('comment-preview-btn');
+        this._previewArea = document.getElementById('comment-preview');
+
+        if (!this._previewBtn || !this._previewArea) {
+            this._previewBtn = null;
+            this._previewArea = null;
+            return;
+        }
+
+        this._previewBtnEvent = function(event) {
+            this.previewComment(this._previewBtn.form);
+            event.preventDefault();
+            return false;
+        }.bind(this);
+
+        this._previewBtn.addEventListener('click', this._previewBtnEvent);
+    },
+
+    removeCommentPreviewStuff: function() {
+        if (this._previewBtnEvent) {
+            this._previewBtn.removeEventListener('click', this._previewBtnEvent);
+            this._previewBtnEvent = null;
+        }
+        this._previewBtn = null;
+        this._previewArea = null;
     }
 };
 
 
 core.onload(comments.load.bind(comments));
+core.onunload(comments.unload.bind(comments));

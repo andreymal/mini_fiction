@@ -22,6 +22,10 @@ class Commentable(object):
         # (`c` variable is required for order_by, don't use something other)
         raise NotImplementedError
 
+    def comment2html(self, text):
+        # it should be redirected to FooComment.bl.text2html
+        raise NotImplementedError
+
     def select_comment_votes(self, author, comment_ids):
         # should return {comment_id: vote_value}
         return {}

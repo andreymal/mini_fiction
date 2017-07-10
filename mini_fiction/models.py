@@ -485,8 +485,13 @@ class StoryComment(db.Entity):
             text = text[:current_app.config['BRIEF_COMMENT_LENGTH']] + '...'
         return text
 
-    text_as_html = filtered_html_property('text', filter_html)
-    brief_text_as_html = filtered_html_property('brief_text', filter_html)
+    @property
+    def text_as_html(self):
+        return self.bl.text2html(self.text)
+
+    @property
+    def brief_text_as_html(self):
+        return self.bl.text2html(self.brief_text)
 
     def before_update(self):
         self.updated = datetime.utcnow()

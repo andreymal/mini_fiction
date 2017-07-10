@@ -5,13 +5,15 @@ import ipaddress
 from datetime import datetime, timedelta
 
 from pony import orm
-from flask import current_app, url_for
+from flask import Markup, current_app, url_for
 from flask_babel import lazy_gettext
 
 from mini_fiction.bl.utils import BaseBL
 from mini_fiction.utils.misc import call_after_request as later
 from mini_fiction.validation import Validator, ValidationError
 from mini_fiction.validation.comments import STORY_COMMENT, NEWS_COMMENT
+from mini_fiction.filters import filter_html
+from mini_fiction.filters.base import html_doc_to_string
 
 
 class BaseCommentBL(BaseBL):
@@ -198,6 +200,19 @@ class BaseCommentBL(BaseBL):
         self.model.vote_total += value
         self.model.vote_count += 1
         return vote
+
+    def text2html(self, text):
+        if not text:
+            return Markup('')
+        try:
+            doc = filter_html(text)
+            return Markup(html_doc_to_string(doc))
+        except Exception:
+            import sys
+            import traceback
+            print("filter_html_comment_text", file=sys.stderr)
+            traceback.print_exc()
+            return "#ERROR#"
 
 
 class StoryCommentBL(BaseCommentBL):

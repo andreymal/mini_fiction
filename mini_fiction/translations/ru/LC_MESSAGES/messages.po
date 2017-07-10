@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version:  0.0.2\n"
 "Report-Msgid-Bugs-To: andriyano-31@mail.ru\n"
-"POT-Creation-Date: 2017-07-09 23:49+0300\n"
+"POT-Creation-Date: 2017-07-10 19:06+0300\n"
 "Last-Translator: andreymal <andriyano-31@mail.ru>\n"
 "Language: ru\n"
 "Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && "
@@ -18,7 +18,7 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 2.4.0\n"
 
-#: mini_fiction/models.py:411 mini_fiction/models.py:661
+#: mini_fiction/models.py:409 mini_fiction/models.py:664
 msgid "Chapter {}"
 msgstr "Глава {}"
 
@@ -76,23 +76,23 @@ msgstr ""
 msgid "Account is disabled"
 msgstr "Аккаунт отключен"
 
-#: mini_fiction/bl/comments.py:86
+#: mini_fiction/bl/comments.py:88
 msgid "Parent comment not found"
 msgstr "Родительский комментарий не найден"
 
-#: mini_fiction/bl/comments.py:181
+#: mini_fiction/bl/comments.py:183
 msgid "Please log in to vote"
 msgstr "Авторизуйтесь, чтобы голосовать"
 
-#: mini_fiction/bl/comments.py:188
+#: mini_fiction/bl/comments.py:190
 msgid "You already voted"
 msgstr "Вы уже голосовали"
 
-#: mini_fiction/bl/comments.py:191
+#: mini_fiction/bl/comments.py:193
 msgid "You can't vote"
 msgstr "Вам нельзя голосовать"
 
-#: mini_fiction/bl/comments.py:194
+#: mini_fiction/bl/comments.py:196
 msgid "Invalid value"
 msgstr "Недопустимое значение"
 
@@ -382,6 +382,7 @@ msgid "Save changes"
 msgstr "Сохранить изменения"
 
 #: mini_fiction/templates/chapter_work.html:84
+#: mini_fiction/templates/macro.html:65
 msgid "Preview"
 msgstr "Предпросмотр"
 
@@ -392,6 +393,10 @@ msgstr "Предпросмотр выделенного"
 #: mini_fiction/templates/index.html:20 mini_fiction/views/editlog.py:30
 msgid "Moderation log"
 msgstr "Лог модерации"
+
+#: mini_fiction/templates/macro.html:64
+msgid "Send"
+msgstr "Отправить"
 
 #: mini_fiction/templates/notifications.html:13
 #: mini_fiction/templates/notifications_popup.html:4
@@ -1046,23 +1051,23 @@ msgstr "Старый пароль неверный"
 msgid "Password is incorrect"
 msgstr "Неверный пароль"
 
-#: mini_fiction/views/chapter.py:123
+#: mini_fiction/views/chapter.py:62
 msgid "Chapter"
 msgstr "Глава"
 
-#: mini_fiction/views/common_comment.py:98
+#: mini_fiction/views/common_comment.py:110
 msgid "Add new comment"
 msgstr "Добавить новый комментарий"
 
-#: mini_fiction/views/common_comment.py:138
+#: mini_fiction/views/common_comment.py:162
 msgid "Edit comment"
 msgstr "Редактировать комментарий"
 
-#: mini_fiction/views/common_comment.py:168
+#: mini_fiction/views/common_comment.py:193
 msgid "Confirm delete comment"
 msgstr "Подтверждение удаления комментария"
 
-#: mini_fiction/views/common_comment.py:197
+#: mini_fiction/views/common_comment.py:222
 msgid "Confirm restore comment"
 msgstr "Подтверждение восстановления комментария"
 

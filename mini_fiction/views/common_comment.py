@@ -63,8 +63,20 @@ def add(target_attr, target, template, template_ajax=None, template_ajax_modal=F
         abort(403)
 
     extra_ajax = g.is_ajax and request.form.get('extra_ajax') == '1'
+    preview_html = None
+
     form = CommentForm()
-    if form.validate_on_submit():
+
+    if request.form.get('act') == 'preview':
+        preview_html = target.bl.comment2html(request.form.get('text'))
+
+        if request.form.get('ajax') == '1':
+            return jsonify(
+                success=True,
+                html=render_template('includes/comment_preview.html', preview_html=preview_html),
+            )
+
+    elif form.validate_on_submit():
         # Обработка POST-запроса
         data = dict(form.data)
 
@@ -100,6 +112,7 @@ def add(target_attr, target, template, template_ajax=None, template_ajax_modal=F
         target_attr: target,
         'parent_comment': parent,
         'edit': False,
+        'preview_html': preview_html,
     }
 
     if g.is_ajax and template_ajax:
@@ -117,8 +130,19 @@ def edit(target_attr, comment, template, template_ajax=None, template_ajax_modal
         abort(403)
 
     extra_ajax = g.is_ajax and request.form.get('extra_ajax') == '1'
+    preview_html = None
     form = CommentForm(request.form, data={'text': comment.text})
-    if form.validate_on_submit():
+
+    if request.form.get('act') == 'preview':
+        preview_html = target.bl.comment2html(request.form.get('text'))
+
+        if request.form.get('ajax') == '1':
+            return jsonify(
+                success=True,
+                html=render_template('includes/comment_preview.html', preview_html=preview_html, comment=comment),
+            )
+
+    elif form.validate_on_submit():
         try:
             comment.bl.update(user, request.remote_addr, form.data)
         except ValidationError as exc:
@@ -140,6 +164,7 @@ def edit(target_attr, comment, template, template_ajax=None, template_ajax_modal
         target_attr: target,
         'comment': comment,
         'edit': True,
+        'preview_html': preview_html,
     }
 
     if g.is_ajax and template_ajax:

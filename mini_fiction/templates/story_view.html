@@ -163,7 +163,7 @@
 
             <form id="comment-form" class="comment-form" method="POST" enctype="multipart/form-data" action="{{ url_for('story_comment.add', story_id=story.id) }}">
             {% from 'macro.html' import comment_form_content %}
-            {{ comment_form_content(comment_form, 'story', story.id) }}
+            {{ comment_form_content(comment_form, 'story', story.id, preview_html=preview_html) }}
             </form>
         {% elif not story.published %}
         <h3 id="banned">В неопубликованном рассказе нельзя добавлять комментарии</h3>

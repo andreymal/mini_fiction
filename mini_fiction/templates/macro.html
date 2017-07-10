@@ -41,7 +41,7 @@
 {% endmacro %}
 
 
-{% macro comment_form_content(form, objtype=None, objid=None, parent=None) %}
+{% macro comment_form_content(form, objtype=None, objid=None, parent=None, preview_html=None) %}
     <div class="comment-form-content">
     {{ form.csrf_token() }}
     <input type="hidden" name="parent" value="{{ parent or '0' }}" />
@@ -61,9 +61,12 @@
     {% endfor %}
     {% endif %}
     <div class="control-group">
-        <input class="btn btn-primary comment_submit" type="submit" value="Отправить" />
+        <button type="submit" name="act" value="add" class="btn btn-primary js-comment-submit-btn">{{ _('Send') }}</button>
+        <button type="submit" name="act" value="preview" class="btn" id="comment-preview-btn">{{ _('Preview') }}</button>
     </div>
-    </div>
+    <img src="{{ url_for('static', filename='i/ajax-loader.gif') }}" alt="" id="comment-preview-loading-img" style="display: none;" />
+    <div id="comment-preview">{% if preview_html %}{% include 'includes/comment_preview.html' %}{% endif %}</div>
+    </div><!-- /comment-form-content -->
 {% endmacro %}
 
 

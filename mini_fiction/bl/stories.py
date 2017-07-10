@@ -655,6 +655,10 @@ class StoryBL(BaseBL, Commentable):
         from mini_fiction.models import StoryComment
         return orm.select(c for c in StoryComment if c.story == self.model)
 
+    def comment2html(self, text):
+        from mini_fiction.models import StoryComment
+        return StoryComment.bl.text2html(text)
+
     def select_comment_votes(self, author, comment_ids):
         from mini_fiction.models import StoryCommentVote
         votes = orm.select(
@@ -780,6 +784,10 @@ class StoryLocalThreadBL(BaseBL, Commentable):
     def select_comments(self):
         from mini_fiction.models import StoryLocalComment
         return orm.select(c for c in StoryLocalComment if c.local == self.model)
+
+    def comment2html(self, text):
+        from mini_fiction.models import StoryLocalComment
+        return StoryLocalComment.bl.text2html(text)
 
 
 class ChapterBL(BaseBL):

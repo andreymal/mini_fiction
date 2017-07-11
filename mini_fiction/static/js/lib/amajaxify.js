@@ -1,5 +1,5 @@
 /*!
- * amajaxify.js (2017-06)
+ * amajaxify.js (2017-07)
  * License: MIT
  * Библиотека для загрузки загрузки страниц и отправки форм с помощью
  * ES6 fetch и HTML5 History API для разных ништяков.
@@ -33,9 +33,10 @@
  *   пропатчить ответ сервера по необходимости. Обработчики должны записать
  *   новые значения page_content в объект preparedContent, а в объекте content
  *   хранится оригинальный ответ сервера, и его никто трогать не должен.
- *   На данный момент toModal всегда false; перед запуском события модальное
- *   окно, если оно было, закрывается, поэтому метод isModalNow тоже всегда
- *   возвращает false.
+ *   На данный момент toModal всегда false; перед запуском события содержимое
+ *   страницы ещё не меняется (за исключением действий в обработчиках unload),
+ *   так что метод isModalNow сообщает, является ли текущая страница, которая
+ *   будет потом выгружена, модальным окном.
  *
  * - `amajaxify:load(detail={url, content, toModal})`
  *
@@ -167,7 +168,7 @@ var amajaxify = {
         this.state.isModalNow = options.isModalNow || false;
 
         // Нужно сохранить изначальный state в истории
-        this.updatePageState(null, null, true);
+        this.updatePageState(null, null, this.state.isModalNow, {replaceState: true});
 
         // И ещё нужно сохранить уже выполненные скрипты, чтобы потом
         // при загрузке следующей страницы они не выполнялись повторно
@@ -415,7 +416,7 @@ var amajaxify = {
      *     // при изменении этого значения в одном из запросов будет
      *     // принудительно обновлена страница при следующем клике
      *     "v": any,
-
+     *
      *     // при наличии будет произведён переход на указанную страницу
      *     // средствами браузера без всяких ajax (текущая страница
      *     // выгрузится)
@@ -431,7 +432,7 @@ var amajaxify = {
      *     "modal": "html-код",
      *
      *     // что на что заменить на странице
-     *     "data": {"id элемента": "html-код", ...},
+     *     "data": {"id элемента": "html-код" или HTMLElement, ...},
      *
      *     // элементы, которые добавить в head; будут удалены при выгрузке
      *     "head": "html-код",
@@ -439,13 +440,20 @@ var amajaxify = {
      *     // заголовок страницы (да, именно html-код ради &mdash; и прочего)
      *     "title": "html-код",
      *
-     *     // список ссылок к скриптам, которые надобно выполнить строго один раз
-     *     // (для скриптов, запускаемых при каждой перезагрузке страницы,
+     *     // список ссылок к скриптам, которые надобно выполнить строго один
+     *     // раз (для скриптов, запускаемых при каждой перезагрузке страницы,
      *     // используйте обычный тег <script> в "data")
      *     "scripts": ["/path/to/script.js", ...],
      *
      *     // плюс что угодно ещё для обработки сторонними обработчиками
      *     }
+     *
+     * Значения `"data"` могут иметь два типа. Если это строка, то HTML-код
+     * просто помещается как содержимое внутрь элемента с данным id. Если это
+     * HTML-элемент, то поведение зависит от его id: если он совпадает
+     * с указанным в ключе id, то старый элемент удаляется совсем и вместо
+     * него помещается новый HTML-элемент; если не совпадает, то HTML-элемент
+     * просто помещается внутрь старого элемента с указанным id.
      *
      * @param {string} url - ссылка на страницу, от которой это содержимое
      *   (будет запихнуто в адресную строку)
@@ -488,11 +496,10 @@ var amajaxify = {
             this._dispatchEvent('amajaxify:unload', {url: url, content: content, toModal: true});
 
             this.updateModalFunc(content.modal);
-            this.state.isModalNow = true;
             if (content.title) {
                 document.head.getElementsByTagName('title')[0].innerHTML = content.title;
             }
-            this.updatePageState(url, content.title, options);
+            this.updatePageState(url, content.title, true, options);
 
             this._dispatchEvent('amajaxify:load', {url: url, content: content, toModal: true});
 
@@ -504,20 +511,19 @@ var amajaxify = {
             // Установка обычного контента страницы
             this._dispatchEvent('amajaxify:unload', {url: url, content: content, toModal: false});
 
+            // Позволяем обработчикам пошаманить по необходимости
+            var readyContent = this._prepareContent(url, content, toModal);
+
             if (this.updateModalFunc) {
                 this.updateModalFunc(null);
             }
-            this.state.isModalNow = false;
-
-            // Позволяем обработчикам пошаманить по необходимости
-            var readyContent = this._prepareContent(url, content, toModal);
 
             this.setHead(readyContent.head);
             if (readyContent.title) {
                 document.head.getElementsByTagName('title')[0].innerHTML = readyContent.title;
             }
             this.setPageData(readyContent.data);
-            this.updatePageState(url, readyContent.title, options);
+            this.updatePageState(url, readyContent.title, false, options);
 
             // Запускаем скрипты (только те, которые ещё не запускались когда-то раньше)
             if (readyContent.scripts) {
@@ -565,7 +571,7 @@ var amajaxify = {
         return readyContent;
     },
 
-    updatePageState: function(url, title, options) {
+    updatePageState: function(url, title, isModalNow, options) {
         options = options || {};
 
         var titleElem = document.head.getElementsByTagName('title')[0];
@@ -578,7 +584,7 @@ var amajaxify = {
 
         var state = {
             amajaxify: true,
-            isModalNow: this.state.isModalNow,
+            isModalNow: isModalNow,
             title: title
         };
 
@@ -591,11 +597,25 @@ var amajaxify = {
             url = url.substring(url.indexOf('://') + 1);
         }
 
-        if (!options.replaceState && location.href !== url) {
+        // Нормализуем ссылки для сравнения: https://example.com/foo/ → /foo/
+        var normCurrentUrl = this._normURL(location.toString());
+        var normNewUrl = this._normURL(url);
+
+        // Вызываем replaceState вместо pushState, если:
+        // 1) Нас об этом явно попросили
+        var replaceState = options.replaceState;
+        // 2) Ссылка другая, и при этом не создаётся модальное окно
+        // (при открытии модального окна с replaceState кнопка «Назад»
+        // иногда ведёт себя неправильно)
+        replaceState = replaceState || normCurrentUrl === normNewUrl && (this.state.isModalNow || !isModalNow);
+
+        if (!replaceState) {
             history.pushState(state, '', url);
         } else {
             history.replaceState(state, '', url);
         }
+
+        this.state.isModalNow = isModalNow;
 
         var scrollTop = window.pageYOffset || document.documentElement.scrollTop || document.body.scrollTop;
         if (!options.noScroll && !this.state.isModalNow && scrollTop >= this.scrollToTopFrom) {
@@ -664,17 +684,44 @@ var amajaxify = {
             if (event.state && event.state.title) {
                 document.head.getElementsByTagName('title')[0].innerHTML = event.state.title;
             }
-            // FIXME: при нажатии «Вперёд» при модальном окне контент не совпадает с ссылкой,
-            // но без сохранения старого location не починить
+            // FIXME: при нажатии «Вперёд» при модальном окне контент
+            // не совпадает с ссылкой, но без сохранения старого location
+            // не починить. Однако сохранить его не дают две вещи:
+            // 1) Другие скрипты могут произвольно вызывать replaceState
+            //    и pushState, в результате сохранённая версия окажется
+            //    протухшей.
+            // 2) Событие popstate сразу же пихает новую ссылку в историю,
+            //    в результате, если было не модальное окно и «Назад»/«Вперёд»
+            //    откроет модальное, если сохранять ссылку в handlePageData
+            //    (который вызывается из goto, который вызывается чуть ниже)
+            //    или пусть даже в самом goto, то будет ошибочна сохранена
+            //    ссылка модального окна вместо ссылки страницы, из которой
+            //    мы уходим и которая будет на фоне свежеоткрытого окна.
             return;
         } else if (!this.state.isModalNow && this.updateModalFunc) {
-            // Но прятать окна, не являющиеся страницами, в любом случае надо (NSFW-предупреждение, например)
+            // Но даже если мы будем загружать новую страницу, перед его
+            // загрузкой надо спрятать модальное окно, которое не страница
+            // (если но есть)
             this.updateModalFunc(null);
         }
         // Здесь в принципе можно организовать кэширование, но нужно ли?
         if (!this.goto('GET', location.toString(), undefined, {replaceState: true, noScroll: true})) {
             console.warn('amajaxify: failed to popstate');
         }
+    },
+
+    /**
+     * Метод, отрезающий протокол и домен от ссылки. Используется
+     * для их сравнения.
+     */
+    _normURL: function(url) {
+        if (url.indexOf('://') > 0) {
+            url = url.substring(url.indexOf('://') + 3);
+        }
+        if (url.indexOf('/') > 0) {
+            url = url.substring(url.indexOf('/'));
+        }
+        return url;
     },
 
     /**
@@ -807,9 +854,25 @@ var amajaxify = {
             }
             var elem = document.getElementById(key);
             if (elem) {
-                elem.innerHTML = data[key];
-                if (this.allowScriptTags) {
-                    this._startElemScripts(elem);
+                if (data[key] instanceof HTMLElement) {
+                    // Если нам скормили HTML-элемент с тем же id, то заменяем
+                    // элемент целиком; если не с тем же, то пихаем внутрь
+                    // FIXME: allowScriptTags учитывать или не надо?
+                    if (data[key].id === elem.id) {
+                        elem.removeAttribute('id');
+                        elem.innerHTML = '';
+                        elem.parentNode.insertBefore(data[key], elem);
+                        elem.parentNode.removeChild(elem);
+                    } else {
+                        elem.innerHTML = '';
+                        elem.appendChild(data[key]);
+                    }
+                } else {
+                    // Если скормили строку, то это HTML-код и просто пихаем
+                    elem.innerHTML = data[key];
+                    if (this.allowScriptTags) {
+                        this._startElemScripts(elem);
+                    }
                 }
             } else {
                 console.warn('amajaxify: received content for #' + key + ', but element not found');

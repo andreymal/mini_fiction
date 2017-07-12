@@ -70,7 +70,7 @@ def bookmarks(page):
         'bookmarks.html',
         objects,
         count=objects.count(),
-        page_title='Закладки',
+        page_title='Прочитать позже',
         objlistname='stories',
     )
 

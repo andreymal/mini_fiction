@@ -329,7 +329,7 @@ var story = {
             return false;
         }
 
-        core.notify(bookmarked ? 'Рассказ добавлен в закладки' : 'Рассказ удален из закладок');
+        core.notify(bookmarked ? 'Рассказ добавлен в список' : 'Рассказ удален из списка');
         return true;
     },
 

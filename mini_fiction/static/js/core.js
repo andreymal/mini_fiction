@@ -225,6 +225,11 @@ var core = {
             return;
         }
 
+        if (document.cookie.indexOf('noajax=1') >= 0) {
+            console.log('amajaxify disabled by cookie');
+            return;
+        }
+
         var initOk = amajaxify.init({
             customFetch: core.ajax.fetch.bind(core.ajax),
             withoutClickHandler: true,

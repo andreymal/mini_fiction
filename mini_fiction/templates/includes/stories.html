@@ -29,8 +29,8 @@
                 {% if current_user.is_authenticated and current_user.detail_view %}
                     <br/>
                     <span>
-                    {{- ngettext("%(num)d view", "%(num)d views", story.views) -}},
-                    {{- ngettext("%(num)d comment", "%(num)d comments", story.comments_count) }}
+                    {{- ngettext("%(num)d view", "%(num)d views", story.views) }},
+                    {{ ngettext("%(num)d comment", "%(num)d comments", story.comments_count) -}}
                     </span>
                     {% set delta = 0 if activities is defined and not activities.get(story.id) else story_comments_delta(story, current_user, activity=activities and activities.get(story.id)) %}
                     {% if delta > 0 %}

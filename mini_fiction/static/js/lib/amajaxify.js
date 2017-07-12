@@ -340,8 +340,13 @@ var amajaxify = {
             return;
         }
 
+        // Если кликнули не левую кнопку мыши, то ничего не делаем
         if ((event.which || event.button) !== 1) {
-            // Если кликнули не левую кнопку мыши
+            return;
+        }
+
+        // Если клинули с какой-то зажатой клавишей, то тоже ничего не делаем
+        if (event.ctrlKey || event.altKey || event.shiftKey || event.metaKey) {
             return;
         }
 

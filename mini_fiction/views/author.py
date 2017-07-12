@@ -30,8 +30,10 @@ def info(user_id=None, comments_page=1):
         author = current_user._get_current_object()
         comments_list = StoryComment.bl.select_by_story_author(author)
         comments_list = comments_list.order_by(StoryComment.id.desc())
-        stories = author.stories.order_by(Story.first_published_at.desc(), Story.id.desc())
-        contributing_stories = author.contributing_stories.order_by(Story.first_published_at.desc(), Story.id.desc())
+        stories = list(author.stories)
+        stories.sort(key=lambda x: x.first_published_at or x.date, reverse=True)
+        contributing_stories = list(author.contributing_stories)
+        contributing_stories.sort(key=lambda x: x.first_published_at or x.date, reverse=True)
 
         data['all_views'] = Story.bl.get_all_views_for_author(author)
 
@@ -45,8 +47,8 @@ def info(user_id=None, comments_page=1):
         comments_list = StoryComment.select(lambda x: x.author.id == author_id and not x.deleted and x.story_published)
         comments_list = comments_list.order_by(StoryComment.id.desc())
         data['page_title'] = gettext('Author: {author}').format(author=author.username)
-        stories = Story.bl.select_by_author(author, for_user=current_user)
-        stories = stories.order_by(Story.first_published_at.desc(), Story.id.desc())
+        stories = list(Story.bl.select_by_author(author, for_user=current_user))
+        stories.sort(key=lambda x: x.first_published_at or x.date, reverse=True)
         contributing_stories = None
         template = 'author_overview.html'
 

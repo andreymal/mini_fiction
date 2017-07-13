@@ -277,8 +277,42 @@ class StoryBL(BaseBL, Commentable):
             later(current_app.tasks['notify_story_chapters'].delay, published_chapter_ids, user.id if user else None)
 
     def delete(self):
+        from mini_fiction.models import StoryComment, StoryLocalComment, Subscription, Notification
+
         story = self.model
         later(current_app.tasks['sphinx_delete_story'].delay, story.id)
+
+        # Pony ORM не осиливает сложный каскад, помогаем
+        # (StoryLog зависит от Chapter и от Story, Pony ORM пытается удалить
+        # Chapter раньше, и БД ругается, что у него ещё есть зависимые StoryLog)
+        # https://github.com/ponyorm/pony/issues/278
+        story.edit_log.select().delete(bulk=True)
+
+        story_id = story.id  # Вроде бы обход утечки памяти
+        local_thread_id = story.local.id if story.local else None
+
+        # Неявная связь с подписками
+        Subscription.select(
+            lambda x: x.type in ('story_comment', 'story_lcomment') and x.target_id == story_id
+        ).delete(bulk=True)
+
+        # Неявная связь с уведомлениями
+        Notification.select(
+            lambda x: x.type in ('story_publish', 'story_draft') and x.target_id == story_id
+        ).delete(bulk=True)
+
+        comment_ids = orm.select(x.id for x in StoryComment if x.story.id == story_id)
+        Notification.select(
+            lambda x: x.type in ('story_reply', 'story_comment') and x.target_id in comment_ids
+        ).delete(bulk=True)
+
+        if local_thread_id is not None:
+            local_comment_ids = orm.select(x.id for x in StoryLocalComment if x.local.id == local_thread_id)
+            Notification.select(
+                lambda x: x.type in ('story_lreply', 'story_lcomment') and x.target_id in local_comment_ids
+            ).delete(bulk=True)
+
+        # Остальные связи Pony ORM осилит
         story.delete()
 
     def viewed(self, user):

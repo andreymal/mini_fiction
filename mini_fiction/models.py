@@ -282,7 +282,7 @@ class Story(db.Entity):
     activity = orm.Set('Activity')
     votes = orm.Set('Vote')
     comments = orm.Set('StoryComment')
-    local = orm.Optional('StoryLocalThread')
+    local = orm.Optional('StoryLocalThread', cascade_delete=True)
 
     orm.composite_index(approved, draft)
     orm.composite_index(approved, draft, first_published_at)

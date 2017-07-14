@@ -24,9 +24,12 @@ from mini_fiction.validation.auth import REGISTRATION, LOGIN
 __all__ = ['AuthorBL']
 
 
+# Здесь перечислены только те подписки, которые не имеют конкретного target
+# Информация о подписке на них хранится в полях Author.silent_*
 allowed_subscriptions = {
     'story_pubrequest',
     'story_publish',
+    'story_publish_noappr',
     'story_draft',
     'story_reply',
     'story_lreply',

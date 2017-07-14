@@ -219,27 +219,48 @@ class StoryBL(BaseBL, Commentable):
             if not story.draft and user and not user.is_staff:
                 story.published_by_author = user
 
-            notify = user and not story.draft and not story.approved and not user.is_staff
-            notify = notify and (
+            # Уведомление о запросе публикации, если:
+            # 1) Это запросил обычный пользователь
+            notify_pubrequest = user and not story.draft and not story.approved and not user.is_staff
+            # 2) С момента предыдущего запроса прошло достаточно времени (защита от email-флуда)
+            notify_pubrequest = notify_pubrequest and (
                 not story.last_staff_notification_at or
                 story.last_staff_notification_at + timedelta(seconds=current_app.config['STORY_NOTIFICATIONS_INTERVAL']) < datetime.utcnow()
             )
 
-            if notify:
-                # Автор запросил публикацию рассказа, сообщаем модераторам по E-mail
+            if notify_pubrequest:
                 story.last_staff_notification_at = datetime.utcnow()
                 story.last_author_notification_at = None
                 later(current_app.tasks['notify_story_pubrequest'].delay, story.id, user.id)
 
-            if user and user.is_staff and (story.published or not old_draft) and (
+            # Уведомление автора о скрытии рассказа модератором, если:
+            # 1) Если это и правда модератор
+            notify_draft = user and user.is_staff
+            # 2) Рассказ был опубликован
+            notify_draft = notify_draft and (old_published and story.draft)
+            # 3) С момента предыдущего уведомления прошло достаточно времени
+            notify_draft = notify_draft and (
                 not story.last_author_notification_at or
                 story.last_author_notification_at + timedelta(seconds=current_app.config['STORY_NOTIFICATIONS_INTERVAL']) < datetime.utcnow()
-            ):
-                # Или это модератор убрал рассказ в черновики, уведомляем автора
+            )
+
+            if notify_draft:
                 story.last_author_notification_at = datetime.utcnow()
                 story.last_staff_notification_at = None
                 later(current_app.tasks['notify_story_publish_draft'].delay, story.id, user.id, not story.published)
 
+            # Уведомление модераторов о публикации рассказа, если:
+            # 1) Его опубликовал обычный пользователь
+            notify_publish_noappr = user and not user.is_staff
+            # 2) Рассказ опубликован и ранее был автоматически одобрен (отключенная премодерация)
+            notify_publish_noappr = notify_publish_noappr and story.published and not story.approved_by
+            # 3) Рассказ ранее не публиковался
+            notify_publish_noappr = notify_publish_noappr and not story.first_published_at
+
+            if notify_publish_noappr:
+                later(current_app.tasks['notify_story_publish_noappr'].delay, story.id, user.id)
+
+            # Прочие действия, в том числе проставление first_published_at
             if old_published != story.published:
                 if story.published and not story.first_published_at:
                     story.first_published_at = datetime.utcnow()

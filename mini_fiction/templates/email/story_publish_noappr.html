@@ -1,0 +1,6 @@
+{% extends 'email/base.html' %}
+{% import 'email/macro.html' as macro %}
+
+{% block body %}
+Пользователь {{ macro.userlink(author.id, author.username) }} опубликовал рассказ {{ macro.storylink(story.id, story.title) }} без премодерации.
+{% endblock %}

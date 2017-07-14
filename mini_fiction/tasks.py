@@ -156,6 +156,21 @@ def notify_story_pubrequest(story_id, author_id):
 
 @task()
 @db_session
+def notify_story_publish_noappr(story_id, author_id):
+    story = models.Story.get(id=story_id)
+    if not story:
+        return
+    author = models.Author.get(id=author_id)
+    if not author:
+        return
+
+    staff = models.Author.select(lambda x: x.is_staff)
+    recipients = [u.email for u in staff if u.email and 'story_publish_noappr' not in u.silent_email_list]
+    _sendmail_notify(recipients, 'story_publish_noappr', {'story': story, 'author': author})
+
+
+@task()
+@db_session
 def notify_story_publish_draft(story_id, staff_id, draft):
     story = models.Story.get(id=story_id)
     if not story:

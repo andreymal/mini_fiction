@@ -1,0 +1,1 @@
+{{ author.username }} опубликовал рассказ «{{ story.title|safe }}» — {{ SITE_NAME }}

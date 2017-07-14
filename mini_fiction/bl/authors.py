@@ -40,7 +40,7 @@ class AuthorBL(BaseBL):
             raise ValidationError({'username': lazy_gettext('Please set username and password')})
 
         errors = {}
-        if self.model.select(lambda x: x.username == data['username']):
+        if self.model.select(lambda x: x.username.lower() == data['username'].lower()):
             errors['username'] = [lazy_gettext('User already exists')]
         if current_app.config['CHECK_PASSWORDS_SECURITY'] and not self.is_password_good(data['password'], extra=(data['username'],)):
             errors['password'] = [lazy_gettext('Password is too bad, please change it')]
@@ -514,9 +514,9 @@ class AuthorBL(BaseBL):
         data = Validator(LOGIN).validated(data)
         user = None
         if data['username']:
-            user = self._model().select(lambda x: x.username == data['username']).first()
+            user = self._model().select(lambda x: x.username.lower() == data['username'].lower()).first()
         if not user or not user.bl.authenticate(data['password']):
-            raise ValidationError({'username': [lazy_gettext('Please enter a correct username and password. Note that both fields may be case-sensitive.')]})
+            raise ValidationError({'username': [lazy_gettext('Please enter a correct username and password.')]})
         if not user.is_active:
             raise ValidationError({'username': [lazy_gettext('Account is disabled')]})
         return user

@@ -66,11 +66,9 @@ msgstr "Слишком большой аватар; надо {w}x{h} или ме
 
 #: mini_fiction/bl/authors.py:519
 msgid ""
-"Please enter a correct username and password. Note that both fields may "
-"be case-sensitive."
+"Please enter a correct username and password."
 msgstr ""
-"Пожалуйста, введите правильные имя пользователя и пароль. Оба поля могут "
-"быть чувствительны к регистру."
+"Пожалуйста, введите правильные имя пользователя и пароль."
 
 #: mini_fiction/bl/authors.py:521
 msgid "Account is disabled"

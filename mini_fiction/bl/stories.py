@@ -169,6 +169,8 @@ class StoryBL(BaseBL, Commentable):
         story.approved = bool(approved)
         if user:
             self.edit_log(user, {'approved': [old_approved, story.approved]})
+            if story.approved:
+                story.approved_by = user
 
         notify = user and user.is_staff and not story.draft
         notify = notify and (

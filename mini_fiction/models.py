@@ -66,6 +66,7 @@ class Author(db.Entity, UserMixin):
     contacts = orm.Set('Contact')
     contributing = orm.Set('StoryContributor')
     coauthorseries = orm.Set('CoAuthorsSeries')
+    approvals = orm.Set('Story', reverse='approved_by')
     published_stories = orm.Set('Story', reverse='published_by_author')
     favorites = orm.Set('Favorites')
     bookmarks = orm.Set('Bookmark')
@@ -271,6 +272,7 @@ class Story(db.Entity):
     source_link = orm.Optional(str, 255)
     source_title = orm.Optional(str, 255)
     pinned = orm.Required(bool, default=False)
+    approved_by = orm.Optional(Author)
     published_by_author = orm.Optional(Author)  # Ему будет отправлено уведомление о публикации
     last_author_notification_at = orm.Optional(datetime, 6)  # Во избежание слишком частых уведомлений
     last_staff_notification_at = orm.Optional(datetime, 6)

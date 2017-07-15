@@ -24,11 +24,15 @@
                     {%- if story.vote_total %} и {% else %}Он собрал{% endif %} {{ ngettext("%(num)d comment", "%(num)d comments", story.comments_count) }}
                 {%- endif %}.
             </p>
+            <p>&nbsp;</p>
         {% endif %}
         {% if story.first_published_at and (story.views or story.vote_total or story.comments_count) %}
             <p><strong>Всё это будет удалено без возможности восстановления!</strong></p>
         {% else %}
             <p>Вся связанная статистика, главы, оценки и комментарии также будут безвозвратно удалены!</p>
+        {% endif %}
+        {% if story.first_published_at %}
+            <p>Модераторам будет отправлено уведомление об этом событии.</p>
         {% endif %}
     </div>
 

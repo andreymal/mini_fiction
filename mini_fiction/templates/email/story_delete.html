@@ -1,0 +1,9 @@
+{% extends 'email/base.html' %}
+{% import 'email/macro.html' as macro %}
+
+{% block body %}
+Рассказ {{ macro.storylink(story_id, story_title) }} (id {{ story_id }}) был удалён{% if user %} пользователем {{ macro.userlink(user.id, user.username) }}{% endif %}.{% if approved_by %}<br/>
+<br/>
+Он был одобрен модератором {{ macro.userlink(approved_by.id, approved_by.username) }}.
+{% endif %}
+{% endblock %}

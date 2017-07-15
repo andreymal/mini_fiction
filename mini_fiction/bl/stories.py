@@ -299,11 +299,22 @@ class StoryBL(BaseBL, Commentable):
         if published_chapter_ids:
             later(current_app.tasks['notify_story_chapters'].delay, published_chapter_ids, user.id if user else None)
 
-    def delete(self):
+    def delete(self, user=None):
         from mini_fiction.models import StoryComment, StoryLocalComment, Subscription, Notification
 
         story = self.model
         later(current_app.tasks['sphinx_delete_story'].delay, story.id)
+
+        # При необходимости уведомляем модераторов об удалении
+        # (учтите, что код отправки уведомления выполнится не сейчас, а после удаления)
+        if story.approved and story.first_published_at:
+            later(
+                current_app.tasks['notify_story_delete'].delay,
+                story_id=story.id,
+                story_title=story.title,
+                user_id=user.id if user else None,
+                approved_by_id=story.approved_by.id if story.approved and story.approved_by else None,
+            )
 
         # Pony ORM не осиливает сложный каскад, помогаем
         # (StoryLog зависит от Chapter и от Story, Pony ORM пытается удалить

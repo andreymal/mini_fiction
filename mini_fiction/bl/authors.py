@@ -31,6 +31,7 @@ allowed_subscriptions = {
     'story_publish',
     'story_publish_noappr',
     'story_draft',
+    'story_delete',
     'story_reply',
     'story_lreply',
     'news_reply',

@@ -170,6 +170,10 @@
                                     <strong>Публикация рассказа без премодерации:</strong>
                                     <label style="display: inline-block;">{{ subs_form.email_story_publish_noappr }} почта</label>
                                 </p>
+                                <p{% if not current_user.is_staff %} style="display: none;"{% endif %}>
+                                    <strong>Удаление опубликованного рассказа:</strong>
+                                    <label style="display: inline-block;">{{ subs_form.email_story_delete }} почта</label>
+                                </p>
                                 <p>
                                     <strong>Публикация вашего рассказа:</strong>
                                     <label style="display: inline-block;">{{ subs_form.email_story_publish }} почта</label>

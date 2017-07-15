@@ -171,6 +171,31 @@ def notify_story_publish_noappr(story_id, author_id):
 
 @task()
 @db_session
+def notify_story_delete(story_id, story_title, user_id=None, approved_by_id=None):
+    user = None
+    if user_id is not None:
+        user = models.Author.get(id=user_id)
+
+    approved_by = None
+    if approved_by_id is not None:
+        approved_by = models.Author.get(id=approved_by_id)
+
+    staff = models.Author.select(lambda x: x.is_staff)
+    recipients = [u.email for u in staff if u.email and 'story_delete' not in u.silent_email_list]
+    _sendmail_notify(
+        recipients,
+        'story_delete',
+        {
+            'story_id': story_id,
+            'story_title': story_title,
+            'user': user,
+            'approved_by': approved_by,
+        }
+    )
+
+
+@task()
+@db_session
 def notify_story_publish_draft(story_id, staff_id, draft):
     story = models.Story.get(id=story_id)
     if not story:

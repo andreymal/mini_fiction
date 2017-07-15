@@ -1,0 +1,7 @@
+{% autoescape false -%}
+Рассказ «{{ story_title }}» (id {{ story_id }}) на сайте {{ url_for('index.index', _external=True) }} был удалён{% if user %} пользователем {{ user.username }}{% endif %}.{% if approved_by %}
+
+Он был одобрен модератором {{ approved_by.username }}{% endif %}
+
+{{ SITE_NAME }}
+{%- endautoescape %}

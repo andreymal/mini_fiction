@@ -158,6 +158,7 @@ def edit():
                     'story_publish': subs_form.email_story_publish.data,
                     'story_publish_noappr': subs_form.email_story_publish_noappr.data,
                     'story_draft': subs_form.email_story_draft.data,
+                    'story_delete': subs_form.email_story_delete.data,
                     'story_reply': subs_form.email_story_reply.data,
                     'story_lreply': subs_form.email_story_lreply.data,
                     'news_reply': subs_form.email_news_reply.data,
@@ -211,6 +212,7 @@ def edit():
         subs_form = AuthorEditSubscriptionsForm(formdata=None, data={
             'email_story_pubrequest': 'story_pubrequest' not in silent_email,
             'email_story_publish_noappr': 'story_publish_noappr' not in silent_email,
+            'email_story_delete': 'story_delete' not in silent_email,
 
             'email_story_publish': 'story_publish' not in silent_email,
             'tracker_story_publish': 'story_publish' not in silent_tracker,

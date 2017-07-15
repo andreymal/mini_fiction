@@ -177,6 +177,7 @@ class AuthorEditSubscriptionsForm(Form):
 
     email_story_pubrequest = BooleanField()
     email_story_publish_noappr = BooleanField()
+    email_story_delete = BooleanField()
 
     email_story_publish = BooleanField()
     tracker_story_publish = BooleanField()

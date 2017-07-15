@@ -440,7 +440,7 @@ def delete(pk):
         abort(403)
 
     if request.method == 'POST':
-        story.bl.delete()
+        story.bl.delete(user=user)
         return redirect(url_for('index.index'))
 
     page_title = 'Подтверждение удаления рассказа'

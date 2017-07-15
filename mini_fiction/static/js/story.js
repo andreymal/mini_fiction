@@ -193,6 +193,16 @@ var story = {
         $('#sortable_chapters').sortable({
             update: this._sortEvent.bind(this)
         });
+
+        // Подтверждение удаления рассказа
+        var delForm = document.getElementsByClassName('js-story-delete-form')[0];
+        if (delForm && delForm.agree) {
+            delForm.agree.checked = false;
+            delForm.getElementsByClassName('js-story-delete-btn')[0].disabled = true;
+            delForm.agree.addEventListener('change', function() {
+                delForm.getElementsByClassName('js-story-delete-btn')[0].disabled = !delForm.agree.checked;
+            });
+        }
     },
 
     unload: function() {

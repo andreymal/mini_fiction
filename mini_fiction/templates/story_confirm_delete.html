@@ -8,15 +8,42 @@
 
     <div class="story-item">
         <p>Вы действительно хотите удалить рассказ <strong>«{{ story.title }}»</strong>?</p>
-        <p>Вся связанная статистика, главы, оценки и комментарии также будут безвозвратно удалены!</p>
+
+        {% if story.approved and story.approved_by %}
+            <p>Он был одобрен модератором <a class="authorlink" href="{{ url_for('author.info', user_id=story.approved_by.id) }}">{{ story.approved_by.username }}</a>.</p>
+        {% endif %}
+
+        {% if story.first_published_at %}
+            <p>
+                Он был опубликован {{ story.first_published_at|datetimeformat('d MMMM Y') -}}
+                {%- if story.views %}, {{ ngettext("it was viewed by %(num)d user", "it was viewed by %(num)d users", story.views) }}{% endif %}.
+            </p>
+            <p>
+                {%- if story.vote_total %}Он собрал {{ ngettext("%(num)d vote", "%(num)d votes", story.vote_total) }}{%- endif %}
+                {%- if story.comments_count %}
+                    {%- if story.vote_total %} и {% else %}Он собрал{% endif %} {{ ngettext("%(num)d comment", "%(num)d comments", story.comments_count) }}
+                {%- endif %}.
+            </p>
+        {% endif %}
+        {% if story.first_published_at and (story.views or story.vote_total or story.comments_count) %}
+            <p><strong>Всё это будет удалено без возможности восстановления!</strong></p>
+        {% else %}
+            <p>Вся связанная статистика, главы, оценки и комментарии также будут безвозвратно удалены!</p>
+        {% endif %}
     </div>
 
-    <form method="POST" enctype="multipart/form-data">
+    <form method="POST" enctype="multipart/form-data" class="js-story-delete-form">
           <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+          {% if story.first_published_at %}
+              <div>
+                <input type="checkbox" name="agree" value="1" autocomplete="off" />
+                Я осознаю возможные последствия и хочу безвозвратно удалить рассказ «{{ story.title }}» и всё, что с ним связано<br/><br/>
+              </div>
+          {% endif %}
           <div class="control-group">
             <div class="controls">
                 <a href="{{ url_for('story.view', pk=story.id) }}" class="btn">Отменить</a>
-                <input type="submit" class="btn btn-danger" value="Удалить">
+                <input type="submit" class="btn btn-danger js-story-delete-btn" value="Удалить" />
             </div>
         </div>
     </form>

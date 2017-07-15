@@ -439,7 +439,7 @@ def delete(pk):
     if not story.bl.deletable_by(user):
         abort(403)
 
-    if request.method == 'POST':
+    if request.method == 'POST' and (not story.first_published_at or request.form.get('agree') == '1'):
         story.bl.delete(user=user)
         return redirect(url_for('index.index'))
 
@@ -449,11 +449,7 @@ def delete(pk):
         'story': story,
     }
 
-    if g.is_ajax:
-        html = render_template('includes/ajax/story_ajax_confirm_delete.html', page_title=page_title, story=story)
-        return jsonify({'page_content': {'modal': html, 'title': page_title}})
-    else:
-        return render_template('story_confirm_delete.html', **data)
+    return render_template('story_confirm_delete.html', **data)
 
 
 @bp.route('/<int:story_id>/download/<filename>', methods=('GET',))

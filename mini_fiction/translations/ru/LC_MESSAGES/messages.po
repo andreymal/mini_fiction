@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version:  0.0.2\n"
 "Report-Msgid-Bugs-To: andriyano-31@mail.ru\n"
-"POT-Creation-Date: 2017-07-12 21:07+0300\n"
+"POT-Creation-Date: 2017-07-15 19:55+0300\n"
 "Last-Translator: andreymal <andriyano-31@mail.ru>\n"
 "Language: ru\n"
 "Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && "
@@ -18,7 +18,7 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 2.4.0\n"
 
-#: mini_fiction/models.py:409 mini_fiction/models.py:664
+#: mini_fiction/models.py:411 mini_fiction/models.py:666
 msgid "Chapter {}"
 msgstr "Глава {}"
 
@@ -26,51 +26,49 @@ msgstr "Глава {}"
 msgid "Add new"
 msgstr "Добавить новый"
 
-#: mini_fiction/bl/authors.py:40
+#: mini_fiction/bl/authors.py:44
 msgid "Please set username and password"
 msgstr "Укажите имя пользователя и пароль"
 
-#: mini_fiction/bl/authors.py:44
+#: mini_fiction/bl/authors.py:48
 msgid "User already exists"
 msgstr "Пользователь уже существует"
 
-#: mini_fiction/bl/authors.py:46 mini_fiction/views/auth.py:113
+#: mini_fiction/bl/authors.py:50 mini_fiction/views/auth.py:113
 #: mini_fiction/views/author.py:114
 msgid "Password is too bad, please change it"
 msgstr "Пароль слишком плохой, поменяйте его"
 
-#: mini_fiction/bl/authors.py:48 mini_fiction/bl/authors.py:219
-#: mini_fiction/bl/authors.py:371
+#: mini_fiction/bl/authors.py:52 mini_fiction/bl/authors.py:223
+#: mini_fiction/bl/authors.py:375
 msgid "Email address is already in use"
 msgstr "Электропочта уже используется"
 
-#: mini_fiction/bl/authors.py:105
+#: mini_fiction/bl/authors.py:109
 msgid "Invalid contact type"
 msgstr "Неправильный тип контакта"
 
-#: mini_fiction/bl/authors.py:144
+#: mini_fiction/bl/authors.py:148
 msgid "Too big avatar; must be {value} KiB or smaller"
 msgstr "Слишком большой аватар; надо {value} КиБ или меньше"
 
-#: mini_fiction/bl/authors.py:151
+#: mini_fiction/bl/authors.py:155
 msgid "Cannot read avatar"
 msgstr "Не получилось прочитать аватар"
 
-#: mini_fiction/bl/authors.py:293
+#: mini_fiction/bl/authors.py:297
 msgid "Too small avatar; must be {w}x{h} or bigger"
 msgstr "Слишком маленький аватар; надо {w}x{h} или больше"
 
-#: mini_fiction/bl/authors.py:295
+#: mini_fiction/bl/authors.py:299
 msgid "Too big avatar; must be {w}x{h} or smaller"
 msgstr "Слишком большой аватар; надо {w}x{h} или меньше"
 
-#: mini_fiction/bl/authors.py:519
-msgid ""
-"Please enter a correct username and password."
-msgstr ""
-"Пожалуйста, введите правильные имя пользователя и пароль."
+#: mini_fiction/bl/authors.py:523
+msgid "Please enter a correct username and password."
+msgstr "Пожалуйста, введите правильные имя пользователя и пароль."
 
-#: mini_fiction/bl/authors.py:521
+#: mini_fiction/bl/authors.py:525
 msgid "Account is disabled"
 msgstr "Аккаунт отключен"
 
@@ -348,6 +346,7 @@ msgstr[2] "%(num)d раз"
 #: mini_fiction/templates/includes/stories.html:33
 #: mini_fiction/templates/index.html:43
 #: mini_fiction/templates/news/index.html:18
+#: mini_fiction/templates/story_confirm_delete.html:24
 #, python-format
 msgid "%(num)d comment"
 msgid_plural "%(num)d comments"
@@ -416,6 +415,23 @@ msgid_plural "Found %(num)d chapters"
 msgstr[0] "Всего нашли %(num)d главу"
 msgstr[1] "Всего нашли %(num)d главы"
 msgstr[2] "Всего нашли %(num)d глав"
+
+#: mini_fiction/templates/story_confirm_delete.html:19
+#, python-format
+msgid "it was viewed by %(num)d user"
+msgid_plural "it was viewed by %(num)d users"
+msgstr[0] "его просмотрел %(num)d пользователь"
+msgstr[1] "его просмотрели %(num)d пользователя"
+msgstr[2] "его просмотрели %(num)d пользователей"
+
+#: mini_fiction/templates/includes/story_header_info.html:1
+#: mini_fiction/templates/story_confirm_delete.html:22
+#, python-format
+msgid "%(num)d vote"
+msgid_plural "%(num)d votes"
+msgstr[0] "%(num)d голос"
+msgstr[1] "%(num)d голоса"
+msgstr[2] "%(num)d голосов"
 
 #: mini_fiction/templates/email/story_chapter.html:13
 #: mini_fiction/templates/includes/ajax/story_ajax_publish_warning.html:9
@@ -791,18 +807,10 @@ msgstr[0] "Показать %(num)d главу"
 msgstr[1] "Показать %(num)d главы"
 msgstr[2] "Показать %(num)d глав"
 
-#: mini_fiction/templates/includes/story_control_buttons.html:36
+#: mini_fiction/templates/includes/story_control_buttons.html:33
 #: mini_fiction/views/editlog.py:48
 msgid "Edit log"
 msgstr "Лог изменений"
-
-#: mini_fiction/templates/includes/story_header_info.html:1
-#, python-format
-msgid "%(num)d vote"
-msgid_plural "%(num)d votes"
-msgstr[0] "%(num)d голос"
-msgstr[1] "%(num)d голоса"
-msgstr[2] "%(num)d голосов"
 
 #: mini_fiction/templates/includes/ajax/story_ajax_publish_approved.html:10
 #: mini_fiction/templates/includes/ajax/story_ajax_publish_unapproved.html:10

@@ -6,10 +6,10 @@
     <div class="span12 story-page" id="story_{{ story.id }}">
         {{- breadcrumbs([[url_for('story.view', pk=story.id), story.title]]) }}
 
+        {% include 'includes/story_control_buttons.html' %}
         <h1 id="story_title">{{ story.title }}
         {% if not story.original %} <sup class="translation">перевод</sup>{% endif %}
             {% if story.finished %} <sup class="complete">завершен</sup>{% endif %}{% if story.freezed %} <sup class="suspended">заморожен</sup>{% endif %}
-              {% include 'includes/story_control_buttons.html' %}
           </h1>
 
         <!-- Вывод комментариев: начало -->

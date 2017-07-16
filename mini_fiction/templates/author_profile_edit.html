@@ -14,11 +14,11 @@
                             <legend>Основное</legend>
                             {% if profile_ok %}<div class="alert-mini green">Профиль успешно обновлен</div>{% endif %}
                             {% for field in profile_form %}
-                                {% if field.widget.input_type == 'hidden' %}{{ field }}{% else %}
+                                {% if field.widget.input_type == 'hidden' %}{{ field(id="profile_form_" + field.id) }}{% else %}
                                 <div class="control-group{% if field.errors %} error{% endif %}">
                                     <label class="control-label">{{ field.label.text }}</label>
                                     <div class="controls">
-                                        {{ field }}
+                                        {{ field(id="profile_form_" + field.id) }}
                                         {% if field.errors and field.name != 'contacts' %}
                                             {% for error in field.errors %}
                                                 <span class="help-inline">{{ error }}</span>
@@ -51,11 +51,11 @@
                             <div class="alert-mini green">Адрес электронной почты успешно обновлен</div>
                           {% endif %}
                             {% for field in email_form %}
-                                {% if field.widget.input_type == 'hidden' %}{{ field }}{% else %}
+                                {% if field.widget.input_type == 'hidden' %}{{ field(id="email_form_" + field.id) }}{% else %}
                                 <div class="control-group{% if field.errors %} error{% endif %}">
                                     <label class="control-label">{{ field.label.text }}</label>
                                     <div class="controls">
-                                        {{ field }}
+                                        {{ field(id="email_form_" + field.id) }}
                                         {% if field.errors %}
                                             {% for error in field.errors %}
                                                 <span class="help-inline">{{ error }}</span>
@@ -89,11 +89,11 @@
                             <legend>Безопасность</legend>
                           {% if password_ok %}<div class="alert-mini green">Новый пароль установлен</div>{% endif %}
                             {% for field in password_form %}
-                                {% if field.widget.input_type == 'hidden' %}{{ field }}{% else %}
+                                {% if field.widget.input_type == 'hidden' %}{{ field(id="password_form_" + field.id) }}{% else %}
                                 <div class="control-group{% if field.errors %} error{% endif %}">
                                     <label class="control-label">{{ field.label.text }}</label>
                                     <div class="controls">
-                                        {{ field }}
+                                        {{ field(id="password_form_" + field.id) }}
                                         {% if field.errors %}
                                             {% for error in field.errors %}
                                                 <span class="help-inline">{{ error }}</span>
@@ -120,7 +120,7 @@
                     <form id="personal" action="#personal" method="POST" enctype="multipart/form-data" class="form-horizontal">
                         <fieldset>
                             <legend>Настройки отображения</legend>
-                            {{ prefs_form.csrf_token }}
+                            {{ prefs_form.csrf_token(id="prefs_form_" + prefs_form.csrf_token.id) }}
                           {% if prefs_ok %}<div class="alert-mini green">Личные настройки сохранены</div>{% endif %}
                             <div class="padded bootstrap checkbox">
                                 <label>Скрыть жанры из поиска:</label>

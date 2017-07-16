@@ -4,7 +4,7 @@
 from itertools import chain
 
 from pony import orm
-from flask import escape
+from flask import Markup, escape
 from flask_babel import gettext
 from wtforms.widgets import Select, Input
 from wtforms.widgets.core import html_params
@@ -94,7 +94,7 @@ class StoriesImgSelect(Select):
         img_class = 'ui-selected' if selected else ''
         item_image = '<img class="%s" src="%s" alt="%s" title="%s" />' % (img_class, img_url, label, label)
         cb = Input('checkbox' if self.multiple else 'radio')
-        rendered_cb = cb(field, value=value, checked=selected, **data_attrs)
+        rendered_cb = cb(field, id=False, value=value, checked=selected, **data_attrs)
         return '<span %s>%s%s</span>' % (html_params(**container_attrs), rendered_cb, item_image)
 
 
@@ -158,8 +158,7 @@ class ContactsWidget(object):
                     for error in errors:
                         output.append('<span class="help-inline">{}</span>'.format(escape(error)))
             output.append('')
-            output.append('</select>')
             output.append('</div>')
-        output.append('<a href="" class="contacts-add">{}</a>'.format(escape(gettext('Add new'))))
+        output.append('<a href="#" class="contacts-add">{}</a>'.format(escape(gettext('Add new'))))
         output.append('</div>')
-        return '\n'.join(output)
+        return Markup('\n'.join(output))

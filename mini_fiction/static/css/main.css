@@ -536,6 +536,8 @@ img.avatar-small, .character-list img {
 
 .story-control-btn {
     float: right;
+    font-family: 'Trebuchet MS', Arial, sans-serif;
+    font-weight: normal;
 }
 
 .story-control-btn a {
@@ -697,8 +699,9 @@ label.gen input {
     margin-top: 12px;
 }
 
-.more-info p {
+.more-info p, .more-info form {
     font-size: 12px;
+    font-weight: 300;
 }
 
 #story_chapters {

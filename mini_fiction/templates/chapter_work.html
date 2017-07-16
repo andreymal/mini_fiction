@@ -22,7 +22,7 @@
             <fieldset>
                 <!-- Название -->
                 <div class="control-group{% if form.title.errors %} error{% endif %}">
-                    <label class="control-label">{{ form.title.label }}</label>
+                    {{ form.title.label(class_='control-label') }}
                     <div class="controls">{{ form.title }}
                         {% if form.title.errors %}
                             {% for error in form.title.errors %}
@@ -35,7 +35,7 @@
                 </div>
                 <!-- Заметки к главе -->
                 <div class="control-group{% if form.notes.errors %} error{% endif %}">
-                    <label class="control-label">{{ form.notes.label }}</label>
+                    {{ form.notes.label(class_='control-label', for='id_text') }}
                     <div class="controls">{{ form.notes }}
                         {% if form.notes.errors %}
                             {% for error in form.notes.errors %}
@@ -48,7 +48,7 @@
                 </div>
                 <!-- Текст главы -->
                 <div class="control-group{% if form.text.errors %} error{% endif %}">
-                    <label class="control-label">{{ form.text.label }}</label>
+                    {{ form.text.label(class_='control-label', for='id_text') }}
                     <div class="controls">{{ form.text }}
                         {% if form.text.errors %}
                             {% for error in form.text.errors %}

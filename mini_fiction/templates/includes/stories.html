@@ -2,6 +2,7 @@
     <!-- Вывод рассказа: начало -->
     {%- set story_chapters_count = chapters_count_cache.get(story.id, 0) if chapters_count_cache is defined else story.bl.select_accessible_chapters(current_user).count() %}
     <div class="story-item" id="story_{{ story.id }}">
+        {% include 'includes/story_control_buttons.html' with context %}
         <h3>
             <a href="{{ url_for('story.view', pk=story.id) }}">{{ story.title }}</a>
             {% if story.pinned -%}
@@ -16,7 +17,6 @@
                 <sup class="complete">завершен</sup>
             {% endif%}
             {% if story.freezed %}<sup class="suspended">заморожен</sup>{% endif %}
-            {% include 'includes/story_control_buttons.html' with context %}
         </h3>
         <p class="meta">
             {% include 'includes/story_reader_buttons.html' with context %}

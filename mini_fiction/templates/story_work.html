@@ -7,9 +7,9 @@
     </div>
 
     <div class="span12"{% if not story_add %} id="story_{{ story.id }}"{% endif %}>
+        {% include 'includes/story_control_buttons.html' %}
         <h1>
             {{ page_title }}
-            {% include 'includes/story_control_buttons.html' %}
         </h1>
         {% if story_add %}
 {{ html_block('story_add') }}
@@ -23,7 +23,7 @@
 
                 <!-- Название -->
                 <div class="control-group{% if form.title.errors %} error{% endif %}">
-                    <label class="control-label">{{ form.title.label }}</label>
+                    {{ form.title.label(class_='control-label') }}
                     <div class="controls">{{ form.title }}
                         {% if form.title.errors %}
                             {% for error in form.title.errors %}
@@ -36,7 +36,7 @@
                 </div>
                 <!-- Жанры -->
                 <div class="control-group{% if form.categories.errors %} error{% endif %}">
-                    <label class="control-label">{{ form.categories.label }}</label>
+                    {{ form.categories.label(class_='control-label', for=False) }}
                     <div class="controls genres-select">
                         {% if form.categories.errors %}
                             {% for error in form.categories.errors %}
@@ -50,7 +50,7 @@
                 </div>
                 <!-- Персонажи -->
                 <div class="control-group{% if form.characters.errors %} error{% endif %}">
-                    <label class="control-label">{{ form.characters.label }}</label>
+                    {{ form.characters.label(class_='control-label', for=False) }}
                     <div class="controls characters-select">
                         {% if form.characters.errors %}
                             {% for error in form.characters.errors %}
@@ -64,7 +64,7 @@
                 </div>
                 <!-- Общее описание -->
                 <div class="control-group{% if form.summary.errors %} error{% endif %}">
-                    <label class="control-label">{{ form.summary.label }}</label>
+                    {{ form.summary.label(class_='control-label') }}
                     <div class="controls">{{ form.summary }}
                         {% if form.summary.errors %}
                             {% for error in form.summary.errors %}
@@ -77,7 +77,7 @@
                 </div>
                 <!-- Заметки к рассказу -->
                 <div class="control-group{% if form.notes.errors %} error{% endif %}">
-                    <label class="control-label">{{ form.notes.label }}</label>
+                    {{ form.notes.label(class_='control-label', for='id_notes') }}
                     <div class="controls">{{ form.notes }}
                         {% if form.notes.errors %}
                             {% for error in form.notes.errors %}
@@ -90,7 +90,7 @@
                 </div>
                 <!-- Источник -->
                 <div class="control-group{% if form.source_link.errors %} error{% endif %}">
-                    <label class="control-label">{{ form.source_link.label }}</label>
+                    {{ form.source_link.label(class_='control-label') }}
                     <div class="controls">{{ form.source_link }}
                         {% if form.source_link.errors %}
                             {% for error in form.source_link.errors %}
@@ -102,7 +102,7 @@
                       </div>
                 </div>
                 <div class="control-group{% if form.source_title.errors %} error{% endif %}">
-                    <label class="control-label">{{ form.source_title.label }}</label>
+                    {{ form.source_title.label(class_='control-label') }}
                     <div class="controls">{{ form.source_title }}
                         {% if form.source_title.errors %}
                             {% for error in form.source_title.errors %}
@@ -115,7 +115,7 @@
                 </div>
                 <!-- Рейтинг -->
                 <div class="control-group{% if form.rating.errors %} error{% endif %}">
-                    <label class="control-label">{{ form.rating.label }}</label>
+                    {{ form.rating.label(class_='control-label', for=False) }}
                     <div class="controls bootstrap radio">{{ form.rating }}
                         {% if form.rating.errors %}
                             {% for error in form.rating.errors %}
@@ -128,7 +128,7 @@
                 </div>
                 <!-- Оригинал/перевод -->
                 <div class="control-group{% if form.original.errors %} error{% endif %}">
-                    <label class="control-label">{{ form.original.label }}</label>
+                    {{ form.original.label(class_='control-label', for=False) }}
                     <div class="controls bootstrap radio">{{ form.original }}
                         {% if form.original.errors %}
                             {% for error in form.original.errors %}
@@ -141,7 +141,7 @@
                 </div>
                 <!-- Заморожен/активен -->
                 <div class="control-group{% if form.freezed.errors %} error{% endif %}">
-                    <label class="control-label">{{ form.freezed.label }}</label>
+                    {{ form.freezed.label(class_='control-label', for=False) }}
                     <div class="controls bootstrap radio">{{ form.freezed }}
                         {% if form.freezed.errors %}
                             {% for error in form.freezed.errors %}
@@ -154,7 +154,7 @@
                 </div>
                 <!-- Закончен/не закончен -->
                 <div class="control-group{% if form.finished.errors %} error{% endif %}">
-                    <label class="control-label">{{ form.finished.label }}</label>
+                    {{ form.finished.label(class_='control-label', for=False) }}
                     <div class="controls bootstrap radio">{{ form.finished }}
                         {% if form.finished.errors %}
                             {% for error in form.finished.errors %}
@@ -165,9 +165,9 @@
                         {% endif %}
                       </div>
                 </div>
-                <!-- Категории -->
+                <!-- События -->
                 <div class="control-group{% if form.classifications.errors %} error{% endif %}">
-                    <label class="control-label">{{ form.classifications.label }}</label>
+                    {{ form.classifications.label(class_='control-label', for=False) }}
                     <div class="controls events">
                         {% if form.classifications.errors %}
                             {% for error in form.classifications.errors %}

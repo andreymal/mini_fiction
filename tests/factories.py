@@ -28,6 +28,6 @@ class AuthorFactory(PonyFactory):
         model = models.Author
 
     password = ''
-    username = factory.Sequence(lambda n: "user%d" % n)
+    username = factory.Sequence(lambda n: "User%d" % n)
     email = factory.Sequence(lambda n: "user%d@example.com" % n)
     date_joined = factory.LazyAttribute(lambda obj: datetime.utcnow())

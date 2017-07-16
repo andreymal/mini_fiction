@@ -39,7 +39,7 @@ def test_author_login_nopassword(app, client, selenium, live_server, factories, 
     assert 'Пожалуйста, введите правильные имя пользователя и пароль' in page
 
 
-def test_author_login_nocase(app, client, selenium, live_server, factories, wait_ajax):
+def test_author_login_is_case_insensitive(app, client, selenium, live_server, factories, wait_ajax):
     author = factories.AuthorFactory()
     author.bl.set_password('123456')
     db.commit()
@@ -51,5 +51,5 @@ def test_author_login_nocase(app, client, selenium, live_server, factories, wait
     selenium.find_element_by_css_selector('.controls .btn.btn-primary').click()
     wait_ajax()
 
-    page = selenium.find_element_by_css_selector('form input[name="username"] + .help-inline').text
-    assert 'Пожалуйста, введите правильные имя пользователя и пароль' in page
+    assert author.username in selenium.find_element_by_css_selector('.nav-main .nav-username').text
+    assert author.username.upper() not in selenium.find_element_by_css_selector('.nav-main .nav-username').text

@@ -1,10 +1,12 @@
 'use strict';
 
-/* global core: false, $: false */
+/* global core: false, $: false, Hypher: false, common: false */
 
 
 var story = {
     panel: null,
+    justifyBtn: null,
+    indentBtn: null,
     contributorsForm: null,
     _contributorsSendEventBinded: null,
     _contributorsChangeEventBinded: null,
@@ -521,6 +523,24 @@ var story = {
                 chapter_text.removeClass('small-font').addClass('big-font');
         });
 
+        // Переключение выравнивания и переноса
+        this.justifyBtn = panelElem.getElementsByClassName('js-story-style-align-btn')[0];
+        if (this.justifyBtn) {
+            this.justifyBtn.addEventListener('click', function() {
+                this.toggleChapterJustify();
+            }.bind(this));
+        }
+        this.setChapterJustifyFromLocalStorage();
+
+        // Переключение режима разделения абзацев
+        this.indentBtn = panelElem.getElementsByClassName('js-story-style-indent-btn')[0];
+        if (this.indentBtn) {
+            this.indentBtn.addEventListener('click', function() {
+                this.toggleChapterIndent();
+            }.bind(this));
+        }
+        this.setChapterIndentFromLocalStorage();
+
         panelElem.classList.remove('no-js');
     },
 
@@ -528,6 +548,9 @@ var story = {
         if (!this.panel) {
             return;
         }
+
+        this.indentBtn = null;
+        this.justifyBtn = null;
 
         var scrollDiv = document.getElementById('toTop');
         scrollDiv.removeEventListener('click', this.panel.eventToTop);
@@ -616,14 +639,166 @@ var story = {
             }).catch(core.handleError);
     },
 
-    chapterPreviewStuff: function() {
-        if (!window.FormData) {
+    /** Включает или выключает выравнивание текста главы по ширине согласно информации из localStorage */
+    setChapterJustifyFromLocalStorage: function(dom) {
+        this.toggleChapterJustify(dom, window.localStorage && window.localStorage.chapterJustify == '1');
+    },
+
+    /** Меняет режим красной строки текста главы согласно информации из localStorage */
+    setChapterIndentFromLocalStorage: function(dom) {
+        this.toggleChapterIndent(dom, window.localStorage && window.localStorage.chapterIndentLeft == '1');
+    },
+
+    /**
+     * Переключает режим выравнивания текста главы.
+     * @param {object} dom - элемент или список элементов глав. По умолчанию
+     *   все элементы с классом chapter-text
+     * @param {object} justify - true: по ширине, false: по левому краю,
+       null/undefined: переключить на другой
+     */
+    toggleChapterJustify: function(dom, justify) {
+        var texts = dom;
+        if (dom instanceof HTMLElement) {
+            texts = [dom];
+        } else if (!dom) {
+            texts = document.getElementsByClassName('chapter-text');
+        }
+
+        if (texts.length < 1) {
             return;
         }
 
+        if (justify === null || justify === undefined) {
+            justify = !texts[0].classList.contains('mode-justify');
+        }
+
+        var scrollingOrigin = common.getOrigin(texts[0], 50);
+
+        var i, text;
+        if (justify) {
+            for (i = 0; i < texts.length; i++) {
+                text = texts[i];
+                if (!text.classList.contains('with-hypher')) {
+                    // TODO: internationalization
+                    Hypher.languages.ru.hyphenateDOM(text);
+                    text.classList.add('with-hypher');
+                }
+                text.classList.add('mode-justify');
+            }
+
+            if (this.justifyBtn) {
+                this.justifyBtn.classList.remove('story-style-align-left');
+                this.justifyBtn.classList.add('story-style-align-justify');
+            }
+
+            if (window.localStorage) {
+                window.localStorage.chapterJustify = '1';
+            }
+
+        } else {
+            for (i = 0; i < texts.length; i++) {
+                text = texts[i];
+                text.classList.remove('mode-justify');
+            }
+
+            if (this.justifyBtn) {
+                this.justifyBtn.classList.remove('story-style-align-justify');
+                this.justifyBtn.classList.add('story-style-align-left');
+            }
+
+            if (window.localStorage) {
+                window.localStorage.chapterJustify = '0';
+            }
+        }
+
+        if (scrollingOrigin !== null) {
+            common.restoreScrollByOrigin(scrollingOrigin[0], scrollingOrigin[1], scrollingOrigin[2]);
+        }
+    },
+
+    /**
+     * Переключает режим разделения абзацев в тексте главы.
+     * @param {object} dom - элемент или список элементов глав. По умолчанию
+     *   все элементы с классом chapter-text
+     * @param {object} indentLeft - true: абзацный отступ, false: интервал
+       между абзацами, null/undefined: переключить на другой
+     */
+    toggleChapterIndent: function(dom, indentLeft) {
+        var texts = dom;
+        if (dom instanceof HTMLElement) {
+            texts = [dom];
+        } else if (!dom) {
+            texts = document.getElementsByClassName('chapter-text');
+        }
+
+        if (texts.length < 1) {
+            return;
+        }
+
+        if (indentLeft === null || indentLeft === undefined) {
+            indentLeft = !texts[0].classList.contains('mode-indent-left');
+        }
+
+        var scrollingOrigin = common.getOrigin(texts[0], 50);
+
+        var i, text;
+        if (indentLeft) {
+            for (i = 0; i < texts.length; i++) {
+                text = texts[i];
+                text.classList.add('mode-indent-left');
+            }
+
+            if (this.indentBtn) {
+                this.indentBtn.classList.remove('story-style-indent-bottom');
+                this.indentBtn.classList.add('story-style-indent-left');
+            }
+
+            if (window.localStorage) {
+                window.localStorage.chapterIndentLeft = '1';
+            }
+
+        } else {
+            for (i = 0; i < texts.length; i++) {
+                text = texts[i];
+                text.classList.remove('mode-indent-left');
+            }
+
+            if (this.indentBtn) {
+                this.indentBtn.classList.remove('story-style-indent-left');
+                this.indentBtn.classList.add('story-style-indent-bottom');
+            }
+
+            if (window.localStorage) {
+                window.localStorage.chapterIndentLeft = '0';
+            }
+        }
+
+        if (scrollingOrigin !== null) {
+            common.restoreScrollByOrigin(scrollingOrigin[0], scrollingOrigin[1], scrollingOrigin[2]);
+        }
+    },
+
+    chapterPreviewStuff: function() {
         this._preview.btn = document.getElementById('chapter-preview-btn');
         this._preview.selectedBtn = document.getElementById('chapter-preview-selected-btn');
         this._preview.area = document.getElementById('chapter-preview');
+
+        // Включаем выбранные пользователем параметры отображения текста главы
+        // (кнопочками в story-panel, хотя story-panel на странице
+        // редактирования главы нету)
+        var chapterText = this._preview.area ? this._preview.area.getElementsByClassName('chapter-text')[0] : null;
+        if (chapterText) {
+            this.setChapterJustifyFromLocalStorage(chapterText);
+            this.setChapterIndentFromLocalStorage(chapterText);
+        }
+
+        if (!window.FormData) {
+            this._preview.area = null;
+            this._preview.selectedBtn = null;
+            this._preview.btn = null;
+            return;
+        }
+
         if (this._preview.btn) {
             this._preview.textInput = this._preview.btn.form.text;
         }
@@ -738,7 +913,16 @@ var story = {
                     return;
                 }
                 if (this._preview.area) {
+                    // Запихиваем HTML-код предпросмотра на страницу
                     this._preview.area.innerHTML = data.html;
+                    // И включаем выбранные пользователем параметры отображения
+                    // (кнопочками в story-panel, хотя story-panel на странице
+                    // редактирования главы нету)
+                    var chapterText = this._preview.area.getElementsByClassName('chapter-text')[0];
+                    if (chapterText) {
+                        this.setChapterJustifyFromLocalStorage(chapterText);
+                        this.setChapterIndentFromLocalStorage(chapterText);
+                    }
                 }
             }.bind(this)).then(null, function(exc) {
                 if (loadingImg) {

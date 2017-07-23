@@ -249,6 +249,71 @@ var common = {
     },
 
     /**
+     * Ищет элемент, ближайший к верхнему краю страницы, среди
+     * непосредственных потомков указанного элемента. Если нашлось, возвращает
+     * массив со следующими элементами:
+     *
+     * - false/true: опорная точка у верхнего или у нижнего края элемента
+     * - number: положение этого края относительно верха страницы
+     * - HTMLElement: сам элемент
+     *
+     * Данная информация позволяет восстановить прокрутку относительно
+     * найденного эелмента с помощью метода restoreScrollByOrigin.
+     */
+    getOrigin: function(elem, topOffset) {
+        topOffset = topOffset || 0;
+
+        if (!elem || !elem.getBoundingClientRect) {
+            return null;
+        }
+
+        var rect = elem.getBoundingClientRect();
+        if (rect.top - topOffset > 500) {
+            // Элемент сильно внизу, цепляться смысла нет
+            return null;
+        }
+        if (rect.bottom - topOffset <= 10) {
+            // Нижняя граница элемента у близко к верху страницы или ещё выше,
+            // цепляться за что-то другое смысла нет
+            return [true, rect.bottom, elem];
+        }
+
+        var selectedElem = null;  // Элемент, за который мы решили зацепиться
+        var diff = null;  // Его расстояние до верха страницы без знака (используем для поиска ближайшего элемента)
+
+        for (var i = 0; i < elem.childNodes.length; i++) {
+            var child = elem.childNodes[i];
+            if (!child.getBoundingClientRect) {
+                continue;
+            }
+
+            rect = child.getBoundingClientRect();
+            var childDiff = Math.abs(rect.top - topOffset);
+            if (selectedElem === null || childDiff < diff) {
+                selectedElem = child;
+                diff = childDiff;
+            }
+        }
+
+        if (selectedElem === null) {
+            return null;
+        }
+
+        rect = selectedElem.getBoundingClientRect();
+        return [false, rect.top, selectedElem];
+    },
+
+    restoreScrollByOrigin: function(toBottom, offset, element) {
+        var rect = element.getBoundingClientRect();
+        // diff - какая позиция относительно верха сейчас, offset - какая позиция нужна
+        var diff = toBottom ? rect.bottom : rect.top;
+        var scrollByValue = offset - diff;
+        if (scrollByValue !== 0 && window.scrollBy) {
+            window.scrollBy(0, -scrollByValue);
+        }
+    },
+
+    /**
      * Вставляет указанный HTML-код, прогнав его через sanitizeHTML,
      * в textarea в то место, где сейчас находится курсор.
      */

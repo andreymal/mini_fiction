@@ -724,10 +724,31 @@ label.gen input {
     font-family: Verdana, Arial, sans-serif;
     font-size: 14px;
     line-height: 26px;
+
+    -ms-hyphens: none;
+    -moz-hyphens: none;
+    -webkit-hyphens: none;
+    hyphens: none;
 }
 
 .chapter-text p,.chapter-text span {
     margin-bottom: 20px;
+}
+
+.chapter-text.mode-justify {
+    text-align: justify;
+    -moz-text-align-last: left;
+    text-align-last: left;
+
+    -ms-hyphens: manual;
+    -moz-hyphens: manual;
+    -webkit-hyphens: manual;
+    hyphens: manual;
+}
+
+.chapter-text.mode-indent-left p, .chapter-text.mode-indent-left span {
+    margin-bottom: 0px;
+    text-indent: 2em;
 }
 
 .chapter-text p[align="center"],.chapter-text span[align="center"] {
@@ -744,6 +765,32 @@ label.gen input {
     display: inline-block;
     width: 100%;
     text-align: right;
+}
+
+.chapter-text.mode-justify p[align="center"], .chapter-text.mode-justify span[align="center"] {
+    display: inline-block;
+    width: 100%;
+    text-align: center;
+    -moz-text-align-last: center;
+    text-align-last: center;
+}
+
+.chapter-text.mode-indent-left p[align="center"], .chapter-text.mode-indent-left span[align="center"] {
+    text-indent: 0;
+}
+
+.chapter-text.mode-justify p[align="left"], .chapter-text.mode-justify span[align="left"] {
+    text-align: justify;
+    -moz-text-align-last: left;
+    text-align-last: left;
+}
+
+.chapter-text.mode-justify p[align="right"], .chapter-text.mode-justify span[align="right"] {
+    display: inline-block;
+    width: 100%;
+    text-align: justify;
+    -moz-text-align-last: right;
+    text-align-last: right;
 }
 
 /* Режимы просмотра текста */
@@ -834,6 +881,7 @@ hr {
     transition-duration: 250ms;
     opacity: 0;
     pointer-events: none;
+    vertical-align: middle;
 }
 
 .story-panel.story-panel-floating {
@@ -852,7 +900,7 @@ hr {
     font-size: 11px;
     margin-bottom: 0;
     padding: 2px;
-    margin-top: -3px;
+    vertical-align: middle;
 }
 
 select.select-font {
@@ -861,6 +909,40 @@ select.select-font {
 
 select.select-size {
     width: 90px;
+}
+
+.btn-mini-story-style {
+    padding: 0;
+    line-height: 1;
+}
+
+.btn-mini-story-style > .story-style-icon {
+    display: inline-block;
+    width: 12px;
+    height: 12px;
+    margin: 3px;
+    vertical-align: top;
+
+    background: url('../i/story-style-buttons.png');
+    background-size: 24px 24px;
+    background-repeat: no-repeat;
+    background-position: 0px 0px;
+}
+
+.btn-mini-story-style.story-style-align-left > .story-style-icon {
+    background-position: 0px 0px;
+}
+
+.btn-mini-story-style.story-style-align-justify > .story-style-icon {
+    background-position: 0px -12px;
+}
+
+.btn-mini-story-style.story-style-indent-bottom > .story-style-icon {
+    background-position: -12px 0px;
+}
+
+.btn-mini-story-style.story-style-indent-left > .story-style-icon {
+    background-position: -12px -12px;
 }
 
 
@@ -889,6 +971,10 @@ select.select-size {
 
 .get:hover,.scon:hover {
     opacity: 0.75;
+}
+
+.story-panel .get, .story-panel .scon {
+    vertical-align: middle;
 }
 
 .pdf {

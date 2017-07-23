@@ -407,9 +407,8 @@ class StoryBL(BaseBL, Commentable):
         story = self.model
         votes = orm.select(x.vote_value for x in Vote if x.story == story)[:]
         m = mean(votes)
-        # round обходит баг https://github.com/ponyorm/pony/issues/256
-        story.vote_average = round(m, 5)
-        story.vote_stddev = round(pstdev(votes, m), 5)
+        story.vote_average = m
+        story.vote_stddev = pstdev(votes, m)
         story.vote_total = len(votes)
         story.flush()
 

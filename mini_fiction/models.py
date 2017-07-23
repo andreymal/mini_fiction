@@ -31,7 +31,7 @@ class Author(db.Entity, UserMixin):
 
     # ported from django user
     password = orm.Optional(str, 255)
-    last_visit = orm.Optional(datetime, 6, volatile=True)
+    last_visit = orm.Optional(datetime, 6, optimistic=False)
     is_superuser = orm.Required(bool, default=False)
     username = orm.Required(str, 32, unique=True, autostrip=False)
     first_name = orm.Optional(str, 30)

@@ -128,7 +128,7 @@
 
         {% if current_user.is_staff or story.bl.is_contributor(current_user) %}
             <h3 style="margin-bottom: 24px;"><a href="{{ url_for('story_local_comment.view', story_id=story.id) }}">
-                Комментарии бета-читателей и редакторов ({{ story.bl.get_or_create_local_thread().comments_count }})</a>
+                Комментарии бета-читателей и редакторов ({{ local_comments_count }})</a>
             {%- if new_local_comments_count > 0 %} <span class="green">(+{{ new_local_comments_count }})</span>{% endif %}</h3>
         {% endif %}
 

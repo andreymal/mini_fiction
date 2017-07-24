@@ -521,7 +521,7 @@ class StoryCommentVote(db.Entity):
 
 class StoryLocalThread(db.Entity):
     """ Временный костыль из-за ограниченной гибкости комментариев """
-    story = orm.Required(Story)
+    story = orm.Required(Story, unique=True)
     comments_count = orm.Required(int, size=16, unsigned=True, default=0)
     comments = orm.Set('StoryLocalComment')
 
@@ -589,9 +589,10 @@ class Vote(db.Entity):
     author = orm.Optional(Author)
     story = orm.Optional(Story)
     date = orm.Required(datetime, 6, default=datetime.utcnow)
-    updated = orm.Required(datetime, 6, default=datetime.utcnow)
-    ip = orm.Required(str, 50, default=ipaddress.ip_address('::1').exploded)
-    vote_value = orm.Required(int, size=16, unsigned=True, default=3)
+    updated = orm.Required(datetime, 6, default=datetime.utcnow, optimistic=False)
+    ip = orm.Required(str, 50, default=ipaddress.ip_address('::1').exploded, optimistic=False)
+    vote_value = orm.Required(int, size=16, unsigned=True, default=3, optimistic=False)
+    orm.composite_key(author, story)
 
     def before_update(self):
         self.updated = datetime.utcnow()

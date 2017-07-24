@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-from flask import Blueprint, current_app, request, render_template, abort, url_for, jsonify
+from flask import Blueprint, current_app, request, render_template, abort, url_for
 from flask_login import current_user
 from pony.orm import db_session
 
@@ -17,6 +17,10 @@ def get_local_thread(story_id, user):
     story = Story.get(id=story_id)
     if not story:
         abort(404)
+    # Проверяем доступ перед созданием StoryLocalThread, чтобы не создавать
+    # его зазря, если доступа вдруг не окажется
+    if not user.is_staff and not story.bl.is_contributor(user):
+        abort(403)
     return story.bl.get_or_create_local_thread()
 
 
@@ -27,8 +31,6 @@ def view(story_id, comments_page):
     user = current_user._get_current_object()
     local = get_local_thread(story_id, user)
     story = local.story
-    if not user.is_staff and not story.bl.is_contributor(user):
-        abort(403)
 
     per_page = current_app.config['COMMENTS_COUNT']['page']
     maxdepth = None if request.args.get('fulltree') == '1' else calc_maxdepth(current_user)

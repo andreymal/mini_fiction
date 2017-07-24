@@ -45,10 +45,15 @@ def view(pk, comments_page):
     act = None
     if user.is_authenticated:
         act = Activity.get(story=story, author=user)
-    new_local_comments_count = (
-        (story.bl.get_or_create_local_thread().comments_count - act.last_local_comments)
-        if act else 0
-    )
+
+    local_comments_count = 0
+    new_local_comments_count = 0
+    if story.bl.is_contributor(user) and story.local:
+        local_comments_count = story.bl.get_or_create_local_thread().comments_count
+        new_local_comments_count = (
+            (story.bl.get_or_create_local_thread().comments_count - act.last_local_comments)
+            if act else 0
+        )
 
     chapters = story.chapters.select().order_by(Chapter.order, Chapter.id)[:]
     if not story.bl.is_contributor(user):
@@ -76,6 +81,7 @@ def view(pk, comments_page):
         'comments_count': comments_count,
         'comment_votes_cache': comment_votes_cache,
         'last_viewed_comment': last_viewed_comment,
+        'local_comments_count': local_comments_count,
         'new_local_comments_count': new_local_comments_count,
         'chapters': chapters,
         'num_pages': paged.num_pages,

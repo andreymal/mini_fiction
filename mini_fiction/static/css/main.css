@@ -865,6 +865,8 @@ hr {
     font-size: 12px;
     box-sizing: border-box;
     z-index: 10;
+    transition-property: opacity;
+    transition-duration: 200ms;
 }
 
 .story-panel-sticky {
@@ -887,6 +889,11 @@ hr {
 .story-panel.story-panel-floating {
     border-top-left-radius: 0;
     border-top-right-radius: 0;
+    opacity: 0;
+}
+
+.story-panel.story-panel-floating:hover {
+    opacity: 1;
 }
 
 .story-panel.no-js .scon.up,
@@ -2048,6 +2055,9 @@ ul.editlog .editlog-item:nth-child(2n+1) {
     }
     .story-panel {
         padding: 10px 0 10px 14px;
+    }
+    .story-panel.story-panel-floating {
+        opacity: 1;
     }
     .chapter-text {
         width: 100% !important;

@@ -29,7 +29,7 @@
 
         <div>
             <h2>Последние комментарии</h2>
-            {% include "includes/comments_list.html" %}
+            {{ comments_html|safe }}
             <p class="more"><a href="{{ url_for('stream.comments') }}">Лента комментариев</a></p>
         </div>
 

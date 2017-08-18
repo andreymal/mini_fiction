@@ -35,25 +35,35 @@ def index():
     chapters_stories = {x.id: x for x in chapters_stories}
     chapters = [(x, chapters_stories[x.story.id]) for x in chapters]
 
-    story_comments = StoryComment.select(lambda x: x.story_published and not x.deleted).order_by(StoryComment.id.desc())
-    story_comments = story_comments[:current_app.config['COMMENTS_COUNT']['main']]
-
     news = NewsItem.select().order_by(NewsItem.id.desc())[:3]
 
-    news_comments = NewsComment.select(lambda x: not x.deleted).order_by(NewsComment.id.desc())
-    news_comments = news_comments[:current_app.config['COMMENTS_COUNT']['main']]
+    comments_html = current_app.cache.get('index_comments_html')
 
-    comments = [('story', x) for x in story_comments]
-    comments += [('news', x) for x in news_comments]
-    comments.sort(key=lambda x: x[1].date, reverse=True)
-    comments = comments[:current_app.config['COMMENTS_COUNT']['main']]
+    if not comments_html:
+        story_comments = StoryComment.select(lambda x: x.story_published and not x.deleted).order_by(StoryComment.id.desc())
+        story_comments = story_comments[:current_app.config['COMMENTS_COUNT']['main']]
+
+        news_comments = NewsComment.select(lambda x: not x.deleted).order_by(NewsComment.id.desc())
+        news_comments = news_comments[:current_app.config['COMMENTS_COUNT']['main']]
+
+        comments = [('story', x) for x in story_comments]
+        comments += [('news', x) for x in news_comments]
+        comments.sort(key=lambda x: x[1].date, reverse=True)
+        comments = comments[:current_app.config['COMMENTS_COUNT']['main']]
+
+        comments_html = render_template(
+            'includes/comments_list.html',
+            comments=comments,
+            comments_short=True,
+        )
+
+        current_app.cache.set('index_comments_html', comments_html, 3600)
 
     data = {
         'categories': categories,
         'stories': stories,
         'chapters': chapters,
-        'comments': comments,
-        'comments_short': True,
+        'comments_html': comments_html,
         'news': news,
         'page_title': page_title,
     }

@@ -118,6 +118,9 @@ class BaseCommentBL(BaseBL):
             target.comments_count += 1
         if parent:
             parent.answers_count += 1
+
+        current_app.cache.delete('index_comments_html')
+
         return comment
 
     def _attributes_for(self, data):
@@ -151,6 +154,9 @@ class BaseCommentBL(BaseBL):
             ip=ipaddress.ip_address(ip).exploded,
         )
         editlog.flush()
+
+        current_app.cache.delete('index_comments_html')
+
         return editlog
 
     def can_update_by(self, author=None):
@@ -172,11 +178,13 @@ class BaseCommentBL(BaseBL):
             raise ValueError('Permission denied')
         self.model.deleted = True
         self.model.last_deleted_at = datetime.utcnow()
+        current_app.cache.delete('index_comments_html')
 
     def restore(self, author):
         if not self.can_delete_or_restore_by(author):
             raise ValueError('Permission denied')
         self.model.deleted = False
+        current_app.cache.delete('index_comments_html')
 
     def vote(self, author, value):
         if not author or not author.is_authenticated:

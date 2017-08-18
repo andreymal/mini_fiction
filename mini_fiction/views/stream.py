@@ -30,7 +30,7 @@ def stories(page):
         page_title='Лента добавлений',
         stories=objects,
         page_obj=page_obj,
-        **cached_lists([x.id for x in objects]),
+        **cached_lists([x.id for x in objects])
     )
 
 

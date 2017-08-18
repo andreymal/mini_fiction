@@ -261,11 +261,13 @@ class Test(Config):
     LOCALES = {'ru': 'Русский'}
     DATABASE_ENGINE = 'sqlite'
     DATABASE = {
-        'filename': os.path.join(os.getcwd(), 'testdb.sqlite3'),  # ':memory:' breaks with connection pool
+        'filename': os.path.join(os.getcwd(), 'testmedia', 'testdb.sqlite3'),  # ':memory:' breaks with connection pool
         'create_db': True,
     }
     DATABASE_CLEANER = {'provider': 'sqlite3'}  # TODO: MySQL and PostgreSQL
     TESTING = True
+    TESTING_DIRECTORY = os.path.join(os.getcwd(), 'testmedia')
+    MEDIA_ROOT = os.path.join(os.getcwd(), 'testmedia', 'media')
     SQL_DEBUG = False
     MEMCACHE_SERVERS = None
     SPHINX_DISABLED = True  # TODO: test it

@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 
 import time
+import shutil
 
 import pytest
 from pony.orm import db_session
@@ -13,7 +14,7 @@ from mini_fiction.application import create_app
 flask_app = None
 
 
-@pytest.fixture(scope="session", autouse=True)
+@pytest.yield_fixture(scope="session", autouse=True)
 def app():
     global flask_app
     flask_app = create_app()
@@ -24,7 +25,9 @@ def app():
         # Init testing database
         fixtures.seed()
 
-    return flask_app
+    yield flask_app
+
+    shutil.rmtree(flask_app.config['TESTING_DIRECTORY'])
 
 
 @pytest.fixture
@@ -40,6 +43,11 @@ def factories():
 
 
 @pytest.fixture
+def testdir():
+    return flask_app.config['TESTING_DIRECTORY']
+
+
+@pytest.fixture
 def wait_ajax(selenium):
     def wait():
         i = 0
@@ -50,7 +58,11 @@ def wait_ajax(selenium):
 
 
 @pytest.yield_fixture(scope="function", autouse=True)
-def database_cleaner():
+def database_cleaner(request):
+    if 'nodbcleaner' in request.keywords:
+        yield
+        return
+
     assert flask_app.config['DATABASE_CLEANER']['provider'] in ('sqlite3',)
     try:
         with db_session:

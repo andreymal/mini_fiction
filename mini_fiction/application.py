@@ -40,6 +40,13 @@ def create_app():
     app = Flask(__name__)
     app.config.from_object(os.environ.get('MINIFICTION_SETTINGS'))
     app.static_folder = app.config['STATIC_ROOT']
+
+    if app.config['TESTING']:
+        if not os.path.isdir(app.config['TESTING_DIRECTORY']):
+            os.makedirs(app.config['TESTING_DIRECTORY'])
+        elif os.listdir(app.config['TESTING_DIRECTORY']):
+            raise RuntimeError('Testing directory %r is not empty' % app.config['TESTING_DIRECTORY'])
+
     init_bl()
 
     configure_i18n(app)

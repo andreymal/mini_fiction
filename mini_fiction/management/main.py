@@ -69,7 +69,6 @@ def createsuperuser():
         cmd()
 
 
-@manager.command
 @manager.option('-e', '--eager', dest='eager', help='Don\'t use Celery for delayed sending', action='store_true')
 def sendtestemail(recipients, eager=False):
     from mini_fiction.management.commands.sendtestemail import sendtestemail as cmd
@@ -94,21 +93,27 @@ def checknewscomments():
         cmd()
 
 
-@manager.command
-def dumpdb(dirpath, models_list):
-    from mini_fiction.management.commands.dumploaddb import dumpdb as cmd
+@manager.option('-s', '--silent', dest='silent', help='Don\'t print progress bar to console', action='store_true')
+@manager.option('-c', '--compression', dest='gzip_compression', type=int, default=0, choices=list(range(10)), help='Use gzip compression for files')
+@manager.option('entities_list', metavar='entity_name', nargs='*', default=(), help='Names of entities that will be dumped (lowercase, all by default)')
+@manager.option('dirpath', metavar='output_directory', help='Directory where dump will be saved')
+def dumpdb(dirpath, entities_list, gzip_compression=0, silent=False):
+    from mini_fiction.dumpload import dumpdb_console as cmd
     orm.sql_debug(False)
-    with db_session:
-        cmd(dirpath, [x.strip().lower() for x in models_list.split(',')])
+    cmd(
+        dirpath,
+        entities_list if entities_list and 'all' not in entities_list else [],
+        gzip_compression,
+        progress=not silent,
+    )
 
 
-@manager.command
-@manager.option('-f', '--force', dest='force', help='Force rewrite existing data', action='store_true')
-def loaddb(pathlist, force=False):
-    from mini_fiction.management.commands.dumploaddb import loaddb as cmd
+@manager.option('-s', '--silent', dest='silent', help='Don\'t print progress bar to console', action='store_true')
+@manager.option('pathlist', metavar='input_directory', nargs='+', help='Directories or files with dump data')
+def loaddb(pathlist, silent=False):
+    from mini_fiction.dumpload import loaddb_console as cmd
     orm.sql_debug(False)
-    with db_session:
-        cmd([x.strip() for x in pathlist.split(',')], force=force)
+    cmd(pathlist, progress=not silent)
 
 
 def run():

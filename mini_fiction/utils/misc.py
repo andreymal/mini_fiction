@@ -1,8 +1,10 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
+import sys
 import json
 import math
+import time
 
 from flask import current_app, g, escape, render_template
 from flask_babel import pgettext, ngettext
@@ -234,3 +236,132 @@ def render_nonrequest_template(*args, **kwargs):
     finally:
         if old_adapter is not None:
             reqctx.url_adapter = old_adapter
+
+
+def progress_drawer(
+    target, w=30, progress_chars=None, lb=None, rb=None, humanize=False,
+    show_count=False, fps=25.0, file=sys.stdout
+):
+    '''Подготавливает всё для рисования полоски прогресса и возвращает
+    сопрограмму, в которую следует передавать текущий прогресс.
+
+    Суть такова:
+
+    1. Вызываем функцию, передавая первым параметром target значение, которое
+       будет считаться за 100%. Полученную сопрограмму сохраняем и запускаем
+       вызовом ``send(None)``.
+
+    2. При каждом обновлении передаём текущий прогресс через ``send(N)``.
+       Функция посчитает проценты относительно target и отрисует полоску
+       загрузки (если ранее уже рисовалась, то отрисует поверх старой).
+       Чаще чем ``fps`` кадров в секунду не перерисовывает.
+
+    3. После завершения передаём прогресс, равный target (что даст 100%),
+       а потом передаём None. Сопрограмма завершит работу и выкинет
+       StopIteration.
+
+    :param int target: число, которое будет считаться за 100%
+    :param int w: длина полоски в символах (без учёта границы и процентов)
+    :param str progress_chars: символы для рисования прогресса (первый —
+       пустая часть, последний — полная часть, между ними — промежуточные
+       состояния)
+    :param str lb: левая граница полоски
+    :param str rb: правая граница полоски
+    :param bool humanize: при True выводит текущее значение в кибибайтах
+       (делённое на 1024), при False как есть
+    :param bool show_count: при True печатает также target
+    :param float fps: максимально допустимая частота кадров. Работает так:
+       если между двумя send частота получается больше чем fps, то один кадр
+       не рисуется и пропускается, однако 100% никогда не пропускается
+    :param file file: куда печатать всё это дело, по умолчанию sys.stdout
+    :rtype: types.GeneratorType
+    '''
+
+    # Выбираем, какими символами будем рисовать полоску
+    encoding = file.encoding if hasattr(file, 'encoding') else sys.stdout.encoding
+    good_charset = (encoding or '').lower() in ('utf-8', 'utf-16', 'utf-16le', 'utf-16be', 'utf-32')
+    if not progress_chars:
+        if good_charset:
+            progress_chars = ' ▏▎▍▌▋▊▉█'
+        else:
+            progress_chars = ' -#'
+    if lb is None:
+        lb = '▕' if good_charset else ' ['
+    if rb is None:
+        rb = '▏' if good_charset else '] '
+
+    min_period = 1 / fps  # для 25 fps это 0.04
+
+    current = 0
+    old_current = None
+    old_line = None
+
+    tm = 0
+    lastlen = 0
+
+    while current is not None:
+        # Умная математика, сколько каких блоков выводить
+        part = (current * 1.0 / target) if target > 0 else 1.0
+        if part < 0.0:
+            part = 0.0
+        elif part > 1.0:
+            part = 1.0
+
+        full_blocks = int(part * w)
+        empty_blocks = w - full_blocks - 1
+        part_block_position = (part * w) - full_blocks
+        part_block_num = int(part_block_position * (len(progress_chars) - 1))
+
+        # Готовим строку с числовой информацией о прогрессе, чтобы вывести после полоски
+        if show_count:
+            if humanize:
+                cnt_string = '({}K/{}K) '.format(int(current / 1024.0), int(target / 1024.0))
+            else:
+                cnt_string = '({}/{}) '.format(current, target)
+        else:
+            if humanize:
+                cnt_string = '({}K) '.format(int(current / 1024.0))
+            else:
+                cnt_string = '({}) '.format(current)
+
+        # Обновляем полоску:
+        # - только когда значение новое
+        # - не чаще 25 кадров в секунду, но только если текущее значение
+        #   не совпадает с 100% (чтобы последний кадр гарантированно
+        #   отрисовался)
+        if current != old_current and (current == target or time.time() - tm >= min_period):
+            old_current = current
+
+            # Собираем всю полоску
+            line = lb
+            line += progress_chars[-1] * full_blocks
+            if full_blocks != w:
+                line += progress_chars[part_block_num]
+            line += progress_chars[0] * empty_blocks
+            line += rb
+            line += '{:.1f}% '.format(part * 100).rjust(7)
+            line += cnt_string
+
+            # Печатаем её (только если полоска вообще изменилась)
+            if line != old_line:
+                old_line = line
+                lastlen = fprint_substring(line, lastlen, file=file)
+
+                # Запоминаем время печати для ограничения кадров в секунду
+                tm = time.time()
+
+        current = yield
+
+
+def fprint_substring(s, l=0, file=sys.stdout):
+    '''Печатает строку, затирая последние l символов.'''
+
+    if l > 0:
+        print('\b' * l, end='', file=file)
+    print(s, end='', file=file)
+    if len(s) < l:
+        print(' ' * (l - len(s)), end='', file=file)
+        print('\b' * (l - len(s)), end='', file=file)
+    if hasattr(file, 'flush'):
+        file.flush()
+    return len(s)

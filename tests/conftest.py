@@ -72,11 +72,12 @@ def database_cleaner(request):
 
         # Workaround for live_server
         conn = database.db.provider.pool.con
-        conn.execute('PRAGMA foreign_keys = OFF')
-        conn.execute('BEGIN TRANSACTION')
-        for x in conn.execute("SELECT name FROM sqlite_master WHERE type='table'").fetchall():
-            if x[0].lower() in ('htmlblock', 'rating', 'staticpage'):
-                continue  # fixtures
-            conn.execute('DELETE FROM {}'.format(x[0]))
-        conn.execute('COMMIT')
-        database.db.disconnect()
+        if conn:
+            conn.execute('PRAGMA foreign_keys = OFF')
+            conn.execute('BEGIN TRANSACTION')
+            for x in conn.execute("SELECT name FROM sqlite_master WHERE type='table'").fetchall():
+                if x[0].lower() in ('htmlblock', 'rating', 'staticpage'):
+                    continue  # fixtures
+                conn.execute('DELETE FROM {}'.format(x[0]))
+            conn.execute('COMMIT')
+            database.db.disconnect()

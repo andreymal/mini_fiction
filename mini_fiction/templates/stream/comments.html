@@ -5,8 +5,20 @@
     <div class="span8">
         {{- breadcrumbs() }}
         <h1>{{ page_title }}</h1>
+
+        <div>
+            {% if tab != 'story' %}<a href="{{ url_for('stream.comments') }}">{% endif -%}
+                К рассказам
+            {%- if tab != 'story' %}</a>{% endif %}
+            &nbsp; &nbsp;
+            {% if tab != 'news' %}<a href="{{ url_for('stream.newscomments') }}">{% endif -%}
+                К новостям
+            {%- if tab != 'news' %}</a>{% endif %}
+        </div>
+        <br/>
+
         <div id="comments-list">
-            {% include "includes/story_comments_list.html" %}
+            {% include "includes/comments_list.html" %}
         </div>
         {% if comments %}
             <!-- Пагинация: начало вывода -->

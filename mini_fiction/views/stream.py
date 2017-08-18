@@ -6,7 +6,7 @@ from pony.orm import db_session
 from flask import Blueprint, current_app, render_template
 from flask_login import current_user
 
-from mini_fiction.models import Story, Chapter, StoryContributor, StoryComment
+from mini_fiction.models import Story, Chapter, StoryContributor, StoryComment, NewsComment
 from mini_fiction.utils.views import cached_lists
 from mini_fiction.utils.misc import Paginator
 
@@ -62,18 +62,42 @@ def comments(page):
     objects = StoryComment.select(lambda x: x.story_published and not x.deleted).order_by(StoryComment.id.desc())
 
     page_obj = Paginator(page, objects.count(), per_page=current_app.config['COMMENTS_COUNT']['stream'])
-    objects = page_obj.slice_or_404(objects)
+    objects = [('story', x) for x in page_obj.slice_or_404(objects)]
 
     comment_votes_cache = Story.bl.select_comment_votes(
         current_user._get_current_object(),
-        [x.id for x in objects]
+        [x[1].id for x in objects]
     ) if current_user.is_authenticated else {}
 
     return render_template(
         'stream/comments.html',
         page_title='Лента комментариев',
+        tab='story',
         comments=objects,
-        with_story_link=True,
+        with_target_link=True,
+        comment_votes_cache=comment_votes_cache,
+        page_obj=page_obj,
+    )
+
+
+@bp.route('/newscomments/page/last/', defaults={'page': -1})
+@bp.route('/newscomments/', defaults={'page': 1})
+@bp.route('/newscomments/page/<int:page>/')
+@db_session
+def newscomments(page):
+    objects = NewsComment.select(lambda x: not x.deleted).order_by(NewsComment.id.desc())
+
+    page_obj = Paginator(page, objects.count(), per_page=current_app.config['COMMENTS_COUNT']['stream'])
+    objects = [('news', x) for x in page_obj.slice_or_404(objects)]
+
+    comment_votes_cache = {}  # FIXME: здесь пересечение айдишников с айдшниками комментов к рассказам
+
+    return render_template(
+        'stream/comments.html',
+        page_title='Лента комментариев',
+        tab='news',
+        comments=objects,
+        with_target_link=True,
         comment_votes_cache=comment_votes_cache,
         page_obj=page_obj,
     )

@@ -1,0 +1,24 @@
+{% from 'macro.html' import comment_html with context %}
+{% for ctype, comment in comments %}
+    <div data-global-id="{{ comment.id }}" class="comment-item">
+       {% call comment_html(comment, short=comments_short, with_controls=not comments_short and not without_comment_controls, with_vote=not comments_short) %}
+       {% if comments_short or with_target_link %}
+            {% if ctype == 'story' %}
+                <span class="comment-story-link">
+                к рассказу
+                <a href="{{ url_for('story.view', pk=comment.story.id) }}"><b>{{ comment.story.title }}</b></a>
+                </span>
+            {% elif ctype == 'news' %}
+                <span class="comment-newsitem-link">
+                к новости
+                <a href="{{ url_for('news.show', name=comment.newsitem.name) }}">{{ comment.newsitem.title }}</a>
+                </span>
+            {% endif %}
+       {% endif %}
+       {% endcall %}
+    </div>
+{% else %}
+    <div class="comment">
+        <h3>Здесь пока ничего нет</h3>
+    </div>
+{% endfor %}

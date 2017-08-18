@@ -12,6 +12,7 @@ from mini_fiction.utils.misc import Paginator
 
 
 def paginate_view(template, objlist, page=None, objlistname='objects', endpoint=None, view_args=None, per_page=50, extra_context=None, **kwargs):
+    # legacy
     data = dict(kwargs)
     if 'count' in data:
         count = data.pop('count')

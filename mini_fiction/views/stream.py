@@ -3,11 +3,12 @@
 
 from pony import orm
 from pony.orm import db_session
-from flask import Blueprint, current_app
+from flask import Blueprint, current_app, render_template
 from flask_login import current_user
 
 from mini_fiction.models import Story, Chapter, StoryContributor, StoryComment
-from mini_fiction.utils.views import paginate_view, cached_lists
+from mini_fiction.utils.views import cached_lists
+from mini_fiction.utils.misc import Paginator
 
 
 bp = Blueprint('stream', __name__)
@@ -20,14 +21,16 @@ bp = Blueprint('stream', __name__)
 def stories(page):
     objects = Story.select_published().order_by(Story.first_published_at.desc(), Story.id.desc())
     objects = objects.prefetch(Story.characters, Story.categories, Story.contributors, StoryContributor.user)
-    return paginate_view(
+
+    page_obj = Paginator(page, objects.count(), per_page=current_app.config['STORIES_COUNT']['stream'])
+    objects = page_obj.slice_or_404(objects)
+
+    return render_template(
         'stream/stories.html',
-        objects,
-        count=objects.count(),
         page_title='Лента добавлений',
-        objlistname='stories',
-        per_page=current_app.config['STORIES_COUNT']['stream'],
-        extra_context=lambda stories_list, _: cached_lists([x.id for x in stories_list])
+        stories=objects,
+        page_obj=page_obj,
+        **cached_lists([x.id for x in objects]),
     )
 
 
@@ -40,13 +43,14 @@ def chapters(page):
     objects = objects.prefetch(Chapter.text, Chapter.story, Story.contributors, StoryContributor.user)
     objects = objects.order_by(Chapter.first_published_at.desc(), Chapter.order.desc())
 
-    return paginate_view(
+    page_obj = Paginator(page, objects.count(), per_page=current_app.config['CHAPTERS_COUNT']['stream'])
+    objects = page_obj.slice_or_404(objects)
+
+    return render_template(
         'stream/chapters.html',
-        objects,
-        count=objects.count(),
         page_title='Лента обновлений',
-        objlistname='chapters',
-        per_page=current_app.config['CHAPTERS_COUNT']['stream'],
+        chapters=objects,
+        page_obj=page_obj,
     )
 
 
@@ -57,18 +61,19 @@ def chapters(page):
 def comments(page):
     objects = StoryComment.select(lambda x: x.story_published and not x.deleted).order_by(StoryComment.id.desc())
 
-    return paginate_view(
+    page_obj = Paginator(page, objects.count(), per_page=current_app.config['COMMENTS_COUNT']['stream'])
+    objects = page_obj.slice_or_404(objects)
+
+    comment_votes_cache = Story.bl.select_comment_votes(
+        current_user._get_current_object(),
+        [x.id for x in objects]
+    ) if current_user.is_authenticated else {}
+
+    return render_template(
         'stream/comments.html',
-        objects,
-        count=objects.count(),
         page_title='Лента комментариев',
-        objlistname='comments',
-        per_page=current_app.config['COMMENTS_COUNT']['stream'],
-        extra_context=lambda comments_list, _: {
-            'with_story_link': True,
-            'comment_votes_cache': Story.bl.select_comment_votes(
-                current_user._get_current_object(),
-                [x.id for x in comments_list]
-            ) if current_user.is_authenticated else {}
-        }
+        comments=objects,
+        with_story_link=True,
+        comment_votes_cache=comment_votes_cache,
+        page_obj=page_obj,
     )

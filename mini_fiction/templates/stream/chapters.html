@@ -13,13 +13,13 @@
             <!-- Пагинация: начало вывода -->
                   <div id="chapters-pagination" class="pagination center">
                       {% if page_obj.has_previous() %}
-                          <a class="btn" href="{{ url_for(endpoint, page=page_obj.number - 1, **view_args) }}">← Назад</a>
+                          <a class="btn" href="{{ modified_url(page=page_obj.number - 1) }}">← Назад</a>
                       {% endif %}
                       <span class="btn btn-primary">
                           {{ page_obj.number }} / {{ page_obj.num_pages }}
                       </span>
                       {% if page_obj.has_next() %}
-                          <a class="btn" href="{{ url_for(endpoint, page=page_obj.number + 1, **view_args) }}">Вперед →</a>
+                          <a class="btn" href="{{ modified_url(page=page_obj.number + 1) }}">Вперед →</a>
                       {% endif %}
                     </div>
                <!-- Пагинация: конец вывода -->

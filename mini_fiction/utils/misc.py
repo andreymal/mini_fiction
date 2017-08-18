@@ -6,7 +6,7 @@ import json
 import math
 import time
 
-from flask import current_app, g, escape, render_template
+from flask import current_app, g, escape, render_template, abort
 from flask_babel import pgettext, ngettext
 
 from mini_fiction.utils import diff as utils_diff
@@ -31,6 +31,12 @@ class Paginator(object):
         if self.offset < 0:
             return []
         return objlist[self.offset:self.offset + self.per_page]
+
+    def slice_or_404(self, objlist):
+        result = self.slice(objlist)
+        if not result and self.number != 1:
+            abort(404)
+        return result
 
     def has_next(self):
         return self.number < self.num_pages

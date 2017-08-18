@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-from flask import request
+from flask import request, url_for
 
 from mini_fiction.templatetags import registry
 from mini_fiction.utils import misc as utils_misc
@@ -27,3 +27,11 @@ def prepare_editlog(edit_log):
         log_data.append((log_item, utils_misc.get_editlog_extra_info(log_item)))
 
     return log_data
+
+
+@registry.simple_tag()
+def modified_url(endpoint=None, view_args=None, **kwargs):
+    endpoint = endpoint or request.endpoint
+    view_args = view_args if view_args is not None else dict(request.view_args or {})
+    view_args.update(kwargs)
+    return url_for(endpoint, **view_args)

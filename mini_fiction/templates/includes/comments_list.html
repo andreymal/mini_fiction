@@ -11,7 +11,7 @@
             {% elif ctype == 'news' %}
                 <span class="comment-newsitem-link">
                 к новости
-                <a href="{{ url_for('news.show', name=comment.newsitem.name) }}">{{ comment.newsitem.title }}</a>
+                <a href="{{ url_for('news.show', name=comment.newsitem.name) }}"><b>{{ comment.newsitem.title }}</b></a>
                 </span>
             {% endif %}
        {% endif %}

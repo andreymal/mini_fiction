@@ -1,6 +1,6 @@
 'use strict';
 
-/* global core: false, $: false, mySettings: false */
+/* global core: false, $: false, mySettings: false, HTMLSanitizer: false */
 
 
 var common = {
@@ -314,30 +314,14 @@ var common = {
     },
 
     /**
-     * Вставляет указанный HTML-код, прогнав его через sanitizeHTML,
+     * Вставляет указанный HTML-код, прогнав его через HTMLSanitizer,
      * в textarea в то место, где сейчас находится курсор.
      */
     pasteHTML: function(textarea, html) {
-        var container = document.createElement('div');
+        var result = new HTMLSanitizer(common.allowedTags, {
+            fancyNewlines: true
+        }).push(html).innerHTML.replace(/[ \n]+$/g, '');
 
-        // Всякие школьные поделки вроде Microsoft Edge пихают в HTML-код
-        // какой-то хлам, обрезаем его
-        // (впрочем, в Edge всё равно кодировка слетевшая)
-        var f = html.indexOf('<body');
-        if (f <= 0) {
-            f = html.indexOf('<BODY');
-        }
-        if (f > 0) {
-            html = html.substring(f);
-        }
-
-        common.sanitizeHTML(container, html, {
-            fancyNewlines: true,
-            allowedTags: common.allowedTags,
-            tabunAlign: false,
-        });
-
-        var result = container.innerHTML.trim();
 
         if (document.selection) {
             // IE
@@ -352,130 +336,7 @@ var common = {
             textarea.selectionStart = startPos + result.length;
             textarea.selectionEnd = startPos + result.length;
         } else {
-            textarea.value += textarea;
-        }
-    },
-
-    /**
-     * Преобразует произвольный HTML-код в другой HTML-код согласно указанным
-     * опциям.
-     *
-     * Для конвертирования тегов их необходимо разрешить, указав в объекте
-     * `options.allowedTags`. Его ключами должны являться названия тегов
-     * в нижнем регистре, а значениями объект с разрешёнными атрибутами.
-     *
-     * Объект с разрешёнными атрибутами в ключах должен содержать название
-     * атрибута, а в значениях — null (тогда атрибут копируется как есть, если
-     * имеется) или функция. Если указана функция, то при обработке атрибута
-     * она вызывается с параметрами `(attrValue, attrName, node, options)`.
-     * Если атрибут отсутствует, то attrValue установлено в null. Функция
-     * должна вернуть значение атрибута, которое будет установлено. Если
-     * возвращается null или undefined, то атрибут пропускается.
-     *
-     * Специальный опциональный ключ `_node` позволяет задать функцию, которая
-     * обработает текущий HTML-элемент произвольно. При её наличии она
-     * вызывается с `(parent, node, copyAttrs, options)` (где `copyAttrs` —
-     * словарь с разрешёнными атрибутами, который и содержит вызываемую
-     * функцию `_node`) и производит всю обработку самостоятельно; ни
-     * обработка атрибутов, ни добавление потомков не будет произведено
-     * автоматически.
-     *
-     * Весь объект `options` передаётся всем обработчикам как есть и может
-     * содержать, помимо `allowedTags`, любые произвольные объекты.
-     *
-     * Имейте в виду, что данная разрабатывалась только для удобства
-     * пользователей и не гарантирует защиту от XSS и прочую безопасность.
-     *
-     * @param {HTMLElement} parent - элемент, в который пихать результат
-     * @param {object} htmlNodes - строка с HTML-кодом или массив элементов
-     *   для обработки
-     * @param {object} [options=null] - дополнительные опции
-     */
-    sanitizeHTML: function (parent, htmlNodes, options) {
-        options = options || {};
-        var allowedTags = options.allowedTags || {};
-
-        var parser = null;
-
-        if (typeof htmlNodes === 'string') {
-            parser = document.createElement('div');
-            parser.style.display = 'none';
-            parser.innerHTML = htmlNodes;
-            document.body.appendChild(parser); // этого требует хром
-            htmlNodes = Array.prototype.slice.call(parser.childNodes);
-        } else if (htmlNodes instanceof HTMLElement || htmlNodes instanceof Text) {
-            htmlNodes = [htmlNodes];
-        }
-
-        try {
-            for (var i = 0; i < htmlNodes.length; i++) {
-                var node = htmlNodes[i];
-                var cleanNode = null;
-
-                if (node instanceof Comment) {
-                    continue;
-                }
-
-                if (node instanceof Text) {
-                    cleanNode = node.textContent.replace(/[\r\n\t]/g, ' ');
-                    cleanNode = cleanNode.replace(/  +/g, ' ');
-                    if (cleanNode) {
-                        parent.appendChild(document.createTextNode(cleanNode));
-                    }
-                    continue;
-                }
-
-                var tag = node.tagName.toLowerCase();
-
-                if (tag == 'meta' || tag == 'script' || tag == 'noscript' || tag == 'style' || tag == 'link') {
-                    // nothing
-
-                } else if (allowedTags.hasOwnProperty(tag)) {
-                    // Копирование разрешённых тегов
-                    var copyAttrs = allowedTags[tag];
-
-                    cleanNode = document.createElement(tag);
-
-                    if (copyAttrs.hasOwnProperty('_node')) {
-                        // Если есть функция, делающая хитрую обработку, то просто
-                        // вызываем её и сами ничего не делаем
-                        copyAttrs._node(parent, node, copyAttrs, options);
-
-                    } else {
-                        // Копирование разрешённых атрибутов тега
-                        for (var attr in copyAttrs) {
-                            if (!copyAttrs.hasOwnProperty(attr)) {
-                                continue;
-                            }
-
-                            // Функция-обработчик значения атрибута, которая может пошаманить что-нибудь
-                            // (вызывается даже при отсутствии атрибута, такак функция может его создать)
-                            var copyAttrFunc = copyAttrs[attr];
-                            var attrValue = node.hasAttribute(attr) ? node.getAttribute(attr) : null;
-                            if (copyAttrFunc) {
-                                attrValue = copyAttrFunc(attrValue, attr, node, options);
-                            }
-
-                            // Если после шаманства значение атрибута получено, то ставим его
-                            if (attrValue !== undefined && attrValue !== null) {
-                                cleanNode.setAttribute(attr, attrValue);
-                            }
-                        }
-
-                        // Копируем все внутренности
-                        common.sanitizeHTML(cleanNode, Array.prototype.slice.call(node.childNodes), options);
-                        parent.appendChild(cleanNode);
-                    }
-
-                } else {
-                    common.sanitizeHTML(parent, Array.prototype.slice.call(node.childNodes), options);
-                }
-            }
-
-        } finally {
-            if (parser && parser.parentNode) {
-                parser.parentNode.removeChild(parser);
-            }
+            textarea.value += result;
         }
     },
 
@@ -537,10 +398,17 @@ var common = {
 // Настройки для конвертера HTML-кода, вставленного из буфера обмена,
 // в HTML-код, пригодный для сайта
 common.allowedTags = {
-    b: {}, strong: {}, i: {}, em: {}, s: {}, u: {},
     p: {},
+    b: {},
+    br: {},
+    i: function(node) {
+        var x = document.createElement('em');
+        this.push(Array.prototype.slice.call(node.childNodes), x);
+        return x;
+    },
+    strong: {}, em: {}, s: {}, u: {},
     h3: {}, h4: {}, h5: {},
-    span: {}, br: {}, hr: {}, // TODO: footnote?
+    span: {}, hr: {}, // TODO: footnote?
     img: {src: null, alt: null, title: null},
     a: {href: null, rel: null, title: null, target: null},
     ul: {}, ol: {}, li: {},
@@ -548,11 +416,7 @@ common.allowedTags = {
 };
 
 
-// Конвертирование тега <p> хитрое, так как вместо него нам нужны пустые
-// строки, ну и ещё атрибут align попутно
-common.allowedTags.p._node = function(parent, node, copyAttrs, options) {
-    var cleanNode = null;
-
+common.allowedTags.p = common.allowedTags.div = function(node) {
     // Копируем один разрешённый атрибут
     var align = null;
     var attrAlign = node.getAttribute('align') || getComputedStyle(node).textAlign;
@@ -564,34 +428,17 @@ common.allowedTags.p._node = function(parent, node, copyAttrs, options) {
         align = 'center';
     }
 
-    if (!align && options.fancyNewlines) {
+    if (!align && this.options.fancyNewlines) {
         // При fancyNewlines вместо <p></p> разделяем параграфы пустой строкой
-        var newline = '\n\n';
-        if (parent.lastChild && parent.lastChild instanceof Text) {
-            if (parent.lastChild.textContent.endsWith('\n\n')) {
-                newline = '';
-            } else if (parent.lastChild.textContent.endsWith('\n')) {
-                newline = '\n';
-            }
-        }
-        if (!parent.lastChild) {
-            newline = '';
-        }
-        if (newline) {
-            parent.appendChild(document.createTextNode(newline));
-        }
-
-        common.sanitizeHTML(parent, Array.prototype.slice.call(node.childNodes), options);
-
-        // Смотрим наперёд: если дальше span, то перед ним тоже пустая строка
-        if (node.nextSibling && node.nextSibling instanceof HTMLElement && node.nextSibling.tagName.toLowerCase() == 'span') {
-            parent.appendChild(document.createTextNode('\n\n'));
-        }
+        this.requireNewlines(2);
+        this.push(Array.prototype.slice.call(node.childNodes));
+        this.requireNewlines(2, true);
 
     } else {
         // Иначе создаём <p> как обычно
         // (за исключением случая, когда нужно выравнивание для табуна)
-        if (options.tabunAlign) {
+        var cleanNode;
+        if (this.options.tabunAlign) {
             cleanNode = document.createElement('span');
             if (align) {
                 cleanNode.className = 'h-' + align;
@@ -602,36 +449,33 @@ common.allowedTags.p._node = function(parent, node, copyAttrs, options) {
                 cleanNode.setAttribute('align', align);
             }
         }
-        common.sanitizeHTML(cleanNode, Array.prototype.slice.call(node.childNodes), options);
-        if (options.fancyNewlines) {
-            parent.appendChild(document.createTextNode('\n'));
+
+        if (this.options.fancyNewlines) {
+            this.requireNewlines(1);
         }
-        parent.appendChild(cleanNode);
-        if (options.fancyNewlines) {
-            parent.appendChild(document.createTextNode('\n'));
+        this.current.appendChild(cleanNode);
+        this.push(Array.prototype.slice.call(node.childNodes), cleanNode);
+        if (this.options.fancyNewlines) {
+            this.requireNewlines(1, true);
         }
     }
+    return null;
 };
 
 
-common.allowedTags.br._node = function(parent, node, copyAttrs, options) {
-    // После </p> дополнительный перенос строки не ставим
-    if (parent.lastChild && parent.lastChild instanceof HTMLElement && parent.lastChild.tagName.toLowerCase() == 'p') {
-        return;
-    }
-
-    if (options.fancyNewlines) {
-        parent.appendChild(document.createTextNode('\n'));
+common.allowedTags.br = function() {
+    if (this.options.fancyNewlines) {
+        this.putNewlines(1);
     } else {
-        parent.appendChild(document.createElement('br'));
+        this.current.appendChild(document.createElement('br'));
     }
 };
 
 
-common.allowedTags.span._node = function(parent, node, copyAttrs, options) {
+common.allowedTags.span = function(node) {
     // Всякие гуглодоки вместо HTML-тегов юзают span со стилями, здесь вот
     // конвертируем эти стили в HTML-теги
-    var cont = parent;
+    var cont = this.current;
     var cont2;
     var style = getComputedStyle(node);
 
@@ -685,11 +529,11 @@ common.allowedTags.span._node = function(parent, node, copyAttrs, options) {
         cont = cont2;
     }
 
-    common.sanitizeHTML(cont, Array.prototype.slice.call(node.childNodes), options);
+    this.push(Array.prototype.slice.call(node.childNodes), cont !== this.current ? cont : null);
 };
 
 
-common.allowedTags.b._node = function(parent, node, copyAttrs, options) {
+common.allowedTags.b = function(node) {
     var cont;
 
     var style = getComputedStyle(node);
@@ -697,17 +541,18 @@ common.allowedTags.b._node = function(parent, node, copyAttrs, options) {
     var bolds = ['bold', 'bolder', '500', '600', '700', '800', '900'];
     if (style.fontWeight && bolds.indexOf(style.fontWeight) >= 0) {
         cont = document.createElement('strong');
-        parent.appendChild(cont);
     } else {
         // Да, так бывает! Google Docs идиот
-        cont = parent;
+        cont = null;
     }
 
-    common.sanitizeHTML(cont, Array.prototype.slice.call(node.childNodes), options);
+    this.current.appendChild(cont);
+    this.push(Array.prototype.slice.call(node.childNodes), cont);
 };
 
 
-common.allowedTags.img.width = common.allowedTags.img.height = function(value, attr, node) {
+common.allowedTags.img.width = common.allowedTags.img.height = function(node, attr) {
+    var value = node.hasAttribute(attr) ? node.getAttribute(attr) : null;
     // Если у картинки нет атрибута width/height, то берём CSS width/height
     if (!value) {
         value = getComputedStyle(node)[attr];

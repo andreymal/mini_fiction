@@ -7,6 +7,9 @@
     <div id="slides" class="carousel">
         {{ random_stories() }}
     </div>
+    {% if logo.original_link and logo.original_link_label -%}
+        <a class="logopic-sourcelink" href="{{ logo.original_link }}" target="_blank">{{ logo.original_link_label }}</a>
+    {%- endif %}
 </div>
 <!-- Logo image and carousel end -->
 {%- endif %}

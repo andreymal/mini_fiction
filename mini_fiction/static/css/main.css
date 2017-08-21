@@ -27,6 +27,34 @@ body {
 
 .logopic {
     height: 240px;
+    position: relative;
+}
+
+.logopic-sourcelink {
+    position: absolute;
+    left: 8px;
+    top: 8px;
+    padding: 1px 6px;
+    font-size: 12px;
+    background-color: #333;
+    background-color: rgba(50, 50, 50, 0.6);
+    color: white;
+    text-decoration: underline;
+    display: inline-block;
+
+    opacity: 0;
+    pointer-events: none;
+    transition-property: opacity;
+    transition-duration: 500ms;
+}
+
+.logopic-sourcelink:hover {
+    color: #cdcae9;
+}
+
+.logopic:hover .logopic-sourcelink {
+    opacity: 1;
+    pointer-events: auto;
 }
 
 .carousel {

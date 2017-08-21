@@ -21,9 +21,8 @@ from flask_login import LoginManager
 from flask_wtf.csrf import CSRFProtect
 
 from mini_fiction import models  # pylint: disable=unused-import
-from mini_fiction import database, tasks
+from mini_fiction import database, tasks, context_processors
 from mini_fiction.bl import init_bl
-from mini_fiction.utils.misc import sitename
 
 
 __all__ = ['create_app']
@@ -125,11 +124,8 @@ def configure_users(app):
 def templates_context():
     context = {}
     context.update(current_app.templatetags)
-    context.update({
-        'SITE_NAME': sitename(),
-        'base': current_app.jinja_env.get_template('base.json' if getattr(g, 'is_ajax', False) else 'base.html'),
-        'contact_types': {x['name']: x for x in current_app.config['CONTACTS']},
-    })
+    for c in context_processors.context_processors:
+        context.update(c() or {})
     return context
 
 

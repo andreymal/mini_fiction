@@ -1,0 +1,19 @@
+{{ html_block('header') }}
+
+{%- set logo = logopic() -%}
+{% if logo -%}
+<!-- Logo image and carousel start -->
+<div class="logopic" style="background-image: url('{{ logo['url'] }}')">
+    <div id="slides" class="carousel">
+        {{ random_stories() }}
+    </div>
+</div>
+<!-- Logo image and carousel end -->
+{%- endif %}
+<!-- Menu start -->
+<div class="nav-main" id="nav-main">
+{% include 'includes/nav.html' %}
+</div>
+<!-- Menu end -->
+{% include 'includes/important_notifications.html' %}
+

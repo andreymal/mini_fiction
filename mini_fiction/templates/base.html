@@ -19,23 +19,7 @@
 <body>
     <!-- Container start -->
     <div class="container">
-    {{ html_block('header') }}
-
-    {% if config['RANDOM_LOGOS'] -%}
-    <!-- Logo image and carousel start -->
-    <div class="logopic" style="background-image: url('{{ random_logo() }}')">
-        <div id="slides" class="carousel">
-            {{ random_stories() }}
-        </div>
-    </div>
-    <!-- Logo image and carousel end -->
-    {%- endif %}
-    <!-- Menu start -->
-    <div class="nav-main" id="nav-main">
-    {% include 'includes/nav.html' %}
-    </div>
-    <!-- Menu end -->
-    {% include 'includes/important_notifications.html' %}
+    {% include 'includes/header.html' with context %}
     <!-- Content start -->
     <div id="content">
 

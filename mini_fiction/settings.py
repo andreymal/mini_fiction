@@ -241,7 +241,6 @@ class Config(object):
     RECAPTCHA_OPTIONS = {'hl': 'ru'}
     NOCAPTCHA = True
 
-    RANDOM_LOGOS = []
     DEFAULT_USERPIC = {'endpoint': 'static', 'filename': 'i/userpic.png'}
 
 

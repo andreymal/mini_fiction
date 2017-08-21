@@ -176,8 +176,9 @@ def configure_views(app):
 
 def configure_admin_views(app):
     from mini_fiction.views.admin import index, categories, characters, charactergroups, classifications
-    from mini_fiction.views.admin import htmlblocks, staticpages, authors, news
+    from mini_fiction.views.admin import logopics, htmlblocks, staticpages, authors, news
     app.register_blueprint(index.bp, url_prefix='/admin')
+    app.register_blueprint(logopics.bp, url_prefix='/admin/logopics')
     app.register_blueprint(htmlblocks.bp, url_prefix='/admin/htmlblocks')
     app.register_blueprint(categories.bp, url_prefix='/admin/categories')
     app.register_blueprint(characters.bp, url_prefix='/admin/characters')

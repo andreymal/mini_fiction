@@ -17,6 +17,25 @@ from mini_fiction.filters.base import html_doc_to_string
 from mini_fiction.filters.html import footnotes_to_html
 
 
+class Logopic(db.Entity):
+    """ Модель картинки в шапке сайта """
+
+    picture = orm.Required(str, 255)
+    sha256sum = orm.Required(str, 64)
+    visible = orm.Required(bool, default=True)
+    description = orm.Optional(orm.LongStr)
+    original_link = orm.Optional(str, 255)
+    original_link_label = orm.Optional(orm.LongStr, lazy=False)
+    created_at = orm.Required(datetime, 6, default=datetime.utcnow)
+    updated_at = orm.Required(datetime, 6, default=datetime.utcnow)
+
+    bl = Resource('bl.logopic')
+
+    @property
+    def url(self):
+        return url_for('media', filename=self.picture, v=self.sha256sum[:6])
+
+
 class AnonymousUser(AnonymousUserMixin):
     id = None
     username = ''

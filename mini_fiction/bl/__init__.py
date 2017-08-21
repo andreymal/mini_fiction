@@ -3,7 +3,7 @@
 
 def init_bl():
     from mini_fiction.bl import registry, authors, stories, comments, htmlblocks, staticpages, news
-    from mini_fiction.bl import sorting
+    from mini_fiction.bl import sorting, logopics
 
     registry.register('bl.author', authors.AuthorBL)
     registry.register('bl.story', stories.StoryBL)
@@ -19,3 +19,4 @@ def init_bl():
     registry.register('bl.character', sorting.CharacterBL)
     registry.register('bl.charactergroup', sorting.CharacterGroupBL)
     registry.register('bl.classifier', sorting.ClassifierBL)
+    registry.register('bl.logopic', logopics.LogopicBL)

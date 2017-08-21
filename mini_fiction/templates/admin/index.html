@@ -8,6 +8,7 @@
         <h1>{{ page_title }}</h1>
 
         <ul>
+            <li><a href="{{ url_for('admin_logopics.index') }}">{{ _('Header pictures') }}</a></li>
             <li><a href="{{ url_for('admin_categories.index') }}">{{ _('Categories (genres)') }}</a></li>
             <li><a href="{{ url_for('admin_characters.index') }}">{{ _('Characters') }}</a></li>
             <li><a href="{{ url_for('admin_charactergroups.index') }}">{{ _('Character groups') }}</a></li>

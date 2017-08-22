@@ -77,7 +77,10 @@ def database_cleaner(request):
             conn.execute('BEGIN TRANSACTION')
             for x in conn.execute("SELECT name FROM sqlite_master WHERE type='table'").fetchall():
                 if x[0].lower() in ('htmlblock', 'rating', 'staticpage'):
-                    continue  # fixtures
-                conn.execute('DELETE FROM {}'.format(x[0]))
+                    pass  # fixtures
+                elif x[0].lower() == 'author':
+                    conn.execute('DELETE FROM {} WHERE id != {}'.format(x[0], flask_app.config['SYSTEM_USER_ID']))
+                else:
+                    conn.execute('DELETE FROM {}'.format(x[0]))
             conn.execute('COMMIT')
             database.db.disconnect()

@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-from flask import Blueprint, render_template, abort, redirect, url_for
+from flask import Blueprint, current_app, render_template, abort, redirect, url_for
 from flask_babel import gettext
 from flask_login import login_user, current_user
 from pony.orm import db_session
@@ -34,11 +34,16 @@ def index(page):
     )
 
 
-@bp.route('/<int:pk>/', methods=('GET', 'POST'))
+@bp.route('/<pk>/', methods=('GET', 'POST'))
 @db_session
 def update(pk):
     if not current_user.is_superuser:
         abort(403)
+
+    try:
+        pk = int(pk)
+    except Exception:
+        abort(404)
 
     author = Author.get(id=pk)
     if not author:
@@ -70,16 +75,22 @@ def update(pk):
         'admin/authors/update.html',
         page_title=author.username,
         author=author,
+        is_system_user=author.id == current_app.config['SYSTEM_USER_ID'],
         form=form,
         saved=saved,
     )
 
 
-@bp.route('/<int:pk>/login/', methods=('POST',))
+@bp.route('/<pk>/login/', methods=('POST',))
 @db_session
 def login(pk):
     if not current_user.is_superuser:
         abort(403)
+
+    try:
+        pk = int(pk)
+    except Exception:
+        abort(404)
 
     author = Author.get(id=pk)
     if not author:

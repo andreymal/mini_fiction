@@ -35,10 +35,16 @@
                 </time>{% else %}N/A{% endif %}</span>
             </div>
         </div>
-        {{ form_fields(form) }}
-        <div class="controls">
-            <input type="submit" value="{{ _('Save') }}" class="btn btn-primary" />
-        </div>
+        {% if not is_system_user %}
+            {{ form_fields(form) }}
+            <div class="controls">
+                <input type="submit" value="{{ _('Save') }}" class="btn btn-primary" />
+            </div>
+        {% else %}
+            <div class="control-group">
+                {{ _('This is system user account, you cannot edit it.') }}
+            </div>
+        {% endif %}
         </form>
 
         {% if author.is_active and author.id != current_user.id %}

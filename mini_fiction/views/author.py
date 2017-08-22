@@ -18,10 +18,16 @@ bp = Blueprint('author', __name__)
 
 @bp.route('/profile/', defaults={'user_id': None, 'comments_page': 1})
 @bp.route('/profile/comments/page/<int:comments_page>/', defaults={'user_id': None})
-@bp.route('/<int:user_id>/', defaults={'comments_page': 1})
-@bp.route('/<int:user_id>/comments/page/<int:comments_page>/')
+@bp.route('/<user_id>/', defaults={'comments_page': 1})
+@bp.route('/<user_id>/comments/page/<int:comments_page>/')
 @db_session
 def info(user_id=None, comments_page=1):
+    if user_id is not None:
+        try:
+            user_id = int(user_id)
+        except Exception:
+            abort(404)
+
     data = {}
 
     if user_id is None:
@@ -66,6 +72,7 @@ def info(user_id=None, comments_page=1):
 
     data.update({
         'author': author,
+        'is_system_user': author.id == current_app.config['SYSTEM_USER_ID'],
         'stories': stories,
         'contributing_stories': contributing_stories,
         'series': series,
@@ -244,10 +251,15 @@ def edit():
     return render_template('author_profile_edit.html', **data)
 
 
-@bp.route('/<int:user_id>/ban/', methods=('POST',))
+@bp.route('/<user_id>/ban/', methods=('POST',))
 @db_session
 def ban(user_id):
-    if current_user.is_staff:
+    try:
+        user_id = int(user_id)
+    except Exception:
+        abort(404)
+
+    if current_user.is_staff and user_id != current_app.config['SYSTEM_USER_ID']:
         author = Author.get(id=user_id)
         if not author:
             abort(404)

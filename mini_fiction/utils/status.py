@@ -288,6 +288,7 @@ class UsersStatus(Status):
         'active_count': 'Active count',
         'staff_count': 'Staff count',
         'superadmins_count': 'Superadmins count',
+        'system_user': 'System user',
     }
 
     def last(self):
@@ -315,12 +316,25 @@ class UsersStatus(Status):
             return self._warn('superadmins_count', '{} (and {} superadmins are not staff, maybe fix it?)'.format(superadmins_count, snostaff_count))
         return self._ok('superadmins_count', str(superadmins_count))
 
+    def system_user(self):
+        uid = self.app.config.get('SYSTEM_USER_ID')
+        if not isinstance(uid, int):
+            return self._fail('system_user', 'not set')
+
+        system = models.Author.get(id=uid)
+        if not system:
+            return self._fail('system_user', '{} (not found)'.format(uid))
+        if not system.is_active or not system.is_staff or not system.is_superuser:
+            return self._fail('system_user', '{} ({}) (but not active superuser)'.format(uid, system.username))
+        return self._ok('system_user', '{} ({})'.format(uid, system.username))
+
     def generate(self):
         yield self.last()
         yield self.count()
         yield self.active_count()
         yield self.staff_count()
         yield self.superadmins_count()
+        yield self.system_user()
 
 
 def generate(app, use_db_session=False):

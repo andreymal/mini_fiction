@@ -114,9 +114,10 @@ def configure_users(app):
         if not user:
             return
 
-        tm = datetime.utcnow()
-        if not user.last_visit or (tm - user.last_visit).total_seconds() >= 60:
-            user.last_visit = tm
+        if user.id != current_app.config['SYSTEM_USER_ID']:
+            tm = datetime.utcnow()
+            if not user.last_visit or (tm - user.last_visit).total_seconds() >= 60:
+                user.last_visit = tm
 
         return user
 

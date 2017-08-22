@@ -498,6 +498,9 @@ class AuthorBL(BaseBL):
         if not password:
             return False
 
+        if self._model().id == current_app.config['SYSTEM_USER_ID']:
+            return False
+
         data = self._model().password
         if not data:
             return False

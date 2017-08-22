@@ -10,7 +10,7 @@
         <h1 id="author-name">
             <img src="{{ author.bl.get_avatar_url() }}" width="42" title="{{ author.username }}" alt="{{ author.username }}" class="userpic"/>
             {{ author.username }}
-            {% if current_user.is_staff %}
+            {% if current_user.is_staff and not is_system_user and current_user.id != author.id %}
                 {# <a href="{% url 'author_approve' author.id %}" id="author_approve" class="btn btn-small{% if author.approved %} btn-primary{% endif %}">{% if author.approved %}Проверен{% else %}Не проверен{% endif %}</a> #}
                 <form style="margin: 0; display: inline-block;" method="POST" action="{{ url_for('author.ban', user_id=author.id) }}" id="author_ban">
                     <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
@@ -25,6 +25,7 @@
                 <sup><a class="edit-link" href="{{ url_for('author.edit') }}">Редактировать профиль</a></sup>
             {% endif %}
         </h1>
+        {% if not is_system_user %}
         <p>
             {% if stories|length > 0 %}
                 Написал <b>{{ ngettext("%(num)d story", "%(num)d stories", stories|length) }}</b>
@@ -42,6 +43,9 @@
             {% endif %}
         </p>
         <p class="author-description">{{ author.bio_as_html }}</p>
+        {% else %}
+            <div class="system-user-description">{{ html_block('system_user') }}</div>
+        {% endif %}
         {% with contacts=author.contacts.select().order_by('c.id')[:] %}{% include 'includes/author_contacts.html' %}{% endwith %}
     </div>
     <div class="span8">
@@ -50,8 +54,10 @@
             {% include "includes/series.html" %}
         {% endif %}
 
-        <h2>Рассказы автора</h2>
-        {% include "includes/stories.html" %}
+        {% if not is_system_user or stories %}
+            <h2>Рассказы автора</h2>
+            {% include "includes/stories.html" %}
+        {% endif %}
     </div>
 
     <div class="span4">

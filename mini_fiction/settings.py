@@ -13,6 +13,7 @@ class Config(object):
     DEBUG = False
     TESTING = False
     SECRET_KEY = 'mnwpNkTYhFeu57Fc9WjVbw7DidbkZoVe'
+    SYSTEM_USER_ID = -1
 
     PLUGINS = []
 

@@ -302,7 +302,7 @@ class PonyDump(object):
         result['_entity'] = name
         return result
 
-    def dump_entity(self, entity, fp, chunk_size=250):
+    def dump_entity(self, entity, fp, chunk_size=250, binary_mode=False, sanitizer=None):
         '''Дампит указанную модель в указанный вывод в формате JSON Lines.
         Генератор, yield'ит прогресс. Если yield'ится 'pk': None, значит всё.
 
@@ -310,6 +310,10 @@ class PonyDump(object):
         :param file fp: файлоподобный объект, имеющий метод write, в который
           можно скармливать строки
         :param int chunk_size: по сколько штук за раз брать объектов из базы
+        :param bool binary_mode: указывает, в каком режиме открыт
+          файлоподобный объект: текстовом (False) или бинарном (True)
+        :param sanitizer: функция, которой будет передан список словарей
+          дампа перед его записью; можно его изменять
         '''
 
         if isinstance(entity, str):
@@ -405,15 +409,20 @@ class PonyDump(object):
                     break
 
                 # Если объекты из базы достались, то дампим их
-                dump = [self.je.encode(self.obj2json(x, name)) for x in objs]
+                dump = [self.obj2json(x, name) for x in objs]
                 pk = objs[-1].get_pk()
                 if not isinstance(pk, tuple):
                     pk = (pk,)
                 del q, objs, pk_zip
 
-            fp.write('\n'.join(dump))
-            fp.write('\n')
-            current_count += len(dump)
+                if sanitizer:
+                    sanitizer(dump)
+
+            if dump:  # sanitizer мог почистить
+                x = '\n'.join(self.je.encode(x) for x in dump)
+                fp.write(x.encode('utf-8') if binary_mode else x)
+                fp.write(b'\n' if binary_mode else '\n')
+                current_count += len(dump)
             dump = None
             yield {'current': current_count, 'count': count, 'pk': pk}
 

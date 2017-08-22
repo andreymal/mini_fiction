@@ -131,7 +131,7 @@ def dumpdb_console(dirpath, entities_list=None, gzip_compression=0, progress=Tru
             drawer.send(status['current'])
 
 
-def loaddb_console(paths, progress=True):
+def loaddb_console(paths, progress=True, only_create=False):
     import os
     from mini_fiction.utils.misc import progress_drawer
 
@@ -146,7 +146,7 @@ def loaddb_console(paths, progress=True):
 
     drawer = None
     current = None
-    for statuses in mfd.load_from_files(filelist=filelist):
+    for statuses in mfd.load_from_files(filelist=filelist, only_create=only_create):
         for status in statuses:
             if status['pk'] is None:
                 continue
@@ -194,7 +194,11 @@ def loaddb_console(paths, progress=True):
         if progress:
             drawer.send(status['current'])
 
-    print('Finished. {} objects created, {} updated, {} not changed'.format(created, updated, not_changed))
+    if only_create:
+        assert not updated
+        print('Finished. {} objects created'.format(created))
+    else:
+        print('Finished. {} objects created, {} updated, {} not changed'.format(created, updated, not_changed))
 
     depcache = mfd.get_depcache_dict()
     if depcache:

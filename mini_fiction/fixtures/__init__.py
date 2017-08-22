@@ -10,5 +10,9 @@ from mini_fiction import dumpload
 fixtures_dir = os.path.abspath(os.path.dirname(__file__))
 
 
-def seed(progress=True):
-    dumpload.loaddb_console([fixtures_dir], progress=progress)
+def seed(progress=True, only_create=True):
+    dumpload.loaddb_console(
+        [fixtures_dir],
+        progress=progress,
+        only_create=only_create,
+    )

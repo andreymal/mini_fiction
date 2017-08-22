@@ -35,7 +35,7 @@ def shell():
 def seed(silent=False):
     from mini_fiction import fixtures
     orm.sql_debug(False)
-    fixtures.seed(progress=not silent)
+    fixtures.seed(progress=not silent, only_create=True)
 
 
 @manager.command
@@ -108,11 +108,12 @@ def dumpdb(dirpath, entities_list, gzip_compression=0, silent=False):
 
 
 @manager.option('-s', '--silent', dest='silent', help='Don\'t print progress bar to console', action='store_true')
+@manager.option('-C', '--only-create', dest='only_create', help='Only create non-existent objects', action='store_true')
 @manager.option('pathlist', metavar='input_directory', nargs='+', help='Directories or files with dump data')
-def loaddb(pathlist, silent=False):
+def loaddb(pathlist, silent=False, only_create=False):
     from mini_fiction.dumpload import loaddb_console as cmd
     orm.sql_debug(False)
-    cmd(pathlist, progress=not silent)
+    cmd(pathlist, progress=not silent, only_create=only_create)
 
 
 def run():

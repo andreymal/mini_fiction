@@ -633,7 +633,7 @@ class PonyDump(object):
 
         return result
 
-    def json2obj(self, dump):
+    def json2obj(self, dump, only_create=False):
         '''Загружает объект в базу данных из указанного дампа, который должен
         быть словарём. В словаре обязательно должны быть прописаны тип объекта
         (``_entity``), все атрибуты первичного ключа и обязательные
@@ -656,6 +656,8 @@ class PonyDump(object):
           создан).
 
         :param dict dump: словарь с содержимым объекта
+        :param bool only_create: если True, то не трогать уже существующие
+          в базе объекты
         :rtype: dict
         '''
 
@@ -669,6 +671,11 @@ class PonyDump(object):
 
         # (1, 2) → {'pk1': 1, 'pk2': 2}
         pk_dict = dict(zip(self.pkmap[name], pk))
+
+        # Возможно, объект уже есть в базе
+        obj = entity.get(**pk_dict)
+        if obj and only_create:
+            return {'obj': obj, 'created': False, 'updated': False}
 
         # Перед тем, как создать/обновить объект, выковыриваем зависимости.
         # Могут быть зависимости, которые не прописаны у нас, но прописаны
@@ -717,7 +724,6 @@ class PonyDump(object):
             ))
 
         # Данные готовы, depcache обновлён, теперь можно создать/обновить объект
-        obj = entity.get(**pk_dict)
         created = not obj
         updated = created
         if not obj:
@@ -746,7 +752,7 @@ class PonyDump(object):
         obj.flush()
         return {'obj': obj, 'created': created, 'updated': updated}
 
-    def load_entities(self, fp, chunk_sizes=None):
+    def load_entities(self, fp, chunk_sizes=None, only_create=False):
         '''Загружает дамп базы из указанного file-подобного объекта, который
         должен иметь метод readline. Генератор, yield'ит прогресс. Когда pk
         или entity будут None, значит всё.
@@ -755,6 +761,8 @@ class PonyDump(object):
         :param dict chunk_sizes: словарь, указывающий, по сколько объектов
           указанного типа загружать в базу в рамках одной транзакции; в ключах
           название модели в lowercase, в значениях число
+        :param bool only_create: если True, то не трогать уже существующие
+          в базе объекты
         '''
 
         chunk_sizes1 = dict(self.chunk_sizes)
@@ -804,7 +812,7 @@ class PonyDump(object):
                     chunk_size = max(1, chunk_sizes.get(name, self.default_chunk_size))
 
                     # Загружаем дамп в БД
-                    result = self.json2obj(dump)
+                    result = self.json2obj(dump, only_create=only_create)
                     result['entity'] = name
                     result['pk'] = result.pop('obj').get_pk()
                     result['lineno'] = lineno
@@ -824,7 +832,7 @@ class PonyDump(object):
 
         yield [{'entity': None, 'created': None, 'updated': None, 'pk': None, 'lineno': lineno, 'current': current}]
 
-    def load_from_files(self, paths=None, chunk_sizes=None, calc_count=True, filelist=None):
+    def load_from_files(self, paths=None, only_create=False, chunk_sizes=None, calc_count=True, filelist=None):
         '''Загружает дамп базы данных с указанных путей. Берутся только файлы,
         оканчивающиеся на ``_dump.jsonl`` и ``_dump.jsonl.gz`` (регистр
         не учитывается). Вложенные каталоги тоже просматриваются.
@@ -849,6 +857,8 @@ class PonyDump(object):
         Генератор, yield'ит прогресс. Когда path становится None, значит всё.
 
         :param list paths: список файлов и каталогов, в которых искать файлы
+        :param bool only_create: если True, то не трогать уже существующие
+          в базе объекты
         :param dict chunk_sizes: cловарь, указывающий, по сколько объектов
           указанного типа загружать в базу в рамках одной транзакции; в ключах
           название модели в lowercase, в значениях число
@@ -894,7 +904,7 @@ class PonyDump(object):
             else:
                 fp = open(file_path, 'r', encoding='utf-8-sig')
             with fp:
-                for results in self.load_entities(fp, chunk_sizes=chunk_sizes):
+                for results in self.load_entities(fp, chunk_sizes=chunk_sizes, only_create=only_create):
                     for result in results:
                         result['path'] = file_path
                         result['count'] = count

@@ -391,13 +391,11 @@ class StoryBL(BaseBL, Commentable):
                 vote_value=value,
                 ip=ip,
             )
-            vote.flush()
-            self._update_rating()
         elif value != vote.vote_value:
             vote.vote_value = value
             vote.ip = ip
-            vote.flush()
-            self._update_rating()
+        vote.flush()
+        self._update_rating()
 
         return vote
 
@@ -405,7 +403,7 @@ class StoryBL(BaseBL, Commentable):
         from mini_fiction.models import Vote
 
         story = self.model
-        votes = orm.select(x.vote_value for x in Vote if x.story == story)[:]
+        votes = orm.select(x.vote_value for x in Vote if x.story == story).without_distinct()[:]
         m = mean(votes)
         story.vote_average = m
         story.vote_stddev = pstdev(votes, m)

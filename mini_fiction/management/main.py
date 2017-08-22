@@ -31,12 +31,11 @@ def shell():
         code.interact(local={'mini_fiction': mini_fiction, 'app': manager.app, 'm': models})
 
 
-@manager.command
-def seed():
+@manager.option('-s', '--silent', dest='silent', help='Don\'t print progress bar to console', action='store_true')
+def seed(silent=False):
     from mini_fiction import fixtures
     orm.sql_debug(False)
-    with db_session:
-        fixtures.seed()
+    fixtures.seed(progress=not silent)
 
 
 @manager.command

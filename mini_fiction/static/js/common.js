@@ -403,8 +403,8 @@ common.allowedTags = {
     br: {},
     i: function(node) {
         var x = document.createElement('em');
+        this.current.appendChild(x);
         this.push(Array.prototype.slice.call(node.childNodes), x);
-        return x;
     },
     strong: {}, em: {}, s: {}, u: {},
     h3: {}, h4: {}, h5: {},

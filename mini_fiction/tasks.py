@@ -3,6 +3,7 @@
 
 from functools import wraps
 
+import os
 import json
 from flask import current_app
 from pony.orm import db_session
@@ -37,6 +38,7 @@ def task_sphinx_retrying(f):
 def apply_for_app(app):
     app.tasks = {}
     for name, (f, kwargs) in tasks.items():
+        kwargs['name'] = name
         app.tasks[name] = app.celery.task(**kwargs)(f)
 
 
@@ -401,3 +403,25 @@ def notify_news_comment(comment_id):
                 sendto.add(user.email)
 
     _sendmail_notify(sendto, 'news_comment', ctx)
+
+
+@task()
+def zip_dump():
+    from mini_fiction import dumpload
+
+    if not current_app.config.get('ZIP_DUMP_PATH'):
+        return
+
+    path = os.path.join(
+        current_app.config['MEDIA_ROOT'],
+        current_app.config['ZIP_DUMP_PATH'],
+    )
+    tmp_path = os.path.join(
+        current_app.config['MEDIA_ROOT'],
+        current_app.config.get('ZIP_TMP_DUMP_PATH') or (current_app.config['ZIP_DUMP_PATH'] + '.tmp'),
+    )
+
+    dumpload.zip_dump(tmp_path)
+    if os.path.isfile(path):
+        os.remove(path)
+    os.rename(tmp_path, path)

@@ -164,6 +164,7 @@ def configure_views(app):
     app.register_blueprint(news_comment.bp)
     app.register_blueprint(notifications.bp, url_prefix='/notifications')
 
+    app.add_url_rule('/dump/', 'dump', misc.dump)
     app.add_url_rule('/media/<path:filename>', 'media', misc.media)
     if app.config['LOCALSTATIC_ROOT']:
         app.add_url_rule('/localstatic/<path:filename>', 'localstatic', misc.localstatic)

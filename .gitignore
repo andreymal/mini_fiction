@@ -41,3 +41,5 @@ dist/
 /sphinxroot.txt
 /local_sphinx.conf
 *.sqlite3
+/celerybeat-schedule
+/celerybeat.pid

@@ -4,6 +4,8 @@
 import os
 import logging
 
+from celery.schedules import crontab
+
 
 class Config(object):
     LOCALES = {
@@ -232,7 +234,17 @@ class Config(object):
         'task_always_eager': False,
         'task_serializer': 'json',
         'accept_content': {'json', 'msgpack', 'yaml'},
+        'timezone': 'UTC',
+        'beat_schedule': {
+            'daily_zip_dump': {
+                'task': 'zip_dump',
+                'schedule': crontab(hour=2, minute=0),
+            }
+        }
     }
+
+    ZIP_DUMP_PATH = 'mini_fiction_dump.zip'  # relative to /media/
+    ZIP_TMP_DUMP_PATH = None  # default ZIP_DUMP_PATH + '.tmp'
 
     NSFW_RATING_IDS = (1,)
 

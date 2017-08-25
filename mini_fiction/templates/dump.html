@@ -1,0 +1,24 @@
+{% extends base %}
+{% from 'macro.html' import breadcrumbs with context %}
+{% block content %}
+
+<div class="row">
+    <div class="span12">
+        {{- breadcrumbs() }}
+    </div>
+
+    <div class="span12">
+        <h2>{{ page_title }}</h2>
+        <div>{{ html_block('dump_description') }}</div>
+        <br/>
+        <div>
+            Последнее обновление: {{ mtime|timedeltaformat }} назад<br/><br/>
+            <a href="{{ dump_url }}" data-noajax="1" download>Скачать</a> ({{ "{:.1f}".format(dump_size_kib) }} КиБ)
+        </div>
+    </div>
+
+    <div class="span12">
+        {{- breadcrumbs() }}
+    </div>
+</div>
+{% endblock %}

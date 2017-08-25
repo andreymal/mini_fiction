@@ -28,6 +28,9 @@ body {
 .logopic {
     height: 240px;
     position: relative;
+    background-position: 0 0;
+    background-repeat: no-repeat;
+    background-size: cover;
 }
 
 .logopic-sourcelink {

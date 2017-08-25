@@ -319,7 +319,8 @@ var common = {
      */
     pasteHTML: function(textarea, html) {
         var result = new HTMLSanitizer(common.allowedTags, {
-            fancyNewlines: true
+            fancyNewlines: true,
+            collapse: true
         }).push(html).innerHTML.replace(/[ \n]+$/g, '');
 
 
@@ -398,21 +399,21 @@ var common = {
 // Настройки для конвертера HTML-кода, вставленного из буфера обмена,
 // в HTML-код, пригодный для сайта
 common.allowedTags = {
+    i: {_rename: 'em', _nonested: ['i', 'em']},
+    strong: {}, em: {_nonested: ['i', 'em']}, s: {_nonested: true}, u: {_nonested: true},
+    h3: {_nonested: ['h3', 'h4', 'h5']},
+    h4: {_nonested: ['h3', 'h4', 'h5']},
+    h5: {_nonested: ['h3', 'h4', 'h5']},
+    span: {}, hr: {_nocollapse: true, _nokids: true}, // TODO: footnote?
+    img: {src: null, alt: null, title: null, _nocollapse: true, _nokids: true},
+    a: {href: null, rel: null, title: null, target: null, _nonested: true},
+    ul: {}, ol: {}, li: {_nocollapse: true},
+    blockquote: {}, sup: {}, sub: {}, pre: {_nonested: true}, small: {}, tt: {_nonested: true},
+
+    // Этими управляют функции ниже:
     p: {},
     b: {},
     br: {},
-    i: function(node) {
-        var x = document.createElement('em');
-        this.current.appendChild(x);
-        this.push(Array.prototype.slice.call(node.childNodes), x);
-    },
-    strong: {}, em: {}, s: {}, u: {},
-    h3: {}, h4: {}, h5: {},
-    span: {}, hr: {}, // TODO: footnote?
-    img: {src: null, alt: null, title: null},
-    a: {href: null, rel: null, title: null, target: null},
-    ul: {}, ol: {}, li: {},
-    blockquote: {}, sup: {}, sub: {}, pre: {}, small: {}, tt: {},
 };
 
 

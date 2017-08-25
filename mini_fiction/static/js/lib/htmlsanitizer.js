@@ -27,10 +27,31 @@
  * `HTMLSanitizer`, так что можно вызывать его методы и обращаться к
  * `this.current`.
  *
+ * Дополнительные параметры для HTML-тегов:
+ *
+ * - `_rename` — переименовать тег в указанный (например, `i` в `em`); всё
+ *   остальное обрабатывается как обычно
+ *
+ * - `_nonested` — массив тегов (lowercase), внутрь которых нельзя вкладывать
+ *   этот тег. Если указать просто `true`, это запретит вкладывать тег сам
+ *   в себя (с учётом `_rename`, если он есть). Потомки обрабатываются
+ *
+ * - `_nokids` — не обрабатывать детей
+ *
+ * - `_nocollapse` — если true, то при включенной опции collapse запрещает
+ *   удалять этот тег, даже если он пуст
+ *
+ * `_nocollapse` действует, даже если есть произвольная функция для обработки
+ * тега, остальные опции произвольный обработчик должен учитывать
+ * самостоятельно.
+ *
  * @param {object} allowedTags - информация о разрешённых тегах
  * @param {objects} [options] - дополнительные параметры
  * @param {boolean} [options.fancyNewlines=false] - если true, то некоторые
  *   HTML-теги (вроде br или p) могут быть заменены на переносы строк
+ * @param {boolean} [options.collapse=false] - если true, то пустые элементы
+ *   без потомков будут удалять из результата. Можно выключить для отдельных
+ *   тегов, прописав в их опциях `_nocollapse: true`
  * @param {string[]} [options.skipTags] - список имён тегов (lowercase),
  *   которые будут игнорироваться целиком и полностью, в том числе
  *   пропускаться обработка их потомков
@@ -48,6 +69,7 @@ var HTMLSanitizer = function(allowedTags, options) {
     this.root = document.createElement('div');
     this.current = this.root;
     this.stack = [];
+    this.stackNames = []; // имена тегов в lowercase
     this.newlines = 0;
     this.newlinesCollapsed = -1;
 
@@ -56,18 +78,21 @@ var HTMLSanitizer = function(allowedTags, options) {
         'meta', 'script', 'noscript', 'style', 'link', 'embed', 'frame', 'object',
     ];
     options.fancyNewlines = !!options.fancyNewlines;
+    options.collapse = !!options.collapse;
 };
 
 
 /**
  * Устанавливает элемент как текущий, в который будут добавляться все новые
- * элементы через push.
+ * элементы через push. Не добавляет его в результат; вызывающий должен
+ * сделать это сам.
  */
 HTMLSanitizer.prototype.pushCurrent = function(node) {
     if (node === this.current || this.stack.indexOf(node) >= 0) {
         throw new Error('This is already current or previous node!');
     }
     this.stack.push(node);
+    this.stackNames.push(node.tagName.toLowerCase());
     this.current = node;
     return node;
 };
@@ -82,8 +107,10 @@ HTMLSanitizer.prototype.popCurrent = function() {
     var r = null;
     if (this.stack.length > 0) {
         r = this.stack.pop();
+        this.stackNames.pop();
         this.current = this.stack.length > 0 ? this.stack[this.stack.length - 1] : this.root;
     }
+
     return r;
 };
 
@@ -155,6 +182,11 @@ HTMLSanitizer.prototype.requireNewlines = function(n, collapsed) {
  * Обрабатывает указанный кусок HTML. Возвращает корень результата
  * для удобства.
  *
+ * В атрибуте `current` можно указать элемент, который будет добавлен в стек
+ * элементов и который будет родителем для всех последующих элементов.
+ * При включенной опции collapse, если этот элемент был пуст, удаляет его
+ * из результата.
+ *
  * @param {object} htmlNodes - строка с HTML-кодом или список HTML-элементов
  *   (элементы должны быть добавлены на страницу, без этого не работает
  *   getComputedStyle в хроме)
@@ -162,7 +194,11 @@ HTMLSanitizer.prototype.requireNewlines = function(n, collapsed) {
  *   родителем для всех обрабатываемых элементов
  */
 HTMLSanitizer.prototype.push = function(htmlNodes, current) {
+    var oldNewlines, oldNewlinesCollapsed;
+
     if (current) {
+        oldNewlines = this.newlines;
+        oldNewlinesCollapsed = this.newlinesCollapsed;
         this.pushCurrent(current);
         this.setNewlines(0);
     }
@@ -202,8 +238,29 @@ HTMLSanitizer.prototype.push = function(htmlNodes, current) {
         if (current) {
             if (this.popCurrent() !== current) {
                 console.warn('HTMLSanitizer: element stack is broken');
+            } else {
+
+                // Если разрешено и элемент пустой, то удаляем его
+                var r = current;
+                if (r && this.options.collapse && r.parentNode) {
+                    var tag = r.tagName.toLowerCase();
+                    if (!this.allowedTags.hasOwnProperty(tag) || !this.allowedTags[tag]._nocollapse) {
+                        if (r.childNodes.length < 1 || !r.innerHTML) {
+                            r.parentNode.removeChild(r);
+                            r = null;
+                        }
+                    }
+                }
+
+                if (r) {
+                    // Если элемент не был удалён, то </тег> ну никак не является переносом строки
+                    this.setNewlines(0);
+                } else {
+                    // Если же удалён, то возвращаем старую информацию о переносах
+                    this.newlines = oldNewlines;
+                    this.newlinesCollapsed = oldNewlinesCollapsed;
+                }
             }
-            this.setNewlines(0);
         }
     }
 
@@ -259,23 +316,54 @@ HTMLSanitizer.prototype.pushNode = function(node) {
 
         } else {
             // Если функции нет, работаем самостоятельно
-            cleanNode = document.createElement(tag);
-
-            // Копирование разрешённых атрибутов тега
-            this.copyAttributes(node, cleanNode, copyAttrs);
-
-            // Запихиваем в результат
-            this.current.appendChild(cleanNode);
-
-            // Копируем все внутренности
-            // push сделает this.setNewlines(0) сам
-            this.push(Array.prototype.slice.call(node.childNodes), cleanNode);
+            this.processElement(node, copyAttrs);
         }
 
     } else {
         // Если текущий HTML-тег вообще не разрешён, то его не копируем,
         // а копируем только потомков
         this.push(Array.prototype.slice.call(node.childNodes), null);
+    }
+};
+
+
+/**
+ * Стандартный обработчик добавления тега, срабатывающий, если не установлен
+ * сторонний (через `_process`).
+ */
+HTMLSanitizer.prototype.processElement = function(node, copyAttrs) {
+    copyAttrs = copyAttrs || {};
+
+    // Проверяем, что этот тег можно вкладывать
+    if (copyAttrs._nonested) {
+        var nonested = copyAttrs._nonested === true ? [node.tagName.toLowerCase()] : copyAttrs._nonested;
+        for (var i = 0; i < nonested.length; i++) {
+            if (this.stackNames.indexOf(nonested[i]) >= 0) {
+                // Вкладывать нельзя, обрабатываем потомков и всё
+                if (!copyAttrs._nokids) {
+                    this.push(Array.prototype.slice.call(node.childNodes), null);
+                }
+                return;
+            }
+        }
+        // Попали сюда — значит вкладывать можно, продолжаем дальше
+    }
+
+    // Создаём копию тега. Если прописан синоним, то переименовываем
+    var cleanNode = document.createElement(
+        copyAttrs.hasOwnProperty('_rename') ? copyAttrs._rename : node.tagName
+    );
+
+    // Копирование разрешённых атрибутов тега
+    this.copyAttributes(node, cleanNode, copyAttrs);
+
+    // Запихиваем в результат
+    this.current.appendChild(cleanNode);
+
+    // Копируем все внутренности
+    // push сделает this.setNewlines(0) сам
+    if (!copyAttrs._nokids) {
+        this.push(Array.prototype.slice.call(node.childNodes), cleanNode);
     }
 };
 

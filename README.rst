@@ -31,7 +31,7 @@ Quick start
     mini_fiction runserver
 
 Website will be available at ``http://localhost:5000/``, administration page is
-``https://localhost:5000/admin/``.
+``http://localhost:5000/admin/``.
 
 
 Configuration file
@@ -39,6 +39,13 @@ Configuration file
 
 Just copy ``local_settings.example.py`` to ``local_settings.py`` and edit it.
 Then run ``mini_fiction runserver`` in the same directory with this file.
+
+If mini_fiction can't import module ``local_settings``, try to set environment
+variable ``PYTHONPATH=.`` (don't forget ``export PYTHONPATH`` for unix
+shells).
+
+If you want to change domain (e.g. ``127.0.0.1:5000`` or ``example.com``
+instead of default ``localhost:5000``), change ``SERVER_NAME`` option.
 
 You can run ``mini_fiction status`` to check some configuration variables.
 

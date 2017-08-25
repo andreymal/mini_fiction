@@ -204,7 +204,7 @@ def configure_ajax(app):
             response.headers['Vary'] = 'X-AJAX'
         if not getattr(g, 'is_ajax', False):
             return response
-        if response.data and response.data.startswith(b'{') and response.content_type == 'text/html; charset=utf-8':
+        if not response.direct_passthrough and response.data and response.data.startswith(b'{') and response.content_type == 'text/html; charset=utf-8':
             response.content_type = 'application/json'
             # for github-fetch polyfill:
             response.headers['X-Request-URL'] = iri_to_uri(request.url)

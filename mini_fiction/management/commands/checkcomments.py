@@ -3,7 +3,7 @@
 
 from pony import orm
 
-from mini_fiction.models import Story, NewsItem
+from mini_fiction.models import Story, StoryLocalThread, NewsItem
 
 
 def check_comments_tree(tree, depth=0, root_order=0, parent_id=None):
@@ -42,17 +42,18 @@ def check_comments_tree(tree, depth=0, root_order=0, parent_id=None):
             print(' -{}: edits_count {} -> {}'.format(comment.id, comment.edits_count, edits_count))
             comment.edits_count = edits_count
 
-        # Проверка vote_count
-        vote_count = comment.votes.select().count()
-        if comment.vote_count != vote_count:
-            print(' -{}: vote_count {} -> {}'.format(comment.id, comment.vote_count, vote_count))
-            comment.vote_count = vote_count
+        if hasattr(comment, 'votes'):
+            # Проверка vote_count
+            vote_count = comment.votes.select().count()
+            if comment.vote_count != vote_count:
+                print(' -{}: vote_count {} -> {}'.format(comment.id, comment.vote_count, vote_count))
+                comment.vote_count = vote_count
 
-        # Проверка vote_total
-        vote_total = sum(x.vote_value for x in comment.votes.select()[:])
-        if comment.vote_total != vote_total:
-            print(' -{}: vote_total {} -> {}'.format(comment.id, comment.vote_total, vote_total))
-            comment.vote_total = vote_total
+            # Проверка vote_total
+            vote_total = sum(x.vote_value for x in comment.votes.select()[:])
+            if comment.vote_total != vote_total:
+                print(' -{}: vote_total {} -> {}'.format(comment.id, comment.vote_total, vote_total))
+                comment.vote_total = vote_total
 
         check_comments_tree(childtree, depth + 1, root_order if depth > 0 else i, comment.id)
 
@@ -67,11 +68,21 @@ def check_comments_for(target, comments_list):
             target.comments_count = comments_count
 
     # Перерасчёт local_id
+    update_locals = []
     for i, c in enumerate(comments_list, 1):
         if c.local_id != i:
             print(' -{}: #{} -> #{}'.format(c.id, c.local_id, i))
-            c.local_id = i
+            # Сперва сбрасываем на заведомо несуществующий номер, а то база
+            # иногда ругается на неуникальность уникального ключа при исправлении
+            c.local_id = -i
+            update_locals.append((c, i))
             c.flush()
+
+    # А потом уже расставляем правильные номера
+    for c, i in update_locals:
+        c.local_id = i
+        c.flush()
+    del update_locals
 
     # Проверяем root_order, tree_depth, answers_count,
     # edits_count, vote_count, и vote_total
@@ -81,44 +92,69 @@ def check_comments_for(target, comments_list):
 
 
 def checkstorycomments():
-    first_story = orm.select(orm.min(x.id) for x in Story).first()
-    last_story = orm.select(orm.max(x.id) for x in Story).first()
+    with orm.db_session:
+        first_story = orm.select(orm.min(x.id) for x in Story).first()
+        last_story = orm.select(orm.max(x.id) for x in Story).first()
 
     story_id = first_story
     while True:
-        story = Story.select(lambda x: x.id >= story_id and x.id <= last_story).first()
-        if not story:
-            break
+        with orm.db_session:
+            story = Story.select(lambda x: x.id >= story_id and x.id <= last_story).first()
+            if not story:
+                break
 
-        print('Story {}'.format(story.id))
-        comments_list = story.bl.select_comments().order_by('c.date, c.id')
+            print('Story {}'.format(story.id))
+            comments_list = story.bl.select_comments().order_by('c.date, c.id')
 
-        # Проверка story_published
-        pub = story.published
-        for c in comments_list:
-            if c.story_published != pub:
-                print(' -{}: pub {} -> {}'.format(c.id, c.story_published, pub))
-                c.story_published = pub
-                c.flush()
+            # Проверка story_published
+            pub = story.published
+            for c in comments_list:
+                if c.story_published != pub:
+                    print(' -{}: pub {} -> {}'.format(c.id, c.story_published, pub))
+                    c.story_published = pub
+                    c.flush()
 
-        # Всё остальное здесь
-        check_comments_for(story, comments_list)
+            # Всё остальное здесь
+            check_comments_for(story, comments_list)
 
-        story_id = story.id + 1
+            story_id = story.id + 1
+
+
+def checkstorylocalcomments():
+    with orm.db_session:
+        first_local = orm.select(orm.min(x.id) for x in StoryLocalThread).first()
+        last_local = orm.select(orm.max(x.id) for x in StoryLocalThread).first()
+
+    local_id = first_local
+    while True:
+        with orm.db_session:
+            local = StoryLocalThread.select(lambda x: x.id >= local_id and x.id <= last_local).first()
+            if not local:
+                break
+
+            print('Story {} / StoryLocalThread {}'.format(local.story.id, local.id))
+            comments_list = local.bl.select_comments().order_by('c.date, c.id')
+
+            # Всё остальное здесь
+            check_comments_for(local, comments_list)
+
+            local_id = local.id + 1
 
 
 def checknewscomments():
-    first_newsitem = orm.select(orm.min(x.id) for x in NewsItem).first()
-    last_newsitem = orm.select(orm.max(x.id) for x in NewsItem).first()
+    with orm.db_session:
+        first_newsitem = orm.select(orm.min(x.id) for x in NewsItem).first()
+        last_newsitem = orm.select(orm.max(x.id) for x in NewsItem).first()
 
     newsitem_id = first_newsitem
     while True:
-        newsitem = NewsItem.select(lambda x: x.id >= newsitem_id and x.id <= last_newsitem).first()
-        if not newsitem:
-            break
+        with orm.db_session:
+            newsitem = NewsItem.select(lambda x: x.id >= newsitem_id and x.id <= last_newsitem).first()
+            if not newsitem:
+                break
 
-        print('News item {} ({})'.format(newsitem.id, newsitem.name))
-        comments_list = newsitem.bl.select_comments().order_by('c.date, c.id')
-        check_comments_for(newsitem, comments_list)
+            print('News item {} ({})'.format(newsitem.id, newsitem.name))
+            comments_list = newsitem.bl.select_comments().order_by('c.date, c.id')
+            check_comments_for(newsitem, comments_list)
 
-        newsitem_id = newsitem.id + 1
+            newsitem_id = newsitem.id + 1

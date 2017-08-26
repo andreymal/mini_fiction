@@ -82,16 +82,21 @@ def sendtestemail(recipients, eager=False):
 def checkstorycomments():
     from mini_fiction.management.commands.checkcomments import checkstorycomments as cmd
     orm.sql_debug(False)
-    with db_session:
-        cmd()
+    cmd()
+
+
+@manager.command
+def checkstorylocalcomments():
+    from mini_fiction.management.commands.checkcomments import checkstorylocalcomments as cmd
+    orm.sql_debug(False)
+    cmd()
 
 
 @manager.command
 def checknewscomments():
     from mini_fiction.management.commands.checkcomments import checknewscomments as cmd
     orm.sql_debug(False)
-    with db_session:
-        cmd()
+    cmd()
 
 
 @manager.option('-s', '--silent', dest='silent', help='Don\'t print progress bar to console', action='store_true')

@@ -5,6 +5,7 @@ from functools import wraps
 
 import os
 import json
+import time
 from flask import current_app
 from pony.orm import db_session
 
@@ -420,6 +421,15 @@ def zip_dump():
         current_app.config['MEDIA_ROOT'],
         current_app.config.get('ZIP_TMP_DUMP_PATH') or (current_app.config['ZIP_DUMP_PATH'] + '.tmp'),
     )
+
+    i = 0
+    while i < 20 and os.path.isfile(tmp_path):
+        # Если временный файл уже есть, то возможно это другая такая задача
+        # уже запущена, пробуем подождать её завершения
+        i += 1
+        time.sleep(2)
+    if os.path.isfile(tmp_path):
+        raise RuntimeError('Cannot create zip dump because tmp file already exists')
 
     dumpload.zip_dump(tmp_path)
     if os.path.isfile(path):

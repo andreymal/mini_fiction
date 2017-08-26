@@ -160,6 +160,28 @@ var comments = {
         return false;
     },
 
+    _addComment: function(comment, parentComment) {
+        var depth = parseInt(comment.getAttribute('data-depth'), 10);
+
+        if (parentComment) {
+            var before = parentComment.nextElementSibling;
+            while (before && parseInt(before.getAttribute('data-depth'), 10) >= depth) {
+                before = before.nextElementSibling;
+            }
+            if (before) {
+                parentComment.parentNode.insertBefore(comment, before);
+            } else {
+                parentComment.parentNode.appendChild(comment);
+            }
+            return true;
+        }
+        if (document.getElementById('comments-tree')) {
+            document.getElementById('comments-tree').appendChild(comment);
+            return true;
+        }
+        return false;
+    },
+
     _submittedFormEvent: function(data, parentComment) {
         var form = this.form;
         if (core.handleResponse(data, form.action)) {
@@ -174,11 +196,7 @@ var comments = {
             this.bindTreeLinksFor(d.firstElementChild);
             this.bindLinksFor(d.firstElementChild);
 
-            if (parentComment) {
-                parentComment.parentNode.insertBefore(d.firstElementChild, parentComment.nextElementSibling);
-            } else if (document.getElementById('comments-tree')) {
-                document.getElementById('comments-tree').appendChild(d.firstElementChild);
-            } else if (data.link) {
+            if (!this._addComment(d.firstElementChild, parentComment)) {
                 amajaxify.goto('GET', data.link);
             }
         } else if (data.link) {

@@ -269,9 +269,17 @@ class StoryCommentBL(BaseCommentBL):
         return {'story_published': data['story'].published}
 
     def create(self, *args, **kwargs):
+        from mini_fiction.models import Activity
+
         comment = super().create(*args, **kwargs)
         later(current_app.tasks['notify_story_comment'].delay, comment.id)
         later(current_app.tasks['sphinx_update_comments_count'].delay, comment.story.id)
+
+        if comment.author:
+            act = Activity.get(story=comment.story, author=comment.author)
+            if act:
+                act.last_comments += 1
+
         return comment
 
     def select_by_story_author(self, user):
@@ -319,8 +327,16 @@ class StoryLocalCommentBL(BaseCommentBL):
         raise ValueError('Not available')
 
     def create(self, *args, **kwargs):
+        from mini_fiction.models import Activity
+
         comment = super().create(*args, **kwargs)
         later(current_app.tasks['notify_story_lcomment'].delay, comment.id)
+
+        assert comment.author
+        act = Activity.get(story=comment.local.story, author=comment.author)
+        if act:
+            act.last_local_comments += 1
+
         return comment
 
 class NewsCommentBL(BaseCommentBL):

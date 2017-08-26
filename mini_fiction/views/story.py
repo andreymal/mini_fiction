@@ -48,7 +48,7 @@ def view(pk, comments_page):
 
     local_comments_count = 0
     new_local_comments_count = 0
-    if story.bl.is_contributor(user) and story.local:
+    if story.local and ((user and user.is_staff) or story.bl.is_contributor(user)):
         local_comments_count = story.bl.get_or_create_local_thread().comments_count
         new_local_comments_count = (
             (story.bl.get_or_create_local_thread().comments_count - act.last_local_comments)

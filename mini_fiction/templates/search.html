@@ -16,6 +16,9 @@
                     <!-- Тип поиска -->
                     <span class="bootstrap radio">{{ form.type }}</span>
                 </div>
+                <div style="margin-bottom: 4px;">
+                <label style="display: inline;">{{ form.extsyntax }} Включить расширенный синтаксис поиска</label> <a href="http://sphinxsearch.com/docs/current/extended-syntax.html" target="_blank">(справка)</a>
+                </div>
                 <!-- Сортировка результатов поиска -->
                 {{ form.button_sort }}
                 <!-- Фильтры поиска -->

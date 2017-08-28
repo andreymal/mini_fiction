@@ -79,13 +79,31 @@ class SphinxConnection(object):
         q = '(' + ('%s, ' * (len(l) - 1)) + '%s)'
         return q, l
 
-    def search(self, index, query, fields=('id',), raw_fields=('WEIGHT() AS weight',), sort_by=None, limit=None, options=None, weights=None, **filters):
+    def escape_sphinxql(self, s):
+        s = str(s)
+        toreplace = [
+            '\\', '(', ')', '|', '-', '!', '@', '~', '"', '&', '/', '^', '$', '=', '<',
+            'OR', 'NOT', 'MAYBE', 'NEAR', 'SENTENCE', 'PARAGRAPH', 'ZONE', 'ZONESPAN',
+        ]
+
+        for c in toreplace:
+            s = s.replace(c, '\\' + c)
+
+        return s
+
+    def search(
+            self, index, query, fields=('id',), raw_fields=('WEIGHT() AS weight',),
+            sort_by=None, limit=None, options=None, weights=None, extended_syntax=True,
+            **filters
+        ):
         # SELECT
         rfields = ', '.join('`%s`' % x for x in fields)
         if raw_fields:
             rfields = rfields + ', ' + ', '.join(raw_fields)
         sql = 'select %s from `%s` where match(%%s)' % (rfields, index)
-        args = [str(query)]
+
+        query = self.escape_sphinxql(query) if not extended_syntax else str(query)
+        args = [query]
 
         # WHERE
         if filters:

@@ -656,7 +656,7 @@ class StoryBL(BaseBL, Commentable):
     def search_delete(self):
         self.delete_stories_from_search((self.model.id,))
 
-    def search(self, query, limit, sort_by=0, only_published=True, **filters):
+    def search(self, query, limit, sort_by=0, only_published=True, extended_syntax=True, **filters):
         if current_app.config['SPHINX_DISABLED']:
             return {}, []
 
@@ -693,6 +693,7 @@ class StoryBL(BaseBL, Commentable):
                 options=current_app.config['SPHINX_CONFIG']['select_options'],
                 limit=limit,
                 sort_by=self.sort_types[sort_by],
+                extended_syntax=extended_syntax,
                 **sphinx_filters
             )
 
@@ -1249,7 +1250,7 @@ class ChapterBL(BaseBL):
         self.delete_chapters_from_search((chapter.id,))
         chapter.story.bl.search_update(('words',))
 
-    def search(self, query, limit, only_published=True):
+    def search(self, query, limit, only_published=True, extended_syntax=True):
         if current_app.config['SPHINX_DISABLED']:
             return {}, []
         sphinx_filters = {}
@@ -1263,6 +1264,7 @@ class ChapterBL(BaseBL):
                 weights=current_app.config['SPHINX_CONFIG']['weights_chapters'],
                 options=current_app.config['SPHINX_CONFIG']['select_options'],
                 limit=limit,
+                extended_syntax=extended_syntax,
                 **sphinx_filters
             )
 

@@ -60,6 +60,7 @@ def search_action(postform):
                 limit,
                 int(sort_type),
                 only_published=not current_user.is_authenticated or not current_user.is_staff,
+                extended_syntax=postform.data.get('extsyntax'),
                 character=postform.data['char'],
                 classifier=postform.data['cls'],
                 category=postform.data['genre'],

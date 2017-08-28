@@ -45,6 +45,9 @@ class SearchForm(Form):
         }
     )
 
+    # Галочка включения расширенного синтаксиса поиска
+    extsyntax = BooleanField('', default=True)
+
     # Минимальный размер
     min_words = IntegerField(
         '',

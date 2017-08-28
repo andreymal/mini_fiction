@@ -73,7 +73,7 @@ def search_action(postform):
                 excluded_categories=excluded_categories,
             )
         except SphinxError as exc:
-            data = {'form': postform, 'page_title': gettext('Search of stories'), 'error': 'Кажется, есть синтаксическая ошибка в запросе'}
+            data = {'form': postform, 'page_title': gettext('Search of stories'), 'error': 'Кажется, есть синтаксическая ошибка в запросе', 'error_type': 'syntax'}
             if current_app.config['DEBUG'] or current_user.is_superuser:
                 data['error'] += ': ' + str(exc)
             return render_template('search.html', **data)
@@ -85,9 +85,10 @@ def search_action(postform):
                 limit,
                 # TODO: сортировка и для глав тоже
                 only_published=not current_user.is_authenticated or not current_user.is_staff,
+                extended_syntax=postform.data.get('extsyntax'),
             )
         except SphinxError as exc:
-            data = {'form': postform, 'page_title': gettext('Search of stories'), 'error': 'Кажется, есть синтаксическая ошибка в запросе'}
+            data = {'form': postform, 'page_title': gettext('Search of stories'), 'error': 'Кажется, есть синтаксическая ошибка в запросе', 'error_type': 'syntax'}
             if current_app.config['DEBUG'] or current_user.is_superuser:
                 data['error'] += ': ' + str(exc)
             return render_template('search.html', **data)

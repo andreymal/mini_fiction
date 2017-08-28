@@ -86,6 +86,20 @@
         </div>
     </div>
     <!-- Результаты: начало вывода -->
+    {% if error %}
+    <div class="span9 search-results tab-content">
+        <h3>
+            {{ error }}
+        </h3>
+        {% if error_type == 'syntax' %}
+            {% if form.extsyntax.data %}
+                <p>Попробуйте отключить расширенный синтаксис поиска, если он вам не нужен.</p>
+            {% else %}
+                <p>Кажется, что-то пошло не так.</p>
+            {% endif %}
+        {% endif %}
+    </div>
+    {% else %}
     <div class="span9 search-results tab-content">
         {% if search_type == 0 %}
             <!-- Рассказы: начало вывода -->
@@ -102,7 +116,7 @@
             <!-- Рассказы: конец вывода -->
         {% else %}
             <!-- Главы: начало вывода -->
-            {% if result %}<div class="story-item"><h3>{{ ngettext("Found %(num)d chapter", "Found %(num)d chapters", total) }}</h3></div>{%elif error %}<h3>{{ error }}</h3>{% else %}<h3>Здесь пока ничего нет</h3>{% endif %}
+            {% if result %}<div class="story-item"><h3>{{ ngettext("Found %(num)d chapter", "Found %(num)d chapters", total) }}</h3></div>{% else %}<h3>Здесь пока ничего нет</h3>{% endif %}
             {% for chapter, excerpt in result %}
                 <div class="story-item">
                     <h3><a href="{{ url_for('chapter.view', story_id=chapter.story.id, chapter_order=chapter.order) }}">{{ chapter.autotitle }}</a></h3>
@@ -122,6 +136,7 @@
                   <!-- Пагинация: конец вывода -->
         {% endif %}
     </div>
+    {% endif %}
     <!-- Результаты: конец вывода -->
 
     <!-- Навигация: начало вывода -->

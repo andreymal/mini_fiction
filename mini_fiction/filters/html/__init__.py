@@ -25,6 +25,11 @@ def normalize_html(doc, block_elements=default_block_elements, **kw):
     )
     squash_paragraph_attributes(doc)
     doc = post_normalize_html(doc, **kw)
+
+    for img in doc.xpath('//img'):
+        if not img.get('alt'):
+            img.set('alt', '')
+
     return doc
 
 

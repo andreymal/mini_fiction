@@ -421,6 +421,23 @@ class Chapter(db.Entity):
         return self.bl.text2html(self.text)
 
     @property
+    def text_preview(self):
+        text = self.text[:500]
+        f = text.rfind(' ')
+        if f >= 0 and len(text) == 500:
+            text = text[:f]
+
+        f = text.rfind('<')
+        if f >= 0 and f > text.rfind('>'):
+            text = text[:f]  # 'foo <stro' → 'foo '
+
+        text = text.replace('</p>', '\n</p>').replace('<br', '\n<br')
+        text = Markup(text).striptags().replace('\n', ' / ').replace('  ', ' ')
+        if len(self.text) > 500:
+            text += '...'
+        return text
+
+    @property
     def autotitle(self):
         # Если у главы нет заголовка, генерирует его
         if self.title:

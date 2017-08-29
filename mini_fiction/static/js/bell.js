@@ -6,6 +6,7 @@
 var bell = {
     _storageEventBind: null,
     _updaterInterval: null,
+    _lastError: null,
 
     load: function() {
         if (!this._storageEventBind) {
@@ -91,21 +92,30 @@ var bell = {
 
         core.ajax.fetch('/notifications/unread_count/')
             .then(function(response) {
+                if (response.status < 100 || response.status >= 400) {
+                    return {success: false, error: 'Bell fetch error ' + response.status};
+                }
                 return response.json();
 
             }).then(function(data) {
                 if (!data.success) {
+                    bell._lastError = data;
                     console.error(data);
                     return;
+                }
+                if (bell._lastError) {
+                    console.log('Bell is working now');
+                    bell._lastError = null;
                 }
                 bell.setUnreadCount(data.unread_count);
 
             }).then(null, function(err) {
+                bell._lastError = err;
                 console.error(err);
             });
 
         return true;
-        },
+    },
 
     setUnreadCount: function(count, noEmit) {
         var link = document.getElementById('nav-icon-bell');

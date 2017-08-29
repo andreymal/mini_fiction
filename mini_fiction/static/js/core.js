@@ -345,7 +345,7 @@ var core = {
 
     _ajaxErrorEvent: function(event) {
         event.preventDefault();
-        if (event.detail.response && event.detail.response.status >= 400) {
+        if (event.detail.response && (event.detail.response.status < 100 || event.detail.response.status >= 400)) {
             this.notifyError('Ошибка ' + event.detail.response.status);
         } else {
             this.handleError(event.detail.exc);

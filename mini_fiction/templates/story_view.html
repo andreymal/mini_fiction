@@ -1,19 +1,40 @@
 {% extends base %}
 {% from 'macro.html' import breadcrumbs with context %}
-{% block content %}
 
+{% block extrahead %}
+    {{- super() }}
+    {% if page_obj.has_previous() -%}
+        <link rel="prev" href="{{ url_for('story.view', pk=story.id, comments_page=page_obj.number - 1, _external=True) }}" />
+    {%- endif %}
+    {% if page_obj.has_next() -%}
+        <link rel="next" href="{{ url_for('story.view', pk=story.id, comments_page=page_obj.number + 1, _external=True) }}" />
+    {%- endif %}
+    {% if page_current == -1 -%}
+        <meta name="description" content="{{ story.summary|striptags }}" />
+    {%- endif -%}
+{% endblock %}
+
+{% block content %}
 <div class="row">
     <div class="span12 story-page" id="story_{{ story.id }}">
         {{- breadcrumbs() }}
 
+        <div class="story-info" itemscope itemtype="http://schema.org/Book">
         {% include 'includes/story_control_buttons.html' %}
-        <h1 id="story_title">{{ story.title }}
-        <span id="stars" style="display: inline;">{% include 'includes/story_header_info.html' %}</span>
+        <h1 id="story_title">
+            <span itemprop="name"><a itemprop="url" class="story-title-link" href="{{ url_for('story.view', pk=story.id, _external=True) }}">{{ story.title }}</a></span>
+            {% if story.bl.can_show_stars() %}
+                <span itemprop="aggregateRating" itemscope itemtype="http://schema.org/AggregateRating">
+                    <meta itemprop="ratingValue" content="{{ '{:.1f}'.format(story.vote_average) }}" />
+                    <meta itemprop="reviewCount" content="{{ story.vote_total }}" />
+                </span>
+            {% endif %}
+            <span id="stars" style="display: inline;">{% include 'includes/story_header_info.html' %}</span>
 
-        {% if not story.draft and not story.approved %} <sup class="on-moderation">на модерации</sup>{% endif %}
-        {% if not story.original %} <sup class="translation">перевод</sup>{% endif %}
-            {% if story.finished %} <sup class="complete">завершен</sup>{% endif %}{% if story.freezed %} <sup class="suspended">заморожен</sup>{% endif %}
-          </h1>
+            {% if not story.draft and not story.approved %} <sup class="on-moderation">на модерации</sup>{% endif %}
+            {% if not story.original %} <sup class="translation">перевод</sup>{% endif %}
+                {% if story.finished %} <sup class="complete">завершен</sup>{% endif %}{% if story.freezed %} <sup class="suspended">заморожен</sup>{% endif %}
+        </h1>
         {% if current_user.is_authenticated and not story.bl.is_author(current_user) %}
         <div class="vote-area">
             Ваша оценка:
@@ -44,7 +65,7 @@
                 {%- endfor -%}
             </p>
 
-        <p>Написал: {% include 'includes/story_authors_list.html' %}</p>
+        <p>Написал: {% include 'includes/story_authors_list_microdata.html' %}</p>
         {% if contributors.editors -%}
             <p>Редакторы: {% for u in contributors.editors -%}
                 <a class="authorlink" href="{{ url_for('author.info', user_id=u.id) }}">{{ u.username }}</a>{% if not loop.last %}, {% endif -%}
@@ -56,7 +77,7 @@
             {% endfor %}</p>
         {%- endif %}
 
-        <div class="story-description">{{ story.summary_as_html }}</div>
+        <div class="story-description" itemprop="description">{{ story.summary_as_html }}</div>
 
         {% if story.notes %}
             <div>Заметки к рассказу:</div>
@@ -84,24 +105,25 @@
                     </time>{% endif %}<br/>
                 {% endif %}
                 {% if story.first_published_at %}
-                    Опубликован: <time datetime="{{ story.first_published_at.strftime('%Y-%m-%dT%H:%M:%SZ') }}">
+                    Опубликован: <time itemprop="datePublished" datetime="{{ story.first_published_at.strftime('%Y-%m-%dT%H:%M:%SZ') }}">
                         {{- story.first_published_at|datetimeformat('d MMMM Y') -}}
-                    </time>, последнее изменение – <time datetime="{{ story.updated.strftime('%Y-%m-%dT%H:%M:%SZ') }}" title="{{ story.updated|datetimeformat('d MMMM Y, HH:mm') }}">
+                    </time>, последнее изменение – <time itemprop="dateModified" datetime="{{ story.updated.strftime('%Y-%m-%dT%H:%M:%SZ') }}" title="{{ story.updated|datetimeformat('d MMMM Y, HH:mm') }}">
                         {{- story.updated|timedeltaformat }} назад
                     </time><br/>
                 {%- endif -%}
-          </p>
+            </p>
 
-          {% if current_user.is_authenticated -%}
-          <form method="POST" action="{{ url_for('story.subscribe', pk=story.id) }}" class="subscription-form js-subscription-form">
+            {% if current_user.is_authenticated -%}
+            <form method="POST" action="{{ url_for('story.subscribe', pk=story.id) }}" class="subscription-form js-subscription-form">
                 <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
                 Подписаться на новые главы:
                 <label><input type="checkbox" name="email" value="1"{% if sub.email %} checked{% endif %} /> почта</label>
                 <label><input type="checkbox" name="tracker" value="1"{% if sub.tracker %} checked{% endif %} /> сайт</label>
                 <button type="submit" class="btn btn-mini js-subscription-form-submit">Сохранить</button>
-          </form>
-          {%- endif %}
-      </blockquote>
+            </form>
+            {%- endif %}
+        </blockquote>
+        </div><!-- /story-info -->
 
         <div class="story-chapters">
             {% if chapters|length > 1 %}

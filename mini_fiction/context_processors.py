@@ -18,6 +18,8 @@ def context_processor(func):
 def website_settings():
     result = {
         'SITE_NAME': sitename(),
+        'SERVER_NAME': current_app.config['SERVER_NAME'],
+        'PREFERRED_URL_SCHEME': current_app.config['PREFERRED_URL_SCHEME'],
         'base': current_app.jinja_env.get_template('base.json' if getattr(g, 'is_ajax', False) else 'base.html'),
         'contact_types': {x['name']: x for x in current_app.config['CONTACTS']},
     }

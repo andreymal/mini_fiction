@@ -40,7 +40,8 @@ def view(story_id, chapter_order=None):
             'prev_chapter': prev_chapter,
             'next_chapter': next_chapter,
             'page_title': page_title,
-            'allchapters': False
+            'allchapters': False,
+            'robots_noindex': not story.published,
         }
     else:
         chapters = story.bl.select_accessible_chapters(user).order_by(Chapter.order, Chapter.id)[:]
@@ -52,7 +53,8 @@ def view(story_id, chapter_order=None):
             'story': story,
             'chapters': chapters,
             'page_title': page_title,
-            'allchapters': True
+            'allchapters': True,
+            'robots_noindex': not story.published,
         }
 
     return render_template('chapter_view.html', **data)

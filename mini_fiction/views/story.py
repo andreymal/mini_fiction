@@ -91,6 +91,7 @@ def view(pk, comments_page):
         'page_obj': paged,
         'sub': story.bl.get_subscription(user),
         'sub_comments': story.bl.get_comments_subscription(user),
+        'robots_noindex': not story.published,
     }
     return render_template('story_view.html', **data)
 

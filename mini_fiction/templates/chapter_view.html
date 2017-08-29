@@ -1,5 +1,17 @@
 {% extends base %}
 {% from 'macro.html' import breadcrumbs with context %}
+
+{% block extrahead %}
+    {{- super() }}
+    {% if prev_chapter -%}
+        <link rel="prev" href="{{ url_for('chapter.view', story_id=story.id, chapter_order=prev_chapter.order, _external=True) }}" />
+    {%- endif %}
+    {% if next_chapter -%}
+        <link rel="next" href="{{ url_for('chapter.view', story_id=story.id, chapter_order=next_chapter.order, _external=True) }}" />
+    {%- endif %}
+    <meta name="description" content="{% if allchapters %}{{ chapters[0].text_preview }}{% else %}{{ chapter.text_preview }}{% endif %}" />
+{% endblock %}
+
 {% block content %}
 <div class="row" id="story_{{ story.id }}">
     <div class="span12">

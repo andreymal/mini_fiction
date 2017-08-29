@@ -801,7 +801,7 @@ class StaticPage(db.Entity):
     lang = orm.Optional(str, 4)
     orm.composite_key(name, lang)
     title = orm.Optional(str, 192)
-    content = orm.Optional(orm.LongStr)
+    content = orm.Optional(orm.LongStr, autostrip=False)
     is_template = orm.Required(bool, default=False)
     is_full_page = orm.Required(bool, default=False)
     date = orm.Required(datetime, 6, default=datetime.utcnow)
@@ -816,7 +816,7 @@ class StaticPage(db.Entity):
 class HtmlBlock(db.Entity):
     name = orm.Required(str, 64)
     lang = orm.Optional(str, 4)
-    content = orm.Optional(orm.LongStr)
+    content = orm.Optional(orm.LongStr, autostrip=False)
     is_template = orm.Required(bool, default=False)
     date = orm.Required(datetime, 6, default=datetime.utcnow)
     updated = orm.Required(datetime, 6, default=datetime.utcnow)

@@ -7,6 +7,7 @@ from pony.orm import select, db_session
 
 from mini_fiction.models import Story, StoryContributor, Category, Chapter, StoryComment, NewsItem, NewsComment
 from mini_fiction.utils.views import cached_lists
+from mini_fiction.utils.misc import indextitle, sitedescription
 
 bp = Blueprint('index', __name__)
 
@@ -66,6 +67,8 @@ def index():
         'comments_html': comments_html,
         'news': news,
         'page_title': page_title,
+        'full_title': indextitle(),
+        'site_description': sitedescription(),
     }
     data.update(cached_lists([x.id for x in stories]))
 

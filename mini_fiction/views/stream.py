@@ -30,6 +30,7 @@ def stories(page):
         page_title='Лента добавлений',
         stories=objects,
         page_obj=page_obj,
+        robots_noindex=True,
         **cached_lists([x.id for x in objects])
     )
 
@@ -51,6 +52,7 @@ def chapters(page):
         page_title='Лента обновлений',
         chapters=objects,
         page_obj=page_obj,
+        robots_noindex=True,
     )
 
 
@@ -77,6 +79,7 @@ def comments(page):
         with_target_link=True,
         comment_votes_cache=comment_votes_cache,
         page_obj=page_obj,
+        robots_noindex=True,
     )
 
 
@@ -100,4 +103,5 @@ def newscomments(page):
         with_target_link=True,
         comment_votes_cache=comment_votes_cache,
         page_obj=page_obj,
+        robots_noindex=True,
     )

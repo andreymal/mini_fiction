@@ -68,6 +68,8 @@ class Config(object):
         'default': 'Library',
         'ru': 'Библиотека'
     }
+    SITE_INDEX_TITLE = {'default': ''}
+    SITE_DESCRIPTION = {'default': ''}
     SITE_FEEDBACK = '/'
     FAVICON_URL = None
 

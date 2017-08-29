@@ -1298,6 +1298,16 @@ blockquote > p {
     margin: 0;
 }
 
+.story-title-link,
+.story-title-link:visited {
+    color: inherit;
+    text-decoration: none;
+}
+
+.story-title-link:hover {
+    text-decoration: underline;
+}
+
 .story-page .story-genres {
     margin-bottom: 4px;
 }

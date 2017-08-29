@@ -79,6 +79,14 @@ def sitename():
     return current_app.config['SITE_NAME'].get(g.locale.language) or current_app.config['SITE_NAME'].get('default', 'Library')
 
 
+def indextitle():
+    return current_app.config['SITE_INDEX_TITLE'].get(g.locale.language) or current_app.config['SITE_INDEX_TITLE'].get('default', '')
+
+
+def sitedescription():
+    return current_app.config['SITE_DESCRIPTION'].get(g.locale.language) or current_app.config['SITE_DESCRIPTION'].get('default', '')
+
+
 def call_after_request(f, *args, **kwargs):
     if not hasattr(g, 'after_request_callbacks'):
         g.after_request_callbacks = []

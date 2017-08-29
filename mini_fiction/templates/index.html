@@ -1,6 +1,21 @@
 {% extends base %}
-{% block content %}
 
+{% block fulltitle %}
+    {%- if full_title -%}
+        {{- full_title -}}
+    {%- else -%}
+        {{- super() -}}
+    {%- endif -%}
+{% endblock %}
+
+{% block extrahead %}
+    {{- super() }}
+    {% if site_description -%}
+        <meta name="description" content="{{ site_description }}" />
+    {%- endif -%}
+{% endblock %}
+
+{% block content %}
 <div class="row welcome-box">
   <div class="span12 genra">
     {% for category in categories -%}

@@ -280,14 +280,14 @@ class Story(db.Entity):
     original = orm.Required(bool, default=True)
     rating = orm.Required(Rating)
     summary = orm.Required(orm.LongStr, lazy=False)
-    updated = orm.Required(datetime, 6, default=datetime.utcnow)
-    words = orm.Required(int, default=0)
-    views = orm.Required(int, default=0)
+    updated = orm.Required(datetime, 6, default=datetime.utcnow, optimistic=False)
+    words = orm.Required(int, default=0, optimistic=False)
+    views = orm.Required(int, default=0, optimistic=False)
     vote_total = orm.Required(int, unsigned=True, default=0)
     vote_average = orm.Required(float, default=3)
-    vote_average_index = orm.Required(int, size=16, unsigned=True, default=300)  # float can't be used with composite_index
+    vote_average_index = orm.Required(int, size=16, unsigned=True, default=300, optimistic=False)  # float can't be used with composite_index
     vote_stddev = orm.Required(float, default=0)
-    comments_count = orm.Required(int, size=16, unsigned=True, default=0)
+    comments_count = orm.Required(int, size=16, unsigned=True, default=0, optimistic=False)
     source_link = orm.Optional(str, 255)
     source_title = orm.Optional(str, 255)
     pinned = orm.Required(bool, default=False)
@@ -384,7 +384,7 @@ class Chapter(db.Entity):
     text_md5 = orm.Required(str, 32, default='d41d8cd98f00b204e9800998ecf8427e')
     updated = orm.Required(datetime, 6, default=datetime.utcnow)
     words = orm.Required(int, default=0)
-    views = orm.Required(int, default=0)
+    views = orm.Required(int, default=0, optimistic=False)
     # Глава опубликована только при draft=False и story_published=True
     draft = orm.Required(bool, default=True)
     story_published = orm.Required(bool)  # optimization of stream pages
@@ -663,13 +663,13 @@ class Activity(db.Entity):
     author = orm.Optional(Author)
     date = orm.Required(datetime, 6, default=datetime.utcnow)
     story = orm.Optional(Story)
-    last_views = orm.Required(int, default=0)
-    last_comments = orm.Required(int, default=0)
-    last_local_comments = orm.Required(int, default=0)
-    last_vote_average = orm.Required(float, default=3)
-    last_vote_stddev = orm.Required(float, default=0)
-    last_comment_id = orm.Required(int, default=0)
-    last_local_comment_id = orm.Required(int, default=0)
+    last_views = orm.Required(int, default=0, optimistic=False)
+    last_comments = orm.Required(int, default=0, optimistic=False)
+    last_local_comments = orm.Required(int, default=0, optimistic=False)
+    last_vote_average = orm.Required(float, default=3, optimistic=False)
+    last_vote_stddev = orm.Required(float, default=0, optimistic=False)
+    last_comment_id = orm.Required(int, default=0, optimistic=False)
+    last_local_comment_id = orm.Required(int, default=0, optimistic=False)
 
 
 class StoryLog(db.Entity):

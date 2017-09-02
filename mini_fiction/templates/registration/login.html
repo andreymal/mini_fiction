@@ -1,5 +1,11 @@
 {% extends base %}
 {% from 'macro.html' import breadcrumbs with context %}
+
+{% block extrahead %}
+    {{- super() }}
+    <link rel="canonical" href="{{ url_for('auth.login', _external=True) }}" />
+{% endblock %}
+
 {% block content %}
 <div class="row login-page">
     <div class="span12">

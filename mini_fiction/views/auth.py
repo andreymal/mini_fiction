@@ -73,9 +73,9 @@ def registration_activate(activation_key):
     if user:
         if current_app.config['REGISTRATION_AUTO_LOGIN']:
             login_user(user, remember=True)
-        return render_template('registration/activation_complete.html')
+        return render_template('registration/activation_complete.html', robots_noindex=True)
     else:
-        return render_template('registration/activate.html')
+        return render_template('registration/activate.html', robots_noindex=True)
 
 
 @bp.route('/password/reset/', methods=('GET', 'POST'))
@@ -116,7 +116,7 @@ def password_reset_confirm(activation_key):
             if not user.bl.activate_password_reset_key(activation_key):
                 raise RuntimeError('activate_password_reset_key returns False')
             return redirect(url_for('auth.password_reset_complete'))
-    return render_template('registration/password_reset_confirm.html', validlink=True, form=form, page_title=page_title)
+    return render_template('registration/password_reset_confirm.html', validlink=True, form=form, page_title=page_title, robots_noindex=True)
 
 
 @bp.route('/password/done/')
@@ -133,9 +133,9 @@ def new_email_activate(activation_key):
     if user:
         if current_app.config['REGISTRATION_AUTO_LOGIN']:
             login_user(user, remember=True)
-        return render_template('registration/change_email_complete.html')
+        return render_template('registration/change_email_complete.html', robots_noindex=True)
     else:
-        return render_template('registration/change_email_failed.html')
+        return render_template('registration/change_email_failed.html', robots_noindex=True)
 
 
 @bp.route('/logout/', methods=('GET',))

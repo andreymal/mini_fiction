@@ -113,6 +113,7 @@ def add(target_attr, target, template, template_ajax=None, template_ajax_modal=F
         'parent_comment': parent,
         'edit': False,
         'preview_html': preview_html,
+        'robots_noindex': True,
     }
 
     if g.is_ajax and template_ajax:
@@ -165,6 +166,7 @@ def edit(target_attr, comment, template, template_ajax=None, template_ajax_modal
         'comment': comment,
         'edit': True,
         'preview_html': preview_html,
+        'robots_noindex': True,
     }
 
     if g.is_ajax and template_ajax:
@@ -194,6 +196,7 @@ def delete(target_attr, comment, template, template_ajax=None, template_ajax_mod
         target_attr: target,
         'comment': comment,
         'comment_delete': True,
+        'robots_noindex': True,
     }
 
     if g.is_ajax and template_ajax:
@@ -223,6 +226,7 @@ def restore(target_attr, comment, template, template_ajax=None, template_ajax_mo
         target_attr: target,
         'comment': comment,
         'comment_restore': True,
+        'robots_noindex': True,
     }
 
     if g.is_ajax and template_ajax:

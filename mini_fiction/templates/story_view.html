@@ -26,7 +26,7 @@
             {% if story.bl.can_show_stars() %}
                 <span itemprop="aggregateRating" itemscope itemtype="http://schema.org/AggregateRating">
                     <meta itemprop="ratingValue" content="{{ '{:.1f}'.format(story.vote_average) }}" />
-                    <meta itemprop="reviewCount" content="{{ story.vote_total }}" />
+                    <meta itemprop="ratingCount" content="{{ story.vote_total }}" />
                 </span>
             {% endif %}
             <span id="stars" style="display: inline;">{% include 'includes/story_header_info.html' %}</span>

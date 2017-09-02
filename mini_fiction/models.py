@@ -798,14 +798,15 @@ class NewsCommentVote(db.Entity):
 
 class StaticPage(db.Entity):
     name = orm.Required(str, 64)
-    lang = orm.Optional(str, 4)
-    orm.composite_key(name, lang)
+    lang = orm.Required(str, 6, default='none')
     title = orm.Optional(str, 192)
     content = orm.Optional(orm.LongStr, autostrip=False)
     is_template = orm.Required(bool, default=False)
     is_full_page = orm.Required(bool, default=False)
     date = orm.Required(datetime, 6, default=datetime.utcnow)
     updated = orm.Required(datetime, 6, default=datetime.utcnow)
+
+    orm.PrimaryKey(name, lang)
 
     bl = Resource('bl.staticpage')
 
@@ -815,13 +816,13 @@ class StaticPage(db.Entity):
 
 class HtmlBlock(db.Entity):
     name = orm.Required(str, 64)
-    lang = orm.Optional(str, 4)
+    lang = orm.Required(str, 6, default='none')
     content = orm.Optional(orm.LongStr, autostrip=False)
     is_template = orm.Required(bool, default=False)
     date = orm.Required(datetime, 6, default=datetime.utcnow)
     updated = orm.Required(datetime, 6, default=datetime.utcnow)
 
-    orm.composite_key(name, lang)
+    orm.PrimaryKey(name, lang)
 
     bl = Resource('bl.htmlblock')
 

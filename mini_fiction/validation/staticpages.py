@@ -16,8 +16,8 @@ STATIC_PAGE = {
         'type': 'string',
         'required': False,
         'minlength': 0,
-        'maxlength': 4,
-        'default': '',
+        'maxlength': 6,
+        'default': 'none',
     },
     'title': {
         'type': 'string',

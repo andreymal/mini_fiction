@@ -7,7 +7,7 @@
         {{- breadcrumbs([
             [url_for('admin_index.index'), _('Administration')],
             [url_for('admin_htmlblocks.index'), _('HTML Blocks')],
-            [url_for('admin_htmlblocks.update', pk=htmlblock.id), block_title]
+            [url_for('admin_htmlblocks.update', name=htmlblock.name, lang=htmlblock.lang), block_title]
         ]) }}
     <h1>{{ block_title }}</h1>
 
@@ -24,7 +24,7 @@
         {{- breadcrumbs([
             [url_for('admin_index.index'), _('Administration')],
             [url_for('admin_htmlblocks.index'), _('HTML Blocks')],
-            [url_for('admin_htmlblocks.update', pk=htmlblock.id), block_title]
+            [url_for('admin_htmlblocks.update', name=htmlblock.name, lang=htmlblock.lang), block_title]
         ]) }}
     </div>
 </div>

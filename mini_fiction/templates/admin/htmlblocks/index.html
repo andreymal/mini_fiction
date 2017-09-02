@@ -9,7 +9,7 @@
 
         <ul>
         {% for htmlblock in htmlblocks %}
-            <li><a href="{{ url_for('admin_htmlblocks.update', pk=htmlblock.id) }}">{{ htmlblock.name }} ({{ htmlblock.lang }})</a></li>
+            <li><a href="{{ url_for('admin_htmlblocks.update', name=htmlblock.name, lang=htmlblock.lang) }}">{{ htmlblock.name }} ({{ htmlblock.lang }})</a></li>
         {% endfor %}
         </ul>
 

@@ -9,7 +9,7 @@
 
         <ul>
         {% for staticpage in staticpages %}
-            <li><a href="{{ url_for('admin_staticpages.update', pk=staticpage.id) }}">{{ staticpage.name }} — {{ staticpage.title or staticpage.name }} ({{ staticpage.lang }})</a></li>
+            <li><a href="{{ url_for('admin_staticpages.update', name=staticpage.name, lang=staticpage.lang) }}">{{ staticpage.name }} — {{ staticpage.title or staticpage.name }} ({{ staticpage.lang }})</a></li>
         {% endfor %}
         </ul>
 

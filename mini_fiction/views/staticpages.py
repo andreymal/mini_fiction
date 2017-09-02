@@ -15,7 +15,7 @@ bp = Blueprint('staticpages', __name__)
 def index(name):
     page = StaticPage.get(name=name, lang=g.locale.language)
     if not page:
-        page = StaticPage.get(name=name)
+        page = StaticPage.get(name=name, lang='none')
     if not page:
         abort(404)
 

@@ -40,7 +40,7 @@ def create():
         except ValidationError as exc:
             form.set_errors(exc.errors)
         else:
-            return redirect(url_for('admin_htmlblocks.update', pk=htmlblock.id))
+            return redirect(url_for('admin_htmlblocks.update', name=htmlblock.name, lang=htmlblock.lang))
 
     return render_template(
         'admin/htmlblocks/work.html',
@@ -50,11 +50,11 @@ def create():
     )
 
 
-@bp.route('/<int:pk>/', methods=('GET', 'POST'))
+@bp.route('/<name>/<lang>/', methods=('GET', 'POST'))
 @db_session
 @admin_required
-def update(pk):
-    htmlblock = HtmlBlock.get(id=pk)
+def update(name, lang):
+    htmlblock = HtmlBlock.get(name=name, lang=lang)
     if not htmlblock:
         abort(404)
 
@@ -91,11 +91,11 @@ def update(pk):
     )
 
 
-@bp.route('/<int:pk>/delete/', methods=('GET', 'POST'))
+@bp.route('/<name>/<lang>/delete/', methods=('GET', 'POST'))
 @db_session
 @admin_required
-def delete(pk):
-    htmlblock = HtmlBlock.get(id=pk)
+def delete(name, lang):
+    htmlblock = HtmlBlock.get(name=name, lang=lang)
     if not htmlblock:
         abort(404)
 

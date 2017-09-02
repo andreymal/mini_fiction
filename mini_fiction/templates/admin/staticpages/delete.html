@@ -7,7 +7,7 @@
         {{- breadcrumbs([
             [url_for('admin_index.index'), _('Administration')],
             [url_for('admin_staticpages.index'), _('Static pages')],
-            [url_for('admin_staticpages.update', pk=staticpage.id), static_title]
+            [url_for('admin_staticpages.update', name=staticpage.name, lang=staticpage.lang), static_title]
         ]) }}
     <h1>{{ static_title }}</h1>
 
@@ -24,7 +24,7 @@
         {{- breadcrumbs([
             [url_for('admin_index.index'), _('Administration')],
             [url_for('admin_staticpages.index'), _('Static pages')],
-            [url_for('admin_staticpages.update', pk=staticpage.id), static_title]
+            [url_for('admin_staticpages.update', name=staticpage.name, lang=staticpage.lang), static_title]
         ]) }}
     </div>
 </div>

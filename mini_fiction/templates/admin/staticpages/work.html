@@ -20,7 +20,7 @@
         <div class="controls">
             {% if not edit or can_edit %}
             <input type="submit" value="{{ _('Save') }}" class="btn btn-primary" />
-            {% if edit %}<a href="{{ url_for('admin_staticpages.delete', pk=staticpage.id) }}" class="btn">{{ _('Delete') }}</a>{% endif %}
+            {% if edit %}<a href="{{ url_for('admin_staticpages.delete', name=staticpage.name, lang=staticpage.lang) }}" class="btn">{{ _('Delete') }}</a>{% endif %}
             {% else %}
             {{ _("You don't have access to edit this Jinja2 template.") }}
             {% endif %}

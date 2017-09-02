@@ -48,7 +48,7 @@ def create():
         except ValidationError as exc:
             form.set_errors(exc.errors)
         else:
-            return redirect(url_for('admin_staticpages.update', pk=staticpage.id))
+            return redirect(url_for('admin_staticpages.update', name=staticpage.name, lang=staticpage.lang))
 
     return render_template(
         'admin/staticpages/work.html',
@@ -58,11 +58,11 @@ def create():
     )
 
 
-@bp.route('/<int:pk>/', methods=('GET', 'POST'))
+@bp.route('/<name>/<lang>/', methods=('GET', 'POST'))
 @db_session
 @admin_required
-def update(pk):
-    staticpage = StaticPage.get(id=pk)
+def update(name, lang):
+    staticpage = StaticPage.get(name=name, lang=lang)
     if not staticpage:
         abort(404)
 
@@ -101,11 +101,11 @@ def update(pk):
     )
 
 
-@bp.route('/<int:pk>/delete/', methods=('GET', 'POST'))
+@bp.route('/<name>/<lang>/delete/', methods=('GET', 'POST'))
 @db_session
 @admin_required
-def delete(pk):
-    staticpage = StaticPage.get(id=pk)
+def delete(name, lang):
+    staticpage = StaticPage.get(name=name, lang=lang)
     if not staticpage:
         abort(404)
 

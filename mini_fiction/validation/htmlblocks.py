@@ -15,8 +15,8 @@ HTML_BLOCK = {
         'type': 'string',
         'required': False,
         'minlength': 0,
-        'maxlength': 4,
-        'default': '',
+        'maxlength': 6,
+        'default': 'none',
     },
     'content': {
         'type': 'string',

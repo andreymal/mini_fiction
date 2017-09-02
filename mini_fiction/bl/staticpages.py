@@ -22,7 +22,7 @@ class StaticPageBL(BaseBL):
             self.check_renderability(author, data['name'], data['content'])
 
         if not data.get('lang'):
-            data['lang'] = None  # normalize for Pony ORM
+            data['lang'] = 'none'
 
         exist_staticpage = self.model.get(name=data['name'], lang=data['lang'])
         if exist_staticpage:
@@ -39,14 +39,11 @@ class StaticPageBL(BaseBL):
         if not author.is_superuser and (staticpage.is_template or data.get('is_template')):
             raise ValidationError({'is_template': [lazy_gettext('Access denied')]})
 
-        if 'lang' in data and not data.get('lang'):
-            data['lang'] = None  # normalize for Pony ORM
-
-        if 'name' in data or 'lang' in data:
-            from mini_fiction.models import StaticPage
-            exist_staticpage = StaticPage.get(name=data['name'], lang=data['lang'])
-            if exist_staticpage and exist_staticpage.id != staticpage.id:
-                raise ValidationError({'name': [lazy_gettext('Page already exists')]})
+        if ('name' in data and data['name'] != staticpage.name) or ('lang' in data and data['lang'] != staticpage.lang):
+            raise ValidationError({
+                'name': [lazy_gettext('Cannot change primary key')],
+                'lang': [lazy_gettext('Cannot change primary key')],
+            })
 
         if data.get('is_template', staticpage.is_template) and 'content' in data:
             self.check_renderability(author, data.get('name', staticpage.name), data['content'])

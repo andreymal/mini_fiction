@@ -15,7 +15,7 @@ def html_block(name, ignore_missing=True):
         block_data = {}
         block = HtmlBlock.get(name=name, lang=g.locale.language)
         if not block:
-            block = HtmlBlock.get(name=name, lang=None)
+            block = HtmlBlock.get(name=name, lang='none')
         if block:
             block_data['lang'] = block.lang
             block_data['content'] = block.content
@@ -32,7 +32,7 @@ def html_block(name, ignore_missing=True):
             template = current_app.jinja_env.from_string(block_data['content'])
             template.name = 'db/htmlblocks/{}.html'.format(name)
             return Markup(render_template(template, htmlblock_name=name))
-        except:
+        except Exception:
             import traceback
             current_app.logger.error('Cannot render htmlblock "{}"\n\n{}'.format(name, traceback.format_exc()))
             return Markup('<span style="color: red; font-size: 2em">ERROR</span>')

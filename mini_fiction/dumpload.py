@@ -98,11 +98,11 @@ zip_dump_params = {
         'exclude': ('stories',),
     },
     'staticpage': {
-        'include': ('id', 'name', 'lang', 'title', 'content', 'is_template', 'is_full_page', 'date', 'updated'),
+        'include': ('name', 'lang', 'title', 'content', 'is_template', 'is_full_page', 'date', 'updated'),
         'datekey': 'updated',
     },
     'htmlblock': {
-        'include': ('id', 'name', 'lang', 'content', 'is_template', 'date', 'updated'),
+        'include': ('name', 'lang', 'content', 'is_template', 'date', 'updated'),
         'datekey': 'updated',
     },
     'author': {

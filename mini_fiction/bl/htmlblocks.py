@@ -23,7 +23,7 @@ class HtmlBlockBL(BaseBL):
             self.check_renderability(author, data['name'], data['content'])
 
         if not data.get('lang'):
-            data['lang'] = None  # normalize for Pony ORM
+            data['lang'] = 'none'
 
         exist_htmlblock = self.model.get(name=data['name'], lang=data['lang'])
         if exist_htmlblock:
@@ -41,14 +41,11 @@ class HtmlBlockBL(BaseBL):
         if not author.is_superuser and (htmlblock.is_template or data.get('is_template')):
             raise ValidationError({'is_template': [lazy_gettext('Access denied')]})
 
-        if 'lang' in data and not data.get('lang'):
-            data['lang'] = None  # normalize for Pony ORM
-
-        if 'name' in data or 'lang' in data:
-            from mini_fiction.models import HtmlBlock
-            exist_htmlblock = HtmlBlock.get(name=data['name'], lang=data['lang'])
-            if exist_htmlblock and exist_htmlblock.id != htmlblock.id:
-                raise ValidationError({'name': [lazy_gettext('Block already exists')]})
+        if ('name' in data and data['name'] != htmlblock.name) or ('lang' in data and data['lang'] != htmlblock.lang):
+            raise ValidationError({
+                'name': [lazy_gettext('Cannot change primary key')],
+                'lang': [lazy_gettext('Cannot change primary key')],
+            })
 
         if data.get('is_template', htmlblock.is_template) and 'content' in data:
             self.check_renderability(author, data.get('name', htmlblock.name), data['content'])

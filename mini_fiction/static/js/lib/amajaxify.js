@@ -1,5 +1,5 @@
 /*!
- * amajaxify.js (2017-08)
+ * amajaxify.js (2017-09)
  * License: MIT
  * Библиотека для загрузки загрузки страниц и отправки форм с помощью
  * ES6 fetch и HTML5 History API для разных ништяков.
@@ -80,7 +80,12 @@ var amajaxify = {
     customFetch: null,
     updateModalFunc: null,
 
-    archiveHosts: ['web.archive.org', 'archive.is', 'archive.today', 'archive.li', 'archive.fo', 'peeep.us'],
+    archiveHosts: [
+        'web.archive.org', 'archive.is', 'archive.today', 'archive.li',
+        'archive.fo', 'peeep.us', 'webcitation.org',
+        'webcache.googleusercontent.com', 'hghltd.yandex.net',
+        'cc.bingj.com', 'nova.rambler.ru'
+    ],
 
     // костыль для Safari по вычислению активной кнопки формы
     _clickedBtn: null,
@@ -505,7 +510,7 @@ var amajaxify = {
 
             this.updateModalFunc(content.modal);
             if (content.title) {
-                document.head.getElementsByTagName('title')[0].innerHTML = content.title;
+                this.setTitle(content.title);
             }
             this.updatePageState(url, content.title, true, options);
 
@@ -528,7 +533,7 @@ var amajaxify = {
 
             this.setHead(readyContent.head);
             if (readyContent.title) {
-                document.head.getElementsByTagName('title')[0].innerHTML = readyContent.title;
+                this.setTitle(readyContent.title);
             }
             this.setPageData(readyContent.data);
             this.updatePageState(url, readyContent.title, false, options);
@@ -582,9 +587,8 @@ var amajaxify = {
     updatePageState: function(url, title, isModalNow, options) {
         options = options || {};
 
-        var titleElem = document.head.getElementsByTagName('title')[0];
         if (title === undefined || title === null) {
-            title = titleElem.innerHTML;
+            title = this.getTitle();
         }
         if (url === undefined || url === null) {
             url = location.toString();
@@ -699,7 +703,7 @@ var amajaxify = {
             this.updateModalFunc(null);
             this.state.isModalNow = false;
             if (event.state && event.state.title) {
-                document.head.getElementsByTagName('title')[0].innerHTML = event.state.title;
+                this.setTitle(event.state.title);
             }
             // FIXME: при нажатии «Вперёд» при модальном окне контент
             // не совпадает с ссылкой, но без сохранения старого location
@@ -862,6 +866,25 @@ var amajaxify = {
         if (onload) {
             setTimeout(onload, 1000);
         }
+    },
+
+    getTitle: function() {
+        var titleElem = document.documentElement.getElementsByTagName('title')[0];
+        if (!titleElem) {
+            console.warn('amajaxify: cannot find <title> element');
+            return '';
+        }
+        return titleElem.innerHTML;
+    },
+
+    setTitle: function(titleHTML) {
+        var titleElem = document.documentElement.getElementsByTagName('title')[0];
+        if (!titleElem) {
+            console.warn('amajaxify: cannot find <title> element');
+            return false;
+        }
+        titleElem.innerHTML = titleHTML;
+        return true;
     },
 
     setPageData: function(data) {

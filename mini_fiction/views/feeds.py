@@ -81,6 +81,8 @@ def feed_story(story_id):
     )
 
     chapters = [c for c in story.chapters if not c.draft]
+    for c in chapters:
+        assert c.first_published_at is not None, 'database is inconsistent: story {} has non-draft and non-published chapter {}'.format(story.id, c.order)
     chapters.sort(key=lambda x: (x.first_published_at, x.order), reverse=True)
 
     for chapter in chapters:

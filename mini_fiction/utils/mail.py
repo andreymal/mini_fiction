@@ -118,7 +118,8 @@ def sendmail(to, subject, body, fro=None, headers=None, config=None, conn=None):
     - всё перечисленное в списке: будет отправлен multipart/mixed со всем
       перечисленным.
 
-    :param to: получатели
+    :param to: получатели (может быть переопределено настройкой
+      EMAIL_REDIRECT_TO)
     :type to: str или list
     :param str subject: тема письма
     :param body: содержимое письма
@@ -145,6 +146,11 @@ def sendmail(to, subject, body, fro=None, headers=None, config=None, conn=None):
 
     if not config.get('EMAIL_HOST') or not body:
         return False
+
+    if config.get('EMAIL_REDIRECT_TO') is not None:
+        if not config.get('EMAIL_DONT_EDIT_SUBJECT_ON_REDIRECT'):
+            subject = '[To: {!r}] {}'.format(to, subject or '').rstrip()
+        to = config['EMAIL_REDIRECT_TO']
 
     if not isinstance(to, (tuple, list, set)):
         to = [to]

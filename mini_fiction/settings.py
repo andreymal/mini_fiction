@@ -146,6 +146,8 @@ class Config(object):
         'change_email_warning': 'stories_chmail_warn',
     }
     DEFAULT_FROM_EMAIL = ('Библиотека', 'minifiction@localhost.com')
+    EMAIL_REDIRECT_TO = None
+    EMAIL_DONT_EDIT_SUBJECT_ON_REDIRECT = False
 
     ACCOUNT_ACTIVATION_DAYS = 5
     REGISTRATION_AUTO_LOGIN = True

@@ -24,7 +24,7 @@ def build_comment_tree_response(comment, target_attr, target):
         'comment': comment.local_id,
         'global_id': comment.id,
         'deleted': comment.deleted,
-        'link': comment.bl.get_permalink(),
+        'link': comment.bl.get_paged_link(current_user._get_current_object()),
         'html': html
     })
 
@@ -37,7 +37,7 @@ def build_comment_response(comment, target_attr, target):
         'comment': comment.local_id,
         'global_id': comment.id,
         'deleted': comment.deleted,
-        'link': comment.bl.get_permalink(),
+        'link': comment.bl.get_paged_link(current_user._get_current_object()),
         'html': html
     })
 
@@ -96,7 +96,7 @@ def add(target_attr, target, template, template_ajax=None, template_ajax_modal=F
             else:
                 # Иначе редиректим на страницу с комментарием
                 # (FIXME: что не всегда хорошо, потому что коммент может оказаться в скрытой ветке)
-                return redirect(comment.bl.get_permalink())
+                return redirect(comment.bl.get_paged_link(current_user._get_current_object()))
 
     # При ошибках с AJAX не церемонимся и просто отсылаем строку с ошибками
     # (на фронтенде будет всплывашка в углу)
@@ -121,6 +121,17 @@ def add(target_attr, target, template, template_ajax=None, template_ajax_modal=F
         return jsonify({'page_content': {'modal': html} if template_ajax_modal else {'content': html}})
     else:
         return render_template(template, **data)
+
+
+def show(target_attr, comment):
+    # В эту вьюху направляет ссылка из метода get_permalink
+    user = current_user._get_current_object()
+    target = getattr(comment, target_attr)
+
+    if not comment.bl.has_comments_access(target, user):
+        abort(403)
+
+    return redirect(comment.bl.get_paged_link(current_user._get_current_object()))
 
 
 def edit(target_attr, comment, template, template_ajax=None, template_ajax_modal=False):
@@ -152,7 +163,7 @@ def edit(target_attr, comment, template, template_ajax=None, template_ajax_modal
             if extra_ajax:
                 return build_comment_response(comment, target_attr, target)
             else:
-                return redirect(comment.bl.get_permalink())
+                return redirect(comment.bl.get_paged_link(user))
 
     if extra_ajax and (form.errors or form.non_field_errors):
         errors = sum(form.errors.values(), []) + form.non_field_errors
@@ -189,7 +200,7 @@ def delete(target_attr, comment, template, template_ajax=None, template_ajax_mod
         if extra_ajax:
             return build_comment_response(comment, target_attr, target)
         else:
-            return redirect(comment.bl.get_permalink())
+            return redirect(comment.bl.get_paged_link(user))
 
     data = {
         'page_title': gettext('Confirm delete comment'),
@@ -219,7 +230,7 @@ def restore(target_attr, comment, template, template_ajax=None, template_ajax_mo
         if extra_ajax:
             return build_comment_response(comment, target_attr, target)
         else:
-            return redirect(comment.bl.get_permalink())
+            return redirect(comment.bl.get_paged_link(user))
 
     data = {
         'page_title': gettext('Confirm restore comment'),

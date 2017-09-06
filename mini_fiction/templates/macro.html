@@ -121,7 +121,7 @@
             </time>
 
             {% if not short %}
-            <a class="comment-link" href="{{ comment.bl.get_permalink() }}">#{{ comment.local_id }}</a>
+            <a class="comment-link" href="{{ comment.bl.get_permalink() }}" rel="nofollow" title="Постоянная ссылка на комментарий">#{{ comment.local_id }}</a>
 
             {%- if comment.parent %}
             <a class="comment-parent-link" href="{{ comment.parent.bl.get_permalink() }}" title="Ответ на комментарий #{{ comment.parent.local_id }} от {{ comment.parent.author.username if comment.parent.author else (comment.parent.author_username or 'гостя') }}">↑</a>
@@ -133,7 +133,7 @@
             {%- endif %}
             {% else %}
             {{ caller() if caller else '' }}
-            <a class="comment-link" href="{{ comment.bl.get_permalink() }}">#</a>
+            <a class="comment-link" href="{{ comment.bl.get_permalink() }}" rel="nofollow" title="Постоянная ссылка на комментарий">#</a>
             {% endif %}
         </div>
     {%- endif -%}

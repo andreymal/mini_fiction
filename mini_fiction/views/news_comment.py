@@ -10,10 +10,19 @@ from mini_fiction.views import common_comment
 bp = Blueprint('news_comment', __name__)
 
 
-@bp.route('/news/<int:news_id>/comment/add/', methods=('GET', 'POST'))
+def _parse_id(news_id):
+    if not news_id.isdigit():
+        newsitem = NewsItem.get(name=news_id)
+        if not newsitem:
+            abort(404)
+        return newsitem.id
+    return int(news_id)
+
+
+@bp.route('/news/<news_id>/comment/add/', methods=('GET', 'POST'))
 @db_session
 def add(news_id):
-    newsitem = NewsItem.get(id=news_id)
+    newsitem = NewsItem.get(id=_parse_id(news_id))
     if not newsitem:
         abort(404)
 
@@ -25,10 +34,20 @@ def add(news_id):
     )
 
 
-@bp.route('/news/<int:news_id>/comment/<int:local_id>/edit/', methods=('GET', 'POST'))
+@bp.route('/news/<news_id>/comment/<int:local_id>/')
+@db_session
+def show(news_id, local_id):
+    comment = NewsComment.get(newsitem=_parse_id(news_id), local_id=local_id, deleted=False)
+    if not comment:
+        abort(404)
+
+    return common_comment.show('newsitem', comment)
+
+
+@bp.route('/news/<news_id>/comment/<int:local_id>/edit/', methods=('GET', 'POST'))
 @db_session
 def edit(news_id, local_id):
-    comment = NewsComment.get(newsitem=news_id, local_id=local_id, deleted=False)
+    comment = NewsComment.get(newsitem=_parse_id(news_id), local_id=local_id, deleted=False)
     if not comment:
         abort(404)
 
@@ -39,10 +58,10 @@ def edit(news_id, local_id):
     )
 
 
-@bp.route('/news/<int:news_id>/comment/<int:local_id>/delete/', methods=('GET', 'POST'))
+@bp.route('/news/<news_id>/comment/<int:local_id>/delete/', methods=('GET', 'POST'))
 @db_session
 def delete(news_id, local_id):
-    comment = NewsComment.get(newsitem=news_id, local_id=local_id, deleted=False)
+    comment = NewsComment.get(newsitem=_parse_id(news_id), local_id=local_id, deleted=False)
     if not comment:
         abort(404)
 
@@ -55,10 +74,10 @@ def delete(news_id, local_id):
     )
 
 
-@bp.route('/news/<int:news_id>/comment/<int:local_id>/restore/', methods=('GET', 'POST'))
+@bp.route('/news/<news_id>/comment/<int:local_id>/restore/', methods=('GET', 'POST'))
 @db_session
 def restore(news_id, local_id):
-    comment = NewsComment.get(newsitem=news_id, local_id=local_id, deleted=True)
+    comment = NewsComment.get(newsitem=_parse_id(news_id), local_id=local_id, deleted=True)
     if not comment:
         abort(404)
 
@@ -71,20 +90,20 @@ def restore(news_id, local_id):
     )
 
 
-@bp.route('/news/<int:news_id>/comment/<int:local_id>/vote/', methods=('POST',))
+@bp.route('/news/<news_id>/comment/<int:local_id>/vote/', methods=('POST',))
 @db_session
 def vote(news_id, local_id):
-    comment = NewsComment.get(newsitem=news_id, local_id=local_id, deleted=False)
+    comment = NewsComment.get(newsitem=_parse_id(news_id), local_id=local_id, deleted=False)
     if not comment:
         abort(404)
 
     return common_comment.vote('newsitem', comment)
 
 
-@bp.route('/ajax/news/<int:news_id>/comments/page/<int:page>/')
+@bp.route('/ajax/news/<news_id>/comments/page/<int:page>/')
 @db_session
 def ajax(news_id, page):
-    newsitem = NewsItem.get(id=news_id)
+    newsitem = NewsItem.get(id=_parse_id(news_id))
     if not newsitem:
         abort(404)
 
@@ -101,10 +120,10 @@ def ajax(news_id, page):
     )
 
 
-@bp.route('/ajax/news/<int:news_id>/comments/tree/<int:local_id>/')
+@bp.route('/ajax/news/<news_id>/comments/tree/<int:local_id>/')
 @db_session
 def ajax_tree(news_id, local_id):
-    newsitem = NewsItem.get(id=news_id)
+    newsitem = NewsItem.get(id=_parse_id(news_id))
     if not newsitem:
         abort(404)
 

@@ -72,6 +72,17 @@ def add(story_id):
     )
 
 
+@bp.route('/story/<int:story_id>/localcomments/<int:local_id>/')
+@db_session
+def show(story_id, local_id):
+    local = get_local_thread(story_id, current_user._get_current_object())
+    comment = StoryLocalComment.get(local=local, local_id=local_id, deleted=False)
+    if not comment:
+        abort(404)
+
+    return common_comment.show('local', comment)
+
+
 @bp.route('/story/<int:story_id>/localcomments/<int:local_id>/edit/', methods=('GET', 'POST'))
 @db_session
 def edit(story_id, local_id):

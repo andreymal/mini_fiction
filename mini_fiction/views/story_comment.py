@@ -27,6 +27,23 @@ def add(story_id):
     )
 
 
+@bp.route('/story/<int:story_id>/comment/<int:local_id>/')
+@db_session
+def show(story_id, local_id):
+    story = Story.get(id=story_id)
+    if not story:
+        abort(404)
+
+    if not story.bl.has_comments_access(current_user._get_current_object()):
+        abort(403)
+
+    comment = StoryComment.get(story=story_id, local_id=local_id, deleted=False)
+    if not comment:
+        abort(404)
+
+    return common_comment.show('story', comment)
+
+
 @bp.route('/story/<int:story_id>/comment/<int:local_id>/edit/', methods=('GET', 'POST'))
 @db_session
 def edit(story_id, local_id):

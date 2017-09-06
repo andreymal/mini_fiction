@@ -25,6 +25,9 @@ class BaseCommentBL(BaseBL):
     def get_permalink(self, _external=False):
         raise NotImplementedError
 
+    def get_paged_link(self, for_user=None, _external=False):
+        raise NotImplementedError
+
     def get_tree_link(self, _external=False):
         raise NotImplementedError
 
@@ -243,6 +246,10 @@ class StoryCommentBL(BaseCommentBL):
 
     def get_permalink(self, _external=False):
         c = self.model
+        return url_for('story_comment.show', story_id=c.story.id, local_id=c.local_id, _external=_external)
+
+    def get_paged_link(self, for_user=None, _external=False):
+        c = self.model
         # root_order starts from 0
         page = c.root_order // current_app.config['COMMENTS_COUNT']['page'] + 1
         return url_for('story.view', pk=c.story.id, comments_page=page, _external=_external) + '#' + str(c.local_id)
@@ -304,6 +311,10 @@ class StoryLocalCommentBL(BaseCommentBL):
 
     def get_permalink(self, _external=False):
         c = self.model
+        return url_for('story_local_comment.show', story_id=c.local.story.id, local_id=c.local_id, _external=_external)
+
+    def get_paged_link(self, for_user=None, _external=False):
+        c = self.model
         # root_order starts from 0
         page = c.root_order // current_app.config['COMMENTS_COUNT']['page'] + 1
         return url_for('story_local_comment.view', story_id=c.local.story.id, comments_page=page, _external=_external) + '#' + str(c.local_id)
@@ -351,6 +362,10 @@ class NewsCommentBL(BaseCommentBL):
         return True
 
     def get_permalink(self, _external=False):
+        c = self.model
+        return url_for('news_comment.show', news_id=c.newsitem.name, local_id=c.local_id, _external=_external)
+
+    def get_paged_link(self, for_user=None, _external=False):
         c = self.model
         # root_order starts from 0
         page = c.root_order // current_app.config['COMMENTS_COUNT']['page'] + 1

@@ -29,11 +29,8 @@
                     <meta itemprop="ratingCount" content="{{ story.vote_total }}" />
                 </span>
             {% endif %}
-            <span id="stars" style="display: inline;">{% include 'includes/story_header_info.html' %}</span>
-
-            {% if not story.draft and not story.approved %} <sup class="on-moderation">на модерации</sup>{% endif %}
-            {% if not story.original %} <sup class="translation">перевод</sup>{% endif %}
-                {% if story.finished %} <sup class="complete">завершен</sup>{% endif %}{% if story.freezed %} <sup class="suspended">заморожен</sup>{% endif %}
+            <span id="stars" style="display: inline;">{% include 'includes/story_stars.html' %}</span>
+            {% include 'includes/story_marks.html' %}
         </h1>
         {% if current_user.is_authenticated and not story.bl.is_author(current_user) %}
         <div class="vote-area">

@@ -501,7 +501,7 @@ class StoryComment(db.Entity):
     tree_depth = orm.Required(int, size=16, unsigned=True, default=0)
     answers_count = orm.Required(int, size=16, unsigned=True, default=0)
     edits_count = orm.Required(int, size=16, unsigned=True, default=0)
-    root_order = orm.Required(int, size=16, unsigned=True)  # for pagination
+    root_id = orm.Required(int)  # for pagination
     story_published = orm.Required(bool)
     last_edited_at = orm.Optional(datetime, 6)  # only for text updates
 
@@ -514,7 +514,7 @@ class StoryComment(db.Entity):
     orm.composite_key(story, local_id)
     orm.composite_index(deleted, story_published)
     orm.composite_index(author, deleted, story_published)
-    orm.composite_index(story, root_order, tree_depth)
+    orm.composite_index(story, root_id, tree_depth)
 
     @property
     def brief_text(self):
@@ -584,7 +584,7 @@ class StoryLocalComment(db.Entity):
     tree_depth = orm.Required(int, size=16, unsigned=True, default=0)
     answers_count = orm.Required(int, size=16, unsigned=True, default=0)
     edits_count = orm.Required(int, size=16, unsigned=True, default=0)
-    root_order = orm.Required(int, size=16, unsigned=True)  # for pagination
+    root_id = orm.Required(int)  # for pagination
     last_edited_at = orm.Optional(datetime, 6)  # only for text updates
 
     edits = orm.Set('StoryLocalCommentEdit')
@@ -750,7 +750,7 @@ class NewsComment(db.Entity):
     tree_depth = orm.Required(int, size=16, unsigned=True, default=0)
     answers_count = orm.Required(int, size=16, unsigned=True, default=0)
     edits_count = orm.Required(int, size=16, unsigned=True, default=0)
-    root_order = orm.Required(int, size=16, unsigned=True)  # for pagination
+    root_id = orm.Required(int)  # for pagination
     last_edited_at = orm.Optional(datetime, 6)  # only for text updates
 
     votes = orm.Set('NewsCommentVote')
@@ -760,7 +760,7 @@ class NewsComment(db.Entity):
     bl = Resource('bl.news_comment')
 
     orm.composite_key(newsitem, local_id)
-    orm.composite_index(newsitem, root_order, tree_depth)
+    orm.composite_index(newsitem, root_id, tree_depth)
 
     @property
     def brief_text(self):

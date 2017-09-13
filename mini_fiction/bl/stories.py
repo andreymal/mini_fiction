@@ -721,6 +721,10 @@ class StoryBL(BaseBL, Commentable):
         from mini_fiction.models import StoryComment
         return orm.select(c for c in StoryComment if c.story == self.model)
 
+    def select_comment_ids(self):
+        from mini_fiction.models import StoryComment
+        return orm.select(c.id for c in StoryComment if c.story == self.model)
+
     def comment2html(self, text):
         from mini_fiction.models import StoryComment
         return StoryComment.bl.text2html(text)
@@ -850,6 +854,10 @@ class StoryLocalThreadBL(BaseBL, Commentable):
     def select_comments(self):
         from mini_fiction.models import StoryLocalComment
         return orm.select(c for c in StoryLocalComment if c.local == self.model)
+
+    def select_comment_ids(self):
+        from mini_fiction.models import StoryLocalComment
+        return orm.select(c.id for c in StoryLocalComment if c.local == self.model)
 
     def comment2html(self, text):
         from mini_fiction.models import StoryLocalComment

@@ -311,8 +311,7 @@ def ajax_tree(target_attr, comment, target=None, last_viewed_comment=None):
     # Проще получить все комментарии и потом выбрать оттуда нужные
     comments_tree_list = target.bl.get_comments_tree_list(
         maxdepth=None,
-        root_offset=comment.root_order,
-        root_count=1,
+        root_id=comment.root_id,
         last_viewed_comment=last_viewed_comment,
     )
 

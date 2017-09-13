@@ -46,6 +46,23 @@ class BaseCommentBL(BaseBL):
     def get_vote_link(self, _external=False):
         raise NotImplementedError
 
+    def get_page_number(self, for_user=None, per_page=None):
+        c = self.model
+        if per_page is None:
+            per_page = current_app.config['COMMENTS_COUNT']['page']
+
+        # FIXME: filter не дружит с select_comment_ids, но оптимизировать нужно
+        comment_ids = getattr(c, self.target_attr).bl.select_comments()
+        comment_ids = comment_ids.filter(lambda x: x.tree_depth == 0).order_by('c.id')[:]
+        comment_ids = [c.id for c in comment_ids]
+
+        try:
+            root_order = comment_ids.index(c.root_id)
+        except ValueError:
+            return 1
+
+        return root_order // per_page + 1
+
     def has_comments_access(self, target, author=None):
         return True
 
@@ -104,11 +121,10 @@ class BaseCommentBL(BaseBL):
             'text': data['text'],
         }
         if parent:
-            data['root_order'] = parent.root_order
+            assert parent.root_id
+            data['root_id'] = parent.root_id
         else:
-            last_root_comment = target.comments.select(lambda x: x.tree_depth == 0)
-            last_root_comment = last_root_comment.order_by(self.model.root_order.desc()).first()
-            data['root_order'] = (last_root_comment.root_order + 1) if last_root_comment else 0
+            data['root_id'] = 0  # заполним после flush
 
         last_comment = target.comments.select().order_by(self.model.id.desc()).first()
         data['local_id'] = (last_comment.local_id + 1) if last_comment else 1
@@ -117,6 +133,9 @@ class BaseCommentBL(BaseBL):
 
         comment = self.model(**data)
         comment.flush()
+        assert comment.id
+        if not parent:
+            comment.root_id = comment.id
         if hasattr(target, 'comments_count'):
             target.comments_count += 1
         if parent:
@@ -250,8 +269,7 @@ class StoryCommentBL(BaseCommentBL):
 
     def get_paged_link(self, for_user=None, _external=False):
         c = self.model
-        # root_order starts from 0
-        page = c.root_order // current_app.config['COMMENTS_COUNT']['page'] + 1
+        page = self.get_page_number(for_user=for_user)
         return url_for('story.view', pk=c.story.id, comments_page=page, _external=_external) + '#' + str(c.local_id)
 
     def get_tree_link(self, _external=False):
@@ -315,8 +333,7 @@ class StoryLocalCommentBL(BaseCommentBL):
 
     def get_paged_link(self, for_user=None, _external=False):
         c = self.model
-        # root_order starts from 0
-        page = c.root_order // current_app.config['COMMENTS_COUNT']['page'] + 1
+        page = self.get_page_number(for_user=for_user)
         return url_for('story_local_comment.view', story_id=c.local.story.id, comments_page=page, _external=_external) + '#' + str(c.local_id)
 
     def get_tree_link(self, _external=False):
@@ -367,8 +384,7 @@ class NewsCommentBL(BaseCommentBL):
 
     def get_paged_link(self, for_user=None, _external=False):
         c = self.model
-        # root_order starts from 0
-        page = c.root_order // current_app.config['COMMENTS_COUNT']['page'] + 1
+        page = self.get_page_number(for_user=for_user)
         return url_for('news.show', name=c.newsitem.name, comments_page=page, _external=_external) + '#' + str(c.local_id)
 
     def get_tree_link(self, _external=False):

@@ -6,24 +6,26 @@ from pony import orm
 from mini_fiction.models import Story, StoryLocalThread, NewsItem
 
 
-def check_comments_tree(tree, depth=0, root_order=0, parent_id=None):
-    for i, x in enumerate(tree):
+def check_comments_tree(tree, depth=0, root_id=None, parent_id=None):
+    for x in tree:
         comment, childtree, _, _ = x
         # Проверка корректности работы get_comments_tree() на всякий случай
         if depth == 0:
             assert comment.parent is None
+            assert root_id is None or root_id == comment.id
         else:
             assert comment.parent.id == parent_id
+            assert root_id is not None and root_id != comment.id
 
-        # Проверка root_order (используется в пагинации)
+        # Проверка root_id — id самого первого коммента в ветке (используется в пагинации)
         if depth == 0:
-            if comment.root_order != i:
-                print(' -{}: root_order {} -> {}'.format(comment.id, comment.root_order, i))
-                comment.root_order = i
+            if comment.root_id != comment.id:
+                print(' -{}: root_id {} -> {}'.format(comment.id, comment.root_id, comment.id))
+                comment.root_id = comment.id
         else:
-            if comment.root_order != root_order:
-                print(' -{}: root_order {} -> {}'.format(comment.id, comment.root_order, root_order))
-                comment.root_order = root_order
+            if comment.root_id != root_id:
+                print(' -{}: root_id {} -> {}'.format(comment.id, comment.root_id, root_id))
+                comment.root_id = root_id
 
         # Проверка tree_depth
         if comment.tree_depth != depth:
@@ -55,7 +57,7 @@ def check_comments_tree(tree, depth=0, root_order=0, parent_id=None):
                 print(' -{}: vote_total {} -> {}'.format(comment.id, comment.vote_total, vote_total))
                 comment.vote_total = vote_total
 
-        check_comments_tree(childtree, depth + 1, root_order if depth > 0 else i, comment.id)
+        check_comments_tree(childtree, depth + 1, root_id if depth > 0 else comment.id, comment.id)
 
 
 def check_comments_for(target, comments_list):
@@ -84,7 +86,7 @@ def check_comments_for(target, comments_list):
         c.flush()
     del update_locals
 
-    # Проверяем root_order, tree_depth, answers_count,
+    # Проверяем root_id, tree_depth, answers_count,
     # edits_count, vote_count, и vote_total
     # (get_comments_tree() их не использует, так что смело получаем сразу дерево)
     tree = target.bl.get_comments_tree()

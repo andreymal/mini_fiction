@@ -22,6 +22,11 @@ class Commentable(object):
         # (`c` variable is required for order_by, don't use something other)
         raise NotImplementedError
 
+    def select_comment_ids(self):
+        # should be like `orm.select(c.id for c in FooComment if c.objattr == self.model)`
+        # (`c` variable is required for order_by, don't use something other)
+        raise NotImplementedError
+
     def comment2html(self, text):
         # it should be redirected to FooComment.bl.text2html
         raise NotImplementedError
@@ -30,20 +35,48 @@ class Commentable(object):
         # should return {comment_id: vote_value}
         return {}
 
-    def get_comments_list(self, maxdepth=None, root_offset=None, root_count=None):
+    def get_comments_list(self, maxdepth=None, root_offset=None, root_count=None, root_id=None):
         result = self.select_comments()
+
         if maxdepth is not None:
             result = result.filter(lambda x: x.tree_depth <= maxdepth)
+
         if root_offset is not None and root_count is not None:
-            offset_to = root_offset + root_count
-            result = result.filter(lambda x: x.root_order >= root_offset and x.root_order < offset_to)
+            if root_id is not None:
+                raise ValueError('Cannot combine root_offset/root_count with root_id')
+            if root_offset < 0:
+                root_offset = 0
+            if root_count < 1:
+                return []
+
+            # FIXME: filter не дружит с select_comment_ids, но оптимизировать нужно
+            comment_ids = self.select_comments().filter(lambda x: x.tree_depth == 0).order_by('c.id')[:]
+            comment_ids = [c.id for c in comment_ids]
+            if not comment_ids or len(comment_ids) <= root_offset:
+                return []
+
+            offset_to = root_offset + root_count - 1
+            if offset_to >= len(comment_ids):
+                offset_to = len(comment_ids) - 1
+
+            result = result.filter(
+                lambda x: x.root_id >= comment_ids[root_offset] and x.root_id <= comment_ids[offset_to]
+            )
+
+        elif root_id is not None:
+            result = result.filter(lambda x: x.root_id == root_id)
+
         result = result.order_by('c.id')
         return result[:]
 
-    def get_comments_tree(self, maxdepth=None, root_offset=None, root_count=None, last_viewed_comment=None):
+    def get_comments_tree(self, maxdepth=None, root_offset=None, root_count=None, root_id=None, last_viewed_comment=None):
+        # Примечание: избегайте использования c.root_id и c.tree_depth в этом методе
+        # при вызове его с параметрами по умолчанию, так как он используется
+        # в команде checkcomments, что подразумевает, что root_id и tree_depth
+        # могут врать
         tree = []
         comments_dict = {}
-        comments = self.get_comments_list(None, root_offset, root_count)  # maxdepth=None для подсчёта числа вложенных комментов
+        comments = self.get_comments_list(None, root_offset, root_count, root_id)  # maxdepth=None для подсчёта числа вложенных комментов
 
         for c in comments:
             # Проставляем счётчики вложенных комментов по всей ветке выше
@@ -69,15 +102,15 @@ class Commentable(object):
 
         return tree
 
-    def get_comments_tree_list(self, maxdepth=None, root_offset=None, root_count=None, last_viewed_comment=None):
-        return self._comments_tree_iter(self.get_comments_tree(maxdepth, root_offset, root_count, last_viewed_comment=last_viewed_comment))
+    def get_comments_tree_list(self, maxdepth=None, root_offset=None, root_count=None, root_id=None, last_viewed_comment=None):
+        return self._comments_tree_iter(self.get_comments_tree(maxdepth, root_offset, root_count, root_id, last_viewed_comment=last_viewed_comment))
 
     def paginate_comments(self, comments_page=1, per_page=25, maxdepth=None, last_viewed_comment=None):
         target = self.model  # pylint: disable=e1101
 
         comments_count = target.comments.select().count()
         if comments_count > 0:
-            root_comments_total = self.select_comments().order_by('-c.root_order').first().root_order + 1
+            root_comments_total = self.select_comments().filter(lambda x: x.tree_depth == 0).count()
         else:
             root_comments_total = comments_count
 

@@ -125,7 +125,7 @@ class Config(object):
     STORY_COMMENTS_BY_GUEST = False
     NEWS_COMMENTS_BY_GUEST = False
     COMMENT_SPOILER_THRESHOLD = -5
-    COMMENTS_TREE_MAXDEPTH = 3
+    COMMENTS_TREE_MAXDEPTH = 4
 
     RSS = {'stories': 20, 'chapters': 20, 'comments': 100}
 

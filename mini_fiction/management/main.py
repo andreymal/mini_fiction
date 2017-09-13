@@ -71,6 +71,7 @@ def createsuperuser():
 
 
 @manager.option('-e', '--eager', dest='eager', help='Don\'t use Celery for delayed sending', action='store_true')
+@manager.option('recipients', metavar='recipients', nargs='+', default=(), help='Recipient addresses')
 def sendtestemail(recipients, eager=False):
     from mini_fiction.management.commands.sendtestemail import sendtestemail as cmd
     orm.sql_debug(False)

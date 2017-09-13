@@ -201,6 +201,11 @@ def edit():
                 'excluded_categories': author.excluded_categories_list,
                 'detail_view': author.detail_view,
                 'nsfw': author.nsfw,
+                'comments_per_page': (
+                    author.comments_per_page
+                    if author.comments_per_page is not None
+                    else current_app.config['COMMENTS_COUNT']['page']
+                ),
                 'comments_maxdepth': (
                     author.comments_maxdepth
                     if author.comments_maxdepth is not None

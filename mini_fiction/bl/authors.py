@@ -81,6 +81,11 @@ class AuthorBL(BaseBL):
         for field in ('is_staff', 'is_active', 'is_superuser', 'detail_view', 'nsfw'):
             if field in data:
                 setattr(user, field, bool(data[field]))
+        if 'comments_per_page' in data:
+            if user.comments_per_page is None and data['comments_per_page'] == current_app.config['COMMENTS_COUNT']['page']:
+                pass  # Если бралось значение из настроек проекта, то его и оставляем
+            else:
+                user.comments_per_page = min(1000, max(1, int(data['comments_per_page'])))
         if 'comments_maxdepth' in data:
             if user.comments_maxdepth is None and data['comments_maxdepth'] == current_app.config['COMMENTS_TREE_MAXDEPTH']:
                 pass  # Если бралось значение из настроек проекта, то его и оставляем

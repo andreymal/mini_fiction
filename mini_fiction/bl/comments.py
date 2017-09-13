@@ -9,7 +9,7 @@ from flask import Markup, current_app, url_for
 from flask_babel import lazy_gettext
 
 from mini_fiction.bl.utils import BaseBL
-from mini_fiction.utils.misc import call_after_request as later
+from mini_fiction.utils.misc import calc_maxdepth, call_after_request as later
 from mini_fiction.validation import Validator, ValidationError
 from mini_fiction.validation.comments import STORY_COMMENT, NEWS_COMMENT
 from mini_fiction.filters import filter_html
@@ -25,7 +25,7 @@ class BaseCommentBL(BaseBL):
     def get_permalink(self, _external=False):
         raise NotImplementedError
 
-    def get_paged_link(self, for_user=None, _external=False):
+    def get_paged_link(self, for_user=None, check_tree=True, _external=False):
         raise NotImplementedError
 
     def get_tree_link(self, _external=False):
@@ -49,7 +49,10 @@ class BaseCommentBL(BaseBL):
     def get_page_number(self, for_user=None, per_page=None):
         c = self.model
         if per_page is None:
-            per_page = current_app.config['COMMENTS_COUNT']['page']
+            if for_user and for_user.comments_per_page is not None:
+                per_page = max(1, for_user.comments_per_page)
+            else:
+                per_page = current_app.config['COMMENTS_COUNT']['page']
 
         # FIXME: filter не дружит с select_comment_ids, но оптимизировать нужно
         comment_ids = getattr(c, self.target_attr).bl.select_comments()
@@ -267,10 +270,17 @@ class StoryCommentBL(BaseCommentBL):
         c = self.model
         return url_for('story_comment.show', story_id=c.story.id, local_id=c.local_id, _external=_external)
 
-    def get_paged_link(self, for_user=None, _external=False):
+    def get_paged_link(self, for_user=None, check_tree=True, _external=False):
         c = self.model
         page = self.get_page_number(for_user=for_user)
-        return url_for('story.view', pk=c.story.id, comments_page=page, _external=_external) + '#' + str(c.local_id)
+
+        result = url_for('story.view', pk=c.story.id, comments_page=page, _external=_external)
+        if check_tree:
+            maxdepth = calc_maxdepth(for_user)
+            if maxdepth is not None and c.tree_depth > maxdepth:
+                result += '?fulltree=1'
+
+        return result + '#' + str(c.local_id)
 
     def get_tree_link(self, _external=False):
         return url_for('story_comment.ajax_tree', story_id=self.model.story.id, local_id=self.model.local_id, _external=_external)
@@ -331,10 +341,17 @@ class StoryLocalCommentBL(BaseCommentBL):
         c = self.model
         return url_for('story_local_comment.show', story_id=c.local.story.id, local_id=c.local_id, _external=_external)
 
-    def get_paged_link(self, for_user=None, _external=False):
+    def get_paged_link(self, for_user=None, check_tree=True, _external=False):
         c = self.model
         page = self.get_page_number(for_user=for_user)
-        return url_for('story_local_comment.view', story_id=c.local.story.id, comments_page=page, _external=_external) + '#' + str(c.local_id)
+
+        result = url_for('story_local_comment.view', story_id=c.local.story.id, comments_page=page, _external=_external)
+        if check_tree:
+            maxdepth = calc_maxdepth(for_user)
+            if maxdepth is not None and c.tree_depth > maxdepth:
+                result += '?fulltree=1'
+
+        return result + '#' + str(c.local_id)
 
     def get_tree_link(self, _external=False):
         return url_for('story_local_comment.ajax_tree', story_id=self.model.local.story.id, local_id=self.model.local_id, _external=_external)
@@ -382,10 +399,17 @@ class NewsCommentBL(BaseCommentBL):
         c = self.model
         return url_for('news_comment.show', news_id=c.newsitem.name, local_id=c.local_id, _external=_external)
 
-    def get_paged_link(self, for_user=None, _external=False):
+    def get_paged_link(self, for_user=None, check_tree=True, _external=False):
         c = self.model
         page = self.get_page_number(for_user=for_user)
-        return url_for('news.show', name=c.newsitem.name, comments_page=page, _external=_external) + '#' + str(c.local_id)
+
+        result = url_for('news.show', name=c.newsitem.name, comments_page=page, _external=_external)
+        if check_tree:
+            maxdepth = calc_maxdepth(for_user)
+            if maxdepth is not None and c.tree_depth > maxdepth:
+                result += '?fulltree=1'
+
+        return result + '#' + str(c.local_id)
 
     def get_tree_link(self, _external=False):
         return url_for('news_comment.ajax_tree', news_id=self.model.newsitem.id, local_id=self.model.local_id, _external=_external)

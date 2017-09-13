@@ -100,6 +100,14 @@ class AuthorEditPrefsForm(Form):
         render_kw=radio_attrs,
     )
 
+    comments_per_page = IntegerField(
+        '',
+        [
+            validators.InputRequired(),
+        ],
+        render_kw=dict(attrs_dict, type='number', min=1, max=1000),
+    )
+
     comments_maxdepth = IntegerField(
         '',
         [

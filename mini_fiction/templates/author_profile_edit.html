@@ -134,11 +134,15 @@
                                 <label>NSFW-предупреждения:</label>
                                 {{ prefs_form.nsfw }}
                             </div>
-                            <div class="padded">
+                            <div class="padded bootstrap radio">
+                                <label>Сколько комментариев первого уровня показывать на одной странице:</label>
+                                {{ prefs_form.comments_per_page }}
+                            </div>
+                            <div class="padded bootstrap radio">
                                 <label>Скрывать ветки комментариев с данной глубиной (1 - скрывать все ветки, 0 - ничего не скрывать):</label>
                                 {{ prefs_form.comments_maxdepth }}
                             </div>
-                            <div class="padded">
+                            <div class="padded bootstrap radio">
                                 <label>Скрывать под спойлером комментарии с данным рейтингом и ниже:</label>
                                 {{ prefs_form.comment_spoiler_threshold }}
                             </div>

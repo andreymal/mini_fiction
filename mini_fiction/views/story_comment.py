@@ -107,7 +107,7 @@ def ajax(story_id, page):
     if not story:
         abort(404)
 
-    per_page = current_app.config['COMMENTS_COUNT']['page']
+    per_page = current_user.comments_per_page or current_app.config['COMMENTS_COUNT']['page']
     link = url_for('story.view', pk=story.id, comments_page=page)
 
     if request.args.get('last_comment') and request.args['last_comment'].isdigit():

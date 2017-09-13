@@ -32,8 +32,8 @@ def view(story_id, comments_page):
     local = get_local_thread(story_id, user)
     story = local.story
 
-    per_page = current_app.config['COMMENTS_COUNT']['page']
-    maxdepth = None if request.args.get('fulltree') == '1' else calc_maxdepth(current_user)
+    per_page = user.comments_per_page or current_app.config['COMMENTS_COUNT']['page']
+    maxdepth = None if request.args.get('fulltree') == '1' else calc_maxdepth(user)
 
     last_viewed_comment = story.bl.last_viewed_local_comment_by(user)
     comments_count, paged, comments_tree_list = local.bl.paginate_comments(comments_page, per_page, maxdepth, last_viewed_comment=last_viewed_comment)
@@ -137,7 +137,7 @@ def restore(story_id, local_id):
 def ajax(story_id, page):
     local = get_local_thread(story_id, current_user._get_current_object())
 
-    per_page = current_app.config['COMMENTS_COUNT']['page']
+    per_page = current_user.comments_per_page or current_app.config['COMMENTS_COUNT']['page']
     link = url_for('story_local_comment.view', story_id=local.story.id, comments_page=page)
 
     if request.args.get('last_comment') and request.args['last_comment'].isdigit():

@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 
 from flask import Blueprint, current_app, abort, url_for
+from flask_login import current_user
 from pony.orm import db_session
 
 from mini_fiction.models import NewsItem, NewsComment
@@ -107,7 +108,7 @@ def ajax(news_id, page):
     if not newsitem:
         abort(404)
 
-    per_page = current_app.config['COMMENTS_COUNT']['page']
+    per_page = current_user.comments_per_page or current_app.config['COMMENTS_COUNT']['page']
     link = url_for('news.show', name=newsitem.name, comments_page=page)
 
     return common_comment.ajax(

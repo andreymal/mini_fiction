@@ -43,6 +43,9 @@ class AnonymousUser(AnonymousUserMixin):
     is_staff = False
     is_superuser = False
     nsfw = False
+    comments_per_page = None
+    comments_maxdepth = None
+    comment_spoiler_threshold = None
 
 
 class Author(db.Entity, UserMixin):
@@ -66,6 +69,7 @@ class Author(db.Entity, UserMixin):
     excluded_categories = orm.Optional(str, 200)  # TODO: use it on index page
     detail_view = orm.Required(bool, default=False)
     nsfw = orm.Required(bool, default=False)
+    comments_per_page = orm.Optional(int, size=16, unsigned=True, nullable=True, default=None)
     comments_maxdepth = orm.Optional(int, size=16, unsigned=True, nullable=True, default=None)
     comment_spoiler_threshold = orm.Optional(int, size=16, nullable=True, default=None)
 

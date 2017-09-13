@@ -279,7 +279,7 @@ def vote(pk, value):
             abort(403)
 
     if g.is_ajax:
-        html = render_template('includes/story_header_info.html', story=story)
+        html = render_template('includes/story_stars.html', story=story)
         return jsonify({'success': True, 'story_id': story.id, 'value': value, 'html': html})
     else:
         return redirect(url_for('story.view', pk=story.id))

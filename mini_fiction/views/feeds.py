@@ -52,9 +52,7 @@ def feed_chapters():
     for chapter in chapters:
         story = chapter.story
         author = story.authors[0]
-        data = Markup(chapter.text).striptags()[:251]
-        if len(data) == 251:
-            data = data[:-1] + '…'
+        data = chapter.text_preview
         feed.add(
             chapter.autotitle,
             data,
@@ -86,9 +84,7 @@ def feed_story(story_id):
     chapters.sort(key=lambda x: (x.first_published_at, x.order), reverse=True)
 
     for chapter in chapters:
-        data = Markup(chapter.text).striptags()[:251]
-        if len(data) == 251:
-            data = data[:-1] + '…'
+        data = chapter.text_preview
         feed.add(
             chapter.autotitle,
             data,

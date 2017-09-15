@@ -1,4 +1,4 @@
-## [ponyFiction](https://github.com/RuFimFiction/ponyFiction)
+## [ponyFiction](https://github.com/everypony/ponyFiction)
 
 * Orhideous – создатель и разработчик
 

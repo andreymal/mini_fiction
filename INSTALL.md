@@ -153,10 +153,11 @@ sudo apt-get install git build-essential python3-dev
 
 * `pip3 install mysqlclient` — установка Python-модуля
 
-* На MySQL-сервере создайте базу данных, не забыв указать кодировку utf8:
+* На MySQL-сервере создайте базу данных, не забыв указать кодировку utf8mb4
+  (в отличие от просто utf8, utf8mb4 корректно хранит Emoji и прочий юникод):
 
 ```
-create database mini_fiction character set utf8;
+create database mini_fiction character set utf8mb4;
 ```
 
 * Подключаем в настройках:
@@ -169,6 +170,7 @@ DATABASE = {
     'user': 'fanfics',  # Не забудьте вписать свои данные!
     'passwd': 'fanfics',
     'db': 'mini_fiction',
+    'charset': 'utf8mb4',
 }
 ```
 

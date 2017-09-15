@@ -14,6 +14,7 @@ class Local(Development):
     #     'user': 'fanfics',
     #     'passwd': 'fanfics',
     #     'db': 'fanfics',
+    #     'charset': 'utf8mb4',
     # }
 
     # SERVER_NAME = 'example.org'

@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version:  0.0.2\n"
 "Report-Msgid-Bugs-To: andriyano-31@mail.ru\n"
-"POT-Creation-Date: 2017-09-13 20:04+0300\n"
+"POT-Creation-Date: 2017-09-15 22:05+0300\n"
 "Last-Translator: andreymal <andriyano-31@mail.ru>\n"
 "Language: ru\n"
 "Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && "
@@ -125,15 +125,15 @@ msgstr "Не удалось отрисовать блок «{0}» для вас:
 msgid "Page already exists"
 msgstr "Страница уже существует"
 
-#: mini_fiction/bl/news.py:76
+#: mini_fiction/bl/news.py:98
 msgid "Cannot parse news item \"{0}\": {1}"
 msgstr "Не удалось распарсить новость «{0}»: {1}"
 
-#: mini_fiction/bl/news.py:85
+#: mini_fiction/bl/news.py:107
 msgid "Cannot render news item \"{0}\" for anonymous: {1}"
 msgstr "Не удалось отрисовать новость «{0}» для анонимуса: {1}"
 
-#: mini_fiction/bl/news.py:92
+#: mini_fiction/bl/news.py:114
 msgid "Cannot render news item \"{0}\" for you: {1}"
 msgstr "Не удалось отрисовать новость «{0}» для вас: {1}"
 
@@ -895,57 +895,57 @@ msgstr "Pony ORM"
 msgid "Pony ORM queries"
 msgstr "Запросы Pony ORM"
 
-#: mini_fiction/utils/misc.py:117
+#: mini_fiction/utils/misc.py:118
 msgctxt "story_edit_log"
 msgid "edited story"
 msgstr "отредактировал рассказ"
 
-#: mini_fiction/utils/misc.py:122
+#: mini_fiction/utils/misc.py:123
 msgctxt "story_edit_log"
 msgid "published story"
 msgstr "опубликовал рассказ"
 
-#: mini_fiction/utils/misc.py:124
+#: mini_fiction/utils/misc.py:125
 msgctxt "story_edit_log"
 msgid "sent to drafts story"
 msgstr "отправил в черновики рассказ"
 
-#: mini_fiction/utils/misc.py:126
+#: mini_fiction/utils/misc.py:127
 msgctxt "story_edit_log"
 msgid "approved story"
 msgstr "одобрил рассказ"
 
-#: mini_fiction/utils/misc.py:128
+#: mini_fiction/utils/misc.py:129
 msgctxt "story_edit_log"
 msgid "unapproved story"
 msgstr "отозвал рассказ"
 
-#: mini_fiction/utils/misc.py:139
+#: mini_fiction/utils/misc.py:140
 msgctxt "story_edit_log"
 msgid "edited chapter"
 msgstr "отредактировал главу"
 
-#: mini_fiction/utils/misc.py:146
+#: mini_fiction/utils/misc.py:147
 msgctxt "story_edit_log"
 msgid "added chapter"
 msgstr "добавил главу"
 
-#: mini_fiction/utils/misc.py:148
+#: mini_fiction/utils/misc.py:149
 msgctxt "story_edit_log"
 msgid "deleted chapter"
 msgstr "удалил главу"
 
-#: mini_fiction/utils/misc.py:151
+#: mini_fiction/utils/misc.py:152
 msgctxt "story_edit_log"
 msgid "sent to drafts chapter"
 msgstr "отправил в черновики главу"
 
-#: mini_fiction/utils/misc.py:153
+#: mini_fiction/utils/misc.py:154
 msgctxt "story_edit_log"
 msgid "published chapter"
 msgstr "опубликовал главу"
 
-#: mini_fiction/utils/misc.py:203
+#: mini_fiction/utils/misc.py:204
 #, python-format
 msgid "Show %(num)s unchanged symbol"
 msgid_plural "Show %(num)s unchanged symbols"

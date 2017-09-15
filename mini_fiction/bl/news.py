@@ -59,6 +59,28 @@ class NewsItemBL(BaseBL, Commentable):
         return newsitem
 
     def delete(self, author):
+        from mini_fiction.models import NewsComment, NewsCommentEdit, NewsCommentVote
+        from mini_fiction.models import Subscription, Notification
+
+        newsitem = self.model
+        news_id = self.model.id
+
+        # Неявная связь с подписками
+        Subscription.select(
+            lambda x: x.type in ('news_comment',) and x.target_id == news_id
+        ).delete(bulk=True)
+
+        # Неявная связь с уведомлениями
+        comment_ids = orm.select(x.id for x in NewsComment if x.newsitem.id == news_id)
+        Notification.select(
+            lambda x: x.type in ('news_reply', 'news_comment') and x.target_id in comment_ids
+        ).delete(bulk=True)
+
+        # Да-да, поне надо помогать с удалением комментов
+        orm.select(c for c in NewsCommentVote if c.comment in newsitem.comments).delete(bulk=True)
+        orm.select(c for c in NewsCommentEdit if c.comment in newsitem.comments).delete(bulk=True)
+        newsitem.comments.select().order_by(NewsComment.id.desc()).delete()
+
         self.model.delete()
 
     def hide_shown_newsitem(self):

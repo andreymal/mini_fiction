@@ -198,6 +198,8 @@ def loaddb_console(paths, progress=True, only_create=False):
     mfd = MiniFictionDump()
 
     filelist = mfd.walk_all_paths(paths)
+    if not filelist:
+        raise OSError('Cannot find dump files')
     ljust_cnt = max(len(os.path.split(x[1])[-1]) for x in filelist) + 2
 
     created = 0
@@ -419,6 +421,7 @@ def zip_dump_db_entity(z, mfd, name, e_params, media_files):
         date_time=date[0].timetuple()[:6],
     )
     zipinfo.compress_type = zipfile.ZIP_DEFLATED
+    zipinfo.external_attr = 0o644 << 16  # Python 3.4 ставит файлам права 000, фиксим
 
     # Теперь пишем подготовленный дамп в архив
     z.writestr(zipinfo, fp.getvalue())

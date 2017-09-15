@@ -88,6 +88,7 @@ def sitedescription():
 
 
 def call_after_request(f, *args, **kwargs):
+    # FIXME: не будет лишней опция отмены вызова при ошибке 500
     if not hasattr(g, 'after_request_callbacks'):
         g.after_request_callbacks = []
     g.after_request_callbacks.append((f, args, kwargs))

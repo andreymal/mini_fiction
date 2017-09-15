@@ -842,6 +842,7 @@ class Notification(db.Entity):
 
     - story_publish (Story): модератор опубликовал рассказ
     - story_draft (Story): модератор отклонил рассказ
+    - story_chapter (Chapter): новая глава в рассказе
     - story_reply (StoryComment): ответ на комментарий к рассказу
     - story_comment (StoryComment): не ответ, просто новый комментарий
     - story_lreply (StoryLocalComment): ответ на комментарий в редакторской
@@ -861,6 +862,7 @@ class Subscription(db.Entity):
     """Модель с информацией о подписке на уведомления.
 
     Куда указывает target_id:
+    - story_chapter: Story
     - story_comment: Story
     - story_lcomment: Story
     - news_comment: NewsItem

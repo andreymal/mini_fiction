@@ -25,6 +25,7 @@ clean-build:
 	rm -fr build/
 	rm -fr dist/
 	rm -fr .eggs/
+	rm -fr .tox/
 	rm -fr *.egg-info
 	rm -fr *.egg
 
@@ -43,9 +44,11 @@ lint:
 	--lint-rcfile pylintrc
 
 test:
+	pybabel compile -d mini_fiction/translations
 	python3 setup.py test
 
 test-all:
+	pybabel compile -d mini_fiction/translations
 	tox
 
 coverage:

@@ -32,6 +32,7 @@ requirements = read_requirements('requirements.txt', deplinks)
 optional_requirements = read_requirements('optional-requirements.txt', deplinks)
 test_requirements = read_requirements('test-requirements.txt', deplinks)
 
+
 with open('README.rst', 'r', encoding='utf-8-sig') as rfp:
     desc = rfp.read()
 
@@ -79,5 +80,5 @@ setup(
         'Topic :: Internet :: WWW/HTTP :: WSGI :: Application',
     ],
     test_suite="tests",
-    tests_require=requirements + test_requirements,
+    tests_require=test_requirements,
 )

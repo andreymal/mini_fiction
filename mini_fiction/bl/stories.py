@@ -300,7 +300,8 @@ class StoryBL(BaseBL, Commentable):
             later(current_app.tasks['notify_story_chapters'].delay, published_chapter_ids, user.id if user else None)
 
     def delete(self, user=None):
-        from mini_fiction.models import StoryComment, StoryLocalComment, Subscription, Notification
+        from mini_fiction.models import Chapter, StoryComment, StoryCommentVote, StoryCommentEdit
+        from mini_fiction.models import StoryLocalComment, StoryLocalCommentEdit, Subscription, Notification
 
         story = self.model
         later(current_app.tasks['sphinx_delete_story'].delay, story.id)
@@ -327,7 +328,7 @@ class StoryBL(BaseBL, Commentable):
 
         # Неявная связь с подписками
         Subscription.select(
-            lambda x: x.type in ('story_comment', 'story_lcomment') and x.target_id == story_id
+            lambda x: x.type in ('story_chapter', 'story_comment', 'story_lcomment') and x.target_id == story_id
         ).delete(bulk=True)
 
         # Неявная связь с уведомлениями
@@ -335,16 +336,33 @@ class StoryBL(BaseBL, Commentable):
             lambda x: x.type in ('story_publish', 'story_draft') and x.target_id == story_id
         ).delete(bulk=True)
 
+        # Неявная связь с уведомлениями о новых главах
+        chapter_ids = orm.select(x.id for x in Chapter if x.story.id == story_id)
+        Notification.select(
+            lambda x: x.type in ('story_chapter',) and x.target_id in chapter_ids
+        ).delete(bulk=True)
+
         comment_ids = orm.select(x.id for x in StoryComment if x.story.id == story_id)
         Notification.select(
             lambda x: x.type in ('story_reply', 'story_comment') and x.target_id in comment_ids
         ).delete(bulk=True)
+        # Да-да, поне надо помогать
+        orm.select(c for c in StoryCommentVote if c.comment in story.comments).delete(bulk=True)
+        orm.select(c for c in StoryCommentEdit if c.comment in story.comments).delete(bulk=True)
+        story.comments.select().order_by(StoryComment.id.desc()).delete()
 
         if local_thread_id is not None:
-            local_comment_ids = orm.select(x.id for x in StoryLocalComment if x.local.id == local_thread_id)
+            local_comment_ids = orm.select(x.id for x in StoryLocalComment if x.local.id == local_thread_id)[:]
             Notification.select(
                 lambda x: x.type in ('story_lreply', 'story_lcomment') and x.target_id in local_comment_ids
             ).delete(bulk=True)
+            orm.select(c for c in StoryLocalCommentEdit if c.comment.id in local_comment_ids).delete()
+            story.local.comments.select().order_by(StoryLocalComment.id.desc()).delete()
+
+        # Не помню почему, но почему-то там Optional
+        story.story_views_set.select().delete()
+        story.activity.select().delete()
+        story.votes.select().delete()
 
         # Остальные связи Pony ORM осилит
         story.delete()

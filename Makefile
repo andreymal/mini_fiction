@@ -1,4 +1,8 @@
-.PHONY: all
+.PHONY: help clean clean-build clean-pyc clean-translations lint test test-all coverage release release-sign dist install develop babel-extract babel-update babel-compile
+
+PYTHON?=python3
+PIP?=pip3
+FIND?=find
 
 help:
 	@echo "mini_fiction"
@@ -6,6 +10,7 @@ help:
 	@echo "clean - remove all build, test, coverage, frontend and Python artifacts"
 	@echo "clean-build - remove build artifacts"
 	@echo "clean-pyc - remove Python file artifacts"
+	@echo "clean-translations - remove gettext *.mo files"
 	@echo "lint - check style with pylint"
 	@echo "test - run tests quickly with the default Python with pytest"
 	@echo "test-all - run tests on every Python version with tox"
@@ -30,56 +35,56 @@ clean-build:
 	rm -fr *.egg
 
 clean-pyc:
-	find . -name '*.pyc' -exec rm -f {} +
-	find . -name '*.pyo' -exec rm -f {} +
-	find . -name '*~' -exec rm -f {} +
-	find . -name '__pycache__' -exec rm -fr {} +
+	$(FIND) . -name '*.pyc' -exec rm -f {} +
+	$(FIND) . -name '*.pyo' -exec rm -f {} +
+	$(FIND) . -name '*~' -exec rm -f {} +
+	$(FIND) . -name '__pycache__' -exec rm -fr {} +
 
 clean-translations:
 	rm -f mini_fiction/translations/*/LC_MESSAGES/*.mo
 
 lint:
-	python3 setup.py lint \
+	$(PYTHON) setup.py lint \
 	--lint-packages mini_fiction \
 	--lint-rcfile pylintrc
 
 test:
 	pybabel compile -d mini_fiction/translations
-	python3 setup.py test
+	$(PYTHON) setup.py test
 
 test-all:
 	pybabel compile -d mini_fiction/translations
 	tox
 
 coverage:
-	pip3 install -r test-requirements.txt
+	$(PIP) install -r test-requirements.txt
 	py.test --cov=mini_fiction --cov-report=html tests
 	ls -lh htmlcov/index.html
 
 release: clean
-	python3 setup.py sdist upload
+	$(PYTHON) setup.py sdist upload
 	pybabel compile -d mini_fiction/translations
-	python3 setup.py bdist_wheel upload
+	$(PYTHON) setup.py bdist_wheel upload
 
 release-sign: clean
-	python3 setup.py sdist upload --sign
+	$(PYTHON) setup.py sdist upload --sign
 	pybabel compile -d mini_fiction/translations
-	python3 setup.py bdist_wheel upload --sign
+	$(PYTHON) setup.py bdist_wheel upload --sign
 
 dist: clean
-	python3 setup.py sdist
+	$(PYTHON) setup.py sdist
 	pybabel compile -d mini_fiction/translations
-	python3 setup.py bdist_wheel
+	$(PYTHON) setup.py bdist_wheel
 	ls -lh dist
 
 install: clean
-	python3 setup.py install
+	$(PYTHON) setup.py install
 
 develop:
-	pip3 install -r requirements.txt
-	pip3 install -r dev-requirements.txt
-	pip3 install -r test-requirements.txt
-	python3 setup.py develop
+	$(PIP) install -r requirements.txt
+	$(PIP) install -r dev-requirements.txt
+	$(PIP) install -r test-requirements.txt
+	$(PYTHON) setup.py develop
 	pybabel compile -d mini_fiction/translations
 
 babel-extract:

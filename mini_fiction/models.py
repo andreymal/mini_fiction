@@ -849,6 +849,7 @@ class Notification(db.Entity):
     - story_lcomment (StoryLocalComment): новый комментарий в редакторской
     - news_reply (NewsComment): ответ на комментарий к новости
     - news_comment (NewsComment): просто новый комментарий
+    - custom (никуда): произвольный HTML-текст
     """
     user = orm.Required(Author)
     created_at = orm.Required(datetime, 6, default=datetime.utcnow)

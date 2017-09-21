@@ -130,6 +130,20 @@
     {% endcall %}
 </div>
 
+{%- elif item.type == 'custom' %}
+<div class="comment-item comment-item-short">
+    <div>{{ item.extra.body|safe }}</div>
+    <div class="notification-meta">
+        {% if item.user -%}
+        <a class="authorlink" href="{{ url_for('author.info', user_id=item.user.id) }}">{{ item.user.username -}}
+        </a>
+        {%- endif %}
+        <time class="notification-time" datetime="{{ item.created_at.strftime('%Y-%m-%dT%H:%M:%SZ') }}">
+            {{ item.created_at|datetimeformat('d MMMM Y, HH:mm') }}
+        </time>
+    </div>
+</div>
+
 {%- else %}
     {{ item }}
     <div class="notification-meta">

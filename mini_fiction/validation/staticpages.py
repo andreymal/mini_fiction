@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-from mini_fiction.validation.utils import bool_coerce
+from mini_fiction.validation.utils import bool_coerce, safe_string_coerce, safe_string_multiline_coerce
 
 
 STATIC_PAGE = {
@@ -14,6 +14,7 @@ STATIC_PAGE = {
     },
     'lang': {
         'type': 'string',
+        'coerce': safe_string_coerce,
         'required': False,
         'minlength': 0,
         'maxlength': 6,
@@ -21,6 +22,7 @@ STATIC_PAGE = {
     },
     'title': {
         'type': 'string',
+        'coerce': safe_string_coerce,
         'required': False,
         'minlength': 0,
         'maxlength': 192,
@@ -28,6 +30,7 @@ STATIC_PAGE = {
     },
     'content': {
         'type': 'string',
+        'coerce': safe_string_multiline_coerce,
         'required': True,
         'minlength': 0,
         'maxlength': 1048575,

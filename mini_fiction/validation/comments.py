@@ -1,6 +1,9 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
+from mini_fiction.validation.utils import safe_string_multiline_coerce
+
+
 STORY_COMMENT = {
     'parent': {
         'type': 'integer',
@@ -10,6 +13,7 @@ STORY_COMMENT = {
 
     'text': {
         'type': 'string',
+        'coerce': safe_string_multiline_coerce,
         'required': True,
         'minlength': 1,
         'maxlength': 8192,
@@ -26,6 +30,7 @@ NEWS_COMMENT = {
 
     'text': {
         'type': 'string',
+        'coerce': safe_string_multiline_coerce,
         'required': True,
         'minlength': 1,
         'maxlength': 8192,

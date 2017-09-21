@@ -3,16 +3,20 @@
 
 from flask_babel import lazy_gettext
 
+from mini_fiction.validation.utils import safe_string_coerce, safe_string_multiline_coerce
+
 
 CATEGORY = {
     'name': {
         'type': 'string',
+        'coerce': safe_string_coerce,
         'required': True,
         'minlength': 1,
         'maxlength': 256,
     },
     'description': {
         'type': 'string',
+        'coerce': safe_string_multiline_coerce,
         'required': False,
         'default': '',
         'minlength': 0,
@@ -32,6 +36,7 @@ CATEGORY = {
 CHARACTER = {
     'name': {
         'type': 'string',
+        'coerce': safe_string_coerce,
         'required': True,
         'minlength': 1,
         'maxlength': 256,
@@ -42,6 +47,7 @@ CHARACTER = {
     },
     'description': {
         'type': 'string',
+        'coerce': safe_string_multiline_coerce,
         'required': False,
         'default': '',
         'minlength': 0,
@@ -58,12 +64,14 @@ CHARACTER = {
 CHARACTER_GROUP = {
     'name': {
         'type': 'string',
+        'coerce': safe_string_coerce,
         'required': True,
         'minlength': 1,
         'maxlength': 256,
     },
     'description': {
         'type': 'string',
+        'coerce': safe_string_multiline_coerce,
         'required': False,
         'default': '',
         'minlength': 0,
@@ -75,12 +83,14 @@ CHARACTER_GROUP = {
 CLASSIFIER = {
     'name': {
         'type': 'string',
+        'coerce': safe_string_coerce,
         'required': True,
         'minlength': 1,
         'maxlength': 256,
     },
     'description': {
         'type': 'string',
+        'coerce': safe_string_multiline_coerce,
         'required': False,
         'default': '',
         'minlength': 0,

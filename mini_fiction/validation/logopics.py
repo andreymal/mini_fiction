@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-from mini_fiction.validation.utils import bool_coerce
+from mini_fiction.validation.utils import bool_coerce, safe_string_coerce, safe_string_multiline_coerce
 
 
 LOGOPIC = {
@@ -17,6 +17,7 @@ LOGOPIC = {
     },
     'description': {
         'type': 'string',
+        'coerce': safe_string_multiline_coerce,
         'required': False,
         'default': '',
         'minlength': 0,
@@ -24,6 +25,7 @@ LOGOPIC = {
     },
     'original_link': {
         'type': 'string',
+        'coerce': safe_string_coerce,
         'required': False,
         'default': '',
         'minlength': 0,
@@ -31,6 +33,7 @@ LOGOPIC = {
     },
     'original_link_label': {
         'type': 'string',
+        'coerce': safe_string_coerce,
         'required': False,
         'default': '',
         'minlength': 0,

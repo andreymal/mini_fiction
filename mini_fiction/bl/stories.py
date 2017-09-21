@@ -885,15 +885,16 @@ class StoryLocalThreadBL(BaseBL, Commentable):
 class ChapterBL(BaseBL):
     def create(self, story, editor, data):
         from mini_fiction.models import Chapter
+        from mini_fiction.validation.utils import safe_string_coerce, safe_string_multiline_coerce
 
         new_order = orm.select(orm.max(x.order) for x in Chapter if x.story == story).first()
 
-        text = data['text'].replace('\r', '').strip()
+        text = safe_string_multiline_coerce(data['text']).strip()
 
         chapter = self.model(
             story=story,
-            title=data['title'],
-            notes=data['notes'],
+            title=safe_string_coerce(data['title']),
+            notes=safe_string_multiline_coerce(data['notes']),
             text=text,
             text_md5=md5(text.encode('utf-8')).hexdigest(),
             draft=True,
@@ -934,6 +935,17 @@ class ChapterBL(BaseBL):
         return sl
 
     def update(self, editor, data):
+        from mini_fiction.validation.utils import safe_string_coerce, safe_string_multiline_coerce
+
+        # TODO: move validation to Cerberus
+        data = dict(data)
+        if 'title' in data:
+            data['title'] = safe_string_coerce(data['title'])
+        if 'notes' in data:
+            data['notes'] = safe_string_multiline_coerce(data['notes'])
+        if 'text' in data:
+            data['text'] = safe_string_multiline_coerce(data['text'])
+
         chapter = self.model
         edited_data = {}
         chapter_text_diff = None
@@ -1001,8 +1013,12 @@ class ChapterBL(BaseBL):
         story.updated = datetime.utcnow()
 
     def notes2html(self, notes):
+        from mini_fiction.validation.utils import safe_string_multiline_coerce
+
+        notes = safe_string_multiline_coerce(notes or '').strip()
         if not notes:
             return Markup('')
+
         try:
             doc = filter_html(notes)
             return Markup(html_doc_to_string(doc))
@@ -1113,13 +1129,18 @@ class ChapterBL(BaseBL):
         return lxml.etree.HTML(html_part)
 
     def text2html(self, text, start=None, end=None):
-        if not text:
+        from mini_fiction.validation.utils import safe_string_multiline_coerce
+
+        safe_text = safe_string_multiline_coerce(text or '').strip()
+        if not safe_text:
             return Markup('')
+
         try:
             if start is not None and end is not None and start < end and start >= 0 and start < len(text) - 1:
+                # FIXME: нельзя просто так взять и накатить safe_string_multiline_coerce, ибо start и end сместятся
                 doc = self.filter_text_for_preview(text, start, end)
             else:
-                doc = self.filter_text(text)
+                doc = self.filter_text(safe_text)
             doc = footnotes_to_html(doc)
             return Markup(html_doc_to_string(doc))
         except Exception:

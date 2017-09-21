@@ -235,8 +235,12 @@ class BaseCommentBL(BaseBL):
         return vote
 
     def text2html(self, text):
+        from mini_fiction.validation.utils import safe_string_multiline_coerce
+
+        text = safe_string_multiline_coerce(text or '').strip()
         if not text:
             return Markup('')
+
         try:
             doc = filter_html(text)
             return Markup(html_doc_to_string(doc))

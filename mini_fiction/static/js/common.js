@@ -547,7 +547,9 @@ common.allowedTags.b = function(node) {
         cont = null;
     }
 
-    this.current.appendChild(cont);
+    if (cont) {
+        this.current.appendChild(cont);
+    }
     this.push(Array.prototype.slice.call(node.childNodes), cont);
 };
 

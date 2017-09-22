@@ -63,6 +63,7 @@ var story = {
     load: function() {
         this.panelStuff();
         this.chapterPreviewStuff();
+        this.chapterLinterStuff();
 
         // Обработчики для кнопок работы с рассказом
 
@@ -887,6 +888,25 @@ var story = {
         this._preview.area = null;
         this._preview.btn = null;
         this._preview.selectedBtn = null;
+    },
+
+    chapterLinterStuff: function() {
+        if (!window.history) {
+            return;
+        }
+
+        // Проверяем, что это страница редактирования главы
+        if (!document.getElementById('chapter-preview')) {
+            return;
+        }
+
+        // Убираем параметр lint из ссылки, чтобы не мешался
+        var url = window.location.toString();
+        var urlFixed = url.replace(/\?lint=[A-Za-z0-9_-]+$/, '');
+        urlFixed = urlFixed.replace(/\?l=1$/, '');
+        if (urlFixed !== url) {
+            window.history.replaceState(window.history.state, '', urlFixed);
+        }
     },
 
     previewChapter: function(form, onlySelected) {

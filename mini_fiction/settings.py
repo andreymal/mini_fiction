@@ -17,6 +17,7 @@ class Config(object):
     SECRET_KEY = 'mnwpNkTYhFeu57Fc9WjVbw7DidbkZoVe'
     SYSTEM_USER_ID = -1
 
+    CHAPTER_LINTER = 'mini_fiction.linters.DefaultChapterLinter'
     PLUGINS = []
 
     DATABASE_ENGINE = 'sqlite'

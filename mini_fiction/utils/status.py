@@ -92,6 +92,7 @@ class ProjectStatus(Status):
         'avatars': 'Avatars uploading',
         'celery': 'Celery',
         'diff': 'google-diff-match-patch',
+        'linter': 'Chapter linter',
     }
 
     def cache(self):
@@ -265,6 +266,21 @@ class ProjectStatus(Status):
         else:
             return self._ok('diff', 'working')
 
+    def linter(self):
+        from mini_fiction.linters import create_chapter_linter
+
+        if not self.app.config.get('CHAPTER_LINTER'):
+            return self._ok('linter', 'disabled')
+
+        try:
+            create_chapter_linter('foo').lint()
+            create_chapter_linter('foo').get_error_messages()
+            create_chapter_linter(None).get_error_messages([])
+        except Exception as exc:
+            return self._fail('linter', self.app.config['CHAPTER_LINTER'] + ' not working: ' + str(exc))
+        else:
+            return self._ok('linter', self.app.config['CHAPTER_LINTER'])
+
     def generate(self):
         yield self.cache()
         yield self.cache_working()
@@ -278,6 +294,7 @@ class ProjectStatus(Status):
         yield self.avatars()
         yield self.celery()
         yield self.diff()
+        yield self.linter()
 
 
 class UsersStatus(Status):

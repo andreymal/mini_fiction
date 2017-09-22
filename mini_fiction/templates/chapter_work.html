@@ -107,3 +107,11 @@
     </div>
 </div>
 {% endblock %}
+
+{%- block modal -%}
+    {%- if linter_error_messages -%}
+        {%- include 'includes/linter_modal.html' -%}
+    {%- elif lint_ok -%}
+        {%- include 'includes/linter_ok_modal.html' -%}
+    {%- endif -%}
+{%- endblock -%}

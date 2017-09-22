@@ -1,6 +1,9 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
+import base64
+import struct
+
 from flask import Blueprint, request, render_template, abort, url_for, redirect, g, jsonify
 from flask_login import current_user, login_required
 from flask_babel import gettext
@@ -9,6 +12,7 @@ from pony.orm import db_session
 from mini_fiction.forms.chapter import ChapterForm
 from mini_fiction.models import Story, Chapter
 from mini_fiction.utils.misc import diff2html
+from mini_fiction.linters import create_chapter_linter
 from .story import get_story
 
 bp = Blueprint('chapter', __name__)
@@ -121,7 +125,14 @@ def add(story_id):
         )
         if request.form.get('act') == 'publish':
             story.bl.publish_all_chapters(user)
-        return redirect(url_for('chapter.edit', pk=chapter.id))
+
+        redir_url = url_for('chapter.edit', pk=chapter.id)
+        linter = create_chapter_linter(chapter.text)
+        error_codes = linter.lint() if linter else []
+        if error_codes:
+            redir_url += '?lint={}'.format(_encode_linter_codes(error_codes))
+        return redirect(redir_url)
+
     elif request.method == 'POST':
         not_saved = True
 
@@ -149,6 +160,19 @@ def edit(pk):
     user = current_user._get_current_object()
     if not chapter.story.bl.editable_by(user):
         abort(403)
+
+    # Параметром ?l=1 просят запустить линтер.
+    # Если всё хорошо, то продолжаем дальше.
+    # Если плохо, перенаправляем на страницу с описанием ошибок
+    lint_ok = None
+    if request.method == 'GET' and request.args.get('l') == '1':
+        linter = create_chapter_linter(chapter.text)
+        error_codes = linter.lint() if linter else []
+        if error_codes:
+            redir_url = url_for('chapter.edit', pk=chapter.id)
+            redir_url += '?lint={}'.format(_encode_linter_codes(error_codes))
+            return redirect(redir_url)
+        lint_ok = linter is not None
 
     chapter_data = {
         'title': chapter.title,
@@ -202,6 +226,17 @@ def edit(pk):
     elif request.method == 'POST':
         not_saved = True
 
+    # Если мы дошли сюда, значит рисуем форму редактирования главы.
+    # В параметре lint могли запросить описание ошибок линтера,
+    # запрашиваем их из собственно линтера
+    error_codes = []
+    linter_error_messages = {}
+    if request.method == 'GET' and request.args.get('lint'):
+        error_codes = _decode_linter_codes(request.args['lint'])
+    if error_codes:
+        linter = create_chapter_linter(None)
+        linter_error_messages = linter.get_error_messages(error_codes) if linter else []
+
     data = {
         'page_title': 'Редактирование главы «%s»' % chapter.autotitle,
         'story': chapter.story,
@@ -213,6 +248,8 @@ def edit(pk):
         'chapter_text_diff': chapter_text_diff,
         'diff_html': diff2html(older_text, chapter_text_diff) if chapter_text_diff else None,
         'unpublished_chapters_count': Chapter.select(lambda x: x.story == chapter.story and x.draft).count(),
+        'linter_error_messages': linter_error_messages,
+        'lint_ok': lint_ok,
     }
     data.update(preview_data)
 
@@ -293,3 +330,30 @@ def sort(story_id):
         for new_order_id, chapter_id in enumerate(new_order):
             chapters[chapter_id].order = new_order_id + 1
         return jsonify({'success': True})
+
+
+def _encode_linter_codes(error_codes):
+    result = 0
+    for x in error_codes:
+        assert x >= 0 and x <= 31
+        result += 1 << x
+
+    result = struct.pack('<I', result).rstrip(b'\x00')
+    return base64.urlsafe_b64encode(result).decode('ascii').strip('=')
+
+
+def _decode_linter_codes(b64):
+    b64 = b64.strip().strip('=')
+    try:
+        b64 += "=" * ((4 - len(b64) % 4) % 4)
+        num = base64.urlsafe_b64decode(b64.encode('ascii'))
+        num = struct.unpack('<I', num.ljust(4, b'\x00'))[0]
+    except Exception:
+        return []
+
+    result = []
+    for x in range(32):
+        if num & (1 << x):
+            result.append(x)
+
+    return result

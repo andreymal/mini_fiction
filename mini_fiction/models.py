@@ -83,6 +83,8 @@ class Author(db.Entity, UserMixin):
     avatar_medium = orm.Optional(str, 255)
     avatar_large = orm.Optional(str, 255)
 
+    extra = orm.Required(orm.LongStr, lazy=False, default='{}')
+
     registration_profile = orm.Optional('RegistrationProfile')
     password_reset_profiles = orm.Set('PasswordResetProfile')
     change_email_profiles = orm.Set('ChangeEmailProfile')

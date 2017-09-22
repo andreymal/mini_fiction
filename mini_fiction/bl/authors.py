@@ -39,6 +39,10 @@ allowed_subscriptions = {
 
 
 class AuthorBL(BaseBL):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self._extra = None
+
     def create(self, data):
         if 'username' not in data or 'password' not in data:
             raise ValidationError({'username': lazy_gettext('Please set username and password')})
@@ -162,6 +166,18 @@ class AuthorBL(BaseBL):
                 with image:
                     self.validate_and_set_avatar(image, image_data)
 
+        if data.get('extra') is not None:
+            if isinstance(data['extra'], str):
+                try:
+                    json.loads(data['extra'])
+                except Exception:
+                    raise ValidationError({'extra': ['Invalid extra JSON']})
+                user.extra = data['extra']
+            elif not isinstance(data['extra'], dict):
+                raise ValidationError({'extra': ['extra must be dict or JSON string']})
+            else:
+                user.extra = json.dumps(data['extra'], ensure_ascii=False)
+
     def update_email_subscriptions(self, subs):
         user = self.model
 
@@ -207,8 +223,6 @@ class AuthorBL(BaseBL):
         if modified:
             user.silent_tracker = ','.join(silent)
         return modified
-
-
 
     def update_email_with_confirmation(self, email):
         from mini_fiction.models import Author, ChangeEmailProfile
@@ -264,6 +278,25 @@ class AuthorBL(BaseBL):
             )
 
         return True
+
+    def get_extra(self, key, default=None):
+        if not isinstance(key, str):
+            raise ValueError('key must be str')
+
+        if self._extra is None:
+            self._extra = json.loads(self.model.extra or '{}')
+
+        return self._extra.get(key, default)
+
+    def set_extra(self, key, value):
+        if not isinstance(key, str):
+            raise ValueError('key must be str')
+
+        if self._extra is None:
+            self._extra = json.loads(self.model.extra or '{}')
+
+        self._extra[key] = value
+        self.model.extra = json.dumps(self._extra, ensure_ascii=False)
 
     def delete_avatar(self):
         user = self.model

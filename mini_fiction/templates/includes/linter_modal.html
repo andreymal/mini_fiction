@@ -9,5 +9,12 @@
     {%- endfor %}</ul>
 </div>
 <div class="modal-footer">
+    {% if linter_allow_hide %}
+    <form method="POST" action="{{ url_for('chapter.hidelinter', pk=chapter.id) }}" style="margin: 0; display: inline;">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+        <input type="hidden" name="errors" value="{{ linter_allow_hide }}" />
+        <button type="submit" class="btn" aria-hidden="true">Больше не показывать</button>
+    </form>
+    {% endif %}
     <button class="btn" data-dismiss="modal" aria-hidden="true">Понятно</button>
 </div>

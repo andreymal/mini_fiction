@@ -127,8 +127,14 @@ def add(story_id):
             story.bl.publish_all_chapters(user)
 
         redir_url = url_for('chapter.edit', pk=chapter.id)
+
+        # Запускаем поиск распространённых ошибок в тексте главы
         linter = create_chapter_linter(chapter.text)
-        error_codes = linter.lint() if linter else []
+        error_codes = set(linter.lint() if linter else [])
+
+        # Те ошибки, которые пользователь просил не показывать, не показываем
+        error_codes = error_codes - set(user.bl.get_extra('hidden_chapter_linter_errors') or [])
+
         if error_codes:
             redir_url += '?lint={}'.format(_encode_linter_codes(error_codes))
         return redirect(redir_url)
@@ -167,7 +173,9 @@ def edit(pk):
     lint_ok = None
     if request.method == 'GET' and request.args.get('l') == '1':
         linter = create_chapter_linter(chapter.text)
-        error_codes = linter.lint() if linter else []
+        error_codes = set(linter.lint() if linter else [])
+        # Те ошибки, которые пользователь просил не показывать, показываем,
+        # потому что они явно запрошены параметром ?l=1
         if error_codes:
             redir_url = url_for('chapter.edit', pk=chapter.id)
             redir_url += '?lint={}'.format(_encode_linter_codes(error_codes))
@@ -231,11 +239,20 @@ def edit(pk):
     # запрашиваем их из собственно линтера
     error_codes = []
     linter_error_messages = {}
+    linter_allow_hide = ''
     if request.method == 'GET' and request.args.get('lint'):
-        error_codes = _decode_linter_codes(request.args['lint'])
+        error_codes = set(_decode_linter_codes(request.args['lint']))
     if error_codes:
         linter = create_chapter_linter(None)
         linter_error_messages = linter.get_error_messages(error_codes) if linter else []
+
+        # Интересуемся, отображались эти ошибки раньше. Если ни одной новой,
+        # разрешаем пользователя попросить больше не показывать
+        old_error_codes = set(user.bl.get_extra('shown_chapter_linter_errors') or [])
+        if not (error_codes - old_error_codes):
+            linter_allow_hide = ','.join(str(x) for x in (error_codes | set(user.bl.get_extra('hidden_chapter_linter_errors') or [])))
+        else:
+            user.bl.set_extra('shown_chapter_linter_errors', list(error_codes | old_error_codes))
 
     data = {
         'page_title': 'Редактирование главы «%s»' % chapter.autotitle,
@@ -250,10 +267,41 @@ def edit(pk):
         'unpublished_chapters_count': Chapter.select(lambda x: x.story == chapter.story and x.draft).count(),
         'linter_error_messages': linter_error_messages,
         'lint_ok': lint_ok,
+        'linter_allow_hide': linter_allow_hide,
     }
     data.update(preview_data)
 
     return render_template('chapter_work.html', **data)
+
+
+@bp.route('/chapter/<int:pk>/hidelinter/', methods=('GET', 'POST'))
+@db_session
+@login_required
+def hidelinter(pk):
+    chapter = Chapter.get(id=pk)
+    if not chapter:
+        abort(404)
+    user = current_user._get_current_object()
+    if not chapter.story.bl.editable_by(user):
+        abort(403)
+
+    if request.method == 'POST':
+        error_codes = request.form.get('errors')
+        if error_codes:
+            try:
+                error_codes = [x.strip() for x in error_codes.split(',')]
+                error_codes = [int(x) for x in error_codes if x.isdigit() and len(x) < 4]
+            except Exception:
+                error_codes = []
+        else:
+            error_codes = []
+
+        error_codes = set(error_codes)
+        if len(error_codes) > 1024:
+            error_codes = set()
+        user.bl.set_extra('hidden_chapter_linter_errors', list(error_codes))
+
+    return redirect(url_for('chapter.edit', pk=chapter.id))
 
 
 @bp.route('/chapter/<int:pk>/delete/', methods=('GET', 'POST'))

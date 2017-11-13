@@ -2036,6 +2036,8 @@ ul.editlog .editlog-item:nth-child(2n+1) {
     }
     .chapter-text {
         width: 96%;
+        width: calc(100% - 20px);
+        margin: 0;
     }
 }
 
@@ -2101,7 +2103,9 @@ ul.editlog .editlog-item:nth-child(2n+1) {
         opacity: 1;
     }
     .chapter-text {
-        width: 100% !important;
+        width: 96%;
+        width: calc(100% - 20px);
+        margin: 0;
     }
     .controls textarea {
         max-width: 400px;
@@ -2169,6 +2173,9 @@ ul.editlog .editlog-item:nth-child(2n+1) {
     .chapter-text {
         font-size: 12px;
         line-height: 22px;
+        width: 96%;
+        width: calc(100% - 12px);
+        margin: 0;
     }
     .characters-group {
         display: inline;

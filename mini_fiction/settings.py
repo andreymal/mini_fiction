@@ -270,7 +270,6 @@ class Config(object):
     RECAPTCHA_PUBLIC_KEY = ''
     RECAPTCHA_PRIVATE_KEY = ''
     RECAPTCHA_OPTIONS = {'hl': 'ru'}
-    NOCAPTCHA = True
 
     DEFAULT_USERPIC = {'endpoint': 'static', 'filename': 'i/userpic.png'}
 

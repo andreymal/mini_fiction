@@ -9,9 +9,10 @@ from flask_login import login_user, logout_user
 from pony.orm import db_session
 
 from mini_fiction.models import Author
+from mini_fiction.captcha import CaptchaError
 from mini_fiction.validation import ValidationError
 from mini_fiction.forms.login import LoginForm
-from mini_fiction.forms.register import AuthorRegistrationForm, AuthorRegistrationCaptchaForm, AuthorPasswordResetForm, AuthorNewPasswordForm
+from mini_fiction.forms.register import AuthorRegistrationForm, AuthorPasswordResetForm, AuthorNewPasswordForm
 
 
 bp = Blueprint('auth', __name__)
@@ -48,16 +49,32 @@ def registration():
 
     page_title = gettext('Registration in library')
 
-    form = AuthorRegistrationForm() if current_app.config['NOCAPTCHA'] else AuthorRegistrationCaptchaForm()
+    captcha = None
+    captcha_error = None
+    if current_app.captcha:
+        captcha = current_app.captcha.generate()
+
+    form = AuthorRegistrationForm()
     if form.validate_on_submit():
+        data = dict(form.data)
+        if current_app.captcha:
+            data = current_app.captcha.copy_fields(data, request.form)
         try:
-            Author.bl.register(form.data)
+            Author.bl.register(data)
+        except CaptchaError:
+            captcha_error = 'Вы не доказали, что вы не робот'
         except ValidationError as exc:
             form.set_errors(exc.errors)
         else:
             return redirect(url_for('auth.registration_complete'))
 
-    return render_template('registration/registration_form.html', form=form, page_title=page_title)
+    return render_template(
+        'registration/registration_form.html',
+        form=form,
+        captcha=captcha,
+        captcha_error=captcha_error,
+        page_title=page_title,
+    )
 
 
 @bp.route('/register/complete/', methods=('GET',))

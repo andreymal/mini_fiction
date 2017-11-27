@@ -2,7 +2,6 @@
 # -*- coding: utf-8 -*-
 
 from flask_babel import lazy_gettext
-from flask_wtf import RecaptchaField
 from wtforms import TextField, PasswordField, validators
 
 from mini_fiction.forms.form import Form
@@ -17,7 +16,6 @@ class AuthorRegistrationForm(Form):
         render_kw=dict(attrs_dict, maxlength=32),
         description='Только русские/латинские буквы, цифры, пробел, точка и символы _ @ + -'
     )
-
     email = TextField(
         'Электропочта',
         render_kw=dict(attrs_dict, maxlength=75),
@@ -34,12 +32,6 @@ class AuthorRegistrationForm(Form):
         [validators.Required()],
         render_kw=attrs_dict,
         description='Повторите пароль, чтобы не забыть'
-    )
-
-
-class AuthorRegistrationCaptchaForm(AuthorRegistrationForm):
-    recaptcha = RecaptchaField(
-        'Капча'
     )
 
 

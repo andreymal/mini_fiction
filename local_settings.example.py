@@ -34,7 +34,6 @@ class Local(Development):
     # CAPTCHA_CLASS = 'mini_fiction.captcha.ReCaptcha'
     # RECAPTCHA_PUBLIC_KEY = '...'
     # RECAPTCHA_PRIVATE_KEY = '...'
-    # NOCAPTCHA = False
 
     # CAPTCHA_FOR_GUEST_COMMENTS = True
 

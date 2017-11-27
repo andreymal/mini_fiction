@@ -406,6 +406,9 @@ class AuthorBL(BaseBL):
     def register(self, data):
         from mini_fiction.models import RegistrationProfile
 
+        if current_app.captcha:
+            current_app.captcha.check_or_raise(data)
+
         try:
             data = Validator(REGISTRATION).validated(data)
         except ValidationError as exc:

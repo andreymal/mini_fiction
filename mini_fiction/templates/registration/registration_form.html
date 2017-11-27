@@ -29,6 +29,17 @@
                         </div>
                     </div>
                 {% endif %}{% endfor %}
+                {% if captcha and captcha.cls -%}
+                    <div class="control-group{% if captcha_error %} error{% endif %} js-captcha-field">
+                        {% if captcha_error %}<span class="help-inline">{{ captcha_error }}</span>{% endif %}
+                        <div class="controls">
+                            <div>Докажите, что вы не робот:</div>
+                            <div class="captcha-wrap js-captcha-wrap">
+                                {%- include 'captcha/captcha.html' with context -%}
+                            </div>
+                        </div>
+                    </div>
+                {%- endif %}
                 {% with messages = get_flashed_messages() %}
                     {% for message in messages %}
                         <div class="control-group error"><span class="help-inline">{{ message }}</span></div>

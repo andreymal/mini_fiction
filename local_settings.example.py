@@ -30,9 +30,13 @@ class Local(Development):
     # EMAIL_PORT = 1025
     DEFAULT_FROM_EMAIL = 'minifiction@example.org'
 
+    # CAPTCHA_CLASS = 'mini_fiction.captcha.PyCaptcha'  # or:
+    # CAPTCHA_CLASS = 'mini_fiction.captcha.ReCaptcha'
     # RECAPTCHA_PUBLIC_KEY = '...'
     # RECAPTCHA_PRIVATE_KEY = '...'
     # NOCAPTCHA = False
+
+    # CAPTCHA_FOR_GUEST_COMMENTS = True
 
     # CELERY_CONFIG = dict(Config.CELERY_CONFIG)
     # CELERY_CONFIG['task_always_eager'] = False

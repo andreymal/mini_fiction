@@ -20,7 +20,7 @@
 
     <form class="comment-form" method="POST" enctype="multipart/form-data" action="">
     {% from 'macro.html' import comment_form_content with context %}
-    {{ comment_form_content(form, 'story', story.id, parent_comment.local_id if parent_comment else None, preview_html=preview_html) }}
+    {{ comment_form_content(form, 'story', story.id, parent_comment.local_id if parent_comment else None, preview_html=preview_html, reqs=comment_reqs) }}
     </form>
 
     {{- breadcrumbs([[url_for('story.view', pk=story.id), story.title]]) }}

@@ -1,11 +1,14 @@
 'use strict';
 
-/* global amajaxify: false, core: false */
+/* global amajaxify: false, core: false, captcha: false */
 
 
 var comments = {
     addlink: null,
     form: null,
+
+    _captchaField: null,
+    _captchaWrap: null,
 
     _previewBtn: null,
     _previewArea: null,
@@ -18,6 +21,9 @@ var comments = {
             this.addlink.addEventListener('click', this._answerEvent);
             this.form.addEventListener('submit', this.submitForm.bind(this));
             this.loadCommentsContent();
+
+            this._captchaField = this.form.getElementsByClassName('js-captcha-field')[0];
+            this._captchaWrap = this.form.getElementsByClassName('js-captcha-wrap')[0];
         }
 
         var list = document.getElementById('comments-list');
@@ -88,6 +94,8 @@ var comments = {
 
     unload: function() {
         this.removeCommentPreviewStuff();
+        this._captchaWrap = null;
+        this._captchaField = null;
         this.addlink = null;
         this.form = null;
     },
@@ -184,6 +192,9 @@ var comments = {
 
     _submittedFormEvent: function(data, parentComment) {
         var form = this.form;
+
+        this._updateCaptchaField(data.captcha_html);
+
         if (core.handleResponse(data, form.action)) {
             return;
         }
@@ -202,6 +213,19 @@ var comments = {
         } else if (data.link) {
             amajaxify.goto('GET', data.link);
         }
+    },
+
+    _updateCaptchaField: function(captchaHtml) {
+        captcha.unload(this._captchaWrap);
+
+        if (!captchaHtml) {
+            this._captchaField.style.display = 'none';
+            return;
+        }
+
+        this._captchaField.style.display = '';
+        this._captchaWrap.innerHTML = captchaHtml;
+        captcha.load(this._captchaWrap);
     },
 
     _answerEvent: function(event) {

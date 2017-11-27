@@ -1,11 +1,12 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-from flask import request, g, jsonify, abort, redirect, render_template
+from flask import current_app, request, g, jsonify, abort, redirect, render_template
 from flask_login import current_user
 from flask_babel import gettext
 
 from mini_fiction.forms.comment import CommentForm
+from mini_fiction.captcha import CaptchaError
 from mini_fiction.validation import ValidationError
 from mini_fiction.utils.misc import calc_maxdepth
 
@@ -18,7 +19,7 @@ def build_comment_tree_response(comment, target_attr, target):
             'comments_tree_list': [[comment, False, 0, 0]]
         }
     )
-    return jsonify({
+    return {
         'success': True,
         target_attr: target.id,
         'comment': comment.local_id,
@@ -26,7 +27,7 @@ def build_comment_tree_response(comment, target_attr, target):
         'deleted': comment.deleted,
         'link': comment.bl.get_paged_link(current_user._get_current_object()),
         'html': html
-    })
+    }
 
 
 def build_comment_response(comment, target_attr, target):
@@ -57,15 +58,17 @@ def add(target_attr, target, template, template_ajax=None, template_ajax_modal=F
 
     # Проверки доступа (дублируются в Comment.bl.create, но здесь они тоже нужны,
     # чтобы пользователь не получил содержимое parent, когда доступа не должно быть)
-    if parent and not parent.bl.can_answer_by(user):
+    if parent and not parent.bl.access_for_answer_by(user):
         abort(403)
-    elif not target.bl.can_comment_by(user):
+    reqs = target.bl.access_for_commenting_by(user)
+    if not reqs:
         abort(403)
 
     extra_ajax = g.is_ajax and request.form.get('extra_ajax') == '1'
     preview_html = None
 
     form = CommentForm()
+    captcha_error = None
 
     if request.form.get('act') == 'preview':
         preview_html = target.bl.comment2html(request.form.get('text'))
@@ -79,6 +82,8 @@ def add(target_attr, target, template, template_ajax=None, template_ajax_modal=F
     elif form.validate_on_submit():
         # Обработка POST-запроса
         data = dict(form.data)
+        if current_app.captcha:
+            data = current_app.captcha.copy_fields(data, request.form)
 
         # Если родительский комментарий указан через query string, а не форму
         if parent:
@@ -86,24 +91,39 @@ def add(target_attr, target, template, template_ajax=None, template_ajax_modal=F
 
         # Собственно создание
         try:
+            # FIXME: здесь проверяется капча, а надо перед валидацией формы,
+            # чтобы не оставалось висячих капч (ох уж эти рефакторинги)
             comment = target.bl.create_comment(user, request.remote_addr, data)
+        except CaptchaError:
+            captcha_error = 'Вы не доказали, что вы не робот'
         except ValidationError as exc:
             form.set_errors(exc.errors)
         else:
             if extra_ajax:
                 # Для AJAX отвечаем просто html-кодом комментария и всякой технической инфой
-                return build_comment_tree_response(comment, target_attr, target)
+                result = build_comment_tree_response(comment, target_attr, target)
+                result['captcha_html'] = render_template('captcha/captcha.html', captcha=current_app.captcha.generate()) if reqs.get('captcha') else None
+                return jsonify(result)
             else:
                 # Иначе редиректим на страницу с комментарием
-                # (FIXME: что не всегда хорошо, потому что коммент может оказаться в скрытой ветке)
                 return redirect(comment.bl.get_paged_link(current_user._get_current_object()))
 
     # При ошибках с AJAX не церемонимся и просто отсылаем строку с ошибками
     # (на фронтенде будет всплывашка в углу)
-    if extra_ajax and (form.errors or form.non_field_errors):
+    if extra_ajax and captcha_error:
+        return jsonify({
+            'success': False,
+            'error': captcha_error,
+            'captcha_html': render_template('captcha/captcha.html', captcha=current_app.captcha.generate()),
+        })
+    elif extra_ajax and (form.errors or form.non_field_errors):
         errors = sum(form.errors.values(), []) + form.non_field_errors
         errors = '; '.join(str(x) for x in errors)
-        return jsonify({'success': False, 'error': errors})
+        return jsonify({
+            'success': False,
+            'error': errors,
+            'captcha_html': render_template('captcha/captcha.html', captcha=current_app.captcha.generate()) if reqs.get('captcha') else None,
+        })
 
     # Здесь код рисования полноценной страницы с формой
     data = {
@@ -114,6 +134,8 @@ def add(target_attr, target, template, template_ajax=None, template_ajax_modal=F
         'edit': False,
         'preview_html': preview_html,
         'robots_noindex': True,
+        'comment_reqs': reqs,
+        'captcha_error': captcha_error,
     }
 
     if g.is_ajax and template_ajax:
@@ -177,6 +199,7 @@ def edit(target_attr, comment, template, template_ajax=None, template_ajax_modal
         'comment': comment,
         'edit': True,
         'preview_html': preview_html,
+        'comment_reqs': None,
         'robots_noindex': True,
     }
 

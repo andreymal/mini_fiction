@@ -118,9 +118,9 @@ class NewsItemBL(BaseBL, Commentable):
         from mini_fiction.models import NewsComment
         return NewsComment.bl.has_comments_access(self.model, author)
 
-    def can_comment_by(self, author=None):
+    def access_for_commenting_by(self, author=None):
         from mini_fiction.models import NewsComment
-        return NewsComment.bl.can_comment_by(self.model, author)
+        return NewsComment.bl.access_for_commenting_by(self.model, author)
 
     def create_comment(self, author, ip, data):
         from mini_fiction.models import NewsComment

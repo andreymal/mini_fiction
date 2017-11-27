@@ -253,6 +253,19 @@ class Config(object):
 
     NSFW_RATING_IDS = (1,)
 
+    CAPTCHA_CLASS = None
+    CAPTCHA_FOR_GUEST_COMMENTS = False
+
+    # PyCaptcha config
+    PYCAPTCHA_FONTS = [
+        os.path.join(os.path.dirname(__file__), 'static', 'fonts', 'PTC75F.ttf'),
+    ]
+    PYCAPTCHA_CACHE_PREFIX = 'pycaptcha_'
+    PYCAPTCHA_CHARS = 'ABCDEFGHJKLMNPQRSTUWXYZ23456789'
+    PYCAPTCHA_CASE_SENSITIVE = False
+    PYCAPTCHA_LENGTH = 7
+
+    # ReCaptcha config
     RECAPTCHA_USE_SSL = True
     RECAPTCHA_PUBLIC_KEY = ''
     RECAPTCHA_PRIVATE_KEY = ''

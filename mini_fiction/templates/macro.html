@@ -41,7 +41,7 @@
 {% endmacro %}
 
 
-{% macro comment_form_content(form, objtype=None, objid=None, parent=None, preview_html=None) %}
+{% macro comment_form_content(form, objtype=None, objid=None, parent=None, preview_html=None, reqs=None) %}
     <div class="comment-form-content">
     {{ form.csrf_token() }}
     <input type="hidden" name="parent" value="{{ parent or '0' }}" />
@@ -54,6 +54,17 @@
                 <span class="help-inline">{{ error }}</span>
             {% endfor %}
         {% endif %}
+    </div>
+    <div class="control-group{% if captcha_error %} error{% endif %} js-captcha-field"{% if not reqs or not reqs.captcha %} style="display: none;"{% endif %}>
+        {% if captcha_error %}<span class="help-inline">{{ captcha_error }}</span>{% endif %}
+        <div class="controls">
+            <div>Докажите, что вы не робот:</div>
+            <div class="captcha-wrap js-captcha-wrap">
+                {%- if reqs and reqs.captcha %}{% with captcha = generate_captcha() %}{% if captcha.cls %}
+                    {%- include 'captcha/captcha.html' with context -%}
+                {% endif %}{% endwith %}{% endif -%}
+            </div>
+        </div>
     </div>
     {% if form.non_field_errors %}
     {% for message in form.non_field_errors %}
@@ -127,7 +138,7 @@
             <a class="comment-parent-link" href="{{ comment.parent.bl.get_permalink() }}" title="Ответ на комментарий #{{ comment.parent.local_id }} от {{ comment.parent.author.username if comment.parent.author else (comment.parent.author_username or 'гостя') }}">↑</a>
             {%- endif %}
 
-            {%- if comment.bl.can_answer_by(current_user) %}
+            {%- if comment.bl.access_for_answer_by(current_user) %}
             <a class="comment-answer-link" data-parent="{{ comment.local_id }}" href="{{ comment.bl.get_answer_link() }}">Ответить</a>
             {{ caller() if caller else '' }}
             {%- endif %}

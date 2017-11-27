@@ -1,0 +1,5 @@
+<div>
+    <input type="hidden" name="captcha_id" value="{{ captcha.pycaptcha_id }}" />
+    <img src="{{ url_for('pycaptcha.captcha_view', captcha_id=captcha.pycaptcha_id) }}" alt="" /><br/>
+    <input type="text" name="captcha_solution" placeholder="Введите буквы и цифры с картинки" style="width: 250px;" />
+</div>

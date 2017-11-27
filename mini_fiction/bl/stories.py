@@ -727,9 +727,9 @@ class StoryBL(BaseBL, Commentable):
         from mini_fiction.models import StoryComment
         return StoryComment.bl.has_comments_access(self.model, author)
 
-    def can_comment_by(self, author=None):
+    def access_for_commenting_by(self, author=None):
         from mini_fiction.models import StoryComment
-        return StoryComment.bl.can_comment_by(self.model, author)
+        return StoryComment.bl.access_for_commenting_by(self.model, author)
 
     def create_comment(self, author, ip, data):
         from mini_fiction.models import StoryComment
@@ -861,9 +861,9 @@ class StoryLocalThreadBL(BaseBL, Commentable):
         from mini_fiction.models import StoryLocalComment
         return StoryLocalComment.bl.has_comments_access(self.model, author)
 
-    def can_comment_by(self, author=None):
+    def access_for_commenting_by(self, author=None):
         from mini_fiction.models import StoryLocalComment
-        return StoryLocalComment.bl.can_comment_by(self.model, author)
+        return StoryLocalComment.bl.access_for_commenting_by(self.model, author)
 
     def create_comment(self, author, ip, data):
         from mini_fiction.models import StoryLocalComment

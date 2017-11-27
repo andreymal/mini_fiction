@@ -1,0 +1,7 @@
+{% if captcha.cls == 'mini_fiction.captcha.ReCaptcha' %}
+    {%- include 'captcha/recaptcha.html' with context -%}
+{% elif captcha.cls == 'mini_fiction.captcha.PyCaptcha' %}
+    {%- include 'captcha/pycaptcha.html' with context -%}
+{% else %}
+<span style="color: red">Неизвестная капча, сообщите администратору сайта об ошибке</span>
+{% endif %}

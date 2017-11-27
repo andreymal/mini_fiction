@@ -42,12 +42,13 @@
             </div>
         </div>
 
-        {% if newsitem.bl.can_comment_by(current_user) %}
+        {% set comment_reqs = newsitem.bl.access_for_commenting_by(current_user) %}
+        {% if comment_reqs %}
             <a href="{{ url_for('news_comment.add', news_id=newsitem.id) }}" id="comment-add-link" class="comment-add-link">Добавить новый комментарий</a>
 
             <form id="comment-form" class="comment-form" method="POST" enctype="multipart/form-data" action="{{- url_for('news_comment.add', news_id=newsitem.id) -}}">
             {% from 'macro.html' import comment_form_content with context %}
-            {{ comment_form_content(comment_form) }}
+            {{ comment_form_content(comment_form, reqs=comment_reqs) }}
             </form>
         {% elif current_user.is_authenticated %}
         <h3 id="banned">К сожалению, Вы не можете добавлять комментарии</h3>

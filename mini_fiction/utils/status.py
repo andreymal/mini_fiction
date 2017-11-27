@@ -93,6 +93,7 @@ class ProjectStatus(Status):
         'celery': 'Celery',
         'diff': 'google-diff-match-patch',
         'linter': 'Chapter linter',
+        'captcha': 'Captcha',
     }
 
     def cache(self):
@@ -281,6 +282,17 @@ class ProjectStatus(Status):
         else:
             return self._ok('linter', self.app.config['CHAPTER_LINTER'])
 
+    def captcha(self):
+        if not self.app.captcha:
+            return self._ok('captcha', 'not configured')
+
+        try:
+            if not isinstance(self.app.captcha.generate(lazy=False), dict):
+                raise TypeError('Generated captcha info is not dict')
+        except Exception as exc:
+            return self._fail('captcha', self.app.config['CAPTCHA_CLASS'] + ' (fail: {})'.format(exc))
+        return self._ok('captcha', self.app.config['CAPTCHA_CLASS'])
+
     def generate(self):
         yield self.cache()
         yield self.cache_working()
@@ -295,6 +307,7 @@ class ProjectStatus(Status):
         yield self.celery()
         yield self.diff()
         yield self.linter()
+        yield self.captcha()
 
 
 class UsersStatus(Status):

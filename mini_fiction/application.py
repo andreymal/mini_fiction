@@ -61,6 +61,7 @@ def create_app():
     if not app.config['SPHINX_DISABLED']:
         configure_search(app)
     configure_celery(app)
+    configure_captcha(app)
     configure_misc(app)
     configure_development(app)
 
@@ -256,7 +257,7 @@ def configure_templates(app):
     from mini_fiction.templatetags import random_stories, logopic, submitted_stories_count
     from mini_fiction.templatetags import story_comments_delta, html_block, hook, shown_newsitem
     from mini_fiction.templatetags import get_comment_threshold, notifications, misc
-    from mini_fiction.templatetags import i18n
+    from mini_fiction.templatetags import i18n, generate_captcha
     from mini_fiction.templatetags import registry
     app.templatetags = dict(registry.tags)
 
@@ -291,6 +292,19 @@ def configure_celery(app):
     app.celery.Task = ContextTask
 
     tasks.apply_for_app(app)
+
+
+def configure_captcha(app):
+    captcha_path = app.config.get('CAPTCHA_CLASS')
+    if not captcha_path or '.' not in captcha_path:
+        app.captcha = None
+        return
+
+    module, cls = captcha_path.rsplit('.', 1)
+    Captcha = getattr(importlib.import_module(module), cls)
+    del module, cls
+
+    app.captcha = Captcha(app)
 
 
 def configure_misc(app):

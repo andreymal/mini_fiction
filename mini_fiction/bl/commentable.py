@@ -9,8 +9,8 @@ class Commentable(object):
         # it should be redirected to FooComment.bl.has_comments_access
         raise NotImplementedError
 
-    def can_comment_by(self, author=None):
-        # it should be redirected to FooComment.bl.can_comment_by
+    def access_for_commenting_by(self, author=None):
+        # it should be redirected to FooComment.bl.access_for_commenting_by
         raise NotImplementedError
 
     def create_comment(self, author, ip, data):

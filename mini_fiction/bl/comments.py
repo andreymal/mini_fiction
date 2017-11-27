@@ -69,13 +69,41 @@ class BaseCommentBL(BaseBL):
     def has_comments_access(self, target, author=None):
         return True
 
-    def can_comment_by(self, target, author=None):
-        return self.has_comments_access(target, author)
+    def access_for_commenting_by(self, target, author=None):
+        '''Возвращает словарь с информацией о требованиях, предъявляемых
+        к автору комментария (должен ли заполнить капчу или нет). Если доступа
+        нет никакого, возвращает пустой словарь или None.
 
-    def can_answer_by(self, author=None):
+        :param target: экземпляр модели, к комментариям которой нужен доступ
+        :param Author author: модель пользователя, который желает оставить
+          комментарий
+        :rtype: dict или None
+        '''
+
+        if not self.has_comments_access(target, author):
+            return None
+        return {'captcha': bool(
+            current_app.captcha and
+            current_app.config.get('CAPTCHA_FOR_GUEST_COMMENTS') and
+            (not author or not author.is_authenticated)
+        )}
+
+    def access_for_answer_by(self, author=None):
+        '''Возвращает словарь с информацией о требованиях, предъявляемых
+        к автору ответа на данный комментарий (должен ли заполнить капчу
+        или нет). Если доступа нет никакого (например, данный комментарий
+        удалён), возвращает пустой словарь или None.
+
+        :param Author author: модель пользователя, который желает оставить
+          комментарий
+        :rtype: dict или None
+        '''
+
         c = self.model
         target = getattr(c, self.target_attr)
-        return not c.deleted and type(c).bl.can_comment_by(target, author)
+        if c.deleted:
+            return None
+        return type(c).bl.access_for_commenting_by(target, author)
 
     def can_delete_or_restore_by(self, author=None):
         return author and author.is_staff
@@ -99,8 +127,13 @@ class BaseCommentBL(BaseBL):
     def create(self, target, author, ip, data):
         if self.schema is None:
             raise NotImplementedError
-        if not self.can_comment_by(target, author):
+        reqs = self.access_for_commenting_by(target, author)
+        if not reqs:  # нет доступа
             raise ValueError('Permission denied')  # TODO: refactor exceptions
+
+        if reqs.get('captcha'):
+            if current_app.captcha:
+                current_app.captcha.check_or_raise(data)
 
         if self.schema:
             data = Validator(self.schema).validated(data)
@@ -109,7 +142,7 @@ class BaseCommentBL(BaseBL):
             parent = target.comments.select(lambda x: x.local_id == data['parent'] and not x.deleted).first()
             if not parent:
                 raise ValidationError({'parent': [lazy_gettext('Parent comment not found')]})
-            if not parent.bl.can_answer_by(author):
+            if not parent.bl.access_for_answer_by(author):
                 raise ValueError('Permission denied')
         else:
             parent = None
@@ -190,7 +223,7 @@ class BaseCommentBL(BaseBL):
             return False
         if author.is_staff:
             return True
-        if not self.can_comment_by(getattr(c, self.target_attr), author):
+        if not self.access_for_commenting_by(getattr(c, self.target_attr), author):
             return False
         if c.author is None or c.author.id != author.id:
             return False
@@ -261,14 +294,15 @@ class StoryCommentBL(BaseCommentBL):
     def has_comments_access(self, target, author=None):
         return target.bl.has_access(author)
 
-    def can_comment_by(self, target, author=None):
+    def access_for_commenting_by(self, target, author=None):
+        reqs = super().access_for_commenting_by(target, author)
         if author and author.is_staff:
-            return True
+            return reqs
         if not target.published:
-            return False
+            return None
         if (not author or not author.is_authenticated) and not current_app.config['STORY_COMMENTS_BY_GUEST']:
-            return False
-        return target.bl.has_access(author)
+            return None
+        return reqs
 
     def get_permalink(self, _external=False):
         c = self.model
@@ -338,8 +372,11 @@ class StoryLocalCommentBL(BaseCommentBL):
     def has_comments_access(self, target, author=None):
         return author and author.is_staff or target.story.bl.is_contributor(author)
 
-    def can_comment_by(self, target, author=None):
-        return author and author.is_staff or target.story.bl.is_contributor(author)
+    def access_for_commenting_by(self, target, author=None):
+        reqs = reqs = target.story.bl.access_for_commenting_by(author)
+        if author and author.is_staff or target.story.bl.is_contributor(author):
+            return reqs
+        return None
 
     def get_permalink(self, _external=False):
         c = self.model
@@ -394,10 +431,10 @@ class NewsCommentBL(BaseCommentBL):
     can_vote = True
     schema = NEWS_COMMENT
 
-    def can_comment_by(self, target, author=None):
+    def access_for_commenting_by(self, target, author=None):
         if (not author or not author.is_authenticated) and not current_app.config['NEWS_COMMENTS_BY_GUEST']:
             return False
-        return True
+        return super().access_for_commenting_by(target, author)
 
     def get_permalink(self, _external=False):
         c = self.model

@@ -196,6 +196,7 @@ class ReCaptcha(BaseCaptcha):
             raise ValueError('RECAPTCHA_PUBLIC_KEY and RECAPTCHA_PRIVATE_KEY configs are required')
         self.key = app.config['RECAPTCHA_PUBLIC_KEY']
         self.private_key = app.config['RECAPTCHA_PRIVATE_KEY']
+        self.user_agent = app.user_agent
 
     def generate(self, lazy=True):
         return {'cls': 'mini_fiction.captcha.ReCaptcha', 'recaptcha_key': self.key}
@@ -208,11 +209,9 @@ class ReCaptcha(BaseCaptcha):
         if not resp or not isinstance(resp, str) or len(resp) > 8192:
             return False
 
-        import mini_fiction
-
         req = Request('https://www.google.com/recaptcha/api/siteverify')
         req.add_header('Content-Type', 'application/x-www-form-urlencoded')
-        req.add_header('User-Agent', 'mini_fiction/{}'.format(mini_fiction.__version__))
+        req.add_header('User-Agent', self.user_agent)
         req.data = 'secret={}&response={}'.format(
             quote(self.private_key), quote(resp)
         ).encode('utf-8')

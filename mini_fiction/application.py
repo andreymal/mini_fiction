@@ -4,6 +4,7 @@
 # pylint: disable=unused-variable
 
 import os
+import sys
 import logging
 import importlib
 from datetime import datetime
@@ -48,6 +49,7 @@ def create_app():
 
     init_bl()
 
+    configure_user_agent(app)
     configure_i18n(app)
     configure_cache(app)
     configure_forms(app)
@@ -71,6 +73,49 @@ def create_app():
     database.configure_for_app(app)
 
     return app
+
+
+def configure_user_agent(app):
+    # pylint: disable=E1101
+
+    if app.config.get('USER_AGENT'):
+        app.user_agent = str(app.config.get('USER_AGENT'))
+        return
+
+    import platform
+    import urllib.request as urequest
+
+    import mini_fiction
+
+    context = {
+        'system': platform.system() or 'NA',
+        'machine': platform.machine() or 'NA',
+        'release': platform.release() or 'NA',
+        'pyi': platform.python_implementation() or 'Python',
+        'pyv': platform.python_version(),
+        'pyiv': platform.python_version(),
+        'urv': urequest.__version__,
+        'mfv': mini_fiction.__version__,
+    }
+    if context['pyi'] == 'PyPy':
+        context['pyiv'] = '{}.{}.{}'.format(
+            sys.pypy_version_info.major,
+            sys.pypy_version_info.minor,
+            sys.pypy_version_info.micro,
+        )
+        if sys.pypy_version_info.releaselevel != 'final':
+            context['pyiv'] = context['pyiv'] + sys.pypy_version_info.releaselevel
+
+    app.user_agent = (
+        'mini_fiction/{mfv} ({system} {machine} {release}) '
+        'Python/{pyv} {pyi}/{pyiv} urllib/{urv}'
+    ).format(**context)
+
+    postfix = None
+    if app.config.get('USER_AGENT_POSTFIX'):
+        postfix = str(app.config.get('USER_AGENT_POSTFIX')).strip()
+    if postfix:
+        app.user_agent += ' ' + postfix
 
 
 def configure_i18n(app):

@@ -17,6 +17,9 @@ class Config(object):
     SECRET_KEY = 'mnwpNkTYhFeu57Fc9WjVbw7DidbkZoVe'
     SYSTEM_USER_ID = -1
 
+    USER_AGENT = None  # generated in application.py
+    USER_AGENT_POSTFIX = ''
+
     CHAPTER_LINTER = 'mini_fiction.linters.DefaultChapterLinter'
     PLUGINS = []
 

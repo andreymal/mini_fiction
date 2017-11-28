@@ -219,7 +219,7 @@ class ReCaptcha(BaseCaptcha):
 
         try:
             answer = urlopen(req, timeout=20).read()
-            answer = dict(json.loads(answer))
+            answer = dict(json.loads(answer.decode('utf-8')))
         except Exception:
             return False
 

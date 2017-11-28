@@ -2,7 +2,8 @@ factory-boy
 pytest-selenium
 pytest-flask
 pytest-cov
-pytest>=2.9.1
+pytest-metadata>=1.5.1
+pytest>=3.3.0
 tox
 # Travis CI
 py>=1.4.29

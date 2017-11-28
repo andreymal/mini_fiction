@@ -349,23 +349,24 @@ class StoryBL(BaseBL, Commentable):
         # Да-да, поне надо помогать
         orm.select(c for c in StoryCommentVote if c.comment in story.comments).delete(bulk=True)
         orm.select(c for c in StoryCommentEdit if c.comment in story.comments).delete(bulk=True)
-        story.comments.select().order_by(StoryComment.id.desc()).delete()
+        story.comments.select().order_by(StoryComment.id.desc()).delete(bulk=False)  # поня не может bulk
 
         if local_thread_id is not None:
             local_comment_ids = orm.select(x.id for x in StoryLocalComment if x.local.id == local_thread_id)[:]
             Notification.select(
                 lambda x: x.type in ('story_lreply', 'story_lcomment') and x.target_id in local_comment_ids
             ).delete(bulk=True)
-            orm.select(c for c in StoryLocalCommentEdit if c.comment.id in local_comment_ids).delete()
-            story.local.comments.select().order_by(StoryLocalComment.id.desc()).delete()
+            orm.select(c for c in StoryLocalCommentEdit if c.comment.id in local_comment_ids).delete(bulk=True)
+            story.local.comments.select().order_by(StoryLocalComment.id.desc()).delete(bulk=True)
 
         # Не помню почему, но почему-то там Optional
-        story.story_views_set.select().delete()
-        story.activity.select().delete()
-        story.votes.select().delete()
+        story.story_views_set.select().delete(bulk=True)
+        story.activity.select().delete(bulk=True)
+        story.votes.select().delete(bulk=True)
 
         # Остальные связи Pony ORM осилит
         story.delete()
+        orm.flush()
 
     def viewed(self, user):
         if not user.is_authenticated:

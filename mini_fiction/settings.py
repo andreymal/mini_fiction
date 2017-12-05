@@ -201,6 +201,7 @@ class Config(object):
 
     STORY_DOWNLOAD_FORMATS = tuple(reversed((
         'mini_fiction.downloads.fb2.FB2Download',
+        # 'mini_fiction.downloads.fb2.FB2ZipDownload',
         'mini_fiction.downloads.html.HTMLDownload',
         # 'mini_fiction.downloads.txt.TXTDownload',
         # 'mini_fiction.downloads.txt.TXT_CP1251Download',

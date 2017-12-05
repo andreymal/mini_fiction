@@ -372,6 +372,7 @@ class Story(db.Entity):
         for f in list_formats():
             downloads.append({
                 'format': f,
+                'cls': f.name.lower().replace('+', '-').replace('/', '-'),
                 'url': f.url(self),
             })
         return downloads

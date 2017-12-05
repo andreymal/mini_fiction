@@ -24,6 +24,9 @@ class BaseDownloadFormat(object):
             filename=slugify(story.title or str(story.id)) + '.' + self.extension,
         )
 
+    def render(self, **kw):
+        raise NotImplementedError
+
     @property
     def slug(self):
         return slugify(str(self.name.lower()))

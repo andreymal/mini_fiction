@@ -1027,7 +1027,7 @@ select.select-size {
     background: transparent url('../i/html.png') no-repeat 0 0;
 }
 
-.fb2 {
+.fb2, .fb2-zip {
     background: transparent url('../i/fb2.png') no-repeat 0 0;
 }
 

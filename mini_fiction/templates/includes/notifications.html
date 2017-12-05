@@ -59,6 +59,7 @@
         в ответ на ваш комментарий к рассказу
         <a href="{{ url_for('story.view', pk=item.story.id) }}"><b>{{ item.story.title }}</b></a>
         </span>
+        <a class="comment-answer-link" href="{{ url_for('story_comment.add', story_id=item.story.id, parent=item.comment.local_id) }}">Ответить</a>
     {% endcall %}
 </div>
 
@@ -69,6 +70,7 @@
         к рассказу
         <a href="{{ url_for('story.view', pk=item.story.id) }}"><b>{{ item.story.title }}</b></a>
         </span>
+        <a class="comment-answer-link" href="{{ url_for('story_comment.add', story_id=item.story.id, parent=item.comment.local_id) }}">Ответить</a>
     {% endcall %}
 </div>
 
@@ -85,9 +87,10 @@
     {%- endif -%}:</div>
     {% call nc.notification_comment_html(item.comment) %}
         <span class="comment-story-link">
-        в ответ на ваш комментарий к редакторской рассказа
+        в ответ на ваш комментарий в <a href="{{ url_for('story_local_comment.view', story_id=item.story.id) }}" class="link-inline">редакторской</a> рассказа
         <a href="{{ url_for('story.view', pk=item.story.id) }}"><b>{{ item.story.title }}</b></a>
         </span>
+        <a class="comment-answer-link" href="{{ url_for('story_local_comment.add', story_id=item.story.id, parent=item.comment.local_id) }}">Ответить</a>
     {% endcall %}
 </div>
 
@@ -107,6 +110,7 @@
         в редакторской рассказа
         <a href="{{ url_for('story.view', pk=item.story.id) }}"><b>{{ item.story.title }}</b></a>
         </span>
+        <a class="comment-answer-link" href="{{ url_for('story_local_comment.add', story_id=item.story.id, parent=item.comment.local_id) }}">Ответить</a>
     {% endcall %}
 </div>
 
@@ -117,6 +121,7 @@
         в ответ на ваш комментарий к новости
         <a href="{{ url_for('news.show', name=item.newsitem.name) }}"><b>{{ item.newsitem.title }}</b></a>
         </span>
+        <a class="comment-answer-link" href="{{ url_for('news_comment.add', news_id=item.newsitem.id, parent=item.comment.local_id) }}">Ответить</a>
     {% endcall %}
 </div>
 
@@ -127,6 +132,7 @@
         к новости
         <a href="{{ url_for('news.show', name=item.newsitem.name) }}"><b>{{ item.newsitem.title }}</b></a>
         </span>
+        <a class="comment-answer-link" href="{{ url_for('news_comment.add', news_id=item.newsitem.id, parent=item.comment.local_id) }}">Ответить</a>
     {% endcall %}
 </div>
 

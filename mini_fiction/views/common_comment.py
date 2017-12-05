@@ -59,9 +59,14 @@ def add(target_attr, target, template, template_ajax=None, template_ajax_modal=F
     # Проверки доступа (дублируются в Comment.bl.create, но здесь они тоже нужны,
     # чтобы пользователь не получил содержимое parent, когда доступа не должно быть)
     if parent and not parent.bl.access_for_answer_by(user):
+        if request.method != 'POST':
+            return redirect(parent.bl.get_paged_link(user))
         abort(403)
+
     reqs = target.bl.access_for_commenting_by(user)
     if not reqs:
+        if request.method != 'POST':
+            return redirect(parent.bl.get_paged_link(user))
         abort(403)
 
     extra_ajax = g.is_ajax and request.form.get('extra_ajax') == '1'

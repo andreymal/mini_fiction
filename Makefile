@@ -58,7 +58,7 @@ test-all:
 
 coverage:
 	$(PIP) install -r test-requirements.txt
-	py.test --cov=mini_fiction --cov-report=html tests
+	py.test --cov=mini_fiction --cov-report=html --cov-branch tests
 	ls -lh htmlcov/index.html
 
 release: clean

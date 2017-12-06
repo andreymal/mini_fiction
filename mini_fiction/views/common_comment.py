@@ -65,7 +65,7 @@ def add(target_attr, target, template, template_ajax=None, template_ajax_modal=F
 
     reqs = target.bl.access_for_commenting_by(user)
     if not reqs:
-        if request.method != 'POST':
+        if parent and request.method != 'POST':
             return redirect(parent.bl.get_paged_link(user))
         abort(403)
 

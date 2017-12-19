@@ -31,11 +31,15 @@
 </xsl:template>
 
 <xsl:template match="body|footnote|annotation" mode="section-content">
-    <xsl:apply-templates select="p" mode="paragraphs"/>
+    <xsl:apply-templates select="p|blockquote" mode="paragraphs"/>
 </xsl:template>
 
 <xsl:template match="p" mode="paragraphs">
     <p><xsl:apply-templates select="node()" mode="body"/></p>
+</xsl:template>
+
+<xsl:template match="blockquote" mode="paragraphs">
+    <cite><p><xsl:apply-templates select="node()" mode="body"/></p></cite>
 </xsl:template>
 
 <xsl:template match="node()" mode="paragraphs">

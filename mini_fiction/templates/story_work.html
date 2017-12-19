@@ -139,29 +139,16 @@
                         {% endif %}
                       </div>
                 </div>
-                <!-- Заморожен/активен -->
-                <div class="control-group{% if form.freezed.errors %} error{% endif %}">
-                    {{ form.freezed.label(class_='control-label', for=False) }}
-                    <div class="controls bootstrap radio">{{ form.freezed }}
-                        {% if form.freezed.errors %}
-                            {% for error in form.freezed.errors %}
+                <!-- Не завершен/завершен/заморожен -->
+                <div class="control-group{% if form.status.errors %} error{% endif %}">
+                    {{ form.status.label(class_='control-label', for=False) }}
+                    <div class="controls bootstrap radio">{{ form.status }}
+                        {% if form.status.errors %}
+                            {% for error in form.status.errors %}
                                 <span class="help-inline">{{ error }}</span>
                             {% endfor %}
                         {% else %}
-                            <span class="help-inline small">{{ form.freezed.description }}</span>
-                        {% endif %}
-                      </div>
-                </div>
-                <!-- Закончен/не закончен -->
-                <div class="control-group{% if form.finished.errors %} error{% endif %}">
-                    {{ form.finished.label(class_='control-label', for=False) }}
-                    <div class="controls bootstrap radio">{{ form.finished }}
-                        {% if form.finished.errors %}
-                            {% for error in form.finished.errors %}
-                                <span class="help-inline">{{ error }}</span>
-                            {% endfor %}
-                        {% else %}
-                            <span class="help-inline small">{{ form.finished.description }}</span>
+                            <span class="help-inline small">{{ form.status.description }}</span>
                         {% endif %}
                       </div>
                 </div>

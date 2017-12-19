@@ -17,7 +17,7 @@
     {% if not chapter_edit_mode %}
     {% if next_chapter %}
         <p><a href="{{ url_for('chapter.view', story_id=story.id, chapter_order=next_chapter.order) }}">Читать дальше</a></p>
-    {% elif not story.finished and not story.freezed and not allchapters %}
+    {% elif story.status_string == 'unfinished' and not allchapters %}
         <p><strong>Продолжение следует...</strong></p>
     {% endif %}
     {% endif %}

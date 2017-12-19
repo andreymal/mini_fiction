@@ -96,18 +96,10 @@ STORY = {
             'required': 'Нужно обязательно указать состояние рассказа!',
         },
     },
-    'freezed': {
-        'type': 'boolean',
+    'status': {
+        'type': 'string',
         'required': True,
-        'coerce': bool_coerce,
-        'error_messages': {
-            'required': 'Нужно обязательно указать статус рассказа!',
-        },
-    },
-    'finished': {
-        'type': 'boolean',
-        'required': True,
-        'coerce': bool_coerce,
+        'allowed': ['unfinished', 'finished', 'freezed'],
         'error_messages': {
             'required': 'Нужно обязательно указать статус рассказа!',
         },

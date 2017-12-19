@@ -57,10 +57,10 @@ class StoryBL(BaseBL, Commentable):
             summary=data['summary'],
             rating=data['rating'],
             original=data['original'],
-            freezed=data['freezed'],
+            freezed=data['status'] == 'freezed',
+            finished=data['status'] == 'finished',
             source_link=data['source_link'],
             source_title=data['source_title'],
-            finished=data['finished'],
             notes=data['notes'],
             draft=True,
             approved=approved,
@@ -111,7 +111,13 @@ class StoryBL(BaseBL, Commentable):
 
         edited_data = {}
 
-        for key in ('title', 'summary', 'notes', 'original', 'finished', 'freezed', 'source_link', 'source_title'):
+        if 'status' in data:
+            edited_data['freezed'] = [story.freezed, data['status'] == 'freezed']
+            edited_data['finished'] = [story.finished, data['status'] == 'finished']
+            story.freezed = edited_data['freezed'][1]
+            story.finished = edited_data['finished'][1]
+
+        for key in ('title', 'summary', 'notes', 'original', 'source_link', 'source_title'):
             if key in data and getattr(story, key) != data[key]:
                 edited_data[key] = [getattr(story, key), data[key]]
                 setattr(story, key, data[key])

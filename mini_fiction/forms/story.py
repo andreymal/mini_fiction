@@ -97,22 +97,13 @@ class StoryForm(Form):
         render_kw=radio_attrs,
     )
 
-    freezed = SelectField(
+    status = SelectField(
         'Состояние',
-        choices=[(0, 'Активен'), (1, 'Заморожен')],
+        choices=[(0, 'Не завершен'), (1, 'Завершен'), (2, 'Заморожен')],
         coerce=int,
         widget=StoriesButtons(),
         render_kw=radio_attrs,
         description='Активность рассказа (пишется ли он сейчас)'
-    )
-
-    finished = SelectField(
-        'Статус',
-        choices=[(0, 'Не закончен'), (1, 'Закончен')],
-        coerce=int,
-        widget=StoriesButtons(),
-        render_kw=radio_attrs,
-        description='Завершен ли рассказ'
     )
 
     classifications = LazySelectMultipleField(

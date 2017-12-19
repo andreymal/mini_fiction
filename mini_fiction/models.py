@@ -278,6 +278,8 @@ class Story(db.Entity):
     first_published_at = orm.Optional(datetime, 6, index=True)
     draft = orm.Required(bool, default=True)
     approved = orm.Required(bool, default=False)
+    # TODO: finished и freezed объединены в интерфейсе сайта,
+    # стоит объединить и в базе тоже
     finished = orm.Required(bool, default=False)
     freezed = orm.Required(bool, default=False)
     favorites = orm.Set('Favorites')
@@ -376,6 +378,14 @@ class Story(db.Entity):
                 'url': f.url(self),
             })
         return downloads
+
+    @property
+    def status_string(self):
+        if self.finished:
+            return 'finished'
+        if self.freezed:
+            return 'freezed'
+        return 'unfinished'
 
 
 class Chapter(db.Entity):

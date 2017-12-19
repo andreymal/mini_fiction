@@ -310,10 +310,17 @@ def edit_log(pk):
 def add():
     user = current_user._get_current_object()
     rating = Rating.select().order_by(Rating.id.desc()).first().id
-    form = StoryForm(data={'finished': 0, 'freezed': 0, 'original': 1, 'rating': rating})
+    form = StoryForm(data={'status': 0, 'original': 1, 'rating': rating})
     if form.validate_on_submit():
+        formdata = dict(form.data)
+        if formdata['status'] == 0:
+            formdata['status'] = 'unfinished'
+        elif formdata['status'] == 1:
+            formdata['status'] = 'finished'
+        elif formdata['status'] == 2:
+            formdata['status'] = 'freezed'
         try:
-            story = Story.bl.create([user], form.data)
+            story = Story.bl.create([user], formdata)
         except ValidationError as exc:
             form.set_errors(exc.errors)
         else:
@@ -352,8 +359,15 @@ def edit(pk):
         'source_link': story.source_link,
         'source_title': story.source_title,
     }
-    for key in ('title', 'summary', 'notes', 'original', 'finished', 'freezed'):
+    for key in ('title', 'summary', 'notes', 'original'):
         story_data[key] = getattr(story, key)
+
+    if story.finished:
+        story_data['status'] = 1
+    elif story.freezed:
+        story_data['status'] = 2
+    else:
+        story_data['status'] = 0
 
     action = request.form.get('act') if request.method == 'POST' else None
 
@@ -366,8 +380,15 @@ def edit(pk):
 
     if action == 'save_story':
         if form.validate_on_submit():
+            formdata = dict(form.data)
+            if formdata['status'] == 0:
+                formdata['status'] = 'unfinished'
+            elif formdata['status'] == 1:
+                formdata['status'] = 'finished'
+            elif formdata['status'] == 2:
+                formdata['status'] = 'freezed'
             try:
-                story = story.bl.update(user, form.data)
+                story = story.bl.update(user, formdata)
             except ValidationError as exc:
                 form.set_errors(exc.errors)
             else:

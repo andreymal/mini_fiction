@@ -267,7 +267,7 @@ ul.nav-main-links {
     width: 370px;
     overflow: visible;
     box-shadow: 0 0 6px rgba(0, 0, 0, 0.3);
-    z-index: 1;
+    z-index: 15;
 }
 
 .bell-popup-content {

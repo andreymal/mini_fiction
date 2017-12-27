@@ -1,5 +1,5 @@
 /*!
- * amajaxify.js (2017-09)
+ * amajaxify.js (2017-12)
  * License: MIT
  * Библиотека для загрузки загрузки страниц и отправки форм с помощью
  * ES6 fetch и HTML5 History API для разных ништяков.
@@ -173,7 +173,7 @@ var amajaxify = {
         this.state.isModalNow = options.isModalNow || false;
 
         // Нужно сохранить изначальный state в истории
-        this.updatePageState(null, null, this.state.isModalNow, {replaceState: true});
+        this.updatePageState(null, null, this.state.isModalNow, {noScroll: true, replaceState: true});
 
         // И ещё нужно сохранить уже выполненные скрипты, чтобы потом
         // при загрузке следующей страницы они не выполнялись повторно
@@ -221,6 +221,18 @@ var amajaxify = {
      */
     isModalNow: function() {
         return this.state.isModalNow;
+    },
+
+
+    /**
+     * Устанавливает новое значение минимальной прокрутки по вертикали,
+     * при которой прокручивать обратно наверх после замены содержимого
+     * страницы.
+     *
+     * @param {number} value - само значение
+     */
+    setScrollToTopFrom: function(value) {
+        this.scrollToTopFrom = value;
     },
 
 
@@ -526,6 +538,12 @@ var amajaxify = {
 
             // Позволяем обработчикам пошаманить по необходимости
             var readyContent = this._prepareContent(url, content, toModal);
+            if (readyContent.hasOwnProperty('noScroll')) {
+                // Обработчики prepare могут запретить прокрутку, если они
+                // уже сами всё сделали
+                options.noScroll = readyContent.noScroll;
+                delete readyContent.noScroll;
+            }
 
             if (this.updateModalFunc) {
                 this.updateModalFunc(null);
@@ -535,6 +553,9 @@ var amajaxify = {
             if (readyContent.title) {
                 this.setTitle(readyContent.title);
             }
+            // После setPageData значение прокрутки скаканёт, а нам нужно получить
+            // именно старое значение, так что сохраняем его в options
+            options.scrollTop = window.pageYOffset || document.documentElement.scrollTop || document.body.scrollTop;
             this.setPageData(readyContent.data);
             this.updatePageState(url, readyContent.title, false, options);
 
@@ -571,7 +592,7 @@ var amajaxify = {
         // Собираем необработанное и обработанное в кучу
         var readyContent = {};
         for (k in content) {
-            if (content.hasOwnProperty(k)) {
+            if (k != 'noScroll' && content.hasOwnProperty(k)) {
                 readyContent[k] = content[k];
             }
         }
@@ -633,7 +654,10 @@ var amajaxify = {
 
         this.state.isModalNow = isModalNow;
 
-        var scrollTop = window.pageYOffset || document.documentElement.scrollTop || document.body.scrollTop;
+        var scrollTop = options.scrollTop;
+        if (scrollTop === undefined || scrollTop === null) {
+            scrollTop = window.pageYOffset || document.documentElement.scrollTop || document.body.scrollTop;
+        }
         if (!options.noScroll && !this.state.isModalNow) {
             var elem = options.hash ? document.getElementById(options.hash) : null;
             if (elem && elem.scrollIntoView) {

@@ -880,6 +880,10 @@ label.gen input {
 
 }
 
+.footnote-back-links a {
+    text-decoration: none;
+}
+
 hr {
     border-top: 1px solid #aaa;
     border-bottom: 1px solid #ddd;

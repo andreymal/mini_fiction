@@ -41,13 +41,10 @@
 </xsl:template>
 
 <xsl:template name="back-links">
-	<xsl:value-of select="concat('[', count(preceding::footnote)+1, '] ')"/>
+	<sup><xsl:value-of select="count(preceding::footnote)+1"/>&#160;</sup>
 	<span class="footnote-back-links">
 	<xsl:for-each select="key('anchors', ancestor-or-self::footnote[last()]/@id)">
-		<a>
-			<xsl:attribute name="href">#<xsl:value-of select="generate-id(.)"/></xsl:attribute>
-			<xsl:value-of select="position()"/>
-		</a>
+		<a><xsl:attribute name="href">#<xsl:value-of select="generate-id(.)"/></xsl:attribute>↑</a>
 		<xsl:choose>
 			<xsl:when test="position() != last()">
 				<xsl:text>, </xsl:text>

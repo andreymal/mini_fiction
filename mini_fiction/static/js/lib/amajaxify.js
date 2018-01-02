@@ -388,7 +388,9 @@ var amajaxify = {
         var href = target.href;
         var host = (location.origin || (location.protocol + '//' + location.host));
 
-        // Если ссылка различается только якорем, то просто меняем его (браузер прокрутит всё сам)
+        // Если ссылка различается только якорем, то не делаем вообще ничего:
+        // браузер сам обновит location.hash и прокрутит до нужного объекта,
+        // а также запустит событие window.hashchange
         var h = href.indexOf('#');
         if (h > 0) {
             var currentPage = location.toString();
@@ -397,7 +399,6 @@ var amajaxify = {
             }
             var hrefPage = href.substring(0, h);
             if (currentPage == hrefPage) {
-                history.pushState(history.state, '', href.substring(h));
                 return;
             }
         }

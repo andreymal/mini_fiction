@@ -10,6 +10,7 @@ var story = {
     contributorsForm: null,
     _contributorsSendEventBinded: null,
     _contributorsChangeEventBinded: null,
+    _hashChangeEventBinded: null,
 
     _preview: {
         btn: null,
@@ -543,6 +544,12 @@ var story = {
         this.setChapterIndentFromLocalStorage();
 
         panelElem.classList.remove('no-js');
+
+        // Из-за того, что панель занимает место вверху страницы, прокрутка
+        // до элементов по хэшу в адресе приводит к залезанию контента
+        // под панель; в обработчике будем это фиксить
+        this._hashChangeEventBinded = this._hashChangeEvent.bind(this);
+        window.addEventListener('hashchange', this._hashChangeEventBinded);
     },
 
     removePanel: function() {
@@ -556,6 +563,7 @@ var story = {
         var scrollDiv = document.getElementById('toTop');
         scrollDiv.removeEventListener('click', this.panel.eventToTop);
 
+        window.removeEventListener('hashchange', this._hashChangeEventBinded);
         window.removeEventListener('resize', this.panel.eventResize);
         window.removeEventListener('scroll', this.panel.event);
         this.panel.stub.parentNode.removeChild(this.panel.stub);
@@ -777,6 +785,13 @@ var story = {
         if (scrollingOrigin !== null) {
             common.restoreScrollByOrigin(scrollingOrigin[0], scrollingOrigin[1], scrollingOrigin[2]);
         }
+    },
+
+    _hashChangeEvent: function() {
+        if (!this.panel || !this.panel.isFixed) {
+            return;
+        }
+        window.scrollBy(0, -this.panel.dom.getBoundingClientRect().height);
     },
 
     chapterPreviewStuff: function() {

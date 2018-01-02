@@ -1,6 +1,6 @@
 'use strict';
 
-/* global amajaxify: false, core: false, captcha: false */
+/* global amajaxify: false, core: false, captcha: false, common: false */
 
 
 var comments = {
@@ -193,6 +193,7 @@ var comments = {
     _submittedFormEvent: function(data, parentComment) {
         var form = this.form;
 
+        common.formSavingGetSavedFields();  // чистит сохранённые формы по команде из кук
         this._updateCaptchaField(data.captcha_html);
 
         if (core.handleResponse(data, form.action)) {

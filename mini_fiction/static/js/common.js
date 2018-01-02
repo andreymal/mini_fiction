@@ -8,6 +8,8 @@ var common = {
     subforms: [],
     _subformSubmitBinded: null,
     _pasteEvents: [],
+    _formSavingFields: {},
+    _formSavingTask: null,
 
     allowedTags: null,
 
@@ -34,6 +36,8 @@ var common = {
         }
 
         this._subformSubmitBinded = this._subformSubmitEvent.bind(this);
+
+        window.addEventListener('unload', this.formSavingDestroy.bind(this));
     },
 
     load: function(content) {
@@ -41,6 +45,7 @@ var common = {
         this.markitupFor(content);
         this.buttonsFor(content);
         this.bootstrapFor(content);
+        this.formSavingFor(content);
 
         // Переключение мобильного меню
         document.getElementById('mobile-menu-btn').addEventListener('click', function(event) {
@@ -87,6 +92,7 @@ var common = {
         }
         this.subforms = [];
         this.markitupDestroy(content);
+        this.formSavingDestroy(content);
     },
 
     unloadModal: function(content) {
@@ -392,6 +398,132 @@ var common = {
             console.error(e);
             alert('Paste fail: ' + e);
         }
+    },
+
+    // Сохранение содержимого, введённого в некоторых формах, и его
+    // восстановление после перезагрузки страницы
+
+    formSavingFor: function(content) {
+        if (!window.localStorage) {
+            return;
+        }
+
+        var formsavingFields = content.getElementsByClassName('js-form-saving');
+
+        var savedFields = this.formSavingGetSavedFields();
+
+        var count = 0;
+        var group, key;
+        for (var i = 0; i < formsavingFields.length; i++) {
+            var field = formsavingFields[i];
+
+            group = field.getAttribute('data-formgroup');
+            key = field.getAttribute('data-formsaving');
+            if (!key || !group) {
+                console.warn('Formsaving field has no key/group');
+                continue;
+            }
+            if (this._formSavingFields.hasOwnProperty(group) && this._formSavingFields[group].hasOwnProperty(key)) {
+                console.warn('Formsaving conflict: ' + group + '/' + key);
+                continue;
+            }
+
+            if (!this._formSavingFields.hasOwnProperty(group)) {
+                this._formSavingFields[group] = {};
+            }
+            this._formSavingFields[group][key] = {dom: field, value: field.value};
+            count++;
+        }
+
+        for (group in this._formSavingFields) {
+            var fields = this._formSavingFields[group];
+
+            // Считаем, пусты ли поля группы
+            var empty = true;
+            for (key in fields) {
+                if (fields[key].value) {
+                    empty = false;
+                    break;
+                }
+            }
+
+            // Если пусты, то загружаем значения из localStorage
+            if (empty) {
+                for (key in fields) {
+                    if (savedFields.hasOwnProperty(group)) {
+                        fields[key].dom.value = fields[key].value = (savedFields[group][key] || '');
+                    }
+                }
+            }
+        }
+
+        if (count > 0 && this._formSavingTask === null) {
+            this._formSavingTask = setInterval(this.formSavingSave.bind(this), 10000);
+        } else if (count === 0 && this._formSavingTask !== null) {
+            clearInterval(this._formSavingTask);
+            this._formSavingTask = null;
+        }
+    },
+
+    formSavingGetSavedFields: function(savedFields) {
+        if (savedFields === undefined) {
+            try {
+                savedFields = JSON.parse(localStorage.savedfields || '{}');
+            } catch (e) {
+                console.warn('Cannot parse localStoage.savedfields: ' + e);
+                savedFields = {};
+            }
+        }
+
+        // В куках сервер мог попросить почистить localStorage; выполняем его просьбу
+        var clearGroups = document.cookie.match('formsaving_clear=(.+?)(;|$)');
+        if (clearGroups && clearGroups.length >= 2) {
+            clearGroups = clearGroups[1].split(',');
+            for (var i = 0; i < clearGroups.length; i++) {
+                delete savedFields[clearGroups[i]];
+            }
+            localStorage.savedfields = JSON.stringify(savedFields);
+            document.cookie = 'formsaving_clear=none; path=/; expires=' + (new Date(0)).toUTCString();
+        }
+
+        return savedFields;
+    },
+
+    formSavingDestroy: function() {
+        if (this._formSavingTask !== null) {
+            clearInterval(this._formSavingTask);
+            this._formSavingTask = null;
+        }
+        this.formSavingSave();
+        this._formSavingFields = {};
+    },
+
+    formSavingSave: function() {
+        if (!window.localStorage) {
+            return;
+        }
+
+        var changed = false;
+        var data = {};
+
+        for (var group in this._formSavingFields) {
+            data[group] = {};
+
+            var fields = this._formSavingFields[group];
+            for (var key in fields) {
+                var field = fields[key];
+                data[group][key] = field.dom.value;
+                if (field.dom.value !== field.value) {
+                    changed = true;
+                }
+            }
+        }
+
+        if (changed) {
+            localStorage.savedfields = JSON.stringify(data);
+        }
+
+        return changed;
     }
 };
 

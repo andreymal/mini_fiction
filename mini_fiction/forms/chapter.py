@@ -9,15 +9,15 @@ from mini_fiction.widgets import ServiceButtonWidget
 
 class ChapterForm(Form):
     """ Форма добавления новой главы к рассказу """
-    textarea_dict = {'class': 'input-xxlarge chapter-textarea with-markitup'}
-    attrs_dict = {'class': 'input-xxlarge'}
+    textarea_dict = {'class': 'input-xxlarge chapter-textarea with-markitup js-form-saving'}
+    attrs_dict = {'class': 'input-xxlarge js-form-saving'}
 
     title = TextField(
         'Название',
         [
             validators.Length(min=0, max=512)
         ],
-        render_kw=dict(attrs_dict, maxlength=512, placeholder='Заголовок главы (необязательно)')
+        render_kw=dict(attrs_dict, data_formsaving='chapter_title', data_formgroup='chapter', maxlength=512, placeholder='Заголовок главы (необязательно)')
     )
 
     notes = TextAreaField(
@@ -25,7 +25,7 @@ class ChapterForm(Form):
         [
             validators.Length(max=4096)
         ],
-        render_kw=dict(textarea_dict, placeholder='Заметки к главе', cols=40, rows=4, id='id_notes'),
+        render_kw=dict(textarea_dict, data_formsaving='chapter_notes', data_formgroup='chapter', placeholder='Заметки к главе', cols=40, rows=4, id='id_notes'),
         description='Заметки автора к главе'
     )
 
@@ -34,5 +34,5 @@ class ChapterForm(Form):
         [
             validators.Length(max=300000)
         ],
-        render_kw=dict(textarea_dict, placeholder='Текст новой главы', cols=40, rows=10, id='id_text'),
+        render_kw=dict(textarea_dict, data_formsaving='chapter_text', data_formgroup='chapter', placeholder='Текст новой главы', cols=40, rows=10, id='id_text'),
     )

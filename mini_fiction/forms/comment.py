@@ -8,11 +8,11 @@ from mini_fiction.forms.form import Form
 
 
 class CommentForm(Form):
-    attrs_dict = {'class': 'span4 with-markitup'}
+    attrs_dict = {'class': 'span4 with-markitup js-form-saving'}
 
     text = TextAreaField(
         '',
-        render_kw=dict(attrs_dict, maxlength=8192, placeholder='Текст нового комментария', id='id_text', rows=10, cols=40)
+        render_kw=dict(attrs_dict, data_formsaving='comment', data_formgroup='comment', maxlength=8192, placeholder='Текст нового комментария', id='id_text', rows=10, cols=40)
     )
 
     def validate_text(self, field):

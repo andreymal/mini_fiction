@@ -108,10 +108,13 @@ def add(target_attr, target, template, template_ajax=None, template_ajax_modal=F
                 # Для AJAX отвечаем просто html-кодом комментария и всякой технической инфой
                 result = build_comment_tree_response(comment, target_attr, target)
                 result['captcha_html'] = render_template('captcha/captcha.html', captcha=current_app.captcha.generate()) if reqs.get('captcha') else None
-                return jsonify(result)
+                response = jsonify(result)
             else:
                 # Иначе редиректим на страницу с комментарием
-                return redirect(comment.bl.get_paged_link(current_user._get_current_object()))
+                response = redirect(comment.bl.get_paged_link(current_user._get_current_object()))
+
+            response.set_cookie('formsaving_clear', 'comment', max_age=None)
+            return response
 
     # При ошибках с AJAX не церемонимся и просто отсылаем строку с ошибками
     # (на фронтенде будет всплывашка в углу)
@@ -188,9 +191,11 @@ def edit(target_attr, comment, template, template_ajax=None, template_ajax_modal
             form.set_errors(exc.errors)
         else:
             if extra_ajax:
-                return build_comment_response(comment, target_attr, target)
+                response = build_comment_response(comment, target_attr, target)
             else:
-                return redirect(comment.bl.get_paged_link(user))
+                response = redirect(comment.bl.get_paged_link(user))
+            response.set_cookie('formsaving_clear', 'comment', max_age=None)
+            return response
 
     if extra_ajax and (form.errors or form.non_field_errors):
         errors = sum(form.errors.values(), []) + form.non_field_errors

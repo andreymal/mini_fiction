@@ -137,7 +137,9 @@ def add(story_id):
 
         if error_codes:
             redir_url += '?lint={}'.format(_encode_linter_codes(error_codes))
-        return redirect(redir_url)
+        result = redirect(redir_url)
+        result.set_cookie('formsaving_clear', 'chapter', max_age=None)
+        return result
 
     elif request.method == 'POST':
         not_saved = True
@@ -271,7 +273,10 @@ def edit(pk):
     }
     data.update(preview_data)
 
-    return render_template('chapter_work.html', **data)
+    result = current_app.make_response(render_template('chapter_work.html', **data))
+    if saved:
+        result.set_cookie('formsaving_clear', 'chapter', max_age=None)
+    return result
 
 
 @bp.route('/chapter/<int:pk>/hidelinter/', methods=('GET', 'POST'))

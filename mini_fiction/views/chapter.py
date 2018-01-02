@@ -374,16 +374,25 @@ def sort(story_id):
 
     try:
         new_order = [int(x) for x in request.json['chapters']]
-    except:
+    except Exception:
         return jsonify({'success': False, 'error': 'Invalid request'})
 
     chapters = {c.id: c for c in story.chapters}
     if not new_order or set(chapters) != set(new_order):
         return jsonify({'success': False, 'error': 'Bad request: incorrect list'})
-    else:
-        for new_order_id, chapter_id in enumerate(new_order):
-            chapters[chapter_id].order = new_order_id + 1
-        return jsonify({'success': True})
+
+    # Сперва проставляем заведомо несуществующие порядки, чтобы Pony ORM
+    # не ругалось на неуникальность ключей
+    max_order = max(x.order for x in chapters.values())
+    for new_order_id, chapter_id in enumerate(new_order):
+        chapters[chapter_id].order = max_order + new_order_id + 1
+        chapters[chapter_id].flush()
+
+    # Когда проблемы с неуникальностью решены, проставляем настоящие значения
+    for new_order_id, chapter_id in enumerate(new_order):
+        chapters[chapter_id].order = new_order_id + 1
+
+    return jsonify({'success': True})
 
 
 def _encode_linter_codes(error_codes):

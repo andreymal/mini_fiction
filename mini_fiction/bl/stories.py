@@ -1013,10 +1013,18 @@ class ChapterBL(BaseBL):
 
         old_order = chapter.order
         chapter.bl.edit_log(editor, 'delete', {})
-        chapter.delete()
 
-        for c in Chapter.select(lambda x: x.story == story and x.order > old_order):
+        # Помогаем поне удалять связи
+        for x in chapter.edit_log:
+            x.chapter = None
+        chapter.chapter_views_set.select().delete(bulk=True)
+
+        chapter.delete()
+        chapter.flush()
+
+        for c in Chapter.select(lambda x: x.story == story and x.order > old_order).order_by('x.order'):
             c.order = c.order - 1
+            c.flush()
 
         story.updated = datetime.utcnow()
 

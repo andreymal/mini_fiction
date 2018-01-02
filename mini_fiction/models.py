@@ -409,6 +409,7 @@ class Chapter(db.Entity):
     first_published_at = orm.Optional(datetime, 6)
     edit_log = orm.Set('StoryLog')
 
+    orm.composite_key(story, order)
     orm.composite_index(first_published_at, order)
 
     bl = Resource('bl.chapter')

@@ -1,0 +1,34 @@
+{% autoescape false -%}
+Пользователь {{ abuse.user.username }} жалуется на
+
+{%- if abuse.target_type == 'story' %} рассказ
+{%- elif abuse.target_type == 'storycomment' %} комментарий к рассказу «{{ target.story.title }}»
+{%- elif abuse.target_type == 'newscomment' %} комментарий к новости «{{ target.newsitem.title }}»
+{%- else %} что-то
+{%- endif -%}
+:
+
+{% if abuse.target_type == 'story' -%}
+
+«{{ target.title }}»: {{ url_for('story.view', pk=target.id, _external=True) }}
+
+{%- elif abuse.target_type == 'storycomment' -%}
+
+{{ target.text_as_html }}
+
+{{ target.bl.get_permalink(_external=True) }}
+
+{%- elif abuse.target_type == 'newscomment' -%}
+
+{{ target.text_as_html }}
+
+{{ target.bl.get_permalink(_external=True) }}
+
+{%- else -%}
+{{ abuse.target_type }} / {{ abuse.target_id }}
+{%- endif %}
+
+Прочитать жалобу: {{ url_for('admin_abuse_reports.show', abuse_id=abuse.id, _external=True) }}
+
+{{ SITE_NAME }}
+{%- endautoescape %}

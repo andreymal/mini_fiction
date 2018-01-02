@@ -983,6 +983,42 @@ select.select-size {
     background-position: -12px -12px;
 }
 
+.abuse-icon {
+    display: inline-block;
+    border: 0;
+    border-radius: 50%;
+    background-color: #d77;
+    vertical-align: middle;
+
+    width: 16px;
+    height: 16px;
+    line-height: 16px;
+
+    color: white;
+    text-decoration: none;
+    text-align: center;
+    font-weight: bold;
+    font-size: 12px;
+
+    opacity: 0;
+}
+
+.story-abuse-area {
+    display: inline-block;
+    width: 16px;
+    height: 16px;
+}
+
+.story-abuse-icon {
+    opacity: 0.25;
+    vertical-align: top;
+}
+
+
+.story-abuse-icon:hover {
+    opacity: 0.5;
+    color: white;
+}
 
 .story-item .chapter-controls {
     float: right;
@@ -1541,6 +1577,22 @@ a.btn {
 
 .comment-vote-area .vote-down {
     background: url('../i/downvote.png') center center no-repeat;
+}
+
+.comment-abuse-area {
+    float: right;
+    padding-left: 0.5em;
+    line-height: 22px;
+    font-weight: bold;
+}
+
+.comment-item:hover .abuse-icon {
+    opacity: 0.25;
+}
+
+.comment-item:hover .abuse-icon:hover {
+    opacity: 0.5;
+    color: white;
 }
 
 .comment-text, .comment-text p {

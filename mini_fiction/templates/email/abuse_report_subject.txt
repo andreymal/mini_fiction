@@ -1,0 +1,7 @@
+Жалоба на
+
+{%- if abuse.target_type == 'story' %} рассказ «{{ target.title }}»
+{%- elif abuse.target_type == 'storycomment' %} комментарий к рассказу «{{ target.story.title }}»
+{%- elif abuse.target_type == 'newscomment' %} комментарий к новости «{{ target.newsitem.title }}»
+{%- else %} что-то
+{%- endif -%}

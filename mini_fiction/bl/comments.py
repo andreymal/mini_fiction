@@ -20,6 +20,7 @@ class BaseCommentBL(BaseBL):
     target_attr = None
     can_update = False
     can_vote = False
+    can_abuse = False
     schema = None
 
     def get_permalink(self, _external=False):
@@ -44,6 +45,9 @@ class BaseCommentBL(BaseBL):
         raise NotImplementedError
 
     def get_vote_link(self, _external=False):
+        raise NotImplementedError
+
+    def get_abuse_link(self, _external=False):
         raise NotImplementedError
 
     def get_page_number(self, for_user=None, per_page=None):
@@ -289,6 +293,7 @@ class StoryCommentBL(BaseCommentBL):
     target_attr = 'story'
     can_update = True
     can_vote = True
+    can_abuse = True
     schema = STORY_COMMENT
 
     def has_comments_access(self, target, author=None):
@@ -338,6 +343,9 @@ class StoryCommentBL(BaseCommentBL):
     def get_vote_link(self, _external=False):
         return url_for('story_comment.vote', story_id=self.model.story.id, local_id=self.model.local_id, _external=_external)
 
+    def get_abuse_link(self, _external=False):
+        return url_for('abuse.abuse_storycomment', story_id=self.model.story.id, local_id=self.model.local_id, _external=_external)
+
     def _attributes_for(self, data):
         return {'story_published': data['story'].published}
 
@@ -367,6 +375,7 @@ class StoryLocalCommentBL(BaseCommentBL):
     target_attr = 'local'
     can_update = True
     can_vote = False
+    can_abuse = False
     schema = STORY_COMMENT
 
     def has_comments_access(self, target, author=None):
@@ -412,6 +421,9 @@ class StoryLocalCommentBL(BaseCommentBL):
     def get_vote_link(self, _external=False):
         raise ValueError('Not available')
 
+    def get_abuse_link(self, _external=False):
+        raise ValueError('Not available')
+
     def create(self, *args, **kwargs):
         from mini_fiction.models import Activity
 
@@ -429,6 +441,7 @@ class NewsCommentBL(BaseCommentBL):
     target_attr = 'newsitem'
     can_update = True
     can_vote = True
+    can_abuse = True
     schema = NEWS_COMMENT
 
     def access_for_commenting_by(self, target, author=None):
@@ -469,6 +482,9 @@ class NewsCommentBL(BaseCommentBL):
 
     def get_vote_link(self, _external=False):
         return url_for('news_comment.vote', news_id=self.model.newsitem.id, local_id=self.model.local_id, _external=_external)
+
+    def get_abuse_link(self, _external=False):
+        return url_for('abuse.abuse_newscomment', news_id=self.model.newsitem.id, local_id=self.model.local_id, _external=_external)
 
     def create(self, *args, **kwargs):
         comment = super().create(*args, **kwargs)

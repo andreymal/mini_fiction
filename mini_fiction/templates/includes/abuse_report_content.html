@@ -1,0 +1,35 @@
+{% from 'macro.html' import comment_html with context %}
+
+{%- if abuse -%}
+    {% if abuse.resolved_at %}
+        {% if abuse.accepted %}Жалоба была принята.{% else %}Жалоба была отклонена.{% endif %}
+
+    {% elif abuse.user.id == current_user.id %}
+        Вы уже подавали жалобу на этот объект, указав следующую причину:
+        <blockquote>{{ abuse.reason }}</blockquote>
+    {% else %}
+        ?
+    {% endif %}
+{%- endif -%}
+
+{%- if can_abuse -%}
+<input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+<input type="hidden" name="next" value="{{ next }}" />
+
+{% if target_type == 'story' %}
+    Вы собираетесь пожаловаться на рассказ <a href="{{ url_for('story.view', pk=target.id) }}"><b>{{ target.title }}</b></a>.<br/>
+{% elif target_type == 'storycomment' %}
+    Вы собираетесь пожаловаться на комментарий к рассказу <a href="{{ url_for('story.view', pk=target.story.id) }}"><b>{{ target.story.title }}</b></a>:
+    <div class="comment-item" id="{{ target.local_id }}">
+        {{ comment_html(target, with_controls=False, with_vote=False) }}
+    </div>
+{% elif target_type == 'newscomment' %}
+    Вы собираетесь пожаловаться на комментарий к новости <a href="{{ url_for('news.show', name=target.newsitem.name) }}"><b>{{ target.newsitem.title }}</b></a>:
+    <div class="comment-item" id="{{ target.local_id }}">
+        {{ comment_html(target, with_controls=False, with_vote=False) }}
+    </div>
+{% endif %}
+
+Укажите причину жалобы:<br/>
+<textarea style="width: 100%; height: 6em; box-sizing: border-box;" name="reason" required placeholder="Спам, оскорбление, чрезмерное количество мата и т. д." autocomplete="off"></textarea>
+{%- endif -%}

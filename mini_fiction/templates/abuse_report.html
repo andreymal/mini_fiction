@@ -1,0 +1,24 @@
+{% extends base %}
+{% from 'macro.html' import breadcrumbs with context %}
+{% from 'macro.html' import comment_html with context %}
+{% block content %}
+<div class="row">
+    <div class="span12">
+    {{- breadcrumbs() }}
+
+    <h1>{{ page_title }}</h1>
+
+    <form method="POST" style="margin: 0">
+        <div>{% include 'includes/abuse_report_content.html' %}</div>
+        {% if can_abuse %}
+        <a href="{{ next }}" class="btn">Отменить</a>
+        <button type="submit" class="btn btn-danger">Отправить жалобу</button>
+        {% else %}
+        <a href="{{ next }}" class="btn">Закрыть</a>
+        {% endif %}
+    </form>
+
+    {{- breadcrumbs() }}
+    </div>
+</div>
+{% endblock %}

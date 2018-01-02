@@ -1,0 +1,67 @@
+{% extends base %}
+{% from 'macro.html' import breadcrumbs with context %}
+{% from 'macro.html' import form_fields with context %}
+{% block content %}
+
+<div class="row">
+    <div class="span12">
+        {{- breadcrumbs([
+            [url_for('admin_index.index'), _('Administration')],
+            [url_for('admin_abuse_reports.index'), 'Жалобы']
+        ]) }}
+
+        {% if not target %}Объект, на который была подана жалоба, удалён из базы данных.{% else %}
+
+        <h1>
+            Жалоба на
+            {%- if abuse.target_type == 'story' %} рассказ «{{ target.title }}»
+            {%- elif abuse.target_type == 'storycomment' %} комментарий к рассказу «{{ target.story.title }}»
+            {%- elif abuse.target_type == 'newscomment' %} комментарий к новости «{{ target.newsitem.title }}»
+            {%- else %} что-то
+            {%- endif -%}
+        </h1>
+
+        {% if saved %}<div class="alert-mini green">{{ _('Saved!') }}</div>{% endif %}
+
+        {% if abuse.target_type == 'story' %}
+            <a href="{{ url_for('story.view', pk=target.id) }}">{{ url_for('story.view', pk=target.id, _external=True) }}</a>
+        {% elif abuse.target_type == 'storycomment' %}
+            <a href="{{ target.bl.get_permalink() }}">{{ target.bl.get_permalink(_external=True) }}</a>
+        {% elif abuse.target_type == 'newscomment' %}
+            <a href="{{ target.bl.get_permalink() }}">{{ target.bl.get_permalink(_external=True) }}</a>
+        {% else %}
+            Тип объекта {{ abuse.target_type }} / {{ abuse.target_id }} неизвестен, поэтому ссылки не будет
+        {% endif %}
+        <br/><br/>
+
+        <ul>{% for abuse_item in all_abuses %}
+            <li>
+                <div>{% with user=abuse_item.user %}
+                    {%- if user -%}{% include 'includes/userlink.html' %}
+                    {%- else -%}N/A{%- endif -%}
+                {% endwith %}: {{ abuse_item.reason }}</div>
+                <small><time class="comment-time" datetime="{{ abuse_item.created_at.strftime('%Y-%m-%dT%H:%M:%SZ') }}">{{ abuse_item.created_at|datetimeformat('d MMMM Y, HH:mm') }}</time></small>
+                <br/><br/>
+            </li>
+        {%- endfor %}</ul>
+
+        <form class="form-horizontal" method="POST" enctype="multipart/form-data">
+            Статус жалобы:<br/>
+            <select name="status" autocomplete="off">
+                <option value="none"{% if not abuse.resolved_at %} selected{% endif %}>Не решено</option>
+                <option value="accepted"{% if abuse.resolved_at and abuse.accepted %} selected{% endif %}>Подтверждено</option>
+                <option value="rejected"{% if abuse.resolved_at and not abuse.accepted %} selected{% endif %}>Отклонено</option>
+            </select><br/>
+
+            <button type="submit" class="btn btn-primary">Сохранить</button>
+        </form>
+
+        {% endif %}
+
+        {{- breadcrumbs([
+            [url_for('admin_index.index'), _('Administration')],
+            [url_for('admin_abuse_reports.index'), 'Жалобы']
+        ]) }}
+    </div>
+</div>
+{% endblock %}

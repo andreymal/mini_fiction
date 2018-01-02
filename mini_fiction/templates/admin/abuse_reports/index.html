@@ -1,0 +1,52 @@
+{% extends base %}
+{% from 'macro.html' import breadcrumbs with context %}
+{% block content %}
+
+<div class="row">
+    <div class="span12">
+        {{- breadcrumbs([[url_for('admin_index.index'), _('Administration')]]) }}
+        <h1>{{ page_title }}</h1>
+
+        <ul>
+        {%- for item in abuse_reports %}
+        {%- if item.deleted %}
+            <li{% if item.abuse.resolved_at %} style="opacity: 0.5"{% endif %}><a href="{{ url_for('admin_abuse_reports.show', abuse_id=item.abuse.id) }}">Жалоба на удалённый объект</a></li>
+        {%- else %}
+            <li{% if item.abuse.resolved_at %} style="opacity: 0.5"{% endif %}>
+                <a href="{{ url_for('admin_abuse_reports.show', abuse_id=item.abuse.id) }}">Жалоба на
+                    {%- if item.target_type == 'story' %} рассказ «{{ item.target.title }}»
+                    {%- elif item.target_type == 'storycomment' %} комментарий к рассказу «{{ item.target.story.title }}»
+                    {%- elif item.target_type == 'newscomment' %} комментарий к новости «{{ item.target.newsitem.title }}»
+                    {%- else %} что-то
+                    {%- endif -%}
+                </a><br/>
+                <small>
+                    {%- if item.count > 1 %}Количество: {{ item.count }}, последняя{% endif %}
+                    <time class="comment-time" datetime="{{ item.abuse.created_at.strftime('%Y-%m-%dT%H:%M:%SZ') }}">{{ item.abuse.created_at|datetimeformat('d MMMM Y, HH:mm') }}</time> от {% if item.abuse.user %}{{ item.abuse.user.username }}{% else %}удалённого пользователя{% endif %}
+                </small>
+
+                {%- if item.abuse.resolved_at %}
+                    <br/>
+                    <small>
+                        {% if item.abuse.accepted %}Подтверждена{% else %}Отклонена{% endif %}
+                        <time class="comment-time" datetime="{{ item.abuse.resolved_at.strftime('%Y-%m-%dT%H:%M:%SZ') }}">{{ item.abuse.resolved_at|datetimeformat('d MMMM Y, HH:mm') }}</time>
+                    </small>
+                {% endif %}
+                <br/><br/>
+            </li>
+        {% endif %}
+        {% endfor %}
+        </ul>
+
+        <!-- Пагинация: начало вывода -->
+        <div class="pagination center">
+            {% for page_id in page_obj.iter_pages() %}
+                <a href="{{ url_for('admin_abuse_reports.index', page=page_id) }}" class="btn{% if page_id == page_obj.number %} btn-primary{% endif %}" name="page">{{ page_id }}</a>
+            {% endfor %}
+        </div>
+        <!-- Пагинация: конец вывода -->
+
+        {{- breadcrumbs([[url_for('admin_index.index'), _('Administration')]]) }}
+    </div>
+</div>
+{% endblock %}

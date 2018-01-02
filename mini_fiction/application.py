@@ -190,7 +190,7 @@ def configure_error_handlers(app):
 def configure_views(app):
     from mini_fiction.views import index, auth, story, chapter, editlog, search, author, stream, object_lists
     from mini_fiction.views import story_comment, story_local_comment, feeds, staticpages, news, news_comment
-    from mini_fiction.views import notifications
+    from mini_fiction.views import notifications, abuse
     from mini_fiction.views import misc
     app.register_blueprint(index.bp)
     app.register_blueprint(auth.bp, url_prefix='/accounts')
@@ -209,6 +209,7 @@ def configure_views(app):
     app.register_blueprint(news.bp, url_prefix='/news')
     app.register_blueprint(news_comment.bp)
     app.register_blueprint(notifications.bp, url_prefix='/notifications')
+    app.register_blueprint(abuse.bp, url_prefix='/abuse')
 
     app.add_url_rule('/dump/', 'dump', misc.dump)
     app.add_url_rule('/media/<path:filename>', 'media', misc.media)
@@ -224,7 +225,7 @@ def configure_views(app):
 
 def configure_admin_views(app):
     from mini_fiction.views.admin import index, categories, characters, charactergroups, classifications
-    from mini_fiction.views.admin import logopics, htmlblocks, staticpages, authors, news
+    from mini_fiction.views.admin import logopics, htmlblocks, staticpages, authors, news, abuse_reports
     app.register_blueprint(index.bp, url_prefix='/admin')
     app.register_blueprint(logopics.bp, url_prefix='/admin/logopics')
     app.register_blueprint(htmlblocks.bp, url_prefix='/admin/htmlblocks')
@@ -235,6 +236,7 @@ def configure_admin_views(app):
     app.register_blueprint(staticpages.bp, url_prefix='/admin/staticpages')
     app.register_blueprint(authors.bp, url_prefix='/admin/authors')
     app.register_blueprint(news.bp, url_prefix='/admin/news')
+    app.register_blueprint(abuse_reports.bp, url_prefix='/admin/abuse_reports')
 
 
 def configure_ajax(app):
@@ -302,7 +304,7 @@ def configure_templates(app):
     from mini_fiction.templatetags import random_stories, logopic, submitted_stories_count
     from mini_fiction.templatetags import story_comments_delta, html_block, hook, shown_newsitem
     from mini_fiction.templatetags import get_comment_threshold, notifications, misc
-    from mini_fiction.templatetags import i18n, generate_captcha
+    from mini_fiction.templatetags import i18n, generate_captcha, unread_abuse_reports_count
     from mini_fiction.templatetags import registry
     app.templatetags = dict(registry.tags)
 

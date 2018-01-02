@@ -111,6 +111,7 @@ class Author(db.Entity, UserMixin):
     notifications = orm.Set('Notification', reverse='user')
     created_notifications = orm.Set('Notification', reverse='caused_by_user')
     subscriptions = orm.Set('Subscription')
+    abuse_reports = orm.Set('AbuseReport')
 
     bl = Resource('bl.author')
 
@@ -888,3 +889,23 @@ class Subscription(db.Entity):
     to_tracker = orm.Required(bool, default=True)
 
     orm.composite_index(type, target_id)
+
+
+class AbuseReport(db.Entity):
+    """Жалоба на какой-либо объект:
+
+    - story: на рассказ
+    - storycomment: на комментарий к рассказу
+    - newscomment: на комментарий к новости
+    """
+
+    target_type = orm.Required(str, 24)
+    target_id = orm.Required(int)
+    user = orm.Optional(Author)
+    reason = orm.Required(orm.LongStr, lazy=False)
+    created_at = orm.Required(datetime, 6, default=datetime.utcnow)
+    updated_at = orm.Required(datetime, 6, default=datetime.utcnow)
+    resolved_at = orm.Optional(datetime, 6)
+    accepted = orm.Required(bool, default=False)
+
+    orm.composite_key(target_type, target_id, user)

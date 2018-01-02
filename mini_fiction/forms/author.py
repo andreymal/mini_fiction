@@ -183,6 +183,7 @@ class AuthorEditPasswordForm(Form):
 class AuthorEditSubscriptionsForm(Form):
     attrs_dict = {'class': 'input-xlarge'}
 
+    email_abuse_report = BooleanField()
     email_story_pubrequest = BooleanField()
     email_story_publish_noappr = BooleanField()
     email_story_delete = BooleanField()

@@ -1,0 +1,37 @@
+{% extends 'email/base.html' %}
+{% import 'email/macro.html' as macro %}
+
+{% block body %}
+Пользователь {{ macro.userlink(abuse.user.id, abuse.user.username) }} жалуется на
+
+{%- if abuse.target_type == 'story' %} рассказ
+{%- elif abuse.target_type == 'storycomment' %} комментарий к рассказу {{ macro.storylink(target.id, target.story.title) }}
+{%- elif abuse.target_type == 'newscomment' %} комментарий к новости <a href="{{ url_for('news.show', name=target.name) }}" target="_blank"><b>{{ target.newsitem.title }}</b></a>
+{%- else %} что-то
+{%- endif -%}
+:<br/>
+
+{% if abuse.target_type == 'story' %}
+
+{{ macro.storylink(target.id, target.title) }}
+
+{% elif abuse.target_type == 'storycomment' %}
+
+{% call macro.comment(target) %}
+    <a href="{{ target.bl.get_permalink(_external=True) }}" target="_blank">#{{ target.local_id }}</a>
+{% endcall %}<br/>
+
+{% elif abuse.target_type == 'newscomment' %}
+
+{% call macro.comment(target) %}
+    <a href="{{ target.bl.get_permalink(_external=True) }}" target="_blank">#{{ target.local_id }}</a>
+{% endcall %}<br/>
+
+{% else %}
+{{ abuse.target_type }} / {{ abuse.target_id }}<br/>
+{% endif %}
+<br/>
+
+<a href="{{ url_for('admin_abuse_reports.show', abuse_id=abuse.id, _external=True) }}">Прочитать жалобу</a>
+
+{%- endblock %}

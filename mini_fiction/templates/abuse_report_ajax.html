@@ -1,0 +1,17 @@
+<form method="POST" style="margin: 0">
+<div class="modal-header">
+    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+    <h3>{{ page_title }}</h3>
+</div>
+<div class="modal-body">
+    {% include 'includes/abuse_report_content.html' %}
+</div>
+<div class="modal-footer">
+    {% if can_abuse %}
+    <a href="{{ next }}" class="btn" data-dismiss="modal">Отменить</a>
+    <button type="submit" class="btn btn-danger">Отправить жалобу</button>
+    {% else %}
+    <a href="{{ next }}" class="btn" data-dismiss="modal">Закрыть</a>
+    {% endif %}
+</div>
+</form>

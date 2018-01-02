@@ -144,6 +144,29 @@ def _notify(to, typ, target, by=None, extra=None):
 
 @task()
 @db_session
+def notify_abuse_report(abuse_id):
+    abuse = models.AbuseReport.get(id=abuse_id)
+    if not abuse or abuse.resolved_at:
+        return
+
+    target = None
+    if abuse.target_type == 'story':
+        target = models.Story.get(id=abuse.target_id)
+    elif abuse.target_type == 'storycomment':
+        target = models.StoryComment.get(id=abuse.target_id)
+    elif abuse.target_type == 'newscomment':
+        target = models.NewsComment.get(id=abuse.target_id)
+
+    if not target:
+        return
+
+    staff = models.Author.select(lambda x: x.is_staff)
+    recipients = [u.email for u in staff if u.email and 'abuse_report' not in u.silent_email_list]
+    _sendmail_notify(recipients, 'abuse_report', {'abuse': abuse, 'target': target})
+
+
+@task()
+@db_session
 def notify_story_pubrequest(story_id, author_id):
     story = models.Story.get(id=story_id)
     if not story:

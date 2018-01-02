@@ -92,6 +92,11 @@
             {% include 'includes/comment_vote.html' %}
         </div>
         {% endif %}
+        {% if with_controls and not comment.deleted and comment.bl.can_abuse and current_user.is_authenticated %}
+        <div class="comment-abuse-area">
+            <a href="{{ comment.bl.get_abuse_link() }}" title="Пожаловаться на комментарий" class="abuse-icon comment-abuse-icon">!</a>
+        </div>
+        {% endif %}
         {% if with_controls %}
             {% include 'includes/comment_controls.html' %}
         {% endif %}

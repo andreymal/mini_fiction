@@ -27,6 +27,7 @@ __all__ = ['AuthorBL']
 # Здесь перечислены только те подписки, которые не имеют конкретного target
 # Информация о подписке на них хранится в полях Author.silent_*
 allowed_subscriptions = {
+    'abuse_report',
     'story_pubrequest',
     'story_publish',
     'story_publish_noappr',

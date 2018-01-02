@@ -4,14 +4,14 @@
 import base64
 import struct
 
-from flask import Blueprint, request, render_template, abort, url_for, redirect, g, jsonify
+from flask import Blueprint, request, render_template, abort, url_for, redirect, g, jsonify, current_app
 from flask_login import current_user, login_required
 from flask_babel import gettext
 from pony.orm import db_session
 
 from mini_fiction.forms.chapter import ChapterForm
 from mini_fiction.models import Story, Chapter
-from mini_fiction.utils.misc import diff2html
+from mini_fiction.utils.misc import diff2html, words_count
 from mini_fiction.linters import create_chapter_linter
 from .story import get_story
 
@@ -78,6 +78,7 @@ def _gen_preview(form, only_selected=False):
     return {
         'preview_title': title,
         'preview_html': html,
+        'preview_words': words_count(html),
         'notes_preview_html': notes_html,
     }
 

@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
+import re
 import sys
 import json
 import math
@@ -380,3 +381,23 @@ def fprint_substring(s, l=0, file=sys.stdout):
     if hasattr(file, 'flush'):
         file.flush()
     return len(s)
+
+
+def words_count(s, html=True):
+    '''По-умному считает число слов в строке.'''
+
+    s = str(s)
+
+    if html:
+        # Добавляем разделительные пробелы тем тегам, которые разделяют слова
+        s = re.sub(r'(</(br|hr|footnote|p|blockquote|img|ul|ol|li|pre)[^>]*?>)', r' \1', s, flags=re.I)
+        # Разделители добавлены, теперь теги можно удалить
+        s = re.sub(r'<!--.*?-->', '', s)
+        s = re.sub(r'<[^<>]*?>', '', s)
+
+    # Знаки препинания за слова не считаются
+    s = re.sub(r'[/-]+', '', s)
+    s = re.sub(r'[.,?!@:;_—…–$%*&]+', ' ', s)
+
+    words = s.split()
+    return len(words)

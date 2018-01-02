@@ -401,7 +401,7 @@ class Chapter(db.Entity):
     text = orm.Optional(orm.LongStr, autostrip=False)
     text_md5 = orm.Required(str, 32, default='d41d8cd98f00b204e9800998ecf8427e')
     updated = orm.Required(datetime, 6, default=datetime.utcnow)
-    words = orm.Required(int, default=0)
+    words = orm.Required(int, default=0, optimistic=False)
     views = orm.Required(int, default=0, optimistic=False)
     # Глава опубликована только при draft=False и story_published=True
     draft = orm.Required(bool, default=True)

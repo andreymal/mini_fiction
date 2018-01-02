@@ -18,7 +18,7 @@ from flask import Markup, current_app
 
 from mini_fiction.bl.utils import BaseBL
 from mini_fiction.bl.commentable import Commentable
-from mini_fiction.utils.misc import call_after_request as later
+from mini_fiction.utils.misc import words_count, call_after_request as later
 from mini_fiction.utils import diff as utils_diff
 from mini_fiction.validation import Validator
 from mini_fiction.validation.stories import STORY
@@ -909,7 +909,7 @@ class ChapterBL(BaseBL):
         )
         chapter.order = (new_order or 0) + 1
 
-        self._update_words_count(chapter)
+        self.update_words_count(chapter)
         chapter.flush()
         chapter.bl.edit_log(editor, 'add', {}, text_md5=chapter.text_md5)
         story.updated = datetime.utcnow()
@@ -983,7 +983,7 @@ class ChapterBL(BaseBL):
 
             chapter.text = text
             chapter.text_md5 = md5(text.encode('utf-8')).hexdigest()
-            self._update_words_count(chapter)
+            self.update_words_count(chapter)
 
         if edited_data or chapter_text_diff:
             chapter.updated = datetime.utcnow()
@@ -993,14 +993,15 @@ class ChapterBL(BaseBL):
         later(current_app.tasks['sphinx_update_chapter'].delay, chapter.id)
         return chapter
 
-    def _update_words_count(self, chapter):
+    def update_words_count(self, chapter):
         old_words = chapter.words
-        new_words = len(Markup.striptags(chapter.text.replace('<', ' <')).split())
+        new_words = words_count(chapter.text, html=True)
         if new_words != chapter.words:
             chapter.words = new_words
             if not chapter.draft:
                 story = chapter.story
                 story.words = story.words - old_words + new_words
+        return old_words, new_words
 
     def delete(self, editor):
         from mini_fiction.models import Chapter

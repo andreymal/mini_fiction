@@ -30,10 +30,14 @@ def abuse_common(target_type, target):
     }
 
     # Если жалоба на этот объект уже рассматривалась, то просто отдаём результат
-    abuse = AbuseReport.select(lambda x: x.target_type == target_type and x.target_id == target.id and x.resolved_at is not None).first()
+    abuse = AbuseReport.select(
+        lambda x: x.target_type == target_type and x.target_id == target.id and x.resolved_at is not None and not x.ignored
+    ).first()
     # Если жалоба ещё не рассматривалась, но пользователь её уже отправлял, то он не может отправить её ещё раз
     if not abuse:
-        abuse = AbuseReport.select(lambda x: x.target_type == target_type and x.target_id == target.id and x.user.id == user.id).first()
+        abuse = AbuseReport.select(
+            lambda x: x.target_type == target_type and x.target_id == target.id and x.user.id == user.id
+        ).first()
 
     if abuse:
         data['abuse'] = abuse
@@ -55,7 +59,7 @@ def abuse_common(target_type, target):
 
     # Если это первая жалоба на объект, то уведомляем админов
     if AbuseReport.select(
-        lambda x: x.target_type == target_type and x.target_id == target.id
+        lambda x: x.target_type == target_type and x.target_id == target.id and not x.ignored
     ).count() == 1:
         later(current_app.tasks['notify_abuse_report'].delay, abuse.id)
 

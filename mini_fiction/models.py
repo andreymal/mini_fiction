@@ -908,5 +908,6 @@ class AbuseReport(db.Entity):
     updated_at = orm.Required(datetime, 6, default=datetime.utcnow)
     resolved_at = orm.Optional(datetime, 6)
     accepted = orm.Required(bool, default=False)
+    ignored = orm.Required(bool, default=False)
 
     orm.composite_key(target_type, target_id, user)

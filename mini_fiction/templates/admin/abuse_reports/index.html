@@ -10,9 +10,9 @@
         <ul>
         {%- for item in abuse_reports %}
         {%- if item.deleted %}
-            <li{% if item.abuse.resolved_at %} style="opacity: 0.5"{% endif %}><a href="{{ url_for('admin_abuse_reports.show', abuse_id=item.abuse.id) }}">Жалоба на удалённый объект</a></li>
+            <li{% if filter != 'ignored' and item.abuse.resolved_at %} style="opacity: 0.5"{% endif %}><a href="{{ url_for('admin_abuse_reports.show', abuse_id=item.abuse.id) }}">Жалоба на удалённый объект</a></li>
         {%- else %}
-            <li{% if item.abuse.resolved_at %} style="opacity: 0.5"{% endif %}>
+            <li{% if filter != 'ignored' and item.abuse.resolved_at %} style="opacity: 0.5"{% endif %}>
                 <a href="{{ url_for('admin_abuse_reports.show', abuse_id=item.abuse.id) }}">Жалоба на
                     {%- if item.target_type == 'story' %} рассказ «{{ item.target.title }}»
                     {%- elif item.target_type == 'storycomment' %} комментарий к рассказу «{{ item.target.story.title }}»
@@ -25,7 +25,7 @@
                     <time class="comment-time" datetime="{{ item.abuse.created_at.strftime('%Y-%m-%dT%H:%M:%SZ') }}">{{ item.abuse.created_at|datetimeformat('d MMMM Y, HH:mm') }}</time> от {% if item.abuse.user %}{{ item.abuse.user.username }}{% else %}удалённого пользователя{% endif %}
                 </small>
 
-                {%- if item.abuse.resolved_at %}
+                {%- if not item.abuse.ignored and item.abuse.resolved_at %}
                     <br/>
                     <small>
                         {% if item.abuse.accepted %}Подтверждена{% else %}Отклонена{% endif %}
@@ -37,6 +37,10 @@
         {% endif %}
         {% endfor %}
         </ul>
+
+        {% if filter != 'ignored' %}
+            <a href="{{ url_for('admin_abuse_reports.index_ignored') }}">Список проигнорированных жалоб</a>
+        {% endif %}
 
         <!-- Пагинация: начало вывода -->
         <div class="pagination center">

@@ -40,20 +40,40 @@
                     {%- if user -%}{% include 'includes/userlink.html' %}
                     {%- else -%}N/A{%- endif -%}
                 {% endwith %}: {{ abuse_item.reason }}</div>
+
+                <a href="{{ url_for('admin_abuse_reports.show', abuse_id=abuse_item.id, exact='1') }}" style="color: inherit;">
                 <small><time class="comment-time" datetime="{{ abuse_item.created_at.strftime('%Y-%m-%dT%H:%M:%SZ') }}">{{ abuse_item.created_at|datetimeformat('d MMMM Y, HH:mm') }}</time></small>
+                </a>
+
                 <br/><br/>
             </li>
         {%- endfor %}</ul>
 
         <form class="form-horizontal" method="POST" enctype="multipart/form-data">
+            {% if not abuse.ignored and not exact %}
             Статус жалобы:<br/>
             <select name="status" autocomplete="off">
                 <option value="none"{% if not abuse.resolved_at %} selected{% endif %}>Не решено</option>
                 <option value="accepted"{% if abuse.resolved_at and abuse.accepted %} selected{% endif %}>Подтверждено</option>
                 <option value="rejected"{% if abuse.resolved_at and not abuse.accepted %} selected{% endif %}>Отклонено</option>
             </select><br/>
+            {% elif not abuse.ignored and exact %}
+                Статус жалобы:
+                {% if not abuse.resolved_at %}Не решено
+                {% elif abuse.resolved_at and abuse.accepted %}Подтверждено
+                {% elif abuse.resolved_at and not abuse.accepted %}Отклонено
+                {% endif %}
+                <br/>
+            {% endif %}
 
-            <button type="submit" class="btn btn-primary">Сохранить</button>
+            <button type="submit" name="act" value="save" class="btn btn-primary">Сохранить</button>
+            {% if exact %}
+                {% if not abuse.ignored %}
+                <button type="submit" name="act" value="ignore" class="btn">Игнорировать</button>
+                {% else %}
+                <button type="submit" name="act" value="unignore" class="btn">Убрать игнорирование</button>
+                {% endif %}
+            {% endif %}
         </form>
 
         {% endif %}

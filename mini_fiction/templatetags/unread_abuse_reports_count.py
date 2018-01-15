@@ -12,5 +12,5 @@ def unread_abuse_reports_count():
     return select(
         (x.target_type, x.target_id, count(x.id))
         for x in AbuseReport
-        if x.resolved_at is None
+        if not x.ignored and x.resolved_at is None
     ).count()

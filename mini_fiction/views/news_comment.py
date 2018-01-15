@@ -38,8 +38,8 @@ def add(news_id):
 @bp.route('/news/<news_id>/comment/<int:local_id>/')
 @db_session
 def show(news_id, local_id):
-    comment = NewsComment.get(newsitem=parse_news_id(news_id), local_id=local_id, deleted=False)
-    if not comment:
+    comment = NewsComment.get(newsitem=parse_news_id(news_id), local_id=local_id)
+    if not comment or (comment.deleted and not current_user.is_staff):
         abort(404)
 
     return common_comment.show('newsitem', comment)

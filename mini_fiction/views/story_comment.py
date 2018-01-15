@@ -37,8 +37,8 @@ def show(story_id, local_id):
     if not story.bl.has_comments_access(current_user._get_current_object()):
         abort(403)
 
-    comment = StoryComment.get(story=story_id, local_id=local_id, deleted=False)
-    if not comment:
+    comment = StoryComment.get(story=story_id, local_id=local_id)
+    if not comment or (comment.deleted and not current_user.is_staff):
         abort(404)
 
     return common_comment.show('story', comment)

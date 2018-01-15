@@ -76,8 +76,8 @@ def add(story_id):
 @db_session
 def show(story_id, local_id):
     local = get_local_thread(story_id, current_user._get_current_object())
-    comment = StoryLocalComment.get(local=local, local_id=local_id, deleted=False)
-    if not comment:
+    comment = StoryLocalComment.get(local=local, local_id=local_id)
+    if not comment or (comment.deleted and not current_user.is_staff):
         abort(404)
 
     return common_comment.show('local', comment)

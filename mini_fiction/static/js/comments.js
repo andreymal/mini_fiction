@@ -202,6 +202,11 @@ var comments = {
         form.text.value = '';
         this.setCommentForm(0);
         if (data.html) {
+            var oldCommentDiv = document.getElementById(data.comment.toString());
+            if (oldCommentDiv) {
+                oldCommentDiv.parentNode.removeChild(oldCommentDiv);
+            }
+
             var d = document.createElement('div');
             d.id = data.comment;
             d.innerHTML = data.html;

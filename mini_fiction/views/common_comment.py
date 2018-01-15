@@ -94,20 +94,31 @@ def add(target_attr, target, template, template_ajax=None, template_ajax_modal=F
         if parent:
             data['parent'] = parent.local_id
 
+        # Проверяем, что точно такого же коммента не отправлялось ранее
+        comment = target.comments.select(
+            lambda c: c.author == user and c.parent == parent and c.text == data['text']
+        ).first() if user.is_authenticated else None
+
+        created = not comment
+
         # Собственно создание
-        try:
-            # FIXME: здесь проверяется капча, а надо перед валидацией формы,
-            # чтобы не оставалось висячих капч (ох уж эти рефакторинги)
-            comment = target.bl.create_comment(user, request.remote_addr, data)
-        except CaptchaError:
-            captcha_error = 'Вы не доказали, что вы не робот'
-        except ValidationError as exc:
-            form.set_errors(exc.errors)
-        else:
+        if not comment:
+            try:
+                # FIXME: здесь проверяется капча, а надо перед валидацией формы,
+                # чтобы не оставалось висячих капч (ох уж эти рефакторинги)
+                comment = target.bl.create_comment(user, request.remote_addr, data)
+            except CaptchaError:
+                captcha_error = 'Вы не доказали, что вы не робот'
+            except ValidationError as exc:
+                form.set_errors(exc.errors)
+
+        # Если коммент создан (или уже был ранее), то отвечаем успехом
+        if comment:
             if extra_ajax:
                 # Для AJAX отвечаем просто html-кодом комментария и всякой технической инфой
                 result = build_comment_tree_response(comment, target_attr, target)
                 result['captcha_html'] = render_template('captcha/captcha.html', captcha=current_app.captcha.generate()) if reqs.get('captcha') else None
+                result['created'] = created
                 response = jsonify(result)
             else:
                 # Иначе редиректим на страницу с комментарием

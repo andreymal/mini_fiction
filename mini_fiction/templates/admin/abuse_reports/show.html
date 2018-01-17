@@ -50,6 +50,7 @@
         {%- endfor %}</ul>
 
         <form class="form-horizontal" method="POST" enctype="multipart/form-data">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
             {% if not abuse.ignored and not exact %}
             Статус жалобы:<br/>
             <select name="status" autocomplete="off">

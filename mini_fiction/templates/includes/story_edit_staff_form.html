@@ -1,0 +1,31 @@
+<form action="{{ url_for('story.edit', pk=story.id) }}" data-ajaxaction="{{ url_for('story.edit', pk=story.id) }}?short=1" method="POST" enctype="multipart/form-data" class="form-horizontal" id="story-edit-staff-form">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+
+    <fieldset>
+        <legend>Администрирование рассказа</legend>
+
+        <div class="control-group{% if staff_error %} error{% endif %}"><div class="controls">
+            {% if staff_saved -%}
+                <div class="alert-mini green">Изменения сохранены</div>
+            {% endif -%}
+        </div></div>
+
+        <div class="control-group">
+            <label class="control-label">Доступ поисковикам</label>
+            <div class="controls">
+                <label>
+                    <input type="radio" name="robots_noindex" value="0"{% if not story.robots_noindex %} checked{% endif %} />
+                    Разрешить
+                </label>
+                <label>
+                    <input type="radio" name="robots_noindex" value="1"{% if story.robots_noindex %} checked{% endif %} />
+                    Запретить
+                </label>
+              </div>
+        </div>
+
+        <div class="form-actions">
+            <button type="submit" class="btn btn-primary" name="act" value="save_staff">Сохранить</button>
+        </div>
+    </fieldset>
+</form>

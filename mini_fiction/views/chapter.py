@@ -45,7 +45,7 @@ def view(story_id, chapter_order=None):
             'next_chapter': next_chapter,
             'page_title': page_title,
             'allchapters': False,
-            'robots_noindex': not story.published,
+            'robots_noindex': not story.published or story.robots_noindex,
         }
     else:
         chapters = story.bl.select_accessible_chapters(user).order_by(Chapter.order, Chapter.id)[:]
@@ -58,7 +58,7 @@ def view(story_id, chapter_order=None):
             'chapters': chapters,
             'page_title': page_title,
             'allchapters': True,
-            'robots_noindex': not story.published,
+            'robots_noindex': not story.published or story.robots_noindex,
         }
 
     return render_template('chapter_view.html', **data)

@@ -91,8 +91,9 @@ def view(pk, comments_page):
         'page_obj': paged,
         'sub': story.bl.get_subscription(user),
         'sub_comments': story.bl.get_comments_subscription(user),
-        'robots_noindex': not story.published,
+        'robots_noindex': not story.published or story.robots_noindex,
     }
+
     return render_template('story_view.html', **data)
 
 
@@ -457,6 +458,11 @@ def edit(pk):
             if request.args.get('short') == '1':
                 html = render_template('includes/story_edit_contributors_form.html', **data)
                 return jsonify({'success': True, 'form': html})
+
+    elif action == 'save_staff' and user.is_staff:
+        # TODO: bl
+        story.robots_noindex = request.form.get('robots_noindex') == '1'
+        data['staff_saved'] = True
 
     return render_template('story_work.html', **data)
 

@@ -302,6 +302,7 @@ class Story(db.Entity):
     source_link = orm.Optional(str, 255)
     source_title = orm.Optional(str, 255)
     pinned = orm.Required(bool, default=False)
+    robots_noindex = orm.Required(bool, default=False)
     approved_by = orm.Optional(Author)
     published_by_author = orm.Optional(Author)  # Ему будет отправлено уведомление о публикации
     last_author_notification_at = orm.Optional(datetime, 6)  # Во избежание слишком частых уведомлений

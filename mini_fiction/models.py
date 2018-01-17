@@ -255,6 +255,7 @@ class Series(db.Entity):
     title = orm.Required(str, 512)
     updated = orm.Required(datetime, 6, default=datetime.utcnow)
     views = orm.Required(int, default=0)
+    extra = orm.Required(orm.LongStr, lazy=False, default='{}')
 
     permissions = orm.Set(InSeriesPermissions)
 
@@ -304,6 +305,7 @@ class Story(db.Entity):
     published_by_author = orm.Optional(Author)  # Ему будет отправлено уведомление о публикации
     last_author_notification_at = orm.Optional(datetime, 6)  # Во избежание слишком частых уведомлений
     last_staff_notification_at = orm.Optional(datetime, 6)
+    extra = orm.Required(orm.LongStr, lazy=False, default='{}')
 
     in_series_permissions = orm.Set(InSeriesPermissions)
     chapters = orm.Set('Chapter')
@@ -407,6 +409,8 @@ class Chapter(db.Entity):
     draft = orm.Required(bool, default=True)
     story_published = orm.Required(bool)  # optimization of stream pages
     first_published_at = orm.Optional(datetime, 6)
+    extra = orm.Required(orm.LongStr, lazy=False, default='{}')
+
     edit_log = orm.Set('StoryLog')
 
     orm.composite_key(story, order)
@@ -524,6 +528,8 @@ class StoryComment(db.Entity):
     story_published = orm.Required(bool)
     last_edited_at = orm.Optional(datetime, 6)  # only for text updates
 
+    extra = orm.Required(orm.LongStr, lazy=False, default='{}')
+
     votes = orm.Set('StoryCommentVote')
     edits = orm.Set('StoryCommentEdit')
     answers = orm.Set('StoryComment', reverse='parent')
@@ -606,6 +612,8 @@ class StoryLocalComment(db.Entity):
     root_id = orm.Required(int)  # for pagination
     last_edited_at = orm.Optional(datetime, 6)  # only for text updates
 
+    extra = orm.Required(orm.LongStr, lazy=False, default='{}')
+
     edits = orm.Set('StoryLocalCommentEdit')
     answers = orm.Set('StoryLocalComment', reverse='parent')
 
@@ -647,6 +655,8 @@ class Vote(db.Entity):
     updated = orm.Required(datetime, 6, default=datetime.utcnow, optimistic=False)
     ip = orm.Required(str, 50, default=ipaddress.ip_address('::1').exploded, optimistic=False)
     vote_value = orm.Required(int, size=16, unsigned=True, default=3, optimistic=False)
+    extra = orm.Required(orm.LongStr, lazy=False, default='{}')
+
     orm.composite_key(author, story)
 
     def before_update(self):
@@ -737,6 +747,7 @@ class NewsItem(db.Entity):
     is_template = orm.Required(bool, default=False)
     date = orm.Required(datetime, 6, default=datetime.utcnow)
     updated = orm.Required(datetime, 6, default=datetime.utcnow)
+    extra = orm.Required(orm.LongStr, lazy=False, default='{}')
 
     comments_count = orm.Required(int, size=16, unsigned=True, default=0)
     comments = orm.Set('NewsComment')
@@ -771,6 +782,8 @@ class NewsComment(db.Entity):
     edits_count = orm.Required(int, size=16, unsigned=True, default=0)
     root_id = orm.Required(int)  # for pagination
     last_edited_at = orm.Optional(datetime, 6)  # only for text updates
+
+    extra = orm.Required(orm.LongStr, lazy=False, default='{}')
 
     votes = orm.Set('NewsCommentVote')
     edits = orm.Set('NewsCommentEdit')

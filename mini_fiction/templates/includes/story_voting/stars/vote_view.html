@@ -1,0 +1,10 @@
+{% if full and can_show_stars %}
+    <span itemprop="aggregateRating" itemscope itemtype="http://schema.org/AggregateRating">
+        <meta itemprop="ratingValue" content="{{ '{:.1f}'.format(vote_average) }}" />
+        <meta itemprop="ratingCount" content="{{ vote_total }}" />
+    </span>
+{% endif %}
+
+<span class="starblock" title="{% if can_show_stars %}Средняя оценка: {{ '{:.1f}'.format(vote_average) }}; {{ ngettext('%(num)d vote', '%(num)d votes', vote_total) }}{% else %}Голосов ещё мало{% endif %}">
+    {% for star in star_ids %}<span class="starvote star-{{ star }}"></span>{% endfor %}
+</span>

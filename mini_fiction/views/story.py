@@ -263,26 +263,31 @@ def bookmark(pk):
         return redirect(url_for('story.view', pk=story.id))
 
 
-@bp.route('/<int:pk>/vote/<int:value>/', methods=('POST',))
+@bp.route('/<int:pk>/vote/', methods=('POST',))
 @db_session
 @login_required
-def vote(pk, value):
+def vote(pk):
     story = get_story(pk)
     user = current_user._get_current_object()
 
     try:
-        story.bl.vote(user, value, ip=request.remote_addr)
+        value = int(request.form.get('vote_value') or '')
+        vote =story.bl.vote(user, value, ip=request.remote_addr)
     except ValueError as exc:  # TODO: refactor exceptions
-        if g.is_ajax:
+        if request.form.get('vote_ajax') == '1':
             return jsonify({'error': str(exc), 'success': False, 'story_id': story.id}), 403
-        else:
-            abort(403)
+        abort(403)
 
-    if g.is_ajax:
-        html = render_template('includes/story_stars.html', story=story)
-        return jsonify({'success': True, 'story_id': story.id, 'value': value, 'html': html})
-    else:
-        return redirect(url_for('story.view', pk=story.id))
+    if request.form.get('vote_ajax') == '1':
+        return jsonify({
+            'success': True,
+            'story_id': story.id,
+            'value': value,
+            'vote_view_html': current_app.story_voting.vote_view_html(story, full=True),
+            'vote_area_1_html': current_app.story_voting.vote_area_1_html(story, user=user, user_vote=vote),
+            'vote_area_2_html': current_app.story_voting.vote_area_2_html(story, user=user, user_vote=vote),
+        })
+    return redirect(url_for('story.view', pk=story.id))
 
 
 @bp.route('/<int:pk>/editlog/')

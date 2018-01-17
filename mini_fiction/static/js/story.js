@@ -59,6 +59,9 @@ var story = {
         // TODO: расхардкодить
         $('.slidesjs-previous').html('<img src="/static/i/arrow-left.png" />');
         $('.slidesjs-next').html('<img src="/static/i/arrow-right.png" />');
+
+        // Обработка нажатия кнопок голосования за рассказ
+        core.utils.addLiveClickListener('js-vote-button', this._voteButtonClickEvent.bind(this));
     },
 
     load: function() {
@@ -170,23 +173,6 @@ var story = {
                         return;
                     }
                     story.setBookmarked(response.story_id, response.bookmarked);
-                }).catch(core.handleError);
-        });
-
-        // Голосование за рассказ
-        core.bind('#content .vote-area .star-button', 'click', function(event) {
-            event.stopImmediatePropagation();
-            event.preventDefault();
-            var url = this.href;
-            core.ajax.post(url)
-                .then(function(response) {
-                    return response.json();
-                })
-                .then(function(response) {
-                    if (core.handleResponse(response, url)) {
-                        return;
-                    }
-                    story.updateStoryVote(response);
                 }).catch(core.handleError);
         });
 
@@ -347,28 +333,55 @@ var story = {
         return true;
     },
 
-    updateStoryVote: function(data) {
-        var story = document.getElementById('story_' + parseInt(data.story_id));
-        if (!story) {
-            return false;
+    _voteButtonClickEvent: function(event, button) {
+        event.stopImmediatePropagation();
+        event.preventDefault();
+
+        var form = button.form;
+
+        var body = new FormData(form);
+        body.append('vote_ajax', '1');
+        if (button.name) {
+            body.append(button.name, button.value);
         }
+        var url = form.action || '';
+        form.classList.add('uploading');
+
+        core.ajax.post(url, body)
+            .then(function(response) {
+                return response.json();
+            })
+            .then(function(response) {
+                if (core.handleResponse(response, url)) {
+                    return;
+                }
+                story.updateStoryVote(response);
+            }).catch(core.handleError)
+            .then(function() {
+                form.classList.remove('uploading');
+            });
+    },
+
+    updateStoryVote: function(data) {
         if (!data.success) {
             core.notifyError(data.error || 'Ошибка');
             return true;
         }
-        document.getElementById('stars').innerHTML = data.html;
 
-        var value = parseInt(data.value);
-        var stars = document.querySelectorAll('.vote-area .star-button');
-        for (var i = 0; i < stars.length; i++){
-            var star = stars[i];
-            if (i + 1 <= value) {
-                star.classList.remove('star-0');
-                star.classList.add('star-5');
-            } else {
-                star.classList.remove('star-5');
-                star.classList.add('star-0');
-            }
+        var i;
+        var voteViewAreas = document.getElementsByClassName('js-vote-view-' + data.story_id);
+        for (i = 0; i < voteViewAreas.length; i++) {
+            voteViewAreas[i].innerHTML = data.vote_view_html;
+        }
+
+        var vote1Areas = document.getElementsByClassName('js-vote-area-1-' + data.story_id);
+        for (i = 0; i < vote1Areas.length; i++) {
+            vote1Areas[i].innerHTML = data.vote_area_1_html;
+        }
+
+        var vote2Areas = document.getElementsByClassName('js-vote-area-2-' + data.story_id);
+        for (i = 0; i < vote2Areas.length; i++) {
+            vote2Areas[i].innerHTML = data.vote_area_2_html;
         }
 
         core.notify('Ваш голос учтен!');

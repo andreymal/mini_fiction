@@ -9,7 +9,6 @@ import random
 import ipaddress
 from hashlib import md5
 from datetime import datetime, timedelta
-from statistics import mean, pstdev
 
 import lxml.html
 import lxml.etree
@@ -64,6 +63,9 @@ class StoryBL(BaseBL, Commentable):
             notes=data['notes'],
             draft=True,
             approved=approved,
+            vote_total=0,
+            vote_value=current_app.story_voting.get_default_vote_value() if current_app.story_voting else 0,
+            vote_extra=current_app.story_voting.get_default_vote_extra() if current_app.story_voting else '{}',
         )
         story.flush()
         story.categories.add(Category.select(lambda x: x.id in data['categories'])[:])
@@ -385,8 +387,6 @@ class StoryBL(BaseBL, Commentable):
         data = {
             'last_views': story.views,
             'last_comments': story.comments_count,
-            'last_vote_average': story.vote_average,
-            'last_vote_stddev': story.vote_stddev,
             'last_comment_id': last_comment.id if last_comment else 0,
         }
         act = Activity.get(story=story, author=user)
@@ -401,9 +401,11 @@ class StoryBL(BaseBL, Commentable):
         from mini_fiction.models import Vote
 
         story = self.model
+        if not current_app.story_voting:
+            raise ValueError('Оценивание рассказов недоступно')
         if self.is_author(user):
             raise ValueError('Нельзя голосовать за свой рассказ')
-        if value < 1 or value > 5:
+        if not current_app.story_voting.validate_value(value):
             raise ValueError('Неверное значение')
 
         ip = ipaddress.ip_address(ip).exploded
@@ -420,49 +422,25 @@ class StoryBL(BaseBL, Commentable):
             vote.vote_value = value
             vote.ip = ip
         vote.flush()
-        self._update_rating()
+        current_app.story_voting.update_rating(self.model)
+        self.model.flush()
 
         return vote
 
-    def _update_rating(self):
-        from mini_fiction.models import Vote
+    def vote_view_html(self, full=False):
+        if not current_app.story_voting:
+            return ''
+        return current_app.story_voting.vote_view_html(self.model, full=full)
 
-        story = self.model
-        votes = orm.select(x.vote_value for x in Vote if x.story == story).without_distinct()[:]
-        m = mean(votes)
-        story.vote_average = m
-        story.vote_stddev = pstdev(votes, m)
-        story.vote_total = len(votes)
-        story.flush()
+    def vote_area_1_html(self, user=None, user_vote=None):
+        if not current_app.story_voting:
+            return ''
+        return current_app.story_voting.vote_area_1_html(self.model, user=user, user_vote=user_vote)
 
-    def can_show_stars(self):
-        story = self.model
-        return story.vote_total >= current_app.config['STARS_MINIMUM_VOTES']
-
-    def stars(self):
-        if not self.can_show_stars():
-            return [6, 6, 6, 6, 6]
-
-        story = self.model
-        stars = []
-        avg = story.vote_average
-        devmax = avg + story.vote_stddev
-
-        for i in range(1, 6):
-            if avg >= i - 0.25:
-                # полная звезда
-                stars.append(5)
-            elif avg >= i - 0.75:
-                # половина звезды
-                stars.append(4 if devmax >= i - 0.25 else 3)
-            elif devmax >= i - 0.25:
-                # пустая звезда (с полным отклонением)
-                stars.append(2)
-            else:
-                # пустая звезда (с неполным отклонением)
-                stars.append(1 if devmax >= i - 0.75 else 0)
-
-        return stars
+    def vote_area_2_html(self, user=None, user_vote=None):
+        if not current_app.story_voting:
+            return ''
+        return current_app.story_voting.vote_area_2_html(self.model, user=user, user_vote=user_vote)
 
     def get_all_views_for_author(self, author):
         # TODO: optimize it
@@ -661,7 +639,7 @@ class StoryBL(BaseBL, Commentable):
             return
         story = self.model
         f = set(update_fields)
-        if f and not f - {'vote_average', 'vote_stddev', 'vote_total'}:
+        if f and not f - {'vote_value', 'vote_total'}:
             pass  # TODO: рейтинг
         elif f and not f - {'date', 'first_published_at', 'draft', 'approved'}:
             with current_app.sphinx as sphinx:

@@ -1,0 +1,13 @@
+Ваша оценка:
+<form method="POST" action="{{ url_for('story.vote', pk=story.id) }}" class="starblock">
+<input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+{% if vote %}
+    {%- for i in range(1, stars_count + 1) -%}
+        <button type="submit" name="vote_value" value="{{ i }}" class="js-vote-button starvote star-button star-{% if vote.vote_value >= i %}5{% else %}0{% endif %}" title="{{ i }}"></button>
+    {%- endfor -%}
+{% else %}
+    {%- for i in range(1, stars_count + 1) -%}
+        <button type="submit" name="vote_value" value="{{ i }}" class="js-vote-button starvote star-button star-0" title="{{ i }}"></button>
+    {%- endfor -%}
+{% endif %}
+</form>

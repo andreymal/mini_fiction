@@ -41,6 +41,8 @@ var core = {
         this.loadingIcon = document.getElementById('loading-icon');
         this.notifications = document.getElementById('popup-notifications');
 
+        core.utils.init();
+
         var i;
 
         for (i = 0; i < this.initCallbacks.length; i++) {

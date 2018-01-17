@@ -197,7 +197,10 @@ class Config(object):
     PUBLISH_SIZE_LIMIT = 1000  # words
     MAX_SIZE_FOR_DIFF = 75000  # chars
     DIFF_CONTEXT_SIZE = 150  # chars
-    STARS_MINIMUM_VOTES = 2
+
+    STORY_VOTING_CLASS = 'mini_fiction.story_voting.star.StarVoting'
+    VOTING_MAX_VALUE = 5
+    MINIMUM_VOTES_FOR_VIEW = 2
 
     STORY_DOWNLOAD_FORMATS = tuple(reversed((
         'mini_fiction.downloads.fb2.FB2Download',
@@ -283,7 +286,7 @@ class Development(Config):
     SQL_DEBUG = True
     CHECK_PASSWORDS_SECURITY = False
     SPHINX_DISABLED = True
-    STARS_MINIMUM_VOTES = 1
+    MINIMUM_VOTES_FOR_VIEW = 1
     PUBLISH_SIZE_LIMIT = 20
     TEMPLATES_AUTO_RELOAD = True
     CELERY_CONFIG = dict(Config.CELERY_CONFIG)
@@ -304,7 +307,7 @@ class Test(Config):
     SQL_DEBUG = False
     MEMCACHE_SERVERS = None
     SPHINX_DISABLED = True  # TODO: test it
-    STARS_MINIMUM_VOTES = 3
+    MINIMUM_VOTES_FOR_VIEW = 3
     PUBLISH_SIZE_LIMIT = 20
     CELERY_CONFIG = dict(Config.CELERY_CONFIG)
     CELERY_CONFIG['task_always_eager'] = True

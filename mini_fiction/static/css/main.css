@@ -576,22 +576,31 @@ img.avatar-small, .character-list img {
 }
 
 /* Vote-buttons */
-.vote-area {
+
+.vote-area-1 {
+    display: inline;
+}
+
+.vote-area-2 {
     display: block;
     margin: 10px 0px;
 }
 
 .starblock {
     display: inline-block;
-    width: 120px;
     height: 24px;
     vertical-align: middle;
     line-height: 24px;
     overflow: hidden;
 }
 
-.vote-area .starblock {
+.vote-area-2 .starblock {
     vertical-align: baseline;
+    margin: 0;
+}
+
+.vote-area-2 .starblock.uploading {
+    opacity: 0.5;
 }
 
 .starvote {
@@ -601,6 +610,13 @@ img.avatar-small, .character-list img {
     display: inline-block;
     background-position: 0px 0px;
     background-size: 100%;
+}
+
+.starvote.star-button {
+    margin: 0;
+    padding: 0;
+    border: 0;
+    text-decoration: none;
 }
 
 .starvote.star-button:hover {

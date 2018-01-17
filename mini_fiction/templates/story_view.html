@@ -23,31 +23,17 @@
         {% include 'includes/story_control_buttons.html' %}
         <h1 id="story_title">
             <span itemprop="name"><a itemprop="url" class="story-title-link" href="{{ url_for('story.view', pk=story.id, _external=True) }}">{{ story.title }}</a></span>
-            {% if story.bl.can_show_stars() %}
-                <span itemprop="aggregateRating" itemscope itemtype="http://schema.org/AggregateRating">
-                    <meta itemprop="ratingValue" content="{{ '{:.1f}'.format(story.vote_average) }}" />
-                    <meta itemprop="ratingCount" content="{{ story.vote_total }}" />
-                </span>
-            {% endif %}
-            <span id="stars" style="display: inline;">{% include 'includes/story_stars.html' %}</span>
+            <div class="vote-area-1 js-vote-area-1-{{ story.id }}">
+                {{- story.bl.vote_area_1_html(user=current_user, user_vote=vote)|safe -}}
+            </div>{#
+            #}<div class="js-vote-view-{{ story.id }}" style="display: inline;">
+                {{- story.bl.vote_view_html(full=True)|safe -}}
+            </div>
             {% include 'includes/story_marks.html' %}
         </h1>
-        {% if current_user.is_authenticated and not story.bl.is_author(current_user) %}
-        <div class="vote-area">
-            Ваша оценка:
-            <span class="starblock">
-            {% if vote %}
-                {%- for i in range(1, 6) -%}
-                    <a href="{{ url_for('story.vote', pk=story.id, value=i) }}" class="starvote star-button star-{% if vote.vote_value >= i %}5{% else %}0{% endif %}" title="{{ i }}"></a>
-                {%- endfor -%}
-            {% else %}
-                {%- for i in range(1, 6) -%}
-                    <a href="{{ url_for('story.vote', pk=story.id, value=i) }}" class="starvote star-button star-0" title="{{ i }}"></a>
-                {%- endfor -%}
-            {% endif %}
-            </span>
+        <div class="vote-area-2 js-vote-area-2-{{ story.id }}">
+            {{- story.bl.vote_area_2_html(user=current_user, user_vote=vote)|safe -}}
         </div>
-        {% endif %}
             <p>
                 {%- include 'includes/story_reader_buttons.html' -%}
                 {% if current_user.is_authenticated %}

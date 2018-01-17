@@ -64,6 +64,7 @@ def create_app():
         configure_search(app)
     configure_celery(app)
     configure_captcha(app)
+    configure_story_voting(app)
     configure_misc(app)
     configure_development(app)
 
@@ -352,6 +353,19 @@ def configure_captcha(app):
     del module, cls
 
     app.captcha = Captcha(app)
+
+
+def configure_story_voting(app):
+    story_voting_path = app.config.get('STORY_VOTING_CLASS')
+    if not story_voting_path or '.' not in story_voting_path:
+        app.story_voting = None
+        return
+
+    module, cls = story_voting_path.rsplit('.', 1)
+    StoryVoting = getattr(importlib.import_module(module), cls)
+    del module, cls
+
+    app.story_voting = StoryVoting(app)
 
 
 def configure_misc(app):

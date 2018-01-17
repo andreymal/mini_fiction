@@ -293,10 +293,11 @@ class Story(db.Entity):
     updated = orm.Required(datetime, 6, default=datetime.utcnow, optimistic=False)
     words = orm.Required(int, default=0, optimistic=False)
     views = orm.Required(int, default=0, optimistic=False)
-    vote_total = orm.Required(int, unsigned=True, default=0)
-    vote_average = orm.Required(float, default=3)
-    vote_average_index = orm.Required(int, size=16, unsigned=True, default=300, optimistic=False)  # float can't be used with composite_index
-    vote_stddev = orm.Required(float, default=0)
+
+    vote_total = orm.Required(int, unsigned=True, default=0, optimistic=False)  # TODO: rename to vote_count
+    vote_value = orm.Required(int, default=0, optimistic=False)
+    vote_extra = orm.Required(orm.LongStr, lazy=False, default='{}', optimistic=False)
+
     comments_count = orm.Required(int, size=16, unsigned=True, default=0, optimistic=False)
     source_link = orm.Optional(str, 255)
     source_title = orm.Optional(str, 255)
@@ -319,14 +320,9 @@ class Story(db.Entity):
     orm.composite_index(approved, draft)
     orm.composite_index(approved, draft, first_published_at)
     orm.composite_index(approved, draft, pinned, first_published_at)
-    orm.composite_index(approved, draft, vote_average_index)
+    orm.composite_index(approved, draft, vote_value)
 
     bl = Resource('bl.story')
-
-    def before_update(self):
-        vote_average_index = round(self.vote_average * 100)
-        if vote_average_index != self.vote_average_index:
-            self.vote_average_index = vote_average_index
 
     @property
     def url(self):
@@ -654,7 +650,7 @@ class Vote(db.Entity):
     date = orm.Required(datetime, 6, default=datetime.utcnow)
     updated = orm.Required(datetime, 6, default=datetime.utcnow, optimistic=False)
     ip = orm.Required(str, 50, default=ipaddress.ip_address('::1').exploded, optimistic=False)
-    vote_value = orm.Required(int, size=16, unsigned=True, default=3, optimistic=False)
+    vote_value = orm.Required(int, default=0, optimistic=False)
     extra = orm.Required(orm.LongStr, lazy=False, default='{}')
 
     orm.composite_key(author, story)
@@ -695,8 +691,6 @@ class Activity(db.Entity):
     last_views = orm.Required(int, default=0, optimistic=False)
     last_comments = orm.Required(int, default=0, optimistic=False)
     last_local_comments = orm.Required(int, default=0, optimistic=False)
-    last_vote_average = orm.Required(float, default=3, optimistic=False)
-    last_vote_stddev = orm.Required(float, default=0, optimistic=False)
     last_comment_id = orm.Required(int, default=0, optimistic=False)
     last_local_comment_id = orm.Required(int, default=0, optimistic=False)
 

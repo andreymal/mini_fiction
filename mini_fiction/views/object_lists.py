@@ -80,8 +80,8 @@ def bookmarks(page):
 @bp.route('/story/top/page/<int:page>/')
 @db_session
 def top(page):
-    objects = Story.select_published().filter(lambda x: x.vote_total >= current_app.config['STARS_MINIMUM_VOTES'])
-    objects = objects.order_by(Story.vote_average.desc(), Story.id.desc())
+    objects = Story.select_published().filter(lambda x: x.vote_total >= current_app.config['MINIMUM_VOTES_FOR_VIEW'])
+    objects = objects.order_by(Story.vote_value.desc(), Story.id.desc())
     objects = objects.prefetch(Story.characters, Story.categories, Story.contributors, StoryContributor.user)
     return paginate_view(
         'stream/stories.html',

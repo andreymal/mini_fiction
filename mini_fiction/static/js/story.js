@@ -334,6 +334,10 @@ var story = {
     },
 
     _voteButtonClickEvent: function(event, button) {
+        if (!core.extraAjaxAllowed()) {
+            return;
+        }
+
         event.stopImmediatePropagation();
         event.preventDefault();
 

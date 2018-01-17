@@ -220,6 +220,18 @@ var core = {
         return false;
     },
 
+    extraAjaxAllowed: function() {
+        if (document.cookie.indexOf('noextraajax=1') >= 0) {
+            return false;
+        }
+
+        if (navigator.userAgent.toString().indexOf('Opera Mini') >= 0) {
+            return false;
+        }
+
+        return true;
+    },
+
     ajaxify: function() {
         var amajaxify = window.amajaxify;
         if (!amajaxify) {
@@ -229,6 +241,10 @@ var core = {
 
         if (document.cookie.indexOf('noajax=1') >= 0) {
             console.log('amajaxify disabled by cookie');
+            return;
+        }
+        if (!this.extraAjaxAllowed()) {
+            console.log('amajaxify disabled by user agent');
             return;
         }
 

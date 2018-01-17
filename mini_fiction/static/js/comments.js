@@ -18,8 +18,10 @@ var comments = {
         this.addlink = document.getElementById('comment-add-link');
         this.form = document.getElementById('comment-form');
         if (this.addlink && this.form) {
-            this.addlink.addEventListener('click', this._answerEvent);
-            this.form.addEventListener('submit', this.submitForm.bind(this));
+            if (core.extraAjaxAllowed()) {
+                this.addlink.addEventListener('click', this._answerEvent);
+                this.form.addEventListener('submit', this.submitForm.bind(this));
+            }
             this.loadCommentsContent();
 
             this._captchaField = this.form.getElementsByClassName('js-captcha-field')[0];
@@ -31,7 +33,9 @@ var comments = {
             this.bindLinksFor(list);
         }
 
-        this.loadPagination();
+        if (core.extraAjaxAllowed()) {
+            this.loadPagination();
+        }
         this.commentPreviewStuff();
     },
 
@@ -61,6 +65,10 @@ var comments = {
     },
 
     bindTreeLinksFor: function(element) {
+        if (!core.extraAjaxAllowed()) {
+            return;
+        }
+
         var links, i;
         links = Array.prototype.slice.call(element.querySelectorAll('.comment-answer-link'));
         for (i = 0; i < links.length; i++) {

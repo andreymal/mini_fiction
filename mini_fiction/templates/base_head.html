@@ -13,6 +13,9 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}" />
     <link rel="stylesheet" href="{{ url_for('static', filename='css/markitup.main.css') }}" />
     <link rel="stylesheet" href="{{ url_for('static', filename='css/markitup.set.css') }}" />
+{%- for css_link in extra_css %}
+    <link rel="stylesheet" href="{{ css_link }}" />
+{%- endfor -%}
 {% endblock -%}
 
 {%- block head_js %}

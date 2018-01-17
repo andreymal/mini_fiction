@@ -40,6 +40,8 @@ def create_app():
     app = Flask(__name__)
     app.config.from_object(os.environ.get('MINIFICTION_SETTINGS'))
     app.static_folder = app.config['STATIC_ROOT']
+    app.extra_css = []
+    app.extra_js = []
 
     if app.config['TESTING']:
         if not os.path.isdir(app.config['TESTING_DIRECTORY']):

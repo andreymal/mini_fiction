@@ -407,11 +407,11 @@ ul.nav-profile-menu-content > li > a {
         width: calc(30px);
     }
     .nav-main-profile {
-        width: 93%;
+        width: 90%;
         width: calc(100% - 40px);
     }
     .nav-profile-menu {
-        width: 86%;
+        width: 75%;
         width: calc(100% - 80px);
         min-width: auto;
     }

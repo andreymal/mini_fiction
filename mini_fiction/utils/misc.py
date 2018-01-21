@@ -390,14 +390,18 @@ def words_count(s, html=True):
 
     if html:
         # Добавляем разделительные пробелы тем тегам, которые разделяют слова
-        s = re.sub(r'(</(br|hr|footnote|p|blockquote|img|ul|ol|li|pre)[^>]*?>)', r' \1', s, flags=re.I)
+        s = re.sub(r'(</?(br|hr|footnote|p|blockquote|img|ul|ol|li|pre)[^>]*?>)', r' \1', s, flags=re.I)
+        # Для таких span прописан display: block
+        s = re.sub(r'(<span+[^>]{,127} +align=[^>]{,127}>)', r' \1', s, flags=re.I)
         # Разделители добавлены, теперь теги можно удалить
         s = re.sub(r'<!--.*?-->', '', s)
         s = re.sub(r'<[^<>]*?>', '', s)
+        # HTML-сущности тоже не считаем за слова
+        s = re.sub(r'&#?[A-Za-z0-9]{1,16};?', '', s)
 
     # Знаки препинания за слова не считаются
     s = re.sub(r'[/-]+', '', s)
-    s = re.sub(r'[.,?!@:;_—…–$%*&]+', ' ', s)
+    s = re.sub(r'[.,?!@:;_—…–$%*&<>]+', ' ', s)
 
     words = s.split()
     return len(words)

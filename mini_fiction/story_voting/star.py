@@ -34,14 +34,16 @@ class StarVoting(BaseVoting):
         from mini_fiction.models import Vote
 
         votes = orm.select(x.vote_value for x in Vote if x.story == story).without_distinct()[:]
-        m = mean(votes)
+        votes = [min(x, current_app.config['VOTING_MAX_VALUE']) for x in votes]
+        votes = [max(1, x) for x in votes]
+        m = mean(votes) if votes else 3.0
 
         story.vote_total = len(votes)
         story.vote_value = int(round(m * 100))
 
         extra = json.loads(story.vote_extra)
-        extra['average'] = float(m)
-        extra['stddev'] = pstdev(votes, m)
+        extra['average'] = round(float(m), 6)
+        extra['stddev'] = round(pstdev(votes, m) if votes else 0.0, 6)
         story.vote_extra = json.dumps(extra, ensure_ascii=False, sort_keys=True)
 
     # templates

@@ -107,6 +107,12 @@ def checkwordscount():
     cmd()
 
 
+@manager.command
+def checkstoryvoting():
+    from mini_fiction.management.commands.checkstoryvoting import checkstoryvoting as cmd
+    orm.sql_debug(False)
+    cmd()
+
 
 @manager.option('-s', '--silent', dest='silent', help='Don\'t print progress bar to console', action='store_true')
 @manager.option('-c', '--compression', dest='gzip_compression', type=int, default=0, choices=list(range(10)), help='Use gzip compression for files')

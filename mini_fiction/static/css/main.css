@@ -1642,7 +1642,8 @@ a.btn {
 }
 
 .comments-tree .comment-item {
-    width: 70%;
+    min-width: 30%;
+    max-width: 70%;
     box-sizing: border-box;
 }
 

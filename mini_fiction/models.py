@@ -512,7 +512,7 @@ class StoryComment(db.Entity):
     deleted = orm.Required(bool, default=False)
     last_deleted_at = orm.Optional(datetime, 6)
     story = orm.Required(Story)
-    text = orm.Required(orm.LongStr, lazy=False)
+    text = orm.Optional(orm.LongStr, lazy=False)
     ip = orm.Required(str, 50, default=ipaddress.ip_address('::1').exploded)
     vote_count = orm.Required(int, size=16, unsigned=True, default=0)
     vote_total = orm.Required(int, default=0)
@@ -599,7 +599,7 @@ class StoryLocalComment(db.Entity):
     deleted = orm.Required(bool, default=False)
     last_deleted_at = orm.Optional(datetime, 6)
     local = orm.Required(StoryLocalThread)
-    text = orm.Required(orm.LongStr, lazy=False)
+    text = orm.Optional(orm.LongStr, lazy=False)
     ip = orm.Required(str, 50, default=ipaddress.ip_address('::1').exploded)
 
     # Optimizations
@@ -766,7 +766,7 @@ class NewsComment(db.Entity):
     deleted = orm.Required(bool, default=False)
     last_deleted_at = orm.Optional(datetime, 6)
     newsitem = orm.Required(NewsItem)
-    text = orm.Required(orm.LongStr, lazy=False)
+    text = orm.Optional(orm.LongStr, lazy=False)
     ip = orm.Required(str, 50, default=ipaddress.ip_address('::1').exploded)
     vote_count = orm.Required(int, size=16, unsigned=True, default=0)
     vote_total = orm.Required(int, default=0)

@@ -107,7 +107,7 @@
     {%- endif -%}:</div>
     {% call nc.notification_comment_html(item.comment) %}
         <span class="comment-story-link">
-        в редакторской рассказа
+        в <a href="{{ url_for('story_local_comment.view', story_id=item.story.id) }}" class="link-inline">редакторской</a> рассказа
         <a href="{{ url_for('story.view', pk=item.story.id) }}"><b>{{ item.story.title }}</b></a>
         </span>
         <a class="comment-answer-link" href="{{ url_for('story_local_comment.add', story_id=item.story.id, parent=item.comment.local_id) }}">Ответить</a>

@@ -39,6 +39,7 @@ def selenium(selenium):
 
 @pytest.fixture
 def chrome_options(chrome_options):
+    chrome_options.add_argument('--no-sandbox')
     if flask_app.config.get('SELENIUM_HEADLESS'):
         chrome_options.add_argument('--headless')
     return chrome_options

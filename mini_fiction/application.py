@@ -142,10 +142,37 @@ def configure_i18n(app):
 
 
 def configure_cache(app):
-    if app.config.get('MEMCACHE_SERVERS'):
-        app.cache = cache.MemcachedCache(app.config['MEMCACHE_SERVERS'], key_prefix=app.config.get('CACHE_PREFIX', ''))
-    else:
+    if app.config['CACHE_TYPE'] == 'memcached':
+        app.cache = cache.MemcachedCache(
+            app.config['CACHE_MEMCACHED_SERVERS'],
+            key_prefix=app.config.get('CACHE_KEY_PREFIX') or '',
+        )
+
+    elif app.config['CACHE_TYPE'] == 'redis':
+        kwargs = {
+            'host': app.config['CACHE_REDIS_HOST'],
+            'port': app.config['CACHE_REDIS_PORT'],
+        }
+
+        if app.config['CACHE_REDIS_PASSWORD']:
+            kwargs['password'] = app.config['CACHE_REDIS_PASSWORD']
+
+        if app.config['CACHE_REDIS_DB'] is not None:
+            kwargs['db'] = app.config['CACHE_REDIS_DB']
+
+        if app.config['CACHE_KEY_PREFIX']:
+            kwargs['key_prefix'] = app.config['CACHE_KEY_PREFIX']
+
+        app.cache = cache.RedisCache(**kwargs)
+
+    elif app.config['CACHE_TYPE'] == 'filesystem':
+        app.cache = cache.FileSystemCache(app.config['CACHE_DIR'])
+
+    elif app.config['CACHE_TYPE'] == 'null':
         app.cache = cache.NullCache()
+
+    else:
+        raise ValueError('Unknown cache type: {}'.format(app.config['CACHE_TYPE']))
 
 
 def configure_forms(app):

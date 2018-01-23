@@ -30,9 +30,23 @@ class Config(object):
     }
     SQL_DEBUG = False
 
+    # cache config
+    CACHE_TYPE = 'memcached'  # 'null', 'redis', 'filesystem'
+    CACHE_KEY_PREFIX = 'mfc_'
+
+    # memcached
+    CACHE_MEMCACHED_SERVERS = ['127.0.0.1:11211']
+
+    # redis
+    CACHE_REDIS_HOST = '127.0.0.1'
+    CACHE_REDIS_PORT = 6379
+    CACHE_REDIS_PASSWORD = None
+    CACHE_REDIS_DB = None
+
+    # filesystem
+    CACHE_DIR = os.path.join(os.getcwd(), 'cache')
+
     JSON_AS_ASCII = False
-    MEMCACHE_SERVERS = ['127.0.0.1:11211']
-    CACHE_PREFIX = 'mfc_'
     MAX_CONTENT_LENGTH = 4 * 1024 * 1024
     PROXIES_COUNT = 0
     LOGGER_LEVEL = logging.INFO
@@ -305,7 +319,7 @@ class Test(Config):
     TESTING_DIRECTORY = os.path.join(os.getcwd(), 'testmedia')
     MEDIA_ROOT = os.path.join(os.getcwd(), 'testmedia', 'media')
     SQL_DEBUG = False
-    MEMCACHE_SERVERS = None
+    CACHE_TYPE = 'null'
     SPHINX_DISABLED = True  # TODO: test it
     MINIMUM_VOTES_FOR_VIEW = 3
     PUBLISH_SIZE_LIMIT = 20

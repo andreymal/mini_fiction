@@ -5,8 +5,6 @@ import os
 import sys
 import random
 
-from werkzeug.contrib.cache import NullCache
-
 from mini_fiction import models
 
 class ANSI:
@@ -80,7 +78,7 @@ class SystemStatus(Status):
 class ProjectStatus(Status):
     title = 'Project configuration'
     labels = {
-        'cache': 'Cache',
+        'cache': 'Cache type',
         'cache_working': 'Cache working',
         'email': 'E-Mail',
         'hasher': 'Password hasher',
@@ -97,13 +95,14 @@ class ProjectStatus(Status):
     }
 
     def cache(self):
-        return self._ok('cache', str(type(self.app.cache)))
+        return self._ok('cache', self.app.config['CACHE_TYPE'])
 
     def cache_working(self):
-        if isinstance(self.app.cache, NullCache):
+        if self.app.config['CACHE_TYPE'] == 'null':
             return self._ok('cache_working', 'disabled')
 
         k = ''.join(random.choice('abcdefghijklmnopqrstuvwxyz') for _ in range(10))
+        k += 'ё©™😊🔒'  # check unicode support
         self.app.cache.set('test_minifiction_status', k, timeout=30)
 
         if self.app.cache.get('test_minifiction_status') == k:

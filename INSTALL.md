@@ -302,6 +302,14 @@ celery -A mini_fiction status
 настройках по умолчанию.
 
 
+### Кэширование в Redis
+
+Пропишите настройку `CACHE_TYPE = 'redis'`. Если настройки Redis отличаются
+от настроек по умолчанию, можно изменить `CACHE_REDIS_HOST`,
+`CACHE_REDIS_PORT`, `CACHE_REDIS_PASSWORD` или `CACHE_REDIS_DB` — их названия
+говорят сами за себя.
+
+
 ### ReCaptcha при регистрации
 
 ```python

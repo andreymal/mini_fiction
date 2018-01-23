@@ -10,6 +10,7 @@ from pony.orm import db_session
 from mini_fiction import database, fixtures
 from mini_fiction.application import create_app
 
+# pylint: disable=W0621
 
 flask_app = None
 
@@ -34,6 +35,20 @@ def app():
 def selenium(selenium):
     selenium.implicitly_wait(5)
     return selenium
+
+
+@pytest.fixture
+def chrome_options(chrome_options):
+    if flask_app.config.get('SELENIUM_HEADLESS'):
+        chrome_options.add_argument('--headless')
+    return chrome_options
+
+
+@pytest.fixture
+def firefox_options(firefox_options):
+    if flask_app.config.get('SELENIUM_HEADLESS'):
+        firefox_options.add_argument('-headless')
+    return firefox_options
 
 
 @pytest.fixture(scope="session")

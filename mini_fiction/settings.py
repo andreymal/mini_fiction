@@ -13,7 +13,6 @@ class Config(object):
         'ru': 'Русский',
     }
     DEBUG = False
-    TESTING = False
     SECRET_KEY = 'mnwpNkTYhFeu57Fc9WjVbw7DidbkZoVe'
     SYSTEM_USER_ID = -1
 
@@ -293,6 +292,10 @@ class Config(object):
     RECAPTCHA_OPTIONS = {'hl': 'ru'}
 
     DEFAULT_USERPIC = {'endpoint': 'static', 'filename': 'i/userpic.png'}
+
+    # Testing
+    TESTING = False
+    SELENIUM_HEADLESS = True
 
 
 class Development(Config):

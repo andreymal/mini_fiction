@@ -33,6 +33,8 @@ class AuthorFactory(PonyFactory):
     username = factory.Sequence(lambda n: "User%d" % n)
     email = factory.Sequence(lambda n: "user%d@example.com" % n)
     date_joined = factory.LazyAttribute(lambda obj: datetime.utcnow())
+    activated_at = factory.LazyAttribute(lambda obj: datetime.utcnow())
+    session_token = factory.Sequence(lambda n: "veryrandomtoken%d" % n)
 
 
 class StoryFactory(PonyFactory):

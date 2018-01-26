@@ -80,7 +80,7 @@ class AuthorBL(BaseBL):
         if data.get('password'):
             user.bl.set_password(data['password'])
         else:
-            user.pssword = data['password_hash']
+            user.password = data['password_hash']
         return user
 
     def update(self, data):
@@ -544,7 +544,9 @@ class AuthorBL(BaseBL):
             return
 
         assert rp.username == user.username
+        assert rp.email == user.email
         RegistrationProfile.select(lambda x: x.username == user.username).delete(bulk=True)
+        RegistrationProfile.select(lambda x: x.email == user.email).delete(bulk=True)
         return user
 
     def activate_changed_email(self, activation_key):

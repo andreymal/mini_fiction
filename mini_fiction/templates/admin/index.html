@@ -19,6 +19,7 @@
             <li><a href="{{ url_for('admin_abuse_reports.index') }}">Жалобы</a></li>
             {% if current_user.is_superuser -%}
                 <li><a href="{{ url_for('admin_authors.index') }}">{{ _('Authors') }}</a></li>
+                <li><a href="{{ url_for('admin_registrations.index') }}">{{ _('Registrations') }}</a></li>
             {%- endif %}
         </ul>
         {{- breadcrumbs() }}

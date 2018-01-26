@@ -1,0 +1,57 @@
+{% extends base %}
+{% from 'macro.html' import breadcrumbs with context %}
+{% from 'macro.html' import form_fields with context %}
+{% block content %}
+
+<div class="row">
+    <div class="span12">
+        {{- breadcrumbs([
+            [url_for('admin_index.index'), _('Administration')],
+            [url_for('admin_registrations.index'), _('Registrations')]
+        ]) }}
+        <h1>{{ page_title }}</h1>
+
+        <form class="form-horizontal" method="POST" enctype="multipart/form-data">
+        <div class="control-group">
+            <label class="control-label">{{ _('Username') }}</label>
+            <div class="controls"><span style="display: inline-block; padding-top: 5px;">
+                {{ rp.username }}
+            </span></div>
+        </div>
+
+        <div class="control-group">
+            <label class="control-label">{{ _('E-mail') }}</label>
+            <div class="controls"><span style="display: inline-block; padding-top: 5px;">
+                {{ rp.email }}
+        </span></div>
+        </div>
+
+        <div class="control-group">
+            <label class="control-label">{{ _('Created at') }}</label>
+            <div class="controls">
+                <span style="display: inline-block; padding-top: 5px;">
+                    <time datetime="{{ rp.created_at.strftime('%Y-%m-%dT%H:%M:%SZ') }}">
+                        {{ rp.created_at|datetimeformat('d MMMM Y, HH:mm') }}
+                    </time>
+                </span>
+            </div>
+        </div>
+
+        {% if not too_old %}
+            <div class="controls">
+                <button type="submit" name="act" value="activate" class="btn btn-primary">{{ _('Activate') }}</button>
+
+                <a href="{{ url_for('admin_registrations.delete', pk=rp.id) }}" class="btn">
+                    {{ _('Delete') }}
+                </a>
+            </div>
+        {% endif %}
+        </form>
+
+        {{- breadcrumbs([
+            [url_for('admin_index.index'), _('Administration')],
+            [url_for('admin_registrations.index'), _('Registrations')]
+        ]) }}
+    </div>
+</div>
+{% endblock %}

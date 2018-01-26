@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version:  0.0.3\n"
 "Report-Msgid-Bugs-To: andriyano-31@mail.ru\n"
-"POT-Creation-Date: 2018-01-26 21:10+0300\n"
+"POT-Creation-Date: 2018-01-26 22:01+0300\n"
 "Last-Translator: andreymal <andriyano-31@mail.ru>\n"
 "Language: ru\n"
 "Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && "
@@ -353,6 +353,87 @@ msgstr "Полная страница"
 #: mini_fiction/forms/admin/staticpage.py:41
 msgid "This option removes header and footer"
 msgstr "Эта опция убирает шапку и подвал"
+
+#: mini_fiction/templatefilters/timesince.py:32
+msgctxt "timesince"
+msgid "just now"
+msgstr "только что"
+
+#: mini_fiction/templatefilters/timesince.py:34
+msgctxt "timesince"
+msgid "very soon"
+msgstr "совсем скоро"
+
+#: mini_fiction/templatefilters/timesince.py:62
+msgctxt "timesince"
+msgid ", "
+msgstr ", "
+
+#: mini_fiction/templatefilters/timesince.py:66
+#, python-format
+msgctxt "timesince"
+msgid "%(delta)s ago"
+msgstr "%(delta)s назад"
+
+#: mini_fiction/templatefilters/timesince.py:67
+#, python-format
+msgctxt "timesince"
+msgid "in %(delta)s"
+msgstr "через %(delta)s"
+
+#: mini_fiction/templatefilters/timesince.py:71
+#, python-format
+msgctxt "timesince"
+msgid "%(num)d year"
+msgid_plural "%(num)d years"
+msgstr[0] "%(num)d год"
+msgstr[1] "%(num)d года"
+msgstr[2] "%(num)d лет"
+
+#: mini_fiction/templatefilters/timesince.py:72
+#, python-format
+msgctxt "timesince"
+msgid "%(num)d month"
+msgid_plural "%(num)d months"
+msgstr[0] "%(num)d месяц"
+msgstr[1] "%(num)d месяца"
+msgstr[2] "%(num)d месяцев"
+
+#: mini_fiction/templatefilters/timesince.py:73
+#, python-format
+msgctxt "timesince"
+msgid "%(num)d week"
+msgid_plural "%(num)d weeks"
+msgstr[0] "%(num)d неделю"
+msgstr[1] "%(num)d недели"
+msgstr[2] "%(num)d недель"
+
+#: mini_fiction/templatefilters/timesince.py:74
+#, python-format
+msgctxt "timesince"
+msgid "%(num)d day"
+msgid_plural "%(num)d days"
+msgstr[0] "%(num)d день"
+msgstr[1] "%(num)d дня"
+msgstr[2] "%(num)d дней"
+
+#: mini_fiction/templatefilters/timesince.py:75
+#, python-format
+msgctxt "timesince"
+msgid "%(num)d hour"
+msgid_plural "%(num)d hours"
+msgstr[0] "%(num)d час"
+msgstr[1] "%(num)d часа"
+msgstr[2] "%(num)d часов"
+
+#: mini_fiction/templatefilters/timesince.py:76
+#, python-format
+msgctxt "timesince"
+msgid "%(num)d minute"
+msgid_plural "%(num)d minutes"
+msgstr[0] "%(num)d минуту"
+msgstr[1] "%(num)d минуты"
+msgstr[2] "%(num)d минут"
 
 #: mini_fiction/templates/author_dashboard.html:20
 #: mini_fiction/templates/author_overview.html:31

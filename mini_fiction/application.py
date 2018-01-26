@@ -353,6 +353,11 @@ def configure_templates(app):
         ])
         app.jinja_loader = my_loader
 
+    from mini_fiction.templatefilters import timesince
+    from mini_fiction.templatefilters import registry as filters_registry
+
+    app.jinja_env.filters.update(filters_registry.filters)
+
 
 def configure_search(app):
     from mini_fiction.apis import amsphinxql

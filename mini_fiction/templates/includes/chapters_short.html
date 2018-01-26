@@ -2,7 +2,7 @@
     <div class="story-item">
         <h3><a href="{{ url_for('chapter.view', story_id=story.id, chapter_order=chapter.order) }}">{{ chapter.autotitle }}</a></h3>
           <p><a href="{{ url_for('story.view', pk=story.id) }}">{{ story.title }}</a> от <a class="authorlink" href="{{ url_for('author.info', user_id=story.authors[0].id) }}">{{ story.authors[0].username }}</a>
-          {%- if chapter.first_published_at %} <time datetime="{{ chapter.first_published_at.strftime('%Y-%m-%dT%H:%M:%SZ') }}" title="{{ chapter.first_published_at|datetimeformat('d MMMM Y, HH:mm') }}">{{ chapter.first_published_at|timedeltaformat }} назад</time>
+          {%- if chapter.first_published_at %} <time datetime="{{ chapter.first_published_at.strftime('%Y-%m-%dT%H:%M:%SZ') }}" title="{{ chapter.first_published_at|datetimeformat('d MMMM Y, HH:mm') }}">{{ chapter.first_published_at|timesince }}</time>
           {%- endif -%}
           </p>
     </div>

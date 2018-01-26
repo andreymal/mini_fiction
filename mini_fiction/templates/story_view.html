@@ -89,14 +89,14 @@
                         {{- story.date|datetimeformat('d MMMM Y') -}}
                     </time>
                     {%- if not story.first_published_at %}, последнее изменение – <time datetime="{{ story.updated.strftime('%Y-%m-%dT%H:%M:%SZ') }}" title="{{ story.updated|datetimeformat('d MMMM Y, HH:mm') }}">
-                        {{- story.updated|timedeltaformat }} назад
+                        {{- story.updated|timesince }}
                     </time>{% endif %}<br/>
                 {% endif %}
                 {% if story.first_published_at %}
                     Опубликован: <time itemprop="datePublished" datetime="{{ story.first_published_at.strftime('%Y-%m-%dT%H:%M:%SZ') }}">
                         {{- story.first_published_at|datetimeformat('d MMMM Y') -}}
                     </time>, последнее изменение – <time itemprop="dateModified" datetime="{{ story.updated.strftime('%Y-%m-%dT%H:%M:%SZ') }}" title="{{ story.updated|datetimeformat('d MMMM Y, HH:mm') }}">
-                        {{- story.updated|timedeltaformat }} назад
+                        {{- story.updated|timesince }}
                     </time><br/>
                 {%- endif -%}
             </p>

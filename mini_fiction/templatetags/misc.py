@@ -35,3 +35,27 @@ def modified_url(endpoint=None, view_args=None, **kwargs):
     view_args = view_args if view_args is not None else dict(request.view_args or {})
     view_args.update(kwargs)
     return url_for(endpoint, **view_args)
+
+
+@registry.simple_tag()
+def safe_password_hash(password_hash):
+    try:
+        if password_hash.startswith('$pbkdf2$pbkdf2_sha256$'):
+            prefix1, prefix2, algorithm, iterations, salt, result = password_hash[:].split('$', 5)
+            return '$'.join([
+                prefix1, prefix2, algorithm, iterations,
+                salt[:4] + '*' * (len(salt) - 4),
+                result[:6] + '*' * (len(result) - 6),
+            ])
+
+        if password_hash.startswith('$bcrypt$$') and password_hash.count('$') == 5:
+            prefix, data = password_hash.rsplit('$', 1)
+            return prefix + '$' + data[:6] + '*' * (len(data) - 6)
+
+    except Exception:
+        pass
+
+    if len(password_hash) < 12:
+        return '*' * len(password_hash)
+
+    return password_hash[:4] + '*' * (len(password_hash) - 4)

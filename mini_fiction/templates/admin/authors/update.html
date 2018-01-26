@@ -14,10 +14,6 @@
 
         {% if saved %}<div class="alert-mini green">{{ _('Saved!') }}</div>{% endif %}
 
-        {% if config['DEBUG'] and current_user.is_superuser %}
-            <div class="password-hash">{{ author.password }}</div><br/>
-        {% endif %}
-
         <form class="form-horizontal" method="POST" enctype="multipart/form-data">
         <div class="control-group">
             <label class="control-label">{{ _('Registered at') }}</label>
@@ -27,6 +23,7 @@
                 </time>{% else %}N/A{% endif %}</span>
             </div>
         </div>
+
         <div class="control-group">
             <label class="control-label">{{ _('Last visit') }}</label>
             <div class="controls">
@@ -38,7 +35,7 @@
         {% if not is_system_user %}
             {{ form_fields(form) }}
             <div class="controls">
-                <input type="submit" value="{{ _('Save') }}" class="btn btn-primary" />
+                <button type="submit" name="act" value="save" class="btn btn-primary">{{ _('Save') }}</button>
             </div>
         {% else %}
             <div class="control-group">
@@ -54,6 +51,37 @@
             <input type="submit" value="{{ _('Log in as this user') }}" class="btn btn-warning" />
         </div>
         </form>
+        {% endif %}
+
+        {% if not is_system_user %}
+        <form class="form-horizontal" method="POST" enctype="multipart/form-data">
+        <div class="control-group">
+            <label class="control-label">{{ _('Password hash') }}</label>
+            <div class="controls">
+                <span style="display: inline-block; padding-top: 5px;">
+                {%- if config['DEBUG'] and current_user.is_superuser -%}
+                    {{ author.password }}
+                {%- else -%}
+                    {{ safe_password_hash(author.password) }}
+                {%- endif -%}
+                </spab>
+            </div>
+        </div>
+
+        <div class="control-group">
+            <label class="control-label">{{ _('Last password change') }}</label>
+            <div class="controls">
+                <span style="display: inline-block; padding-top: 5px;">{% if author.last_password_change %}<time datetime="{{ author.last_password_change.strftime('%Y-%m-%dT%H:%M:%SZ') }}">
+                    {{ author.last_password_change|datetimeformat('d MMMM Y, HH:mm') }}
+                </time>{% else %}N/A{% endif %}</span>
+            </div>
+        </div>
+
+        {{ form_fields(password_edit_form) }}
+        <div class="controls">
+            <button type="submit" name="act" value="change_password" class="btn btn-primary">{{ _('Change password') }}</button>
+        </div>
+        </span>
         {% endif %}
 
         {{- breadcrumbs([

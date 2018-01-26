@@ -1,13 +1,13 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-from flask import Blueprint, current_app, render_template, abort, redirect, url_for
+from flask import Blueprint, current_app, render_template, abort, redirect, url_for, request
 from flask_babel import gettext
 from flask_login import login_user, current_user
 from pony.orm import db_session
 
 from mini_fiction.validation import ValidationError
-from mini_fiction.forms.admin.authors import AdminAuthorForm
+from mini_fiction.forms.admin.authors import AdminAuthorForm, AdminEditPasswordForm
 from mini_fiction.models import Author
 from mini_fiction.utils.views import paginate_view
 
@@ -57,18 +57,26 @@ def update(pk):
         'premoderation_mode': author.premoderation_mode,
     })
 
+    password_edit_form = AdminEditPasswordForm()
+
     saved = False
 
-    if form.validate_on_submit():
-        if author.id == current_user.id:
-            for true_field in ('is_active', 'is_superuser', 'is_staff'):
-                if true_field in form.data and not form.data[true_field]:
-                    abort(403)
-        try:
-            author.bl.update(form.data)
-        except ValidationError as exc:
-            form.set_errors(exc.errors)
-        else:
+    if request.form.get('act') == 'save':
+        if form.validate_on_submit():
+            if author.id == current_user.id:
+                for true_field in ('is_active', 'is_superuser', 'is_staff'):
+                    if true_field in form.data and not form.data[true_field]:
+                        abort(403)
+            try:
+                author.bl.update(form.data)
+            except ValidationError as exc:
+                form.set_errors(exc.errors)
+            else:
+                saved = True
+
+    elif request.form.get('act') == 'change_password':
+        if password_edit_form.validate_on_submit():
+            author.bl.set_password(password_edit_form.data['new_password_1'])
             saved = True
 
     return render_template(
@@ -77,6 +85,7 @@ def update(pk):
         author=author,
         is_system_user=author.id == current_app.config['SYSTEM_USER_ID'],
         form=form,
+        password_edit_form=password_edit_form,
         saved=saved,
     )
 

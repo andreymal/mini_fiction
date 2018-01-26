@@ -32,7 +32,8 @@ def login():
         except ValidationError as exc:
             form.set_errors(exc.errors)
         else:
-            user.last_visit = datetime.utcnow()
+            user.last_login = datetime.utcnow()
+            user.last_visit = user.last_login
             next_url = request.args.get('next')
             if not next_url or len(next_url) < 2 or next_url[0] != '/' or next_url.startswith('//'):
                 next_url = url_for('index.index')

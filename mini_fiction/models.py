@@ -53,6 +53,7 @@ class Author(db.Entity, UserMixin):
 
     password = orm.Optional(str, 255)
     last_password_change = orm.Optional(datetime, 6, optimistic=False, default=datetime.utcnow)
+    last_login = orm.Optional(datetime, 6, optimistic=False)
     last_visit = orm.Optional(datetime, 6, optimistic=False)
     is_superuser = orm.Required(bool, default=False)
     username = orm.Required(str, 32, unique=True, autostrip=False)

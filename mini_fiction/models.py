@@ -62,7 +62,8 @@ class Author(db.Entity, UserMixin):
     email = orm.Optional(str, 254, index=True)
     is_staff = orm.Required(bool, default=False)
     is_active = orm.Required(bool, default=True)
-    date_joined = orm.Required(datetime, 6, default=datetime.utcnow)
+    date_joined = orm.Required(datetime, 6, default=datetime.utcnow)  # Дата отправки формы регистрации
+    activated_at = orm.Optional(datetime, 6)  # Дата перехода по ссылке активации из письма
     session_token = orm.Required(str, 32)
 
     premoderation_mode = orm.Optional(str, 8, py_check=lambda x: x in {'', 'off', 'on'})
@@ -87,7 +88,6 @@ class Author(db.Entity, UserMixin):
 
     extra = orm.Required(orm.LongStr, lazy=False, default='{}')
 
-    registration_profile = orm.Optional('RegistrationProfile')
     password_reset_profiles = orm.Set('PasswordResetProfile')
     change_email_profiles = orm.Set('ChangeEmailProfile')
     contacts = orm.Set('Contact')
@@ -150,8 +150,10 @@ class Author(db.Entity, UserMixin):
 
 class RegistrationProfile(db.Entity):
     activation_key = orm.Required(str, 40, unique=True)
-    user = orm.Required(Author, unique=True)
-    activated = orm.Required(bool, default=False)
+    email = orm.Required(str, 254)
+    password = orm.Optional(str, 255)
+    username = orm.Required(str, 32, index=True)
+    created_at = orm.Required(datetime, 6, default=datetime.utcnow)
 
 
 class PasswordResetProfile(db.Entity):

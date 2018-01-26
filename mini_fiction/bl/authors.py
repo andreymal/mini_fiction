@@ -44,17 +44,25 @@ class AuthorBL(BaseBL):
         super().__init__(*args, **kwargs)
         self._extra = None
 
+    def _check_existence(self, username, email):
+        errors = {}
+        if self.model.select(lambda x: x.username.lower() == username.lower()):
+            errors['username'] = [lazy_gettext('User already exists')]
+        if email and self.is_email_busy(email):
+            errors['email'] = [lazy_gettext('Email address is already in use')]
+        return errors
+
     def create(self, data):
-        if 'username' not in data or 'password' not in data:
+        if 'username' not in data or (not data.get('password') and not data.get('password_hash')):
             raise ValidationError({'username': lazy_gettext('Please set username and password')})
 
+        if data.get('password') and data.get('password_hash'):
+            raise ValidationError({'password': lazy_gettext('Please set only password or password hash')})
+
         errors = {}
-        if self.model.select(lambda x: x.username.lower() == data['username'].lower()):
-            errors['username'] = [lazy_gettext('User already exists')]
-        if current_app.config['CHECK_PASSWORDS_SECURITY'] and not self.is_password_good(data['password'], extra=(data['username'],)):
+        if data.get('password') and current_app.config['CHECK_PASSWORDS_SECURITY'] and not self.is_password_good(data['password'], extra=(data['username'],)):
             errors['password'] = [lazy_gettext('Password is too bad, please change it')]
-        if data.get('email') and self.is_email_busy(data['email']):
-            errors['email'] = [lazy_gettext('Email address is already in use')]
+        errors.update(self._check_existence(data['username'], data['email']))
         if errors:
             raise ValidationError(errors)
 
@@ -64,10 +72,15 @@ class AuthorBL(BaseBL):
             is_active=bool(data.get('is_active', True)),
             is_staff=bool(data.get('is_staff', False)),
             is_superuser=bool(data.get('is_superuser', False)),
+            date_joined=data.get('date_joined', datetime.utcnow()),
+            activated_at=data.get('activated_at', None),
             session_token=''.join(random.choice(string.ascii_letters + string.digits) for _ in range(32)),
         )
         user.flush()  # for user.id
-        user.bl.set_password(data['password'])
+        if data.get('password'):
+            user.bl.set_password(data['password'])
+        else:
+            user.pssword = data['password_hash']
         return user
 
     def update(self, data):
@@ -411,19 +424,21 @@ class AuthorBL(BaseBL):
         if current_app.captcha:
             current_app.captcha.check_or_raise(data)
 
-        try:
-            data = Validator(REGISTRATION).validated(data)
-        except ValidationError as exc:
-            if 'email' not in exc.errors and self.is_email_busy(data['email']):
-                exc.errors['email'] = [lazy_gettext('Email address is already in use')]
-            raise
-        data['is_active'] = False
-        user = self.create(data)
+        data = Validator(REGISTRATION).validated(data)
+        errors = self._check_existence(data['username'], data['email'])
+        if errors:
+            raise ValidationError(errors)
+
+        old_rp = RegistrationProfile.get(username=data['username'], email=data['email'])
+        if old_rp:
+            old_rp.delete()
+        del old_rp
 
         rp = RegistrationProfile(
-            user=user,
             activation_key=''.join(random.choice(string.ascii_letters + string.digits) for _ in range(40)),
-            activated=False,
+            email=data['email'],
+            password=self.generate_password_hash(data['password']),
+            username=data['username'],
         )
         rp.flush()
 
@@ -438,7 +453,7 @@ class AuthorBL(BaseBL):
             headers={'X-Postmaster-Msgtype': current_app.config['EMAIL_MSGTYPES']['registration']},
         )
 
-        return user
+        return rp
 
     def is_email_busy(self, email):
         return self.model.select(lambda x: x.email.lower() == email.lower()).exists()
@@ -503,21 +518,33 @@ class AuthorBL(BaseBL):
 
     def activate(self, activation_key):
         from mini_fiction.models import RegistrationProfile
+
         rp = RegistrationProfile.get(activation_key=activation_key)
         if not rp:
             return
-        user = rp.user
-        if user.is_active and not rp.activated:
-            # unreal case
+
+        if not rp.password or rp.created_at + timedelta(days=current_app.config['ACCOUNT_ACTIVATION_DAYS']) < datetime.utcnow():
+            rp.delete()
             return
-        elif rp.activated and not user.is_active:
-            # user is already registered and banned
+
+        tm = datetime.utcnow()
+
+        try:
+            user = self.create({
+                'email': rp.email,
+                'username': rp.username,
+                'password_hash': rp.password,
+                'is_active': True,
+                'is_staff': False,
+                'is_superuser': False,
+                'date_joined': rp.created_at,
+                'activated_at': tm,
+            })
+        except ValidationError:
             return
-        elif user.date_joined + timedelta(days=current_app.config['ACCOUNT_ACTIVATION_DAYS']) < datetime.utcnow():
-            # key is expired
-            return
-        rp.activated = True
-        user.is_active = True
+
+        assert rp.username == user.username
+        RegistrationProfile.select(lambda x: x.username == user.username).delete(bulk=True)
         return user
 
     def activate_changed_email(self, activation_key):
@@ -578,24 +605,25 @@ class AuthorBL(BaseBL):
             return
 
         changed = not self.authenticate(password)
+        user.password = self.generate_password_hash(password)
+        if changed:
+            user.last_password_change = datetime.utcnow()
 
+    def generate_password_hash(self, password):
         if not password:
-            user.password = ''
+            return ''
 
         elif current_app.config['PASSWORD_HASHER'] == 'pbkdf2':
-            user.password = '$pbkdf2$' + hashers.pbkdf2_encode(password)  # $pbkdf2$pbkdf2_sha256$50000$...
+            return '$pbkdf2$' + hashers.pbkdf2_encode(password)  # $pbkdf2$pbkdf2_sha256$50000$...
 
         elif current_app.config['PASSWORD_HASHER'] == 'scrypt':
-            user.password = '$scrypt$' + hashers.scrypt_encode(password)
+            return '$scrypt$' + hashers.scrypt_encode(password)
 
         elif current_app.config['PASSWORD_HASHER'] == 'bcrypt':
-            user.password = '$bcrypt$' + hashers.bcrypt_encode(password)
+            return '$bcrypt$' + hashers.bcrypt_encode(password)
 
         else:
             raise NotImplementedError('Cannot use current password hasher')
-
-        if changed:
-            user.last_password_change = datetime.utcnow()
 
     def is_password_good(self, password, extra=()):
         if len(password) < 6:

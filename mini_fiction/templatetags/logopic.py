@@ -8,7 +8,7 @@ from mini_fiction.templatetags import registry
 
 
 @registry.simple_tag()
-def logopic():
+def get_current_logopic():
     logo = Logopic.bl.get_current()
     if logo:
         if g.locale.language in logo['original_link_label']:

@@ -1,7 +1,7 @@
 <header>
 {{ html_block('header') }}
 
-{%- set logo = logopic() -%}
+{%- set logo = get_current_logopic() -%}
 {% if logo -%}
 <!-- Logo image and carousel start -->
 <div class="logopic" style="background-image: url('{{ logo['url'] }}')">

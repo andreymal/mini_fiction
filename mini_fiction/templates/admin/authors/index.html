@@ -61,12 +61,16 @@
 
         <div class="admin-index-filters">
             <form action="{{ url_for('admin_authors.index') }}" method="GET">
-                {% for k, v in args.items() if k not in ['username', 'page'] %}
+                {% for k, v in args.items() if k not in ['username', 'email', 'page'] %}
                     <input type="hidden" name="{{ k }}" value="{{ v }}" />
                 {%- endfor %}
 
-                <label for="username">Имя пользователя:</label>
-                <input type="text" id="username" name="username" class="admin-input-text-full" value="{{ args.username or '' }}" /><br/>
+                <label for="username">{{ _('Username') }}:</label>
+                <input type="text" id="username" name="username" class="admin-input-text-full" value="{{ args.username or '' }}" /><br/><br/>
+
+                <label for="email">{{ _('E-mail') }}:</label>
+                <input type="text" id="email" name="email" class="admin-input-text-full" value="{{ args.email or '' }}" /><br/><br/>
+
                 <button type="submit" class="btn btn-primary">{{ _('Search') }}</button>
             </form>
         </div>

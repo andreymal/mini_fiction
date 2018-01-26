@@ -29,9 +29,13 @@ def index(page):
         'page': page,
         'sorting': request.args.get('sorting') or 'id',
     }
+
     if request.args.get('username'):
         args['username'] = request.args['username']
         objects = objects.filter(lambda x: args['username'].lower() in x.username.lower())
+    if request.args.get('email'):
+        args['email'] = request.args['email']
+        objects = objects.filter(lambda x: args['email'].lower() in x.email.lower())
 
     objects = admin_sort(args['sorting'], objects, {
         'username': Author.username,

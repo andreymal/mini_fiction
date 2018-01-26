@@ -9,7 +9,8 @@ from pony.orm import db_session
 from mini_fiction.validation import ValidationError
 from mini_fiction.forms.admin.authors import AdminAuthorForm, AdminEditPasswordForm
 from mini_fiction.models import Author
-from mini_fiction.utils.views import paginate_view
+from mini_fiction.utils.misc import Paginator
+from mini_fiction.utils.views import admin_sort
 
 bp = Blueprint('admin_authors', __name__)
 
@@ -24,13 +25,31 @@ def index(page):
 
     objects = Author.select().order_by(Author.username)
 
-    return paginate_view(
+    args = {
+        'page': page,
+        'sorting': request.args.get('sorting') or 'id',
+    }
+    if request.args.get('username'):
+        args['username'] = request.args['username']
+        objects = objects.filter(lambda x: args['username'].lower() in x.username.lower())
+
+    objects = admin_sort(args['sorting'], objects, {
+        'username': Author.username,
+        'date_joined': (Author.date_joined, Author.id),
+        'last_visit': (Author.last_visit, Author.id),
+        'is_active': (Author.is_active, Author.id),
+        'id': Author.id,
+    })
+
+    page_obj = Paginator(page, objects.count(), per_page=100)
+
+    return render_template(
         'admin/authors/index.html',
-        objects,
-        count=objects.count(),
+        authors=page_obj.slice_or_404(objects),
+        page_obj=page_obj,
         page_title=gettext('Authors'),
-        objlistname='authors',
-        per_page=100,
+        endpoint=request.endpoint,
+        args=args,
     )
 
 

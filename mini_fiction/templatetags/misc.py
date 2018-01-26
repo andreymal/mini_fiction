@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-from flask import request, url_for
+from flask import Markup, escape, request, url_for
 
 from mini_fiction.templatetags import registry
 from mini_fiction.utils import misc as utils_misc
@@ -32,9 +32,39 @@ def prepare_editlog(edit_log):
 @registry.simple_tag()
 def modified_url(endpoint=None, view_args=None, **kwargs):
     endpoint = endpoint or request.endpoint
-    view_args = view_args if view_args is not None else dict(request.view_args or {})
+    view_args = dict(view_args) if view_args is not None else dict(request.view_args or {})
     view_args.update(kwargs)
     return url_for(endpoint, **view_args)
+
+
+@registry.simple_tag()
+def admin_sorting_link(label, sorting_asc, sorting_desc=None, endpoint=None, view_args=None, **kwargs):
+    endpoint = endpoint or request.endpoint
+    view_args = dict(view_args) if view_args is not None else dict(request.view_args or {})
+    view_args.update(kwargs)
+
+    if sorting_desc is None:
+        sorting_desc = '-' + sorting_asc
+
+    sorting = view_args.get('sorting')
+
+    if not sorting or sorting != sorting_asc:
+        view_args['sorting'] = sorting_asc
+    else:
+        view_args['sorting'] = sorting_desc
+
+    if sorting == sorting_asc:
+        order_arrow = ' ↑'
+    elif sorting == sorting_desc:
+        order_arrow = ' ↓'
+    else:
+        order_arrow = ''
+
+    return Markup('<a href="{url}" class="td-sortable-link">{label}{order_arrow}</a>'.format(
+        url=escape(url_for(endpoint, **view_args)),
+        label=escape(label),
+        order_arrow=order_arrow,
+    ))
 
 
 @registry.simple_tag()

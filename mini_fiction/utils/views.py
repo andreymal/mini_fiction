@@ -69,3 +69,26 @@ def admin_required(f):
             abort(403)
         return f(*args, **kwargs)
     return wrapper
+
+
+def admin_sort(sorting, objects, fields_map, default='id'):
+    desc = False
+    if sorting and sorting.startswith('-'):
+        desc = True
+        sorting = sorting[1:]
+
+    if sorting in fields_map:
+        fields = fields_map[sorting]
+    else:
+        desc = False
+        if default.startswith('-'):
+            desc = True
+            default = default[1:]
+        fields = fields_map[default]
+
+    if not isinstance(fields, (tuple, list)):
+        fields = [fields]
+
+    if not desc:
+        return objects.order_by(*fields)
+    return objects.order_by(*[x.desc() for x in fields])

@@ -51,8 +51,8 @@ class AnonymousUser(AnonymousUserMixin):
 class Author(db.Entity, UserMixin):
     """Модель автора"""
 
-    # ported from django user
     password = orm.Optional(str, 255)
+    last_password_change = orm.Optional(datetime, 6, optimistic=False, default=datetime.utcnow)
     last_visit = orm.Optional(datetime, 6, optimistic=False)
     is_superuser = orm.Required(bool, default=False)
     username = orm.Required(str, 32, unique=True, autostrip=False)
@@ -62,6 +62,7 @@ class Author(db.Entity, UserMixin):
     is_staff = orm.Required(bool, default=False)
     is_active = orm.Required(bool, default=True)
     date_joined = orm.Required(datetime, 6, default=datetime.utcnow)
+    session_token = orm.Required(str, 32)
 
     premoderation_mode = orm.Optional(str, 8, py_check=lambda x: x in {'', 'off', 'on'})
 
@@ -116,6 +117,10 @@ class Author(db.Entity, UserMixin):
     bl = Resource('bl.author')
 
     bio_as_html = filtered_html_property('bio', filter_html)
+
+    def get_id(self):
+        # for flask-login
+        return str(self.id) + '#' + self.session_token
 
     @property
     def contributing_stories(self):

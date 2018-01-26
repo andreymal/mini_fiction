@@ -1,5 +1,5 @@
 Flask-WTF
-Flask-Login
+Flask-Login>=0.4.1
 Flask-Script
 Flask-Babel
 Flask

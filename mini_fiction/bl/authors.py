@@ -64,6 +64,7 @@ class AuthorBL(BaseBL):
             is_active=bool(data.get('is_active', True)),
             is_staff=bool(data.get('is_staff', False)),
             is_superuser=bool(data.get('is_superuser', False)),
+            session_token=''.join(random.choice(string.ascii_letters + string.digits) for _ in range(32)),
         )
         user.flush()  # for user.id
         user.bl.set_password(data['password'])
@@ -573,11 +574,15 @@ class AuthorBL(BaseBL):
     def set_password(self, password):
         user = self.model
 
-        if not password:
-            user.password = ''
+        if not password and not user.password:
             return
 
-        if current_app.config['PASSWORD_HASHER'] == 'pbkdf2':
+        changed = not self.authenticate(password)
+
+        if not password:
+            user.password = ''
+
+        elif current_app.config['PASSWORD_HASHER'] == 'pbkdf2':
             user.password = '$pbkdf2$' + hashers.pbkdf2_encode(password)  # $pbkdf2$pbkdf2_sha256$50000$...
 
         elif current_app.config['PASSWORD_HASHER'] == 'scrypt':
@@ -588,6 +593,9 @@ class AuthorBL(BaseBL):
 
         else:
             raise NotImplementedError('Cannot use current password hasher')
+
+        if changed:
+            user.last_password_change = datetime.utcnow()
 
     def is_password_good(self, password, extra=()):
         if len(password) < 6:
@@ -605,6 +613,11 @@ class AuthorBL(BaseBL):
                 if password == v:
                     return False
         return True
+
+    def reset_session_token(self):
+        token = ''.join(random.choice(string.ascii_letters + string.digits) for _ in range(32))
+        self.model.session_token = token
+        return token
 
     def get_full_name(self):
         user = self._model()

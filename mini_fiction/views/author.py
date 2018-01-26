@@ -122,6 +122,7 @@ def edit():
                 else:
                     author.bl.set_password(password_form.new_password_1.data)
                     logout_user()
+                    author.bl.reset_session_token()
                     return redirect(url_for('auth.login'))
 
         if 'save_profile' in request.form:

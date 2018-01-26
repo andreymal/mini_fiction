@@ -185,9 +185,14 @@ def configure_users(app):
     app.login_manager.anonymous_user = models.AnonymousUser
 
     @app.login_manager.user_loader
-    def load_user(user_id):
-        user = models.Author.get(id=int(user_id), is_active=1)
-        if not user:
+    def load_user(token):
+        try:
+            user_id = token.split('#', 1)[0]
+        except Exception:
+            return
+
+        user = models.Author.get(id=user_id, is_active=1)
+        if not user or user.get_id() != token:
             return
 
         if user.id != current_app.config['SYSTEM_USER_ID']:

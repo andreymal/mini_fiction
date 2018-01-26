@@ -87,7 +87,6 @@
                     <form id="security" action="#security" method="POST" enctype="multipart/form-data" class="form-horizontal">
                         <fieldset>
                             <legend>Безопасность</legend>
-                          {% if password_ok %}<div class="alert-mini green">Новый пароль установлен</div>{% endif %}
                             {% for field in password_form %}
                                 {% if field.widget.input_type == 'hidden' %}{{ field(id="password_form_" + field.id) }}{% else %}
                                 <div class="control-group{% if field.errors %} error{% endif %}">
@@ -111,6 +110,9 @@
                                     {% endfor %}
                                 </div>
                             {% endif %}
+                            <div class="controls">
+                                <span class="help-inline">После смены пароля вы будете разлогинены на всех устройствах.</span>
+                            </div>
                             <div class="form-actions">
                                 <button class="btn btn-primary" type="submit" name="save_password">Сменить пароль</button>
                             </div>

@@ -1,0 +1,28 @@
+<div class="admin-log-item
+    {%- if logitem.action_flag == 1 %} log-item-addition
+    {%- elif logitem.action_flag == 2 %} log-item-change
+    {%- elif logitem.action_flag == 3 %} log-item-deletion
+    {%- endif %}" data-id="{{ logitem.id }}" data-model="{{ logitem.type_str }}" data-pk="{{ logitem.object_id_str }}">
+
+<span class="log-action-label">
+    {%- if logitem.action_flag == 1 %}{{ pgettext('admin_log', 'Created:') }}
+    {%- elif logitem.action_flag == 2 %}{{ pgettext('admin_log', 'Updated:') }}
+    {%- elif logitem.action_flag == 3 %}{{ pgettext('admin_log', 'Deleted:') }}
+    {%- else %}???{% endif -%}
+</span>
+
+<strong>{% if logitem.admin_url and logitem.action_flag != 3 %}<a href="{{ logitem.admin_url }}">{% endif %}
+    {{- logitem.object_repr -}}
+{% if logitem.admin_url and logitem.action_flag != 3 %}</a>{% endif %}</strong>
+
+{% if logitem.change_message %}<div class="log-item-message">{{ logitem.change_message }}</div>{% endif %}
+
+<div class="log-item-meta">
+    <a class="authorlink log-item-ser" href="{{ url_for('author.info', user_id=logitem.user.id) }}">
+        {{- logitem.user.username -}}
+    </a>
+    <time class="log-item-time" datetime="{{ logitem.action_time.strftime('%Y-%m-%dT%H:%M:%SZ') }}">
+        {{ logitem.action_time|datetimeformat('d MMMM Y, HH:mm') }}
+    </time>
+</div>
+</div>

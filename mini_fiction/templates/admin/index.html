@@ -5,6 +5,9 @@
 <div class="row">
     <div class="span12">
         {{- breadcrumbs() }}
+    </div>
+
+    <div class="span8">
         <h1>{{ page_title }}</h1>
 
         <ul>
@@ -22,6 +25,19 @@
                 <li><a href="{{ url_for('admin_registrations.index') }}">{{ _('Registrations') }}</a></li>
             {%- endif %}
         </ul>
+    </div>
+
+    <div class="span4">
+        <div class="admin-log-list">
+            <h3>{{ _('Last actions') }}</h3>
+            {% if not log['items'] %}{{ _('(nothing)') }}{% endif %}
+            {% for logitem in log['items'] %}
+                {%- include 'includes/admin_log_item.html' with context -%}
+            {%- endfor -%}
+        </div>
+    </div>
+
+    <div class="span12">
         {{- breadcrumbs() }}
     </div>
 </div>

@@ -1,6 +1,8 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
+import ast
+
 from mini_fiction.bl.utils import BaseBL
 from mini_fiction.validation import ValidationError
 
@@ -9,6 +11,47 @@ _types_cache_rev = {}  # {id: str}
 
 
 class AdminLogBL(BaseBL):
+    def get_list(self, offset=0, limit=20000, order_desc=True):
+        if limit < 1:
+            limit = 1
+        elif limit > 1000:
+            limit = 1000
+
+        objects = self.model.select()
+        if order_desc:
+            objects = objects.order_by(self.model.id.desc())
+        else:
+            objects = objects.order_by(self.model.id)
+
+        count = objects.count()
+        objects = objects.prefetch(self.model.user)[offset:offset + limit]
+
+        result = []
+        for x in objects:
+            item = {
+                'id': x.id,
+                'user': {
+                    'id': x.user.id,
+                    'username': x.user.username,
+                } if x.user else None,
+                'type': x.type.id,
+                'type_str': _types_cache_rev.get(x.type.id),
+                'object_id': ast.literal_eval(x.object_id),
+                'object_id_str': x.object_id,
+                'object_repr': x.object_repr,
+                'action_flag': x.action_flag,
+                'change_message': x.change_message,
+                'action_time': x.action_time,
+            }
+
+            if item['type_str'] is None:
+                self._load_type_cache()
+                item['type_str'] = _types_cache_rev.get(x.type.id) or 'N/A'
+
+            result.append(item)
+
+        return {'count': count, 'items': result}
+
     def create(self, user, obj, action, fields=None, change_message=None):
         from mini_fiction.models import AdminLog
 

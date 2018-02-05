@@ -2171,6 +2171,34 @@ ul.editlog .editlog-item:nth-child(2n+1) {
     width: calc(100% - 12px - 2px);  /* margin and padding */
 }
 
+.admin-log-list {
+    background-color: white;
+    padding: 8px;
+}
+
+.admin-log-item {
+    font-size: 12px;
+    border-top: 1px solid #eee;
+    margin: 8px 0;
+}
+
+.admin-log-item.log-item-addition .log-action-label {
+    color: #080;
+}
+
+.admin-log-item.log-item-change .log-action-label {
+    color: #00a;
+}
+
+.admin-log-item.log-item-deletion .log-action-label {
+    color: #a00;
+}
+
+.admin-log-item .log-item-meta,
+.admin-log-item .log-item-meta a {
+    color: #999;
+}
+
 @media (max-width: 840px) {
     .admin-index-table {
         float: none;

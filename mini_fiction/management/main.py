@@ -44,8 +44,7 @@ def seed(silent=False):
 def initsphinx():
     from mini_fiction.management.commands.initsphinx import initsphinx as cmd
     orm.sql_debug(False)
-    with db_session:
-        cmd()
+    cmd()
 
 
 @manager.command

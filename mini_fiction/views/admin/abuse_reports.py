@@ -4,6 +4,7 @@
 from datetime import datetime
 
 from flask import Blueprint, render_template, abort, url_for, redirect, request
+from flask_login import current_user
 from pony.orm import select, db_session, count
 
 from mini_fiction.utils.views import admin_required
@@ -121,11 +122,13 @@ def show(abuse_id):
         all_abuses = [abuse]
 
     saved = False
+    changed_fields = set()
 
     if request.method == 'POST' and request.form.get('act') == 'ignore':
         if exact and not abuse.ignored:
             assert all_abuses == [abuse]
             abuse.ignored = True
+            changed_fields |= {'ignored',}
             saved = True
 
     elif request.method == 'POST' and request.form.get('act') == 'unignore':
@@ -133,6 +136,7 @@ def show(abuse_id):
             assert all_abuses == [abuse]
 
             abuse.ignored = False
+            changed_fields |= {'ignored',}
 
             # Решения жалоб у нас группируются по таргету, поэтому при снятии
             # игнора в решение жалобы нужно скопировать решение группы
@@ -151,6 +155,7 @@ def show(abuse_id):
                 for x in all_abuses:
                     x.resolved_at = None
                     x.accepted = False
+            changed_fields |= {'status',}
             saved = True
 
         elif request.form.get('status') == 'accepted':
@@ -158,6 +163,7 @@ def show(abuse_id):
                 for x in all_abuses:
                     x.resolved_at = datetime.utcnow()
                     x.accepted = True
+            changed_fields |= {'status',}
             saved = True
 
         elif request.form.get('status') == 'rejected':
@@ -165,7 +171,16 @@ def show(abuse_id):
                 for x in all_abuses:
                     x.resolved_at = datetime.utcnow()
                     x.accepted = False
+            changed_fields |= {'status',}
             saved = True
+
+    if changed_fields:
+        models.AdminLog.bl.create(
+            user=current_user._get_current_object(),
+            obj=abuse,
+            action=models.AdminLog.CHANGE,
+            fields=sorted(changed_fields),
+        )
 
     if not exact and all_abuses[0].id != abuse.id:
         return redirect(url_for('admin_abuse_reports.show', abuse_id=all_abuses[0].id))

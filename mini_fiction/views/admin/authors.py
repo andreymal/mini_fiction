@@ -91,7 +91,7 @@ def update(pk):
                     if true_field in form.data and not form.data[true_field]:
                         abort(403)
             try:
-                author.bl.update(form.data)
+                author.bl.update(form.data, modified_by_user=current_user._get_current_object(), fill_admin_log=True)
             except ValidationError as exc:
                 form.set_errors(exc.errors)
             else:

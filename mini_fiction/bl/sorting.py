@@ -15,6 +15,8 @@ from mini_fiction.validation.sorting import CATEGORY, CHARACTER, CHARACTER_GROUP
 
 class CategoryBL(BaseBL):
     def create(self, author, data):
+        from mini_fiction.models import AdminLog
+
         data = Validator(CATEGORY).validated(data)
 
         exist_category = self.model.get(name=data['name'])
@@ -23,9 +25,13 @@ class CategoryBL(BaseBL):
 
         category = self.model(**data)
         category.flush()
+        AdminLog.bl.create(user=author, obj=category, action=AdminLog.ADDITION)
+
         return category
 
     def update(self, author, data):
+        from mini_fiction.models import AdminLog
+
         data = Validator(CATEGORY).validated(data, update=True)
         category = self.model
 
@@ -35,17 +41,32 @@ class CategoryBL(BaseBL):
             if exist_category and exist_category.id != category.id:
                 raise ValidationError({'name': [lazy_gettext('Category already exists')]})
 
+        changed_fields = set()
         for key, value in data.items():
-            setattr(category, key, value)
+            if getattr(category, key) != value:
+                setattr(category, key, value)
+                changed_fields |= {key,}
+
+        if changed_fields:
+            AdminLog.bl.create(
+                user=author,
+                obj=category,
+                action=AdminLog.CHANGE,
+                fields=sorted(changed_fields),
+            )
 
         return category
 
     def delete(self, author):
+        from mini_fiction.models import AdminLog
+        AdminLog.bl.create(user=author, obj=self.model, action=AdminLog.DELETION)
         self.model.delete()
 
 
 class CharacterBL(BaseBL):
     def create(self, author, data):
+        from mini_fiction.models import AdminLog
+
         data = Validator(CHARACTER).validated(data)
 
         errors = {}
@@ -68,9 +89,13 @@ class CharacterBL(BaseBL):
         character = self.model(picture='pending', **data)
         character.flush()
         character.bl.set_picture_data(picture)
+        AdminLog.bl.create(user=author, obj=character, action=AdminLog.ADDITION)
+
         return character
 
     def update(self, author, data):
+        from mini_fiction.models import AdminLog
+
         data = Validator(CHARACTER).validated(data, update=True)
         character = self.model
 
@@ -94,7 +119,9 @@ class CharacterBL(BaseBL):
         if errors:
             raise ValidationError(errors)
 
-        if data.get('picture'):
+        changed_fields = set()
+
+        if data.get('picture'):  # FIXME: Cerberus считает picture обязательным
             picture = self.validate_and_get_picture_data(data['picture'])
         else:
             picture = None
@@ -103,12 +130,28 @@ class CharacterBL(BaseBL):
             if key == 'picture':
                 if picture is not None:
                     self.set_picture_data(picture)
-            else:
+                    changed_fields |= {'picture',}
+            elif key == 'group':
+                if character.group.id != value:
+                    setattr(character, key, value)
+                    changed_fields |= {key,}
+            elif getattr(character, key) != value:
                 setattr(character, key, value)
+                changed_fields |= {key,}
+
+        if changed_fields:
+            AdminLog.bl.create(
+                user=author,
+                obj=character,
+                action=AdminLog.CHANGE,
+                fields=sorted(changed_fields),
+            )
 
         return character
 
     def delete(self, author):
+        from mini_fiction.models import AdminLog
+        AdminLog.bl.create(user=author, obj=self.model, action=AdminLog.DELETION)
         self.model.delete()
 
     def validate_and_get_picture_data(self, picture):
@@ -142,6 +185,8 @@ class CharacterBL(BaseBL):
 
 class CharacterGroupBL(BaseBL):
     def create(self, author, data):
+        from mini_fiction.models import AdminLog
+
         data = Validator(CHARACTER_GROUP).validated(data)
 
         exist_group = self.model.get(name=data['name'])
@@ -150,9 +195,12 @@ class CharacterGroupBL(BaseBL):
 
         group = self.model(**data)
         group.flush()
+        AdminLog.bl.create(user=author, obj=group, action=AdminLog.ADDITION)
         return group
 
     def update(self, author, data):
+        from mini_fiction.models import AdminLog
+
         data = Validator(CHARACTER_GROUP).validated(data, update=True)
         group = self.model
 
@@ -162,17 +210,32 @@ class CharacterGroupBL(BaseBL):
             if exist_group and exist_group.id != group.id:
                 raise ValidationError({'name': [lazy_gettext('Group already exists')]})
 
+        changed_fields = set()
         for key, value in data.items():
-            setattr(group, key, value)
+            if getattr(group, key) != value:
+                setattr(group, key, value)
+                changed_fields |= {key,}
+
+        if changed_fields:
+            AdminLog.bl.create(
+                user=author,
+                obj=group,
+                action=AdminLog.CHANGE,
+                fields=sorted(changed_fields),
+            )
 
         return group
 
     def delete(self, author):
+        from mini_fiction.models import AdminLog
+        AdminLog.bl.create(user=author, obj=self.model, action=AdminLog.DELETION)
         self.model.delete()
 
 
 class ClassifierBL(BaseBL):
     def create(self, author, data):
+        from mini_fiction.models import AdminLog
+
         data = Validator(CLASSIFIER).validated(data)
 
         exist_classifier = self.model.get(name=data['name'])
@@ -181,9 +244,12 @@ class ClassifierBL(BaseBL):
 
         classifier = self.model(**data)
         classifier.flush()
+        AdminLog.bl.create(user=author, obj=classifier, action=AdminLog.ADDITION)
         return classifier
 
     def update(self, author, data):
+        from mini_fiction.models import AdminLog
+
         data = Validator(CLASSIFIER).validated(data, update=True)
         classifier = self.model
 
@@ -193,10 +259,23 @@ class ClassifierBL(BaseBL):
             if exist_classifier and exist_classifier.id != classifier.id:
                 raise ValidationError({'name': [lazy_gettext('Classifier already exists')]})
 
+        changed_fields = set()
         for key, value in data.items():
-            setattr(classifier, key, value)
+            if getattr(classifier, key) != value:
+                setattr(classifier, key, value)
+                changed_fields |= {key,}
+
+        if changed_fields:
+            AdminLog.bl.create(
+                user=author,
+                obj=classifier,
+                action=AdminLog.CHANGE,
+                fields=sorted(changed_fields),
+            )
 
         return classifier
 
     def delete(self, author):
+        from mini_fiction.models import AdminLog
+        AdminLog.bl.create(user=author, obj=self.model, action=AdminLog.DELETION)
         self.model.delete()

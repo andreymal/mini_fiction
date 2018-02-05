@@ -18,6 +18,8 @@ from mini_fiction.validation.logopics import LOGOPIC, LOGOPIC_FOR_UPDATE
 
 class LogopicBL(BaseBL):
     def create(self, author, data):
+        from mini_fiction.models import AdminLog
+
         data = Validator(LOGOPIC).validated(data)
 
         picture = data.pop('picture')
@@ -25,27 +27,45 @@ class LogopicBL(BaseBL):
         logopic.flush()
         logopic.bl.set_picture_data(picture)
         current_app.cache.delete('logopics')
+        AdminLog.bl.create(user=author, obj=logopic, action=AdminLog.ADDITION)
         return logopic
 
     def update(self, author, data):
+        from mini_fiction.models import AdminLog
+
         data = Validator(LOGOPIC_FOR_UPDATE).validated(data, update=True)
         logopic = self.model
+
+        changed_fields = set()
 
         for key, value in data.items():
             if key == 'picture':
                 if value:
                     self.set_picture_data(value)
+                    changed_fields |= {'picture',}
             else:
                 if key == 'original_link_label':
                     value = value.replace('\r', '')
-                setattr(logopic, key, value)
+                if getattr(logopic, key) != value:
+                    setattr(logopic, key, value)
+                    changed_fields |= {key,}
 
-        logopic.updated_at = datetime.utcnow()
-        current_app.cache.delete('logopics')
+        if changed_fields:
+            logopic.updated_at = datetime.utcnow()
+            current_app.cache.delete('logopics')
+
+            AdminLog.bl.create(
+                user=author,
+                obj=logopic,
+                action=AdminLog.CHANGE,
+                fields=sorted(changed_fields),
+            )
 
         return logopic
 
     def delete(self, author):
+        from mini_fiction.models import AdminLog
+        AdminLog.bl.create(user=author, obj=self.model, action=AdminLog.DELETION)
         self.model.delete()
         current_app.cache.delete('logopics')
 

@@ -27,6 +27,7 @@ dumpdb_params = {
         'contacts', 'subscriptions', 'notifications',
         'created_notifications', 'published_stories', 'approvals',
         'change_email_profiles', 'password_reset_profiles',
+        'abuse_reports', 'admin_log',
     )},
     'chapter': {'exclude': (
         'edit_log', 'chapter_views_set',
@@ -60,6 +61,9 @@ dumpdb_params = {
     )},
     'series': {'exclude': (
         'permissions',
+    )},
+    'adminlogtype': {'exclude': (
+        'log',
     )},
 }
 
@@ -103,6 +107,10 @@ zip_dump_params = {
     'htmlblock': {
         'include': ('name', 'lang', 'content', 'is_template', 'date', 'updated'),
         'datekey': 'updated',
+    },
+    'adminlogtype': {
+        'include': ('id', 'model'),
+        'exclude': ('log',),
     },
     'author': {
         # Дампится только один системный пользователь

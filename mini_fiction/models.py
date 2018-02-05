@@ -114,10 +114,14 @@ class Author(db.Entity, UserMixin):
     created_notifications = orm.Set('Notification', reverse='caused_by_user')
     subscriptions = orm.Set('Subscription')
     abuse_reports = orm.Set('AbuseReport')
+    admin_log = orm.Set('AdminLog')
 
     bl = Resource('bl.author')
 
     bio_as_html = filtered_html_property('bio', filter_html)
+
+    def __str__(self):
+        return self.username
 
     def get_id(self):
         # for flask-login
@@ -155,12 +159,18 @@ class RegistrationProfile(db.Entity):
     username = orm.Required(str, 32, index=True)
     created_at = orm.Required(datetime, 6, default=datetime.utcnow)
 
+    def __str__(self):
+        return 'Registration information for {}'.format(self.username)
+
 
 class PasswordResetProfile(db.Entity):
     date = orm.Required(datetime, 6, default=datetime.utcnow)
     activation_key = orm.Required(str, 40, unique=True)
     user = orm.Required(Author)
     activated = orm.Required(bool, default=False)
+
+    def __str__(self):
+        return 'Password reset information for {}'.format(self.user.username)
 
 
 class ChangeEmailProfile(db.Entity):
@@ -169,12 +179,18 @@ class ChangeEmailProfile(db.Entity):
     user = orm.Required(Author, unique=True)
     email = orm.Required(str, 254, index=True)
 
+    def __str__(self):
+        return '<Change email information for{}'.format(self.user.username)
+
 
 class Contact(db.Entity):
     """ Модель контакта пользователя """
     author = orm.Required(Author)
     name = orm.Required(str, 64)
     value = orm.Required(str, 255)
+
+    def __str__(self):
+        return '<Contact {}/{}>'.format(self.author.username, self.name)
 
 
 class CharacterGroup(db.Entity):
@@ -186,6 +202,9 @@ class CharacterGroup(db.Entity):
     characters = orm.Set('Character')
 
     bl = Resource('bl.charactergroup')
+
+    def __str__(self):
+        return self.name
 
 
 class Character(db.Entity):
@@ -199,6 +218,9 @@ class Character(db.Entity):
     stories = orm.Set('Story')
 
     bl = Resource('bl.character')
+
+    def __str__(self):
+        return self.name
 
     @property
     def thumb(self):
@@ -216,6 +238,9 @@ class Category(db.Entity):
 
     bl = Resource('bl.category')
 
+    def __str__(self):
+        return self.name
+
 
 class Classifier(db.Entity):
     """ Модель события """
@@ -227,6 +252,9 @@ class Classifier(db.Entity):
 
     bl = Resource('bl.classifier')
 
+    def __str__(self):
+        return self.name
+
 
 class Rating(db.Entity):
     """ Модель рейтинга """
@@ -235,6 +263,9 @@ class Rating(db.Entity):
     name = orm.Required(str, 256)
 
     stories = orm.Set('Story')
+
+    def __str__(self):
+        return self.name
 
 
 class InSeriesPermissions(db.Entity):
@@ -266,6 +297,9 @@ class Series(db.Entity):
     extra = orm.Required(orm.LongStr, lazy=False, default='{}')
 
     permissions = orm.Set(InSeriesPermissions)
+
+    def __str__(self):
+        return self.title
 
     def before_update(self):
         self.updated = datetime.utcnow()
@@ -332,6 +366,9 @@ class Story(db.Entity):
     orm.composite_index(approved, draft, vote_value)
 
     bl = Resource('bl.story')
+
+    def __str__(self):
+        return self.title
 
     @property
     def url(self):
@@ -424,6 +461,9 @@ class Chapter(db.Entity):
     bl = Resource('bl.chapter')
 
     chapter_views_set = orm.Set('StoryView')
+
+    def __str__(self):
+        return self.title
 
     def get_absolute_url(self):
         return url_for('chapter.view_single', story_id=self.story.id, order=self.order)
@@ -757,6 +797,9 @@ class NewsItem(db.Entity):
 
     bl = Resource('bl.newsitem')
 
+    def __str__(self):
+        return self.name
+
     def before_update(self):
         self.updated = datetime.utcnow()
 
@@ -845,6 +888,9 @@ class StaticPage(db.Entity):
 
     bl = Resource('bl.staticpage')
 
+    def __str__(self):
+        return '/page/{}/ - {}'.format(self.name, self.title)
+
     def before_update(self):
         self.updated = datetime.utcnow()
 
@@ -860,6 +906,9 @@ class HtmlBlock(db.Entity):
     orm.PrimaryKey(name, lang)
 
     bl = Resource('bl.htmlblock')
+
+    def __str__(self):
+        return self.name
 
     def before_update(self):
         self.updated = datetime.utcnow()
@@ -926,4 +975,59 @@ class AbuseReport(db.Entity):
     accepted = orm.Required(bool, default=False)
     ignored = orm.Required(bool, default=False)
 
+    def __str__(self):
+        username = self.user.username if self.user else 'N/A'
+
+        if self.target_type == 'story':
+            target_obj = Story.get(id=self.target_id)
+            target = 'рассказ «{}»'.format(target_obj.title if target_obj else 'N/A')
+
+        elif self.target_type == 'storycomment':
+            target_obj = StoryComment.get(id=self.target_id)
+            target = 'комментарий {} к рассказу «{}»'.format(
+                target_obj.author.username if target_obj.author else (target_obj.author_username or 'N/A'),
+                target_obj.story.title,
+            )
+
+        elif self.target_type == 'newscomment':
+            target_obj = NewsComment.get(id=self.target_id)
+            target = 'комментарий {} к новости «{}»'.format(
+                target_obj.author.username if target_obj.author else (target_obj.author_username or 'N/A'),
+                target_obj.newsitem.name,
+            )
+        else:
+            target = self.target_type + '/' + str(self.target_id)
+
+        return 'Жалоба от {} на {}'.format(username, target)
+
     orm.composite_key(target_type, target_id, user)
+
+
+class AdminLogType(db.Entity):
+    """Типы моделей, используемых в истории изменений в админке. Используется
+    для составления соответствия id-модель.
+    """
+
+    id = orm.PrimaryKey(int, auto=True)
+    model = orm.Required(str, 100, unique=True)
+
+    log = orm.Set('AdminLog')
+
+
+class AdminLog(db.Entity):
+    """Лог изменений в админке"""
+    # ported from django
+
+    ADDITION = 1
+    CHANGE = 2
+    DELETION = 3
+
+    action_time = orm.Required(datetime, 6, default=datetime.utcnow)
+    user = orm.Optional(Author)
+    type = orm.Required(AdminLogType)
+    object_id = orm.Required(str, 255)  # str for non-integer pk
+    object_repr = orm.Optional(str, 255)
+    action_flag = orm.Required(int, size=8)
+    change_message = orm.Optional(orm.LongStr)
+
+    bl = Resource('bl.adminlog')

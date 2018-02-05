@@ -14,6 +14,8 @@ from mini_fiction.validation.htmlblocks import HTML_BLOCK
 
 class HtmlBlockBL(BaseBL):
     def create(self, author, data):
+        from mini_fiction.models import AdminLog
+
         data = Validator(HTML_BLOCK).validated(data)
 
         if not author.is_superuser and data.get('is_template'):
@@ -31,10 +33,13 @@ class HtmlBlockBL(BaseBL):
 
         htmlblock = self.model(**data)
         htmlblock.flush()
+        AdminLog.bl.create(user=author, obj=htmlblock, action=AdminLog.ADDITION)
         later(self.clear_cache, htmlblock.name)  # avoid race condition by `later` (runs after commit)
         return htmlblock
 
     def update(self, author, data):
+        from mini_fiction.models import AdminLog
+
         data = Validator(HTML_BLOCK).validated(data, update=True)
         htmlblock = self.model
 
@@ -50,20 +55,36 @@ class HtmlBlockBL(BaseBL):
         if data.get('is_template', htmlblock.is_template) and 'content' in data:
             self.check_renderability(author, data.get('name', htmlblock.name), data['content'])
 
+        changed_fields = set()
         old_name = htmlblock.name
+
         for key, value in data.items():
-            setattr(htmlblock, key, value)
+            if getattr(htmlblock, key) != value:
+                setattr(htmlblock, key, value)
+                changed_fields |= {key,}
+
         later(self.clear_cache, old_name)
         if htmlblock.name != old_name:
             later(self.clear_cache, htmlblock.name)
 
+        if changed_fields:
+            AdminLog.bl.create(
+                user=author,
+                obj=htmlblock,
+                action=AdminLog.CHANGE,
+                fields=sorted(changed_fields),
+            )
+
         return htmlblock
 
     def delete(self, author):
+        from mini_fiction.models import AdminLog
+
         htmlblock = self.model
         if htmlblock.is_template and not author.is_superuser:
             raise ValidationError({'is_template': [lazy_gettext('Access denied')]})
         later(self.clear_cache, htmlblock.name)
+        AdminLog.bl.create(user=author, obj=htmlblock, action=AdminLog.DELETION)
         htmlblock.delete()
 
     def clear_cache(self, name):

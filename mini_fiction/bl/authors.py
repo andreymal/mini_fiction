@@ -83,38 +83,55 @@ class AuthorBL(BaseBL):
             user.password = data['password_hash']
         return user
 
-    def update(self, data):
+    def update(self, data, modified_by_user=None, fill_admin_log=False):
         from mini_fiction.models import ChangeEmailProfile
 
         user = self.model
-        if 'email' in data:
+        changed_fields = set()
+
+        if 'email' in data and data['email'] != user.email:
             user.email = data['email']
             cep = ChangeEmailProfile.get(user=user)
             if cep:
                 cep.delete()
+            changed_fields |= {'email',}
+
         for field in ('bio', 'premoderation_mode'):
-            if field in data:
+            if field in data and getattr(user, field) != data[field]:
                 setattr(user, field, data[field])
+                changed_fields |= {field,}
+
+        for field in ('is_staff', 'is_active', 'is_superuser', 'detail_view', 'nsfw'):
+            if field in data and getattr(user, field) != bool(data[field]):
+                setattr(user, field, bool(data[field]))
+                changed_fields |= {field,}
+
         if 'excluded_categories' in data:
             user.excluded_categories = ','.join(str(x) for x in data['excluded_categories'])
-        for field in ('is_staff', 'is_active', 'is_superuser', 'detail_view', 'nsfw'):
-            if field in data:
-                setattr(user, field, bool(data[field]))
+            changed_fields |= {'excluded_categories',}
+
         if 'comments_per_page' in data:
             if user.comments_per_page is None and data['comments_per_page'] == current_app.config['COMMENTS_COUNT']['page']:
                 pass  # Если бралось значение из настроек проекта, то его и оставляем
             else:
-                user.comments_per_page = min(1000, max(1, int(data['comments_per_page'])))
+                value = min(1000, max(1, int(data['comments_per_page'])))
+                if user.comments_per_page != value:
+                    user.comments_per_page = value
+                    changed_fields |= {'comments_per_page',}
+
         if 'comments_maxdepth' in data:
             if user.comments_maxdepth is None and data['comments_maxdepth'] == current_app.config['COMMENTS_TREE_MAXDEPTH']:
                 pass  # Если бралось значение из настроек проекта, то его и оставляем
-            else:
+            elif user.comments_maxdepth != int(data['comments_maxdepth']):
                 user.comments_maxdepth = int(data['comments_maxdepth'])
+                changed_fields |= {'comments_maxdepth',}
+
         if 'comment_spoiler_threshold' in data:
             if user.comment_spoiler_threshold is None and data['comment_spoiler_threshold'] == current_app.config['COMMENT_SPOILER_THRESHOLD']:
                 pass  # Если бралось значение из настроек проекта, то его и оставляем
-            else:
+            elif user.comment_spoiler_threshold != int(data['comment_spoiler_threshold']):
                 user.comment_spoiler_threshold = int(data['comment_spoiler_threshold'])
+                changed_fields |= {'comment_spoiler_threshold',}
 
         if 'contacts' in data:
             contacts = [x for x in data['contacts'] if x.get('name') and x.get('value')]
@@ -162,8 +179,12 @@ class AuthorBL(BaseBL):
                 ))
                 i = len(old_contacts)
 
+            changed_fields |= {'contacts',}  # TODO: надо ли?
+
         if data.get('delete_avatar'):
             self.delete_avatar()
+            changed_fields |= {'avatar_small', 'avatar_medium', 'avatar_large'}
+
         elif current_app.config['AVATARS_UPLOADING'] and data.get('avatar'):
             from PIL import Image
 
@@ -180,6 +201,7 @@ class AuthorBL(BaseBL):
             else:
                 with image:
                     self.validate_and_set_avatar(image, image_data)
+                changed_fields |= {'avatar_small', 'avatar_medium', 'avatar_large'}
 
         if data.get('extra') is not None:
             if isinstance(data['extra'], str):
@@ -188,10 +210,23 @@ class AuthorBL(BaseBL):
                 except Exception:
                     raise ValidationError({'extra': ['Invalid extra JSON']})
                 user.extra = data['extra']
+                changed_fields |= {'extra',}
             elif not isinstance(data['extra'], dict):
                 raise ValidationError({'extra': ['extra must be dict or JSON string']})
             else:
                 user.extra = json.dumps(data['extra'], ensure_ascii=False)
+                changed_fields |= {'extra',}
+
+        if modified_by_user and fill_admin_log and changed_fields:
+            from mini_fiction.models import AdminLog
+            AdminLog.bl.create(
+                user=modified_by_user,
+                obj=user,
+                action=AdminLog.CHANGE,
+                fields=sorted(changed_fields),
+            )
+
+        return changed_fields
 
     def update_email_subscriptions(self, subs):
         user = self.model

@@ -62,9 +62,9 @@ class Author(db.Entity, UserMixin):
     email = orm.Optional(str, 254, index=True)
     is_staff = orm.Required(bool, default=False)
     is_active = orm.Required(bool, default=True)
-    date_joined = orm.Required(datetime, 6, default=datetime.utcnow)  # Дата отправки формы регистрации
-    activated_at = orm.Optional(datetime, 6)  # Дата перехода по ссылке активации из письма
-    session_token = orm.Required(str, 32)
+    date_joined = orm.Required(datetime, 6, default=datetime.utcnow, optimistic=False)  # Дата отправки формы регистрации
+    activated_at = orm.Optional(datetime, 6, optimistic=False)  # Дата перехода по ссылке активации из письма
+    session_token = orm.Required(str, 32, optimistic=False)
 
     premoderation_mode = orm.Optional(str, 8, py_check=lambda x: x in {'', 'off', 'on'})
 

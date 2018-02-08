@@ -11,7 +11,7 @@ _types_cache_rev = {}  # {id: str}
 
 
 class AdminLogBL(BaseBL):
-    def get_list(self, offset=0, limit=20000, order_desc=True):
+    def get_list(self, offset=0, limit=20, order_desc=True):
         if limit < 1:
             limit = 1
         elif limit > 1000:

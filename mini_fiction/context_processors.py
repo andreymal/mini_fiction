@@ -20,6 +20,7 @@ def website_settings():
         'SITE_NAME': sitename(),
         'SERVER_NAME': current_app.config['SERVER_NAME'],
         'PREFERRED_URL_SCHEME': current_app.config['PREFERRED_URL_SCHEME'],
+        'STATIC_V': current_app.static_v,
         'base': current_app.jinja_env.get_template('base.json' if getattr(g, 'is_ajax', False) else 'base.html'),
         'contact_types': {x['name']: x for x in current_app.config['CONTACTS']},
         'extra_css': current_app.extra_css,

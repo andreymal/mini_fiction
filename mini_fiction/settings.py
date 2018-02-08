@@ -91,7 +91,11 @@ class Config(object):
     FAVICON_URL = None
 
     MEDIA_ROOT = os.path.join(os.getcwd(), 'media')
+
     STATIC_ROOT = os.path.join(os.path.dirname(__file__), 'static')
+    STATIC_VERSION_FILE = 'VERSION'
+    STATIC_VERSION_TYPE = 'date'  # or 'hash'
+    STATIC_V = None
 
     LOCALSTATIC_ROOT = None
     LOCALTEMPLATES = None

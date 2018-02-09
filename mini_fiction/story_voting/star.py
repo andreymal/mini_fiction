@@ -22,7 +22,7 @@ class StarVoting(BaseVoting):
     '''
 
     def get_default_vote_value(self):
-        return 300
+        return int(current_app.config['VOTES_MID'] * 100)
 
     def get_default_vote_extra(self):
         return '{"average": 3.0, "stddev": 0.0}'
@@ -38,8 +38,16 @@ class StarVoting(BaseVoting):
         votes = [max(1, x) for x in votes]
         m = mean(votes) if votes else 3.0
 
-        story.vote_total = len(votes)
-        story.vote_value = int(round(m * 100))
+        # Это называют алгоритмом Томаса Байеса https://i.imgur.com/z0bRn9a.gif
+        n = current_app.config['MINIMUM_VOTES_FOR_VIEW']
+        votes_mid = current_app.config['VOTES_MID']
+        count = len(votes)
+
+        v1 = count / (count + n) * m
+        v2 = n / (count + n) * votes_mid
+        story.vote_value = int((v1 + v2) * 100)
+
+        story.vote_total = count
 
         extra = json.loads(story.vote_extra)
         extra['average'] = round(float(m), 6)

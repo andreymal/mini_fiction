@@ -220,7 +220,8 @@ class Config(object):
 
     STORY_VOTING_CLASS = 'mini_fiction.story_voting.star.StarVoting'
     VOTING_MAX_VALUE = 5
-    MINIMUM_VOTES_FOR_VIEW = 2
+    MINIMUM_VOTES_FOR_VIEW = 5
+    VOTES_MID = 4.1
 
     STORY_DOWNLOAD_FORMATS = tuple(reversed((
         'mini_fiction.downloads.fb2.FB2Download',

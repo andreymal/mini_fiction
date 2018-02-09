@@ -16,6 +16,10 @@ def initsphinx():
         sphinx.delete('stories', id__gte=0)
     with current_app.sphinx as sphinx:
         sphinx.delete('chapters', id__gte=0)
+    with current_app.sphinx as sphinx:
+        sphinx.flush('stories')
+    with current_app.sphinx as sphinx:
+        sphinx.flush('chapters')
     sys.stderr.write('\n')
     sys.stderr.flush()
 
@@ -35,7 +39,7 @@ def initsphinx():
             if not stories:
                 break
 
-            Story.bl.add_stories_to_search(stories)
+            Story.bl.add_stories_to_search(stories, with_chapters=False)
             pk = stories[-1].id
             ok += len(stories)
             sys.stderr.write(' [%.1f%%] %d/%d stories\r' % (ok * 100 / count, ok, count))
@@ -57,7 +61,7 @@ def initsphinx():
             if not chapters:
                 break
 
-            Chapter.bl.add_chapters_to_search(chapters)
+            Chapter.bl.add_chapters_to_search(chapters, update_story_words=False)
             pk = chapters[-1].id
             ok += len(chapters)
             sys.stderr.write(' [%.1f%%] %d/%d chapters\r' % (ok * 100 / count, ok, count))

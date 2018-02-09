@@ -57,23 +57,25 @@ def sendmail(to, subject, body, fro=None, headers=None, config=None):
 
 @task_sphinx_retrying
 @db_session
-def sphinx_update_story(story_id, update_fields):
+def sphinx_update_story(story_id, update_fields=None):
     story = Story.get(id=story_id)
     if not story:
         return
 
-    story.bl.search_update(update_fields)
+    if update_fields is None:
+        story.bl.search_add()
+    else:
+        story.bl.search_update(update_fields)
 
 
 @task_sphinx_retrying
 @db_session
-def sphinx_update_chapter(chapter_id):
+def sphinx_update_chapter(chapter_id, update_story_words=True):
     chapter = Chapter.get(id=chapter_id)
     if not chapter:
         return
 
-    chapter.bl.search_add()
-    chapter.story.bl.search_update(('words',))
+    chapter.bl.search_add(update_story_words=update_story_words)
 
 
 @task_sphinx_retrying
@@ -82,7 +84,7 @@ def sphinx_update_comments_count(story_id):
     story = Story.get(id=story_id)
     if not story:
         return
-    story.bl.search_update(('comments',))
+    story.bl.search_update(('comments_count',))
 
 
 @task_sphinx_retrying
@@ -93,13 +95,7 @@ def sphinx_delete_story(story_id):
 @task_sphinx_retrying
 @db_session
 def sphinx_delete_chapter(story_id, chapter_id):
-    Chapter.bl.delete_chapters_from_search((chapter_id,))
-
-    story = Story.get(id=story_id)
-    if not story:
-        return
-
-    story.bl.search_update(('words',))
+    Chapter.bl.delete_chapters_from_search((story_id,), (chapter_id,))
 
 
 # tasks for notificaions

@@ -105,6 +105,9 @@ class Config(object):
         'connection_params': {'unix_socket': '/tmp/sphinx_fanfics.socket', 'charset': 'utf8'},
         'excerpts_opts': {'chunk_separator': '…', 'limit': 2048, 'around': 10, 'html_strip_mode': 'strip'},
 
+        'stories_rt_mem_limit': '128M',
+        'chapters_rt_mem_limit': '256M',
+
         'weights_stories': {'title': 100, 'summary': 50, 'notes': 25, 'username': 150},
         'weights_chapters': {'text': 100, 'title': 50, 'notes': 25},
 

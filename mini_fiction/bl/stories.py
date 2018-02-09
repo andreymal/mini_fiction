@@ -30,9 +30,9 @@ class StoryBL(BaseBL, Commentable):
     sort_types = {
         0: "weight() DESC, first_published_at DESC",
         1: "first_published_at DESC",
-        2: "size DESC",
-        3: "id ASC",  # TODO: rating DESC
-        4: "comments DESC"
+        2: "words DESC",
+        3: "vote_value DESC",
+        4: "comments_count DESC",
     }
 
     _contributors = None
@@ -82,7 +82,7 @@ class StoryBL(BaseBL, Commentable):
         story.bl.subscribe_to_comments(authors[0], email=True, tracker=True)
         story.bl.subscribe_to_local_comments(authors[0], email=True, tracker=True)
 
-        later(current_app.tasks['sphinx_update_story'].delay, story.id, ())
+        later(current_app.tasks['sphinx_update_story'].delay, story.id, None)
         return story
 
     def edit_log(self, editor, data):
@@ -112,14 +112,26 @@ class StoryBL(BaseBL, Commentable):
         old_published = story.published  # for chapters
 
         edited_data = {}
+        changed_sphinx_fields = set()
 
         if 'status' in data:
-            edited_data['freezed'] = [story.freezed, data['status'] == 'freezed']
-            edited_data['finished'] = [story.finished, data['status'] == 'finished']
-            story.freezed = edited_data['freezed'][1]
-            story.finished = edited_data['finished'][1]
+            new_freezed = data['status'] == 'freezed'
+            new_finished = data['status'] == 'finished'
+            if story.freezed != new_freezed or story.finished != new_finished:
+                edited_data['freezed'] = [story.freezed, new_freezed]
+                story.freezed = edited_data['freezed'][1]
+                edited_data['finished'] = [story.finished, new_finished]
+                story.finished = edited_data['finished'][1]
+                changed_sphinx_fields.add('freezed')
+                changed_sphinx_fields.add('finished')
 
-        for key in ('title', 'summary', 'notes', 'original', 'source_link', 'source_title'):
+        for key in ('title', 'summary', 'notes', 'original'):
+            if key in data and getattr(story, key) != data[key]:
+                edited_data[key] = [getattr(story, key), data[key]]
+                setattr(story, key, data[key])
+                changed_sphinx_fields.add(key)
+
+        for key in ('source_link', 'source_title'):
             if key in data and getattr(story, key) != data[key]:
                 edited_data[key] = [getattr(story, key), data[key]]
                 setattr(story, key, data[key])
@@ -127,6 +139,7 @@ class StoryBL(BaseBL, Commentable):
         if 'rating' in data and story.rating.id != data['rating']:
             edited_data['rating'] = [story.rating.id, data['rating']]
             story.rating = Rating.get(id=data['rating'])
+            changed_sphinx_fields.add('rating_id')
 
         # TODO: refactor
         if 'categories' in data:
@@ -136,6 +149,7 @@ class StoryBL(BaseBL, Commentable):
                 edited_data['categories'] = [old_value, new_value]
                 story.categories.clear()
                 story.categories.add(Category.select(lambda x: x.id in data['categories'])[:])
+                changed_sphinx_fields.add('category')
 
         if 'characters' in data:
             old_value = [x.id for x in story.characters]
@@ -144,6 +158,7 @@ class StoryBL(BaseBL, Commentable):
                 edited_data['characters'] = [old_value, new_value]
                 story.characters.clear()
                 story.characters.add(Character.select(lambda x: x.id in data['characters'])[:])
+                changed_sphinx_fields.add('character')
 
         if 'classifications' in data:
             old_value = [x.id for x in story.classifications]
@@ -152,6 +167,7 @@ class StoryBL(BaseBL, Commentable):
                 edited_data['classifications'] = [old_value, new_value]
                 story.classifications.clear()
                 story.classifications.add(Classifier.select(lambda x: x.id in data['classifications'])[:])
+                changed_sphinx_fields.add('classifier')
 
         if edited_data:
             story.updated = datetime.utcnow()
@@ -162,11 +178,13 @@ class StoryBL(BaseBL, Commentable):
             for c in story.chapters:
                 c.story_published = story.published
 
-        later(current_app.tasks['sphinx_update_story'].delay, story.id, ())
+        if changed_sphinx_fields:
+            later(current_app.tasks['sphinx_update_story'].delay, story.id, changed_sphinx_fields)
         return story
 
     def approve(self, user, approved):
         story = self.model
+        tm = datetime.utcnow()
 
         old_approved = story.approved
         if approved == old_approved:
@@ -187,28 +205,35 @@ class StoryBL(BaseBL, Commentable):
         )
         if notify:
             # Уведомляем автора об изменении состояния рассказа
-            story.last_author_notification_at = datetime.utcnow()
+            story.last_author_notification_at = tm
             story.last_staff_notification_at = None
             later(current_app.tasks['notify_story_publish_draft'].delay, story.id, user.id, not story.published)
 
+        sphinx_update_fields = set()
+
+        if old_approved != story.approved:
+            sphinx_update_fields.add('approved')
+
         if old_published != story.published:
             if story.published and not story.first_published_at:
-                story.first_published_at = datetime.utcnow()
-            later(current_app.tasks['sphinx_update_story'].delay, story.id, ('approved', 'first_published_at'))
+                story.first_published_at = tm
+                sphinx_update_fields.add('first_published_at')
 
             published_chapter_ids = []
             for c in sorted(story.chapters, key=lambda c: c.order):
                 c.story_published = story.published
                 if story.published and not c.draft and not c.first_published_at:
-                    c.first_published_at = datetime.utcnow()
+                    c.first_published_at = tm
                     published_chapter_ids.append(c.id)
-                later(current_app.tasks['sphinx_update_chapter'].delay, c.id)
 
             if published_chapter_ids:
                 later(current_app.tasks['notify_story_chapters'].delay, published_chapter_ids, user.id if user else None)
 
             for c in story.comments:  # TODO: update StoryComment where story = story.id
                 c.story_published = story.published
+
+        if sphinx_update_fields:
+            later(current_app.tasks['sphinx_update_story'].delay, story.id, sphinx_update_fields)
 
     def publish(self, user, published):
         story = self.model
@@ -269,10 +294,11 @@ class StoryBL(BaseBL, Commentable):
                 later(current_app.tasks['notify_story_publish_noappr'].delay, story.id, user.id)
 
             # Прочие действия, в том числе проставление first_published_at
+            sphinx_update_fields = {'draft',}
             if old_published != story.published:
                 if story.published and not story.first_published_at:
                     story.first_published_at = datetime.utcnow()
-                later(current_app.tasks['sphinx_update_story'].delay, story.id, ('draft', 'first_published_at'))
+                    sphinx_update_fields.add('first_published_at')
 
                 published_chapter_ids = []
                 for c in sorted(story.chapters, key=lambda c: c.order):
@@ -287,6 +313,9 @@ class StoryBL(BaseBL, Commentable):
 
                 for c in story.comments:
                     c.story_published = story.published
+
+            later(current_app.tasks['sphinx_update_story'].delay, story.id, sphinx_update_fields)
+
             return True
 
         return False
@@ -294,6 +323,7 @@ class StoryBL(BaseBL, Commentable):
     def publish_all_chapters(self, user=None):
         story = self.model
         published_chapter_ids = []
+        tm = datetime.utcnow()
         for c in sorted(story.chapters, key=lambda x: x.order):
             if not c.draft:
                 continue
@@ -301,8 +331,10 @@ class StoryBL(BaseBL, Commentable):
             c.draft = False
             later(current_app.tasks['sphinx_update_chapter'].delay, c.id)
             if story.published and not c.first_published_at:
-                c.first_published_at = datetime.utcnow()
+                c.first_published_at = tm
                 published_chapter_ids.append(c.id)
+
+        later(current_app.tasks['sphinx_update_story'].delay, story.id, {'words',})
 
         if published_chapter_ids:
             later(current_app.tasks['notify_story_chapters'].delay, published_chapter_ids, user.id if user else None)
@@ -424,6 +456,8 @@ class StoryBL(BaseBL, Commentable):
         vote.flush()
         current_app.story_voting.update_rating(self.model)
         self.model.flush()
+
+        later(current_app.tasks['sphinx_update_story'].delay, story.id, {'vote_total', 'vote_value'})
 
         return vote
 
@@ -597,31 +631,31 @@ class StoryBL(BaseBL, Commentable):
 
     # search
 
-    def add_stories_to_search(self, stories):
+    def add_stories_to_search(self, stories, with_chapters=True):
         if current_app.config['SPHINX_DISABLED']:
             return
-        stories = [{
-            'id': story.id,
-            'title': story.title,
-            'summary': story.summary,
-            'notes': story.notes,
-            'first_published_at': int(((story.first_published_at or story.date) - datetime(1970, 1, 1, 0, 0, 0)).total_seconds()),
-            'rating_id': story.rating.id,
-            'size': story.words,
-            'comments': story.comments_count,
-            'finished': story.finished,
-            'original': story.original,
-            'freezed': story.freezed,
-            'published': story.published,
-            'character': [x.id for x in story.characters],  # TODO: check performance
-            'category': [x.id for x in story.categories],
-            'classifier': [x.id for x in story.classifications],
-            'match_author': ' '.join(x.username for x in story.authors),
-            'author': [x.id for x in story.authors],
-        } for story in stories]
+        sphinx_stories = []
+        for story in stories:
+            data = {
+                'id': story.id,
+                'title': story.title,
+                'summary': story.summary,
+                'notes': story.notes,
+                'match_author': ' '.join(x.username for x in story.authors),
+
+                'first_published_at': int(((story.first_published_at or story.date) - datetime(1970, 1, 1, 0, 0, 0)).total_seconds()),
+                'words': story.words,
+            }
+            data.update(story.bl.sphinx_get_common_fields())
+            sphinx_stories.append(data)
 
         with current_app.sphinx as sphinx:
-            sphinx.add('stories', stories)
+            sphinx.add('stories', sphinx_stories)
+
+        if with_chapters:
+            from mini_fiction.models import Chapter
+            chapters = sum([list(x.chapters) for x in stories], [])
+            Chapter.bl.add_chapters_to_search(chapters)
 
     def delete_stories_from_search(self, story_ids):
         if current_app.config['SPHINX_DISABLED']:
@@ -631,33 +665,71 @@ class StoryBL(BaseBL, Commentable):
         with current_app.sphinx as sphinx:
             sphinx.delete('chapters', story_id__in=story_ids)
 
-    def search_add(self):
-        self.add_stories_to_search((self.model,))
+    def search_add(self, with_chapters=True):
+        self.add_stories_to_search((self.model,), with_chapters=with_chapters)
 
-    def search_update(self, update_fields=()):
+    def search_update(self, update_fields=(), with_chapters=True):
         if current_app.config['SPHINX_DISABLED']:
             return
         story = self.model
+
         f = set(update_fields)
-        if f and not f - {'vote_value', 'vote_total'}:
-            pass  # TODO: рейтинг
-        elif f and not f - {'date', 'first_published_at', 'draft', 'approved'}:
-            with current_app.sphinx as sphinx:
-                timestamp = ((story.first_published_at or story.date) - datetime(1970, 1, 1, 0, 0, 0)).total_seconds()
-                sphinx.update('stories', fields={'first_published_at': int(timestamp), 'published': int(story.published)}, id=story.id)
-                sphinx.update('chapters', fields={'first_published_at': int(timestamp), 'published': int(story.published)}, id__in=[x.id for x in story.chapters])
-        elif f == {'words'}:
-            with current_app.sphinx as sphinx:
-                sphinx.update('stories', fields={'size': int(story.words)}, id=story.id)
-        elif f == {'comments'}:
-            with current_app.sphinx as sphinx:
-                sphinx.update('stories', fields={'comments': int(story.comments_count)}, id=story.id)
+
+        # Изменённые поля, общие и для рассказа, и для его глав
+        common_fields = self.sphinx_get_common_fields(f)
+        # Изменённые поля конкретно рассказа
+        story_fields = common_fields.copy()
+
+        if 'first_published_at' in f:
+            # first_published_at изменяется только один раз и одновременно у рассказов и у глав
+            # Поэтому смело пихаем в common_fields
+            common_fields['first_published_at'] = int(((story.first_published_at or story.date) - datetime(1970, 1, 1, 0, 0, 0)).total_seconds())
+            story_fields['first_published_at'] = common_fields['first_published_at']
+
+        if 'words' in f:
+            story_fields['words'] = story.words
+
+        if f - set(story_fields):
+            # Есть неучтённые поля — для них оптимизаций нет, тупо переиндексируем всё
+            self.search_add(with_chapters=False)
         else:
             with current_app.sphinx as sphinx:
-                self.add_stories_to_search((story,))
+                sphinx.update('stories', fields=story_fields, id=story.id)
+
+        if with_chapters and common_fields and len(list(story.chapters)) > 0:
+            with current_app.sphinx as sphinx:
+                sphinx.update('chapters', fields=common_fields, id__in=[x.id for x in story.chapters])
 
     def search_delete(self):
         self.delete_stories_from_search((self.model.id,))
+
+    def sphinx_get_common_fields(self, fields=None):
+        story = self.model
+        common_fields = {}
+
+        f = set(fields) if fields is not None else None
+
+        # TODO: rename vote_total to vote_count
+        for field in (
+            'vote_total', 'vote_value', 'comments_count',
+            'finished', 'original', 'freezed', 'draft', 'approved',
+        ):
+            if f is None or field in f:
+                common_fields[field] = getattr(story, field)
+
+        if f is None or 'rating_id' in f:
+            common_fields['rating_id'] = story.rating.id
+
+        if f is None or 'character' in f:
+            common_fields['character'] = [x.id for x in story.characters]  # TODO: check performance
+        if f is None or 'category' in f:
+            common_fields['category'] = [x.id for x in story.categories]
+        if f is None or 'classifier' in f:
+            common_fields['classifier'] = [x.id for x in story.classifications]
+        if f is None or 'author' in f:
+            common_fields['author'] = [x.id for x in story.authors]
+
+        return common_fields
 
     def search(self, query, limit, sort_by=0, only_published=True, extended_syntax=True, **filters):
         if current_app.config['SPHINX_DISABLED']:
@@ -668,7 +740,8 @@ class StoryBL(BaseBL, Commentable):
 
         sphinx_filters = {}
         if only_published:
-            sphinx_filters['published'] = 1
+            sphinx_filters['draft'] = 0
+            sphinx_filters['approved'] = 1
 
         # TODO: unused, remove it?
         # for ofilter in ('character', 'classifier', 'category', 'rating_id'):
@@ -683,10 +756,19 @@ class StoryBL(BaseBL, Commentable):
             sphinx_filters['category__not_in'] = [int(x) for x in filters['excluded_categories']]
 
         if filters.get('min_words') is not None:
-            sphinx_filters['size__gte'] = int(filters['min_words'])
-
+            sphinx_filters['words__gte'] = int(filters['min_words'])
         if filters.get('max_words') is not None:
-            sphinx_filters['size__lte'] = int(filters['max_words'])
+            sphinx_filters['words__lte'] = int(filters['max_words'])
+
+        if filters.get('min_vote_total') is not None:
+            sphinx_filters['vote_total__gte'] = int(filters['min_vote_total'])
+        if filters.get('max_vote_total') is not None:
+            sphinx_filters['vote_total__lte'] = int(filters['max_vote_total'])
+
+        if filters.get('min_vote_value') is not None:
+            sphinx_filters['vote_value__gte'] = int(filters['min_vote_value'])
+        if filters.get('max_vote_value') is not None:
+            sphinx_filters['vote_value__lte'] = int(filters['max_vote_value'])
 
         with current_app.sphinx as sphinx:
             raw_result = sphinx.search(
@@ -868,6 +950,14 @@ class StoryLocalThreadBL(BaseBL, Commentable):
 
 
 class ChapterBL(BaseBL):
+    sort_types = {
+        0: "weight() DESC, first_published_at DESC",
+        1: "first_published_at DESC",
+        2: "words DESC",
+        3: "vote_value DESC",
+        4: "comments_count DESC",
+    }
+
     def create(self, story, editor, data):
         from mini_fiction.models import Chapter
         from mini_fiction.validation.utils import safe_string_coerce, safe_string_multiline_coerce
@@ -1256,47 +1346,96 @@ class ChapterBL(BaseBL):
                 story.views += 1
         return view
 
-    def add_chapters_to_search(self, chapters):
+    # search
+
+    def add_chapters_to_search(self, chapters, update_story_words=True):
         if current_app.config['SPHINX_DISABLED']:
             return
-        chapters = [{
-            'id': chapter.id,
-            'title': chapter.title,
-            'notes': chapter.notes,
-            'text': chapter.text,
-            'story_id': chapter.story.id,
-            'published': chapter.story_published and not chapter.draft,
-            'first_published_at': int(((chapter.first_published_at or chapter.date) - datetime(1970, 1, 1, 0, 0, 0)).total_seconds()),
-        } for chapter in chapters]
+
+        sphinx_chapters = []
+        for chapter in chapters:
+            data = {
+                'id': chapter.id,
+
+                'title': chapter.title,
+                'notes': chapter.notes,
+                'text': chapter.text,
+
+                'story_id': chapter.story.id,
+                'first_published_at': int(((chapter.first_published_at or chapter.date) - datetime(1970, 1, 1, 0, 0, 0)).total_seconds()),
+                'words': chapter.words,
+
+                'chapter_draft': chapter.draft,
+            }
+            data.update(chapter.story.bl.sphinx_get_common_fields())
+            sphinx_chapters.append(data)
 
         with current_app.sphinx as sphinx:
-            sphinx.add('chapters', chapters)
+            sphinx.add('chapters', sphinx_chapters)
 
-    def delete_chapters_from_search(self, chapter_ids):
+        if update_story_words:
+            stories = {}
+            for chapter in chapters:
+                stories[chapter.story.id] = chapter.story
+            with current_app.sphinx as sphinx:
+                for story in stories.values():
+                    story.bl.search_update(('words',))
+
+    def delete_chapters_from_search(self, story_ids, chapter_ids, update_story_words=True):
         if current_app.config['SPHINX_DISABLED']:
             return
         with current_app.sphinx as sphinx:
             sphinx.delete('chapters', id__in=chapter_ids)
 
-    def search_add(self):
-        chapter = self.model
-        self.add_chapters_to_search((chapter,))
-        chapter.story.bl.search_update(('words',))
+        if story_ids and update_story_words:
+            from mini_fiction.models import Story
+            stories = Story.select(lambda x: x.id in story_ids)
+            for s in stories:
+                s.bl.search_update(update_fields=('words',))
 
-    def search_update(self):
-        self.search_add()
+    def search_add(self, update_story_words=True):
+        self.add_chapters_to_search((self.model,), update_story_words=update_story_words)
 
-    def search_delete(self):
-        chapter = self.model
-        self.delete_chapters_from_search((chapter.id,))
-        chapter.story.bl.search_update(('words',))
+    def search_update(self, update_story_words=True):
+        self.search_add(update_story_words=update_story_words)
 
-    def search(self, query, limit, only_published=True, extended_syntax=True):
+    def search_delete(self, update_story_words=True):
+        self.delete_chapters_from_search((self.model.story.id), (self.model.id,), update_story_words=update_story_words)
+
+    def search(self, query, limit, sort_by=0, only_published=True, extended_syntax=True, **filters):
         if current_app.config['SPHINX_DISABLED']:
             return {}, []
+
+        if sort_by not in self.sort_types:
+            sort_by = 0
+
         sphinx_filters = {}
         if only_published:
-            sphinx_filters['published'] = 1
+            sphinx_filters['chapter_draft'] = 0
+            sphinx_filters['draft'] = 0
+            sphinx_filters['approved'] = 1
+
+        for ifilter in ('original', 'finished', 'freezed', 'character', 'classifier', 'category', 'rating_id'):
+            if filters.get(ifilter):
+                sphinx_filters[ifilter + '__in'] = [int(x) for x in filters[ifilter]]
+
+        if filters.get('excluded_categories'):
+            sphinx_filters['category__not_in'] = [int(x) for x in filters['excluded_categories']]
+
+        if filters.get('min_words') is not None:
+            sphinx_filters['words__gte'] = int(filters['min_words'])
+        if filters.get('max_words') is not None:
+            sphinx_filters['words__lte'] = int(filters['max_words'])
+
+        if filters.get('min_vote_total') is not None:
+            sphinx_filters['vote_total__gte'] = int(filters['min_vote_total'])
+        if filters.get('max_vote_total') is not None:
+            sphinx_filters['vote_total__lte'] = int(filters['max_vote_total'])
+
+        if filters.get('min_vote_value') is not None:
+            sphinx_filters['vote_value__gte'] = int(filters['min_vote_value'])
+        if filters.get('max_vote_value') is not None:
+            sphinx_filters['vote_value__lte'] = int(filters['max_vote_value'])
 
         with current_app.sphinx as sphinx:
             raw_result = sphinx.search(
@@ -1305,6 +1444,7 @@ class ChapterBL(BaseBL):
                 weights=current_app.config['SPHINX_CONFIG']['weights_chapters'],
                 options=current_app.config['SPHINX_CONFIG']['select_options'],
                 limit=limit,
+                sort_by=self.sort_types[sort_by],
                 extended_syntax=extended_syntax,
                 **sphinx_filters
             )

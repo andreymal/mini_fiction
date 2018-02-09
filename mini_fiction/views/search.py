@@ -70,6 +70,7 @@ def search_action(postform):
                 freezed=postform.data['freezed'],
                 min_words=postform.data['min_words'],
                 max_words=postform.data['max_words'],
+                min_vote_total=current_app.config['MINIMUM_VOTES_FOR_VIEW'] if int(sort_type) == 3 else None,
                 excluded_categories=excluded_categories,
             )
         except SphinxError as exc:
@@ -83,9 +84,20 @@ def search_action(postform):
             raw_result, result = Chapter.bl.search(
                 query,
                 limit,
+                int(sort_type),
                 # TODO: сортировка и для глав тоже
                 only_published=not current_user.is_authenticated or not current_user.is_staff,
                 extended_syntax=postform.data.get('extsyntax'),
+                character=postform.data['char'],
+                classifier=postform.data['cls'],
+                category=postform.data['genre'],
+                rating_id=postform.data['rating'],
+                original=postform.data['original'],
+                finished=postform.data['finished'],
+                freezed=postform.data['freezed'],
+                min_words=postform.data['min_words'],
+                max_words=postform.data['max_words'],
+                min_vote_total=current_app.config['MINIMUM_VOTES_FOR_VIEW'] if int(sort_type) == 3 else None,
             )
         except SphinxError as exc:
             data = {'form': postform, 'page_title': gettext('Search of stories'), 'error': 'Кажется, есть синтаксическая ошибка в запросе', 'error_type': 'syntax'}

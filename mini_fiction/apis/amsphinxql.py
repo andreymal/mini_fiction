@@ -206,6 +206,8 @@ class SphinxConnection(object):
     def update(self, index, fields, **filters):
         sql = 'update `%s` set ' % index
         fields_list = tuple(fields.keys())
+        if not fields_list:
+            raise ValueError('Empty fields list is not allowed')
         sql += ', '.join(('`%s` = %%s' % f) for f in fields_list)
         args = list(fields[f] for f in fields_list)
 

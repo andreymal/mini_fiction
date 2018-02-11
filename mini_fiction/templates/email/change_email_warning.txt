@@ -1,7 +1,9 @@
-{% autoescape false -%}
+{%- extends 'email/base.txt' -%}
+
+{%- block content -%}
+{%- autoescape false -%}
 Для аккаунта {{ user.username }} на сайте {{ url_for('index.index', _external=True) }} был указан новый почтовый адрес {{ new_email }} вместо данного.
 
 Если вы не меняли его, срочно смените пароль и установите старую почту обратно.
-
-{{ SITE_NAME }}
-{%- endautoescape %}
+{%- endautoescape -%}
+{%- endblock -%}

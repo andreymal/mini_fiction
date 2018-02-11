@@ -1,4 +1,7 @@
-{% autoescape false -%}
+{%- extends 'email/base.txt' -%}
+
+{%- block content -%}
+{%- autoescape false -%}
 {% if comment.author %}
     {%- if is_staff %}Модератор{% elif is_author %}Автор{% elif is_editor %}Редактор{% else %}Бета-читатель{% endif %} {{ comment.author_username }}
 {%- else -%}
@@ -6,6 +9,5 @@
 {%- endif %} в редакторской рассказа «{{ story.title }}» на сайте {{ url_for('index.index', _external=True) }} добавил новый комментарий:
 
 {{ comment.text_as_html }}
-
-{{ SITE_NAME }}
-{%- endautoescape %}
+{%- endautoescape -%}
+{%- endblock -%}

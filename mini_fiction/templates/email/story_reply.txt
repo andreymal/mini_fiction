@@ -1,4 +1,7 @@
-{% autoescape false -%}
+{%- extends 'email/base.txt' -%}
+
+{%- block content -%}
+{%- autoescape false -%}
 {% if comment.author %}Пользователь {{ comment.author_username }}{% else %}Гость{% endif %} в рассказе «{{ story.title }}» на сайте {{ url_for('index.index', _external=True) }} добавил новый комментарий:
 
 {{ comment.text_as_html }}
@@ -6,6 +9,5 @@
 Он является ответом на ваш комментарий:
 
 {{ parent.text_as_html }}
-
-{{ SITE_NAME }}
-{%- endautoescape %}
+{%- endautoescape -%}
+{%- endblock -%}

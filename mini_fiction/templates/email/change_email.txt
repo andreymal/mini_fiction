@@ -1,4 +1,7 @@
-{% autoescape false -%}
+{%- extends 'email/base.txt' -%}
+
+{%- block content -%}
+{%- autoescape false -%}
 Для аккаунта {{ user.username }} на сайте {{ url_for('index.index', _external=True) }} был указан новый почтовый адрес, на который прислано данное письмо.
 
 Для сохранения нового адреса необходимо перейти по ссылке:
@@ -6,6 +9,5 @@
 {{ url_for('auth.new_email_activate', activation_key=activation_key, _external=True) }}
 
 Если вы ничего такого не делали — смело удаляйте это письмо.
-
-{{ SITE_NAME }}
-{%- endautoescape %}
+{%- endautoescape -%}
+{%- endblock -%}

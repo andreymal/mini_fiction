@@ -1,4 +1,7 @@
-{% autoescape false -%}
+{%- extends 'email/base.txt' -%}
+
+{%- block content -%}
+{%- autoescape false -%}
 Пользователь {{ abuse.user.username }} жалуется на
 
 {%- if abuse.target_type == 'story' %} рассказ
@@ -29,6 +32,5 @@
 {%- endif %}
 
 Прочитать жалобу: {{ url_for('admin_abuse_reports.show', abuse_id=abuse.id, _external=True) }}
-
-{{ SITE_NAME }}
-{%- endautoescape %}
+{%- endautoescape -%}
+{%- endblock -%}

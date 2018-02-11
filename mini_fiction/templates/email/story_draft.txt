@@ -1,7 +1,9 @@
-{% autoescape false -%}
+{%- extends 'email/base.txt' -%}
+
+{%- block content -%}
+{%- autoescape false -%}
 Ваш рассказ «{{ story.title }}» на сайте {{ url_for('index.index', _external=True) }} был убран в черновики модератором {{ staff.username }} и теперь скрыт от читателей.
 
 Ссылка на рассказ: {{ url_for('story.view', pk=story.id, _external=True) }}
-
-{{ SITE_NAME }}
-{%- endautoescape %}
+{%- endautoescape -%}
+{%- endblock -%}

@@ -1,1 +1,1 @@
-Рассказ «{{ story.title|safe }}» убран в черновики — {{ SITE_NAME }}
+Рассказ «{{ story.title|safe }}» убран в черновики — {{ EMAIL_SITE_NAME }}

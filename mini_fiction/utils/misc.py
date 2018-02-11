@@ -80,6 +80,12 @@ def sitename():
     return current_app.config['SITE_NAME'].get(g.locale.language) or current_app.config['SITE_NAME'].get('default', 'Library')
 
 
+def emailsitename():
+    if current_app.config['EMAIL_SITE_NAME'] is None:
+        return sitename()
+    return current_app.config['EMAIL_SITE_NAME'].get(g.locale.language) or current_app.config['EMAIL_SITE_NAME'].get('default', 'Library')
+
+
 def indextitle():
     return current_app.config['SITE_INDEX_TITLE'].get(g.locale.language) or current_app.config['SITE_INDEX_TITLE'].get('default', '')
 

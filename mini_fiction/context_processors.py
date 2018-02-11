@@ -3,7 +3,7 @@
 
 from flask import current_app, g
 
-from mini_fiction.utils.misc import sitename
+from mini_fiction.utils.misc import sitename, emailsitename
 
 
 context_processors = []
@@ -18,6 +18,7 @@ def context_processor(func):
 def website_settings():
     result = {
         'SITE_NAME': sitename(),
+        'EMAIL_SITE_NAME': emailsitename(),
         'SERVER_NAME': current_app.config['SERVER_NAME'],
         'PREFERRED_URL_SCHEME': current_app.config['PREFERRED_URL_SCHEME'],
         'STATIC_V': current_app.static_v,

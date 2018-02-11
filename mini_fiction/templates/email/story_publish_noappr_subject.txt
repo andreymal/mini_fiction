@@ -1,1 +1,1 @@
-{{ author.username }} опубликовал рассказ «{{ story.title|safe }}» — {{ SITE_NAME }}
+{{ author.username }} опубликовал рассказ «{{ story.title|safe }}» — {{ EMAIL_SITE_NAME }}

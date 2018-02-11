@@ -1,1 +1,1 @@
-{% if user %}{{ user.username }} удалил рассказ{% else %}Удалён рассказ{% endif %} «{{ story_title|safe }}» — {{ SITE_NAME }}
+{% if user %}{{ user.username }} удалил рассказ{% else %}Удалён рассказ{% endif %} «{{ story_title|safe }}» — {{ EMAIL_SITE_NAME }}

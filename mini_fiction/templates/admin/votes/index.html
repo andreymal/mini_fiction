@@ -16,7 +16,7 @@
         </tr></thead>
 
         <tbody>
-        {%- for vote in votes %}<tr>
+        {%- for vote in votes %}<tr data-id="{{ vote.id }}">
             <td class="col-vote-story-title">
                 <strong><a href="{{ url_for('story.view', pk=vote.story.id) }}">{{ vote.story.title }}</a></strong>
             </td>

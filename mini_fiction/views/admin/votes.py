@@ -23,7 +23,6 @@ def index(page):
 
     args = {
         'page': page,
-        'sorting': request.args.get('sorting') or 'id',
     }
 
     if request.args.get('story_id'):

@@ -269,7 +269,9 @@ def configure_views(app):
 
 def configure_admin_views(app):
     from mini_fiction.views.admin import index, categories, characters, charactergroups, classifications
-    from mini_fiction.views.admin import logopics, htmlblocks, staticpages, authors, news, abuse_reports, registrations
+    from mini_fiction.views.admin import logopics, htmlblocks, staticpages, news, abuse_reports, votes
+    from mini_fiction.views.admin import authors, registrations
+
     app.register_blueprint(index.bp, url_prefix='/admin')
     app.register_blueprint(logopics.bp, url_prefix='/admin/logopics')
     app.register_blueprint(htmlblocks.bp, url_prefix='/admin/htmlblocks')
@@ -278,9 +280,10 @@ def configure_admin_views(app):
     app.register_blueprint(charactergroups.bp, url_prefix='/admin/charactergroups')
     app.register_blueprint(classifications.bp, url_prefix='/admin/classifications')
     app.register_blueprint(staticpages.bp, url_prefix='/admin/staticpages')
-    app.register_blueprint(authors.bp, url_prefix='/admin/authors')
     app.register_blueprint(news.bp, url_prefix='/admin/news')
     app.register_blueprint(abuse_reports.bp, url_prefix='/admin/abuse_reports')
+    app.register_blueprint(votes.bp, url_prefix='/admin/votes')
+    app.register_blueprint(authors.bp, url_prefix='/admin/authors')
     app.register_blueprint(registrations.bp, url_prefix='/admin/registrations')
 
 

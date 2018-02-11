@@ -20,6 +20,7 @@
             <li><a href="{{ url_for('admin_staticpages.index') }}">{{ _('Static pages') }}</a></li>
             <li><a href="{{ url_for('admin_news.index') }}">{{ _('News') }}</a></li>
             <li><a href="{{ url_for('admin_abuse_reports.index') }}">Жалобы</a></li>
+            <li><a href="{{ url_for('admin_votes.index') }}">Оценки</a></li>
             {% if current_user.is_superuser -%}
                 <li><a href="{{ url_for('admin_authors.index') }}">{{ _('Authors') }}</a></li>
                 <li><a href="{{ url_for('admin_registrations.index') }}">{{ _('Registrations') }}</a></li>

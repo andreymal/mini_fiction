@@ -2146,6 +2146,10 @@ ul.editlog .editlog-item:nth-child(2n+1) {
     text-align: center;
 }
 
+.admin-index-table .col-vote-story-title {
+    width: 45%;
+}
+
 .icon-admin-checkbox-true,
 .icon-admin-checkbox-false {
     display: inline-block;

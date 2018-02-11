@@ -33,9 +33,30 @@ def index(page):
     if request.args.get('username'):
         args['username'] = request.args['username']
         objects = objects.filter(lambda x: args['username'].lower() in x.username.lower())
+
     if request.args.get('email'):
         args['email'] = request.args['email']
         objects = objects.filter(lambda x: args['email'].lower() in x.email.lower())
+
+    if request.args.get('is_active') in ('0', '1'):
+        args['is_active'] = request.args['is_active']
+        is_active = args['is_active'] == '1'
+        objects = objects.filter(lambda x: x.is_active == is_active)
+
+    if request.args.get('is_staff') in ('0', '1'):
+        args['is_staff'] = request.args['is_staff']
+        is_staff = args['is_staff'] == '1'
+        objects = objects.filter(lambda x: x.is_staff == is_staff)
+
+    if request.args.get('is_superuser') in ('0', '1'):
+        args['is_superuser'] = request.args['is_superuser']
+        is_superuser = args['is_superuser'] == '1'
+        objects = objects.filter(lambda x: x.is_superuser == is_superuser)
+
+    if request.args.get('premoderation_mode') in ('none', 'on', 'off'):
+        args['premoderation_mode'] = request.args['premoderation_mode']
+        premoderation_mode = '' if args['premoderation_mode'] == 'none' else args['premoderation_mode']
+        objects = objects.filter(lambda x: x.premoderation_mode == premoderation_mode)
 
     objects = admin_sort(args['sorting'], objects, {
         'username': Author.username,

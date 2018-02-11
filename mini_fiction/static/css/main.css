@@ -2177,6 +2177,13 @@ ul.editlog .editlog-item:nth-child(2n+1) {
     width: calc(100% - 12px - 2px);  /* margin and padding */
 }
 
+.admin-input-select-full {
+    margin-left: 0;
+    margin-right: 0;
+    box-sizing: border-box;
+    width: 100%;
+}
+
 .admin-log-list {
     background-color: white;
     padding: 8px;

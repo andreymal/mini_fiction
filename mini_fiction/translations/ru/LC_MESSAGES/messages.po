@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version:  0.0.3\n"
 "Report-Msgid-Bugs-To: andriyano-31@mail.ru\n"
-"POT-Creation-Date: 2018-02-05 22:48+0300\n"
+"POT-Creation-Date: 2018-02-11 16:39+0300\n"
 "Last-Translator: andreymal <andriyano-31@mail.ru>\n"
 "Language: ru\n"
 "Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && "
@@ -218,6 +218,7 @@ msgstr "Электропочта"
 
 #: mini_fiction/forms/admin/authors.py:21
 #: mini_fiction/templates/admin/authors/index.html:14
+#: mini_fiction/templates/admin/authors/index.html:74
 msgid "Is active"
 msgstr "Активен"
 
@@ -226,6 +227,7 @@ msgid "Inactive users can't log in"
 msgstr "Неактивные пользователи не могут войти"
 
 #: mini_fiction/forms/admin/authors.py:27
+#: mini_fiction/templates/admin/authors/index.html:81
 msgid "Is staff"
 msgstr "Персонал"
 
@@ -234,6 +236,7 @@ msgid "Staff can approve stories and partially administer the site"
 msgstr "Персонал может подтверждать рассказы и частично администрировать сайт"
 
 #: mini_fiction/forms/admin/authors.py:33
+#: mini_fiction/templates/admin/authors/index.html:88
 msgid "Is superuser"
 msgstr "Суперпользователь"
 
@@ -242,18 +245,22 @@ msgid "Superuser can fully administer the site"
 msgstr "Суперпользователь может целиком администрировать сайт"
 
 #: mini_fiction/forms/admin/authors.py:39
+#: mini_fiction/templates/admin/authors/index.html:95
 msgid "Premoderation mode"
 msgstr "Режим премодерации"
 
 #: mini_fiction/forms/admin/authors.py:41
+#: mini_fiction/templates/admin/authors/index.html:98
 msgid "Default"
 msgstr "По умолчанию"
 
 #: mini_fiction/forms/admin/authors.py:42
+#: mini_fiction/templates/admin/authors/index.html:99
 msgid "Enable premoderation"
 msgstr "Включить премодерацию"
 
 #: mini_fiction/forms/admin/authors.py:43
+#: mini_fiction/templates/admin/authors/index.html:100
 msgid "Disable premoration (verified author)"
 msgstr "Отключить премодерацию (проверенный автор)"
 
@@ -648,7 +655,7 @@ msgstr "Новости"
 #: mini_fiction/templates/admin/authors/update.html:10
 #: mini_fiction/templates/admin/authors/update.html:90
 #: mini_fiction/templates/admin/index.html:24
-#: mini_fiction/views/admin/authors.py:54
+#: mini_fiction/views/admin/authors.py:75
 msgid "Authors"
 msgstr "Авторы"
 
@@ -674,7 +681,7 @@ msgstr "(ничего)"
 #: mini_fiction/templates/admin/abuse_reports/show.html:9
 #: mini_fiction/templates/admin/abuse_reports/show.html:83
 #: mini_fiction/templates/admin/authors/index.html:6
-#: mini_fiction/templates/admin/authors/index.html:89
+#: mini_fiction/templates/admin/authors/index.html:118
 #: mini_fiction/templates/admin/authors/update.html:9
 #: mini_fiction/templates/admin/authors/update.html:89
 #: mini_fiction/templates/admin/categories/delete.html:7
@@ -769,7 +776,26 @@ msgstr "(это вы)"
 msgid "E-mail"
 msgstr "E-mail"
 
-#: mini_fiction/templates/admin/authors/index.html:74
+#: mini_fiction/templates/admin/authors/index.html:76
+#: mini_fiction/templates/admin/authors/index.html:83
+#: mini_fiction/templates/admin/authors/index.html:90
+#: mini_fiction/templates/admin/authors/index.html:97
+msgid "All"
+msgstr "Все"
+
+#: mini_fiction/templates/admin/authors/index.html:77
+#: mini_fiction/templates/admin/authors/index.html:84
+#: mini_fiction/templates/admin/authors/index.html:91
+msgid "Yes"
+msgstr "Да"
+
+#: mini_fiction/templates/admin/authors/index.html:78
+#: mini_fiction/templates/admin/authors/index.html:85
+#: mini_fiction/templates/admin/authors/index.html:92
+msgid "No"
+msgstr "Нет"
+
+#: mini_fiction/templates/admin/authors/index.html:103
 #: mini_fiction/templates/includes/nav.html:65
 msgid "Search"
 msgstr "Поиск"
@@ -1063,57 +1089,57 @@ msgstr "Pony ORM"
 msgid "Pony ORM queries"
 msgstr "Запросы Pony ORM"
 
-#: mini_fiction/utils/misc.py:119
+#: mini_fiction/utils/misc.py:125
 msgctxt "story_edit_log"
 msgid "edited story"
 msgstr "отредактировал рассказ"
 
-#: mini_fiction/utils/misc.py:124
+#: mini_fiction/utils/misc.py:130
 msgctxt "story_edit_log"
 msgid "published story"
 msgstr "опубликовал рассказ"
 
-#: mini_fiction/utils/misc.py:126
+#: mini_fiction/utils/misc.py:132
 msgctxt "story_edit_log"
 msgid "sent to drafts story"
 msgstr "отправил в черновики рассказ"
 
-#: mini_fiction/utils/misc.py:128
+#: mini_fiction/utils/misc.py:134
 msgctxt "story_edit_log"
 msgid "approved story"
 msgstr "одобрил рассказ"
 
-#: mini_fiction/utils/misc.py:130
+#: mini_fiction/utils/misc.py:136
 msgctxt "story_edit_log"
 msgid "unapproved story"
 msgstr "отозвал рассказ"
 
-#: mini_fiction/utils/misc.py:141
+#: mini_fiction/utils/misc.py:147
 msgctxt "story_edit_log"
 msgid "edited chapter"
 msgstr "отредактировал главу"
 
-#: mini_fiction/utils/misc.py:148
+#: mini_fiction/utils/misc.py:154
 msgctxt "story_edit_log"
 msgid "added chapter"
 msgstr "добавил главу"
 
-#: mini_fiction/utils/misc.py:150
+#: mini_fiction/utils/misc.py:156
 msgctxt "story_edit_log"
 msgid "deleted chapter"
 msgstr "удалил главу"
 
-#: mini_fiction/utils/misc.py:153
+#: mini_fiction/utils/misc.py:159
 msgctxt "story_edit_log"
 msgid "sent to drafts chapter"
 msgstr "отправил в черновики главу"
 
-#: mini_fiction/utils/misc.py:155
+#: mini_fiction/utils/misc.py:161
 msgctxt "story_edit_log"
 msgid "published chapter"
 msgstr "опубликовал главу"
 
-#: mini_fiction/utils/misc.py:205
+#: mini_fiction/utils/misc.py:211
 #, python-format
 msgid "Show %(num)s unchanged symbol"
 msgid_plural "Show %(num)s unchanged symbols"
@@ -1301,8 +1327,8 @@ msgid "Confirm restore comment"
 msgstr "Подтверждение восстановления комментария"
 
 #: mini_fiction/views/search.py:21 mini_fiction/views/search.py:29
-#: mini_fiction/views/search.py:37 mini_fiction/views/search.py:76
-#: mini_fiction/views/search.py:91 mini_fiction/views/search.py:110
+#: mini_fiction/views/search.py:37 mini_fiction/views/search.py:77
+#: mini_fiction/views/search.py:103 mini_fiction/views/search.py:122
 msgid "Search of stories"
 msgstr "Поиск рассказов"
 

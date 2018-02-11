@@ -179,7 +179,7 @@ class StoryBL(BaseBL, Commentable):
                 c.story_published = story.published
 
         if changed_sphinx_fields:
-            later(current_app.tasks['sphinx_update_story'].delay, story.id, changed_sphinx_fields)
+            later(current_app.tasks['sphinx_update_story'].delay, story.id, tuple(changed_sphinx_fields))
         return story
 
     def approve(self, user, approved):
@@ -209,15 +209,15 @@ class StoryBL(BaseBL, Commentable):
             story.last_staff_notification_at = None
             later(current_app.tasks['notify_story_publish_draft'].delay, story.id, user.id, not story.published)
 
-        sphinx_update_fields = set()
+        changed_sphinx_fields = set()
 
         if old_approved != story.approved:
-            sphinx_update_fields.add('approved')
+            changed_sphinx_fields.add('approved')
 
         if old_published != story.published:
             if story.published and not story.first_published_at:
                 story.first_published_at = tm
-                sphinx_update_fields.add('first_published_at')
+                changed_sphinx_fields.add('first_published_at')
 
             published_chapter_ids = []
             for c in sorted(story.chapters, key=lambda c: c.order):
@@ -232,8 +232,8 @@ class StoryBL(BaseBL, Commentable):
             for c in story.comments:  # TODO: update StoryComment where story = story.id
                 c.story_published = story.published
 
-        if sphinx_update_fields:
-            later(current_app.tasks['sphinx_update_story'].delay, story.id, sphinx_update_fields)
+        if changed_sphinx_fields:
+            later(current_app.tasks['sphinx_update_story'].delay, story.id, tuple(changed_sphinx_fields))
 
     def publish(self, user, published):
         story = self.model
@@ -294,11 +294,11 @@ class StoryBL(BaseBL, Commentable):
                 later(current_app.tasks['notify_story_publish_noappr'].delay, story.id, user.id)
 
             # Прочие действия, в том числе проставление first_published_at
-            sphinx_update_fields = {'draft',}
+            changed_sphinx_fields = {'draft',}
             if old_published != story.published:
                 if story.published and not story.first_published_at:
                     story.first_published_at = datetime.utcnow()
-                    sphinx_update_fields.add('first_published_at')
+                    changed_sphinx_fields.add('first_published_at')
 
                 published_chapter_ids = []
                 for c in sorted(story.chapters, key=lambda c: c.order):
@@ -314,7 +314,7 @@ class StoryBL(BaseBL, Commentable):
                 for c in story.comments:
                     c.story_published = story.published
 
-            later(current_app.tasks['sphinx_update_story'].delay, story.id, sphinx_update_fields)
+            later(current_app.tasks['sphinx_update_story'].delay, story.id, tuple(changed_sphinx_fields))
 
             return True
 
@@ -334,7 +334,7 @@ class StoryBL(BaseBL, Commentable):
                 c.first_published_at = tm
                 published_chapter_ids.append(c.id)
 
-        later(current_app.tasks['sphinx_update_story'].delay, story.id, {'words',})
+        later(current_app.tasks['sphinx_update_story'].delay, story.id, ('words',))
 
         if published_chapter_ids:
             later(current_app.tasks['notify_story_chapters'].delay, published_chapter_ids, user.id if user else None)
@@ -457,7 +457,7 @@ class StoryBL(BaseBL, Commentable):
         current_app.story_voting.update_rating(self.model)
         self.model.flush()
 
-        later(current_app.tasks['sphinx_update_story'].delay, story.id, {'vote_total', 'vote_value'})
+        later(current_app.tasks['sphinx_update_story'].delay, story.id, ('vote_total', 'vote_value'))
 
         return vote
 

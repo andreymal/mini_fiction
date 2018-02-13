@@ -7,7 +7,7 @@ from base64 import b64decode, b64encode
 from werkzeug.security import safe_str_cmp
 
 
-def pbkdf2_encode(password, salt=None, iterations=50000):
+def pbkdf2_encode(password, salt=None, iterations=100000):
     from hashlib import pbkdf2_hmac
     if not salt:
         salt = b64encode(os.urandom(32)).decode('ascii').strip()

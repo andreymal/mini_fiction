@@ -78,6 +78,7 @@ class Config(object):
     PONYORM_RECORD_QUERIES = False
 
     PASSWORD_HASHER = 'pbkdf2'  # or 'bcrypt' or 'scrypt'
+    PBKDF2_ITERATIONS = 100000
 
     SERVER_NAME = 'localhost:5000'
     PREFERRED_URL_SCHEME = 'http'

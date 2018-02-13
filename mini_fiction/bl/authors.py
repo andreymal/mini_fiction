@@ -651,7 +651,8 @@ class AuthorBL(BaseBL):
             return ''
 
         elif current_app.config['PASSWORD_HASHER'] == 'pbkdf2':
-            return '$pbkdf2$' + hashers.pbkdf2_encode(password)  # $pbkdf2$pbkdf2_sha256$50000$...
+            iterations = current_app.config['PBKDF2_ITERATIONS']
+            return '$pbkdf2$' + hashers.pbkdf2_encode(password, iterations=iterations)  # $pbkdf2$pbkdf2_sha256$50000$...
 
         elif current_app.config['PASSWORD_HASHER'] == 'scrypt':
             return '$scrypt$' + hashers.scrypt_encode(password)

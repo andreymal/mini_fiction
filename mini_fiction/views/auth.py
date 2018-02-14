@@ -103,10 +103,21 @@ def password_reset():
 
     form = AuthorPasswordResetForm()
     if form.validate_on_submit():
-        user = Author.get(email=form.email.data)
-        if user:
-            user.bl.reset_password_by_email()
-        return redirect(url_for('auth.password_reset_done'))
+        clean_email = form.email.data.lower().strip()
+        users = Author.select(lambda x: x.email.lower() == clean_email)[:2]
+
+        if len(users) == 1:
+            users[0].bl.reset_password_by_email()
+            return redirect(url_for('auth.password_reset_done'))
+
+        if not users:
+            form.set_errors({'email': ['Пользователь с таким e-mail не найден']})
+        else:  # len(users) > 1
+            form.set_errors({'email': [
+                'Как-то получилось, что этот e-mail есть у нескольких пользователей. '
+                'Обратитесь к администрации для разбирательств'
+            ]})
+
     return render_template('registration/password_reset_form.html', form=form, page_title=page_title)
 
 

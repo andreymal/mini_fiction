@@ -2,29 +2,68 @@
 # -*- coding: utf-8 -*-
 
 from pony import orm
+from flask import current_app
 
-from mini_fiction.models import Chapter
+from mini_fiction.models import Story, Chapter
 
 
-def checkwordscount():
-    with orm.db_session:
-        first_chapter = orm.select(orm.min(x.id) for x in Chapter).first()
-        last_chapter = orm.select(orm.max(x.id) for x in Chapter).first()
+def story_check_words_count(story, verbose=True):
+    if isinstance(story, int):
+        story = Story.get(id=story)
+    if not story:
+        return
 
-    chapter_id = first_chapter
-    while True:
-        with orm.db_session:
-            chapter = Chapter.select(lambda x: x.id >= chapter_id and x.id <= last_chapter).prefetch(Chapter.story).first()
-            if not chapter:
-                break
+    chapters = list(story.chapters)
+    chapters.sort(key=lambda c: c.order)
 
+    all_words = 0
+    for chapter in chapters:
+        if verbose:
             print('Chapter {}/{} ({}):'.format(chapter.story.id, chapter.order, chapter.id), end=' ', flush=True)
-            old_words, new_words = Chapter.bl.update_words_count(chapter)
-            print('{} -> {}'.format(old_words, new_words), end='', flush=True)
 
-            if old_words != new_words:
+        old_words, new_words = Chapter.bl.update_words_count(chapter)
+        if verbose:
+            print('{} -> {}'.format(old_words, new_words), end='', flush=True)
+        all_words += new_words
+
+        if old_words != new_words:
+            if verbose:
                 print(' (changed)', end='', flush=True)
-                orm.commit()
+            orm.commit()
+            current_app.tasks['sphinx_update_chapter'].delay(chapter.id)
+
+        if verbose:
             print()
 
-            chapter_id = chapter.id + 1
+    if verbose:
+        print('Story {}: {} -> {}'.format(story.id, story.words, all_words), end='', flush=True)
+
+    if story.words != all_words:
+        if verbose:
+            print(' (changed)', end='', flush=True)
+        story.words = all_words
+        orm.commit()
+        current_app.tasks['sphinx_update_story'].delay(story.id, ('words',))
+
+    if verbose:
+        print()
+
+
+def checkwordscount(story_ids=None):
+    if story_ids:
+        for story_id in story_ids:
+            with orm.db_session:
+                story_check_words_count(int(story_id))
+        return
+
+    with orm.db_session:
+        first_story = orm.select(orm.min(x.id) for x in Story).first()
+
+    story_id = first_story
+    while True:
+        with orm.db_session:
+            story = Story.select(lambda x: x.id >= story_id).first()
+            if not story:
+                break
+            story_check_words_count(story)
+            story_id = story.id + 1

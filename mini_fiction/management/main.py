@@ -98,12 +98,11 @@ def checknewscomments():
     orm.sql_debug(False)
     cmd()
 
-
-@manager.command
-def checkwordscount():
+@manager.option('story_ids', metavar='story_ids', nargs='*', default=(), help='Story IDs')
+def checkwordscount(story_ids):
     from mini_fiction.management.commands.checkwordscount import checkwordscount as cmd
     orm.sql_debug(False)
-    cmd()
+    cmd(story_ids)
 
 
 @manager.command

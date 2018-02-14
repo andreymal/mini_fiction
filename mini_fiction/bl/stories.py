@@ -1076,7 +1076,8 @@ class ChapterBL(BaseBL):
 
         chapter = self.model
         story = chapter.story
-        story.words = story.words - chapter.words
+        if not chapter.draft:
+            story.words = story.words - chapter.words
         later(current_app.tasks['sphinx_delete_chapter'].delay, story.id, chapter.id)
 
         old_order = chapter.order

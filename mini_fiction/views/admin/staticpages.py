@@ -58,7 +58,7 @@ def create():
     )
 
 
-@bp.route('/<name>/<lang>/', methods=('GET', 'POST'))
+@bp.route('/<path:name>/<lang>/', methods=('GET', 'POST'))
 @db_session
 @admin_required
 def update(name, lang):
@@ -101,7 +101,7 @@ def update(name, lang):
     )
 
 
-@bp.route('/<name>/<lang>/delete/', methods=('GET', 'POST'))
+@bp.route('/<path:name>/<lang>/delete/', methods=('GET', 'POST'))
 @db_session
 @admin_required
 def delete(name, lang):

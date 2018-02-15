@@ -601,12 +601,12 @@ img.avatar-small, .character-list img {
     overflow: hidden;
 }
 
-.vote-area-2 .starblock {
+.starblock-voting {
     vertical-align: baseline;
     margin: 0;
 }
 
-.vote-area-2 .starblock.uploading {
+.starblock-voting.uploading {
     opacity: 0.5;
 }
 
@@ -626,8 +626,8 @@ img.avatar-small, .character-list img {
     text-decoration: none;
 }
 
-.starvote.star-button:hover {
-    background-position: 0px -48px;
+.starblock-voting .starvote.star-button {
+    float: right;
 }
 
 .starvote.star-0 {
@@ -656,6 +656,15 @@ img.avatar-small, .character-list img {
 
 .starvote.star-6 {
     background-position: 0px -144px;
+}
+
+.starblock-voting:hover .starvote.star-button {
+    background-position: 0px 0px;
+}
+
+.starblock-voting .starvote.star-button:hover,
+.starblock-voting .starvote.star-button:hover ~ .starvote.star-button {
+    background-position: 0px -120px;
 }
 
 h1 .alert {

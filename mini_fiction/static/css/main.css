@@ -275,12 +275,20 @@ ul.nav-main-links {
     z-index: 15;
 }
 
-.bell-popup-content {
+.bell-popup-content,
+.bell-popup-content-loading {
     min-height: 3em;
     max-height: 25em;
     overflow: auto;
     cursor: auto;
     text-align: left;
+    box-sizing: border-box;
+}
+
+.bell-popup-content-loading {
+    min-height: 0;
+    text-align: center;
+    padding: 1em;
 }
 
 .bell-popup:before {

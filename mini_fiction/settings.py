@@ -302,6 +302,7 @@ class Config(object):
     RECAPTCHA_OPTIONS = {'hl': 'ru'}
 
     DEFAULT_USERPIC = {'endpoint': 'static', 'filename': 'i/userpic.png'}
+    LOADING_ICON = {'endpoint': 'static', 'filename': 'i/ajax-loader.gif'}
 
     # Testing
     TESTING = False

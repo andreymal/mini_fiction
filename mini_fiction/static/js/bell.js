@@ -50,6 +50,7 @@ var bell = {
         var link = document.getElementById('nav-icon-bell');
         var popup = document.getElementById('bell-popup');
         var content = document.getElementById('bell-popup-content');
+        var contentLoading = document.getElementById('bell-popup-content-loading');
         var url = link.getAttribute('data-ajax');
 
         popup.style.display = '';
@@ -60,18 +61,25 @@ var bell = {
                 return response.json();
             })
             .then(function(data) {
+                if (data.popup) {
+                    content.innerHTML = data.popup;
+                }
                 if (core.handleResponse(data, url)) {
                     bell.hidePopup();
                     return;
+                } else if (data.success && data.last_id) {
+                    bell.setViewed(data.last_id);
                 }
-                content.innerHTML = data.popup;
-                bell.setViewed(data.last_id);
             }).then(null, function(exc) {
                 bell.hidePopup();
                 core.handleError(exc);
+            }).then(function() {
+                content.style.display = '';
+                contentLoading.style.display = 'none';
             });
 
-        content.innerHTML = '';
+        content.style.display = 'none';
+        contentLoading.style.display = '';
     },
 
     hidePopup: function() {

@@ -404,7 +404,7 @@ class Story(db.Entity):
     # Проверка возможности публикации
     @property
     def publishable(self):
-        return True if self.words >= current_app.config['PUBLISH_SIZE_LIMIT'] else False
+        return self.words >= current_app.config['PUBLISH_SIZE_LIMIT']
 
     @property
     def nsfw(self):

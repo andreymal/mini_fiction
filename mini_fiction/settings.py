@@ -216,7 +216,7 @@ class Config(object):
     }
 
     PREMODERATION = True
-    PUBLISH_SIZE_LIMIT = 1000  # words
+    PUBLISH_SIZE_LIMIT = 400  # words
     MAX_SIZE_FOR_DIFF = 75000  # chars
     DIFF_CONTEXT_SIZE = 150  # chars
 

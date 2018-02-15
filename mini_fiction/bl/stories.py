@@ -397,7 +397,9 @@ class StoryBL(BaseBL, Commentable):
                 lambda x: x.type in ('story_lreply', 'story_lcomment') and x.target_id in local_comment_ids
             ).delete(bulk=True)
             orm.select(c for c in StoryLocalCommentEdit if c.comment.id in local_comment_ids).delete(bulk=True)
-            story.local.comments.select().order_by(StoryLocalComment.id.desc()).delete(bulk=True)
+            orm.sql_debug(True)
+            story.local.comments.select().order_by(StoryLocalComment.id.desc()).delete(bulk=False)  # не может в bulk, ага
+            orm.sql_debug(False)
 
         # Не помню почему, но почему-то там Optional
         story.story_views_set.select().delete(bulk=True)

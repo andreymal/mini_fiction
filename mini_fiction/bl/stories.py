@@ -82,6 +82,8 @@ class StoryBL(BaseBL, Commentable):
         story.bl.subscribe_to_comments(authors[0], email=True, tracker=True)
         story.bl.subscribe_to_local_comments(authors[0], email=True, tracker=True)
 
+        current_app.cache.delete('index_updated_chapters')
+
         later(current_app.tasks['sphinx_update_story'].delay, story.id, None)
         return story
 
@@ -232,6 +234,8 @@ class StoryBL(BaseBL, Commentable):
             for c in story.comments:  # TODO: update StoryComment where story = story.id
                 c.story_published = story.published
 
+            current_app.cache.delete('index_updated_chapters')
+
         if changed_sphinx_fields:
             later(current_app.tasks['sphinx_update_story'].delay, story.id, tuple(changed_sphinx_fields))
 
@@ -314,6 +318,8 @@ class StoryBL(BaseBL, Commentable):
                 for c in story.comments:
                     c.story_published = story.published
 
+                current_app.cache.delete('index_updated_chapters')
+
             later(current_app.tasks['sphinx_update_story'].delay, story.id, tuple(changed_sphinx_fields))
 
             return True
@@ -338,6 +344,7 @@ class StoryBL(BaseBL, Commentable):
 
         if published_chapter_ids:
             later(current_app.tasks['notify_story_chapters'].delay, published_chapter_ids, user.id if user else None)
+            current_app.cache.delete('index_updated_chapters')
 
     def delete(self, user=None):
         from mini_fiction.models import Chapter, StoryComment, StoryCommentVote, StoryCommentEdit
@@ -409,6 +416,7 @@ class StoryBL(BaseBL, Commentable):
         # Остальные связи Pony ORM осилит
         story.delete()
         orm.flush()
+        current_app.cache.delete('index_updated_chapters')
 
     def viewed(self, user):
         if not user.is_authenticated:
@@ -984,6 +992,7 @@ class ChapterBL(BaseBL):
         chapter.bl.edit_log(editor, 'add', {}, text_md5=chapter.text_md5)
         story.updated = datetime.utcnow()
         later(current_app.tasks['sphinx_update_chapter'].delay, chapter.id)
+        # current_app.cache.delete('index_updated_chapters') не нужен, если draft=True
         return chapter
 
     def edit_log(self, editor, action, data, chapter_text_diff=None, text_md5=None):
@@ -1098,6 +1107,7 @@ class ChapterBL(BaseBL):
             c.flush()
 
         story.updated = datetime.utcnow()
+        current_app.cache.delete('index_updated_chapters')
 
     def notes2html(self, notes):
         from mini_fiction.validation.utils import safe_string_multiline_coerce
@@ -1325,6 +1335,7 @@ class ChapterBL(BaseBL):
         story.updated = datetime.utcnow()
 
         later(current_app.tasks['sphinx_update_chapter'].delay, chapter.id)
+        current_app.cache.delete('index_updated_chapters')
 
     def viewed(self, user):
         if not user.is_authenticated:

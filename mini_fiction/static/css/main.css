@@ -789,9 +789,12 @@ label.gen input {
     margin-bottom: 0;
 }
 
-.chapter-text {
+.chapter-text-block {
     width: 70%;
     margin: 0 auto;
+}
+
+.chapter-text {
     font-family: Verdana, Arial, sans-serif;
     font-size: 14px;
     line-height: 26px;
@@ -2295,7 +2298,7 @@ ul.editlog .editlog-item:nth-child(2n+1) {
     .main-menu .logolink {
         font-size: 32px;
     }
-    .chapter-text {
+    .chapter-text-block {
         width: 96%;
         width: calc(100% - 20px);
         margin: 0;
@@ -2363,7 +2366,7 @@ ul.editlog .editlog-item:nth-child(2n+1) {
     .story-panel.story-panel-floating {
         opacity: 1;
     }
-    .chapter-text {
+    .chapter-text-block {
         width: 96%;
         width: calc(100% - 20px);
         margin: 0;
@@ -2431,12 +2434,14 @@ ul.editlog .editlog-item:nth-child(2n+1) {
     .nav-tabs>li,.nav-pills>li {
         padding: 0 0 0px;
     }
-    .chapter-text {
-        font-size: 12px;
-        line-height: 22px;
+    .chapter-text-block {
         width: 96%;
         width: calc(100% - 12px);
         margin: 0;
+    }
+    .chapter-text {
+        font-size: 12px;
+        line-height: 22px;
     }
     .characters-group {
         display: inline;

@@ -1,4 +1,4 @@
-<div class="chapter-text" id="chapter{{ chapter.id }}">
+<div class="chapter-text chapter-text-block" id="chapter{{ chapter.id }}">
     {% if chapter.title or chapter.order != 1 -%}
         <h1>
             {% if chapter_edit_mode %}<a href="{{ url_for('chapter.view', story_id=story.id, chapter_order=chapter.order) }}">{% endif %}{{ chapter.autotitle }}{% if chapter_edit_mode %}</a>{% endif %}

@@ -471,10 +471,10 @@ class StoryBL(BaseBL, Commentable):
 
         return vote
 
-    def vote_view_html(self, full=False):
+    def vote_view_html(self, user=None, full=False):
         if not current_app.story_voting:
             return ''
-        return current_app.story_voting.vote_view_html(self.model, full=full)
+        return current_app.story_voting.vote_view_html(self.model, user=user, full=full)
 
     def vote_area_1_html(self, user=None, user_vote=None):
         if not current_app.story_voting:

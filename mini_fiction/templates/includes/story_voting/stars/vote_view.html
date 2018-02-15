@@ -5,6 +5,13 @@
     </span>
 {% endif %}
 
-<span class="starblock" title="{% if can_show_stars %}Средняя оценка: {{ '{:.1f}'.format(vote_average) }}; {{ ngettext('%(num)d vote', '%(num)d votes', vote_total) }}{% else %}Голосов ещё мало{% endif %}">
+{% if current_user.is_staff -%}<a href="{{ url_for('admin_votes.index') }}?story_id={{ story.id }}">{% endif -%}
+<span class="starblock" title="
+{%- if can_show_stars -%}
+    Средняя оценка: {{ '{:.1f}'.format(vote_average) }}; {{ ngettext('%(num)d vote', '%(num)d votes', vote_total) }}{% if not can_show_stars_for_anon %} (голосов ещё мало){% endif %}
+{%- else -%}
+    Голосов ещё мало
+{%- endif -%}"{% if not can_show_stars_for_anon %} style="opacity: 0.5;"{% endif %}>
     {% for star in star_ids %}<span class="starvote star-{{ star }}"></span>{% endfor %}
 </span>
+{%- if current_user.is_staff -%}</a>{% endif -%}

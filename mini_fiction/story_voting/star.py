@@ -56,11 +56,15 @@ class StarVoting(BaseVoting):
 
     # templates
 
-    def can_show_stars(self, story):
-        return story.vote_total and self.can_show(story)
+    def can_show_stars(self, story, user=None):
+        if not story.vote_total:
+            return False
+        if user and user.is_staff:
+            return True
+        return self.can_show(story)
 
-    def stars(self, story, extra=None):
-        if not self.can_show_stars(story):
+    def stars(self, story, user=None, extra=None):
+        if not self.can_show_stars(story, user):
             return [6] * current_app.config['VOTING_MAX_VALUE']
 
         if not extra:
@@ -91,11 +95,12 @@ class StarVoting(BaseVoting):
 
         ctx = {
             'story': story,
-            'can_show_stars': self.can_show_stars(story),
+            'can_show_stars': self.can_show_stars(story, user),
+            'can_show_stars_for_anon': self.can_show_stars(story, None),
             'vote_total': story.vote_total,
             'vote_average': extra.get('average') or 0.0,
             'vote_stddev': extra.get('stddev') or 0.0,
-            'star_ids': self.stars(story, extra=extra),
+            'star_ids': self.stars(story, user, extra=extra),
             'full': full,
             'stars_count': current_app.config['VOTING_MAX_VALUE'],
         }

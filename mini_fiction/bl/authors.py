@@ -737,6 +737,11 @@ class AuthorBL(BaseBL):
 
         user = self.model
 
+        if older is None and offset == 0 and count <= 101:
+            result = current_app.cache.get('bell_content_{}'.format(user.id))
+            if result is not None:
+                return result[:count]
+
         result = []
 
         # Забираем уведомления
@@ -871,6 +876,8 @@ class AuthorBL(BaseBL):
 
             result.append(item)
 
+        if older is None and offset == 0 and count >= 101:
+            current_app.cache.set('bell_content_{}'.format(user.id), result[:101], 600)
         return result
 
     def set_last_viewed_notification_id(self, nid):

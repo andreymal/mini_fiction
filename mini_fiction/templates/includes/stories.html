@@ -8,7 +8,7 @@
             {% if story.pinned -%}
                 <img class="story-pin" src="{{ url_for('static', filename='i/fa-pin-45.png') }}" alt="Pin" title="Этот рассказ закреплён на главной странице" />
             {%- endif %}
-            {{ story.bl.vote_view_html(full=False)|safe }}
+            {{ story.bl.vote_view_html(user=current_user, full=False)|safe }}
             {% include 'includes/story_marks.html' with context %}
         </h3>
         <p class="meta">

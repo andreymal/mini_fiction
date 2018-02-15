@@ -284,7 +284,7 @@ def vote(pk):
             'success': True,
             'story_id': story.id,
             'value': value,
-            'vote_view_html': current_app.story_voting.vote_view_html(story, full=True),
+            'vote_view_html': current_app.story_voting.vote_view_html(story, user=user, full=True),
             'vote_area_1_html': current_app.story_voting.vote_area_1_html(story, user=user, user_vote=vote),
             'vote_area_2_html': current_app.story_voting.vote_area_2_html(story, user=user, user_vote=vote),
         })

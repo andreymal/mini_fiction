@@ -27,7 +27,7 @@
                 {{- story.bl.vote_area_1_html(user=current_user, user_vote=vote)|safe -}}
             </div>{#
             #}<div class="js-vote-view-{{ story.id }}" style="display: inline;">
-                {{- story.bl.vote_view_html(full=True)|safe -}}
+                {{- story.bl.vote_view_html(user=current_user, full=True)|safe -}}
             </div>
             {% include 'includes/story_marks.html' %}
         </h1>

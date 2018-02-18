@@ -1423,6 +1423,7 @@ a.btn {
     width: 70%;
     background-image: none;
     background-color: #F5F5F5;
+    overflow: hidden;
 }
 
 .chapters-control li.btn-large:hover {

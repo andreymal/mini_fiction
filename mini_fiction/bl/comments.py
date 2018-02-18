@@ -382,10 +382,7 @@ class StoryLocalCommentBL(BaseCommentBL):
         return author and author.is_staff or target.story.bl.is_contributor(author)
 
     def access_for_commenting_by(self, target, author=None):
-        reqs = reqs = target.story.bl.access_for_commenting_by(author)
-        if author and author.is_staff or target.story.bl.is_contributor(author):
-            return reqs
-        return None
+        return super().access_for_commenting_by(target, author)
 
     def get_permalink(self, _external=False):
         c = self.model

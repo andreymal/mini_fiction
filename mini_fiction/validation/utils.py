@@ -28,9 +28,9 @@ def optional(src):
 
 
 def bool_coerce(v):
-    if v in (True, 1, '1', 'y', 'Y', 'on'):
+    if v in (True, 1, '1', 'y', 'Y', 'on', 'true'):
         return True
-    if v in (False, 0, '0', 'n', 'N', 'off', ''):
+    if v in (False, 0, '0', 'n', 'N', 'off', 'false', ''):
         return False
     raise ValueError
 

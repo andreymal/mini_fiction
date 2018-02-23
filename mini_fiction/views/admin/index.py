@@ -18,7 +18,6 @@ def index():
     log = AdminLog.bl.get_list()
     for x in log['items']:
         x['admin_url'] = get_adminlog_object_url(x['type_str'], x['object_id'])
-        print(x['type_str'], '-', x['admin_url'])
 
     return render_template('admin/index.html', page_title=gettext('Administration'), log=log)
 

@@ -13,8 +13,6 @@ from flask_login import AnonymousUserMixin, UserMixin
 from mini_fiction.database import db
 from mini_fiction.bl.registry import Resource
 from mini_fiction.filters import filter_html, filtered_html_property
-from mini_fiction.filters.base import html_doc_to_string
-from mini_fiction.filters.html import footnotes_to_html
 
 
 class Logopic(db.Entity):

@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
 # pylint: disable=unexpected-keyword-arg,no-value-for-parameter
@@ -109,5 +109,4 @@ class StaticPageBL(BaseBL):
     def get_mimetype(self):
         if self.model.name == 'robots.txt':
             return 'text/plain'
-        else:
-            return 'text/html'
+        return 'text/html'

@@ -160,8 +160,7 @@ def add(target_attr, target, template, template_ajax=None, template_ajax_modal=F
     if g.is_ajax and template_ajax:
         html = render_template(template_ajax, **data)
         return jsonify({'page_content': {'modal': html} if template_ajax_modal else {'content': html}})
-    else:
-        return render_template(template, **data)
+    return render_template(template, **data)
 
 
 def show(target_attr, comment):
@@ -227,8 +226,7 @@ def edit(target_attr, comment, template, template_ajax=None, template_ajax_modal
     if g.is_ajax and template_ajax:
         html = render_template(template_ajax, **data)
         return jsonify({'page_content': {'modal': html} if template_ajax_modal else {'content': html}})
-    else:
-        return render_template(template, **data)
+    return render_template(template, **data)
 
 
 def delete(target_attr, comment, template, template_ajax=None, template_ajax_modal=False):
@@ -243,8 +241,7 @@ def delete(target_attr, comment, template, template_ajax=None, template_ajax_mod
         comment.bl.delete(user)  # из БД не удаляется!
         if extra_ajax:
             return build_comment_response(comment, target_attr, target)
-        else:
-            return redirect(comment.bl.get_paged_link(user))
+        return redirect(comment.bl.get_paged_link(user))
 
     data = {
         'page_title': gettext('Confirm delete comment'),
@@ -257,8 +254,7 @@ def delete(target_attr, comment, template, template_ajax=None, template_ajax_mod
     if g.is_ajax and template_ajax:
         html = render_template(template_ajax, **data)
         return jsonify({'page_content': {'modal': html} if template_ajax_modal else {'content': html}})
-    else:
-        return render_template(template, **data)
+    return render_template(template, **data)
 
 
 def restore(target_attr, comment, template, template_ajax=None, template_ajax_modal=False):
@@ -287,8 +283,7 @@ def restore(target_attr, comment, template, template_ajax=None, template_ajax_mo
     if g.is_ajax and template_ajax:
         html = render_template(template_ajax, **data)
         return jsonify({'page_content': {'modal': html} if template_ajax_modal else {'content': html}})
-    else:
-        return render_template(template, **data)
+    return render_template(template, **data)
 
 
 def vote(target_attr, comment):

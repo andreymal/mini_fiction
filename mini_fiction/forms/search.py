@@ -3,7 +3,6 @@
 
 from wtforms import Form
 from wtforms import SelectField, SelectMultipleField, TextField, BooleanField, IntegerField, validators
-from wtforms.widgets import Input
 from pony import orm
 
 from mini_fiction.models import Category, Character, Rating, Classifier

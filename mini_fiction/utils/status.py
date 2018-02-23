@@ -62,7 +62,7 @@ class SystemStatus(Status):
         return self._warn('sysencoding', enc + ' (mini_fiction tested only with UTF-8)')
 
     def stdoutencoding(self):
-        enc = sys.stdout.encoding.lower()
+        enc = str(sys.stdout.encoding).lower()
         if enc == 'utf-8':
             return self._ok('stdoutencoding', enc)
         return self._warn('stdoutencoding', enc + ' (mini_fiction tested only with UTF-8)')
@@ -138,14 +138,14 @@ class ProjectStatus(Status):
 
         if hasher == 'bcrypt':
             try:
-                import bcrypt
+                import bcrypt  # pylint: disable=unused-variable
             except ImportError:
                 return self._fail('hasher', 'bcrypt, but cannot import module')
             return self._ok('hasher', 'bcrypt')
 
         if hasher == 'scrypt':
             try:
-                import scrypt
+                import scrypt  # pylint: disable=unused-variable
             except ImportError:
                 return self._fail('hasher', 'scrypt, but cannot import module')
             return self._ok('hasher', 'scrypt')
@@ -220,7 +220,7 @@ class ProjectStatus(Status):
             return self._ok('avatars', 'disabled')
 
         try:
-            from PIL import Image
+            from PIL import Image  # pylint: disable=unused-variable
         except ImportError:
             return self._fail('avatars', 'enabled, but Pillow is not available')
         else:

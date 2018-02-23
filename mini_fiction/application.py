@@ -324,9 +324,9 @@ def configure_errorpages(app):
             # for github-fetch polyfill:
             response.headers['X-Request-URL'] = iri_to_uri(request.url)
             return response
-        else:
-            html = render_template(template, error=e, error_code=code)
-            return html, code
+
+        html = render_template(template, error=e, error_code=code)
+        return html, code
 
     def _page403(e):
         return _error_common('403.html', '403_modal.html', 403, e)

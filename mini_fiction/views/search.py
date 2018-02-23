@@ -136,5 +136,4 @@ def simple(search_type, search_id):
     postform = SearchForm(ImmutableMultiDict(bound_data))
     if postform.validate():
         return search_action(postform)
-    else:
-        return search_form()
+    return search_form()

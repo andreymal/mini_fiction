@@ -337,8 +337,7 @@ def delete(pk):
     if g.is_ajax:
         html = render_template('includes/ajax/chapter_ajax_confirm_delete.html', page_title=page_title, story=story, chapter=chapter)
         return jsonify({'page_content': {'modal': html, 'title': page_title}})
-    else:
-        return render_template('chapter_confirm_delete.html', **data)
+    return render_template('chapter_confirm_delete.html', **data)
 
 
 @bp.route('/chapter/<int:pk>/publish/', methods=('GET', 'POST',))
@@ -355,8 +354,7 @@ def publish(pk):
     chapter.bl.publish(user, chapter.draft)  # draft == not published
     if g.is_ajax:
         return jsonify({'success': True, 'story_id': chapter.story.id, 'chapter_id': chapter.id, 'published': not chapter.draft})
-    else:
-        return redirect(url_for('story.edit', pk=chapter.story.id))
+    return redirect(url_for('story.edit', pk=chapter.story.id))
 
 
 @bp.route('/story/<int:story_id>/sort/', methods=('POST',))

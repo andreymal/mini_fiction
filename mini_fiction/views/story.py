@@ -167,8 +167,7 @@ def approve(pk):
     story.bl.approve(user, not story.approved)
     if g.is_ajax:
         return jsonify({'success': True, 'story_id': story.id, 'approved': story.approved})
-    else:
-        return redirect(url_for('story.view', pk=story.id))
+    return redirect(url_for('story.view', pk=story.id))
 
 
 @bp.route('/<int:pk>/pin/', methods=('POST',))
@@ -242,8 +241,7 @@ def favorite(pk):
         f = Favorites(author=user, story=story)
     if g.is_ajax:
         return jsonify({'success': True, 'story_id': story.id, 'favorited': f is not None})
-    else:
-        return redirect(url_for('story.view', pk=story.id))
+    return redirect(url_for('story.view', pk=story.id))
 
 
 @bp.route('/<int:pk>/bookmark/', methods=('POST',))
@@ -260,8 +258,7 @@ def bookmark(pk):
         b = Bookmark(author=user, story=story)
     if g.is_ajax:
         return jsonify({'success': True, 'story_id': story.id, 'bookmarked': b is not None})
-    else:
-        return redirect(url_for('story.view', pk=story.id))
+    return redirect(url_for('story.view', pk=story.id))
 
 
 @bp.route('/<int:pk>/vote/', methods=('POST',))
@@ -273,7 +270,7 @@ def vote(pk):
 
     try:
         value = int(request.form.get('vote_value') or '')
-        vote =story.bl.vote(user, value, ip=request.remote_addr)
+        vote_obj = story.bl.vote(user, value, ip=request.remote_addr)
     except ValueError as exc:  # TODO: refactor exceptions
         if request.form.get('vote_ajax') == '1':
             return jsonify({'error': str(exc), 'success': False, 'story_id': story.id}), 403
@@ -285,8 +282,8 @@ def vote(pk):
             'story_id': story.id,
             'value': value,
             'vote_view_html': current_app.story_voting.vote_view_html(story, user=user, full=True),
-            'vote_area_1_html': current_app.story_voting.vote_area_1_html(story, user=user, user_vote=vote),
-            'vote_area_2_html': current_app.story_voting.vote_area_2_html(story, user=user, user_vote=vote),
+            'vote_area_1_html': current_app.story_voting.vote_area_1_html(story, user=user, user_vote=vote_obj),
+            'vote_area_2_html': current_app.story_voting.vote_area_2_html(story, user=user, user_vote=vote_obj),
         })
     return redirect(url_for('story.view', pk=story.id))
 
@@ -541,6 +538,6 @@ def download(story_id, filename):
         # TODO: for example, /media/stories/{md5(updated + secret_random_story_key)}/filename.zip
         # return redirect(path to media)
         return send_file(storage_path)
-    else:
-        response = Response(data, mimetype=fmt.debug_content_type)
-        return response
+
+    response = Response(data, mimetype=fmt.debug_content_type)
+    return response

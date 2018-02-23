@@ -700,8 +700,7 @@ class AuthorBL(BaseBL):
         default_userpic = dict(current_app.config['DEFAULT_USERPIC'])
         if 'endpoint' in default_userpic:
             return url_for(default_userpic.pop('endpoint'), **default_userpic)
-        else:
-            return default_userpic['url']
+        return default_userpic['url']
 
     def get_small_avatar_url(self):
         if self.model.avatar_small:
@@ -710,8 +709,7 @@ class AuthorBL(BaseBL):
         default_userpic = dict(current_app.config['DEFAULT_USERPIC'])
         if 'endpoint' in default_userpic:
             return url_for(default_userpic.pop('endpoint'), **default_userpic)
-        else:
-            return default_userpic['url']
+        return default_userpic['url']
 
     def get_large_avatar_url(self):
         if self.model.avatar_large:
@@ -720,8 +718,7 @@ class AuthorBL(BaseBL):
         default_userpic = dict(current_app.config['DEFAULT_USERPIC'])
         if 'endpoint' in default_userpic:
             return url_for(default_userpic.pop('endpoint'), **default_userpic)
-        else:
-            return default_userpic['url']
+        return default_userpic['url']
 
     def get_unread_notifications_count(self):
         user = self.model

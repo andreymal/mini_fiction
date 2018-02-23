@@ -8,7 +8,6 @@ from flask_babel import gettext
 from flask_login import current_user
 from pony.orm import db_session
 
-from mini_fiction.validation import ValidationError
 from mini_fiction.models import Author, RegistrationProfile
 from mini_fiction.utils.misc import Paginator
 

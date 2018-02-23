@@ -24,8 +24,7 @@ class Resource(object):
         # return target.__dict__[self.resource_name]
         if target is cls:
             return _cache[(target, self.resource_name)]
-        else:
-            return _cache.pop((target, self.resource_name))
+        return _cache.pop((target, self.resource_name))
 
 
 def register(name, get_func):

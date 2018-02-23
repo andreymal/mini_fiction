@@ -35,11 +35,11 @@ class StoriesCheckboxSelect(Select):
         output = []
         for (option_value, option_label, selected) in field.iter_choices():
             output.append(
-                self.render_option(field, option_value, option_label, selected, label_class)
+                self.render_custom_option(field, option_value, option_label, selected, label_class)
             )
         return '\n'.join(output)
 
-    def render_option(self, field, value, label, selected, label_class):
+    def render_custom_option(self, field, value, label, selected, label_class):
         cb = Input('checkbox' if self.multiple else 'radio')  # NOTE: CheckboxInput() is always checked if field.data is present
         rendered_cb = cb(field, checked=selected, value=value, id='{}_{}'.format(field.id, value))
         label_class_final = ' class="%s"' % (label_class,)
@@ -47,7 +47,7 @@ class StoriesCheckboxSelect(Select):
 
 
 class StoriesCategorySelect(StoriesCheckboxSelect):
-    def render_option(self, field, value, label, selected, label_class):
+    def render_custom_option(self, field, value, label, selected, label_class):
         categories = dict(orm.select((c.id, c.color) for c in Category)[:])  # NOTE: Pony ORM caches this
         label_attrs = ' style="background-color: %s;"' % categories[value]
         cb = Input('checkbox' if self.multiple else 'radio')  # NOTE: CheckboxInput() is always checked if field.data is present
@@ -73,7 +73,7 @@ class StoriesImgSelect(Select):
             output.append('<span class="%s%s" title="%s">' % (group_container_class, group.id, group.name))
             for option in option_sublist:
                 # *option == (id, value)
-                output.append(self.render_option(
+                output.append(self.render_custom_option(
                     field,
                     value=option[0],
                     label=option[1],
@@ -87,7 +87,7 @@ class StoriesImgSelect(Select):
     def get_img_url(self, field, value):
         raise NotImplementedError
 
-    def render_option(self, field, value, label, selected, **kwargs):
+    def render_custom_option(self, field, value, label, selected, **kwargs):
         container_attrs = kwargs['container_attrs']
         data_attrs = kwargs['data_attrs']
         img_url = self.get_img_url(field, value)

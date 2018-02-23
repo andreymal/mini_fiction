@@ -28,7 +28,7 @@ def pbkdf2_encode(password, salt=None, iterations=100000):
 
 def pbkdf2_check(data, password):
     try:
-        algorithm, iterations, salt, result = data.split('$', 3)
+        algorithm, iterations, salt, _ = data.split('$', 3)
         iterations = int(iterations)
     except (KeyboardInterrupt, SystemExit):
         raise

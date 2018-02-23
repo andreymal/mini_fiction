@@ -115,8 +115,7 @@ def calc_maxdepth(user=None):
 def calc_comment_threshold(user):
     if user.is_authenticated and user.comment_spoiler_threshold is not None:
         return user.comment_spoiler_threshold
-    else:
-        return current_app.config['COMMENT_SPOILER_THRESHOLD']
+    return current_app.config['COMMENT_SPOILER_THRESHOLD']
 
 
 def get_editlog_extra_info(log_item, prepare_chapter_diff=False):

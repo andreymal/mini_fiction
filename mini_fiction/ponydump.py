@@ -18,7 +18,7 @@ class JSONEncoder(json.JSONEncoder):
             return o.strftime('%Y-%m-%dT%H:%M:%S.%fZ')
         if isinstance(o, uuid.UUID):
             return str(o)
-        return super().default(self, o)
+        return super().default(o)
 
 
 class PonyDump(object):

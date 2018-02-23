@@ -46,12 +46,11 @@ class FB2ZipDownload(FB2BaseDownload, ZipFileDownloadFormat):
     debug_content_type = 'text/xml'
 
 
-    def render_zip_contents(self, zipfile, filename, **kw):
-        data = self.render_fb2(**kw)
+    def render_zip_contents(self, zipfile, story, filename, **kw):
+        data = self.render_fb2(story=story, **kw)
         zipfile.writestr(filename + '.fb2', data)
 
     def render(self, **kw):
         if kw.get('debug'):
             return self.render_fb2(**kw)
-        else:
-            return super().render(**kw)
+        return super().render(**kw)

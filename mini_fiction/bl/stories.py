@@ -1,9 +1,8 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
 # pylint: disable=unexpected-keyword-arg,no-value-for-parameter
 
-import re
 import json
 import random
 import ipaddress
@@ -38,7 +37,7 @@ class StoryBL(BaseBL, Commentable):
     _contributors = None
 
     def create(self, authors, data):
-        from mini_fiction.models import Category, Character, Classifier, Author, StoryContributor
+        from mini_fiction.models import Category, Character, Classifier, StoryContributor
 
         if not authors:
             raise ValueError('Authors are required')
@@ -404,9 +403,7 @@ class StoryBL(BaseBL, Commentable):
                 lambda x: x.type in ('story_lreply', 'story_lcomment') and x.target_id in local_comment_ids
             ).delete(bulk=True)
             orm.select(c for c in StoryLocalCommentEdit if c.comment.id in local_comment_ids).delete(bulk=True)
-            orm.sql_debug(True)
             story.local.comments.select().order_by(StoryLocalComment.id.desc()).delete(bulk=False)  # не может в bulk, ага
-            orm.sql_debug(False)
 
         # Не помню почему, но почему-то там Optional
         story.story_views_set.select().delete(bulk=True)
@@ -500,8 +497,7 @@ class StoryBL(BaseBL, Commentable):
             return default_queryset
         if user.is_staff:
             return cls.select()
-        else:
-            return default_queryset
+        return default_queryset
 
     def select_by_author(self, author, for_user=None):
         from mini_fiction.models import StoryContributor
@@ -553,8 +549,6 @@ class StoryBL(BaseBL, Commentable):
     # access control
 
     def get_contributors(self):
-        from mini_fiction.models import StoryContributor
-
         if self._contributors is None:
             self._contributors = sorted(self.model.contributors, key=lambda x: x.id)
         return self._contributors
@@ -706,7 +700,7 @@ class StoryBL(BaseBL, Commentable):
             with current_app.sphinx as sphinx:
                 sphinx.update('stories', fields=story_fields, id=story.id)
 
-        if with_chapters and common_fields and len(list(story.chapters)) > 0:
+        if with_chapters and common_fields and list(story.chapters):
             with current_app.sphinx as sphinx:
                 sphinx.update('chapters', fields=common_fields, id__in=[x.id for x in story.chapters])
 
@@ -837,8 +831,7 @@ class StoryBL(BaseBL, Commentable):
         if author and author.is_authenticated:
             act = self.model.activity.select(lambda x: x.author.id == author.id).first()
             return act.last_comment_id if act else None
-        else:
-            return None
+        return None
 
     def get_subscription(self, user):
         if not user or not user.is_authenticated:
@@ -912,14 +905,14 @@ class StoryBL(BaseBL, Commentable):
         if author and author.is_authenticated:
             act = self.model.activity.select(lambda x: x.author.id == author.id).first()
             return act.last_local_comment_id if act else None
-        else:
-            return None
+        return None
 
     # misc
 
     def get_random(self, count=10):
         # это быстрее, чем RAND() в MySQL
-        from mini_fiction.models import Story, Character, Category
+        from mini_fiction.models import Story
+
         Story = self.model
         ids = current_app.cache.get('all_story_ids')
         if not ids:

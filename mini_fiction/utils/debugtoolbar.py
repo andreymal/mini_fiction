@@ -3,7 +3,7 @@
 
 import threading
 
-from flask import request, current_app, abort, json_available, g
+from flask import current_app, abort, json_available, g
 from flask_debugtoolbar import module
 from flask_debugtoolbar.panels import DebugPanel
 import itsdangerous
@@ -86,10 +86,10 @@ class PonyDebugPanel(DebugPanel):
     def has_content(self):
         return bool(get_queries()) or not is_available()
 
-    def process_request(self, req):
+    def process_request(self, request):
         pass
 
-    def process_response(self, req, response):
+    def process_response(self, request, response):
         pass
 
     def nav_title(self):
@@ -139,6 +139,8 @@ class PonyDebugPanel(DebugPanel):
               defaults=dict(explain=True))
 @db_session
 def sql_select(explain=False):
+    from flask import request
+
     statement, params = load_query(request.args['query'])
 
     if explain:

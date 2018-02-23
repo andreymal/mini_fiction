@@ -3,7 +3,7 @@
 
 from flask import Blueprint, current_app, request, render_template, abort, url_for, jsonify
 from flask_login import current_user
-from pony.orm import db_session, select
+from pony.orm import db_session
 
 from mini_fiction.models import Story, StoryComment, Author
 from mini_fiction.utils.misc import Paginator

@@ -83,8 +83,7 @@ class CustomErrorHandler(cerberus.errors.BasicErrorHandler):
                 return super().format_message(field, error)
         if isinstance(tmp, dict):
             return super().format_message(field, error)
-        else:
-            return tmp
+        return tmp
 
 
 class Validator(cerberus.Validator):
@@ -128,7 +127,8 @@ class Validator(cerberus.Validator):
                     msgs[k] = {}
                     queue.append((v, msgs[k]))
 
-    def validated(self, document, throw_exception=True, *args, **kwargs):
+    def validated(self, document, *args, **kwargs):
+        throw_exception = kwargs.pop('throw_exception', True)
         result = super().validated(document, *args, **kwargs)
         if result is None and throw_exception:
             raise ValidationError(self.errors)

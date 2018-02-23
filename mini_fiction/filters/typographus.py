@@ -6,8 +6,8 @@ from .base import html_text_transform
 
 
 typo_patterns = [
-    (r'([\n>]|^)-\s+', '\\1\u2014 '),
-    (r'[ \t\r\f\v]+-[ \t\r\f\v]+', '\xa0\u2014 '),
+    (r'(^|\n)[-—]-?[ \t\r\f\v]+', '\\1— '),
+    (r'[ \t\r\f\v]+[-—]-?[ \t\r\f\v]+', '\xa0— '),
 ]
 typo_patterns = [(re.compile(p), r) for p, r in typo_patterns]
 

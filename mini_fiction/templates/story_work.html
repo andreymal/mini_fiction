@@ -208,8 +208,8 @@
                         </div>
                     </div>
               </fieldset>
-        {% endif %}
         </form>
+        {% endif %}
 
         {% if story_edit and current_user.is_staff %}
             {%- include 'includes/story_edit_staff_form.html' with context %}

@@ -61,7 +61,7 @@
     <!-- Пагинация: начало вывода -->
     <div class="pagination center">
         {% for page_id in page_obj.iter_pages() %}
-            <a href="{{ modified_url('admin_votes.index', args, page=page_id) }}" class="btn{% if page_id == page_obj.number %} btn-primary{% endif %}" name="page">{{ page_id }}</a>
+            <a href="{{ modified_url('admin_votes.index', args, page=page_id) }}" class="btn{% if page_id == page_obj.number %} btn-primary{% endif %}">{{ page_id }}</a>
         {% endfor %}
     </div>
     <!-- Пагинация: конец вывода -->

@@ -23,12 +23,12 @@
         {% include 'includes/story_control_buttons.html' %}
         <h1 id="story_title">
             <span itemprop="name"><a itemprop="url" class="story-title-link" href="{{ url_for('story.view', pk=story.id, _external=True) }}">{{ story.title }}</a></span>
-            <div class="vote-area-1 js-vote-area-1-{{ story.id }}">
+            <span class="vote-area-1 js-vote-area-1-{{ story.id }}">
                 {{- story.bl.vote_area_1_html(user=current_user, user_vote=vote)|safe -}}
-            </div>{#
-            #}<div class="js-vote-view-{{ story.id }}" style="display: inline;">
+            </span>{#
+            #}<span class="js-vote-view-{{ story.id }}" style="display: inline;">
                 {{- story.bl.vote_view_html(user=current_user, full=True)|safe -}}
-            </div>
+            </span>
             {% include 'includes/story_marks.html' %}
         </h1>
         <div class="vote-area-2 js-vote-area-2-{{ story.id }}">

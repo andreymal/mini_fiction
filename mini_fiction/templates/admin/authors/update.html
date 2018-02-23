@@ -64,7 +64,7 @@
                 {%- else -%}
                     {{ safe_password_hash(author.password) }}
                 {%- endif -%}
-                </spab>
+                </span>
             </div>
         </div>
 
@@ -82,7 +82,7 @@
             <span class="help-inline">При смене пароля на странице администрирования пользователь не будет разлогинен.</span><br/><br/>
             <button type="submit" name="act" value="change_password" class="btn btn-primary">{{ _('Change password') }}</button>
         </div>
-        </span>
+        </form>
         {% endif %}
 
         {{- breadcrumbs([

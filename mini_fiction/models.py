@@ -1000,8 +1000,6 @@ class AbuseReport(db.Entity):
 
         return 'Жалоба от {} на {}'.format(username, target)
 
-    orm.composite_key(target_type, target_id, user)
-
 
 class AdminLogType(db.Entity):
     """Типы моделей, используемых в истории изменений в админке. Используется

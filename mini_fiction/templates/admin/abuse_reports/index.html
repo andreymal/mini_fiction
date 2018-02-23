@@ -2,55 +2,124 @@
 {% from 'macro.html' import breadcrumbs with context %}
 {% block content %}
 
-<div class="row">
-    <div class="span12">
-        {{- breadcrumbs([[url_for('admin_index.index'), _('Administration')]]) }}
-        <h1>{{ page_title }}</h1>
+<div class="row"><div class="span12">
+    {{- breadcrumbs([[url_for('admin_index.index'), _('Administration')]]) }}
+    <h1>{{ page_title }}</h1>
 
-        <ul>
-        {%- for item in abuse_reports %}
-        {%- if item.deleted %}
-            <li{% if filter != 'ignored' and item.abuse.resolved_at %} style="opacity: 0.5"{% endif %}><a href="{{ url_for('admin_abuse_reports.show', abuse_id=item.abuse.id) }}">Жалоба на удалённый объект</a></li>
-        {%- else %}
-            <li{% if filter != 'ignored' and item.abuse.resolved_at %} style="opacity: 0.5"{% endif %}>
-                <a href="{{ url_for('admin_abuse_reports.show', abuse_id=item.abuse.id) }}">Жалоба на
-                    {%- if item.target_type == 'story' %} рассказ «{{ item.target.title }}»
-                    {%- elif item.target_type == 'storycomment' %} комментарий к рассказу «{{ item.target.story.title }}»
-                    {%- elif item.target_type == 'newscomment' %} комментарий к новости «{{ item.target.newsitem.title }}»
-                    {%- else %} что-то
-                    {%- endif -%}
-                </a><br/>
-                <small>
-                    {%- if item.count > 1 %}Количество: {{ item.count }}, последняя{% endif %}
-                    <time class="comment-time" datetime="{{ item.abuse.created_at.strftime('%Y-%m-%dT%H:%M:%SZ') }}">{{ item.abuse.created_at|datetimeformat('d MMMM Y, HH:mm') }}</time> от {% if item.abuse.user %}{{ item.abuse.user.username }}{% else %}удалённого пользователя{% endif %}
-                </small>
+    <div class="admin-index">
+        <form method="POST" action="{{ url_for('admin_abuse_reports.manyupdate') }}">
+        <table class="admin-index-table">
+        <thead><tr>
+            <th>&nbsp;</th>
+            <th>Объект</th>
+            <th>{{ _('Username') }}</th>
+            <th>Статус</th>
+            <th>Дата</th>
+        </tr></thead>
 
-                {%- if not item.abuse.ignored and item.abuse.resolved_at %}
-                    <br/>
-                    <small>
-                        {% if item.abuse.accepted %}Подтверждена{% else %}Отклонена{% endif %}
-                        <time class="comment-time" datetime="{{ item.abuse.resolved_at.strftime('%Y-%m-%dT%H:%M:%SZ') }}">{{ item.abuse.resolved_at|datetimeformat('d MMMM Y, HH:mm') }}</time>
-                    </small>
+        <tbody>
+        {%- for abuse in abuse_reports %}<tr data-id="{{ abuse.id }}"{% if abuse.resolved_at or abuse.ignored %} style="opacity: 0.5;"{% endif %}>
+            <td>
+                <input type="checkbox" name="abuse" value="{{ abuse.id }}" />
+            </td>
+            <td>
+                <strong><a href="{{ url_for('admin_abuse_reports.show', abuse_id=abuse.id) }}">
+                {%- if abuse.target_type == 'story' and abuse.target_id in stories -%}
+                    {{ stories[abuse.target_id].title|truncate(32) }}
+                {%- elif abuse.target_type == 'storycomment' and abuse.target_id in storycomments -%}
+                    Комментарий: {{ storycomments[abuse.target_id].story.title|truncate(32) }}
+                {%- elif abuse.target_type == 'newscomment' and abuse.target_id in newscomments -%}
+                    Комментарий: {{ newscomments[abuse.target_id].newsitem.title|truncate(32) }}
+                {%- else -%}
+                    {{ abuse.target_type }}/{{ abuse.target_id }}
+                {%- endif -%}
+                </a></strong>
+            </td>
+
+            <td class="col-user-name">
+                {% if abuse.user %}
+                <img src="{{ abuse.user.bl.get_small_avatar_url() }}" alt="" />
+                <a href="{{ url_for('admin_authors.update', pk=abuse.user.id) }}">
+                    {{- abuse.user.username -}}
+                </a>
+                {% else %}N/A{% endif %}
+            </td>
+
+            <td>
+                {% if abuse.ignored %}Игнорируется
+                {% elif not abuse.resolved_at %}Не решено
+                {% elif abuse.resolved_at and abuse.accepted %}Подтверждено
+                {% elif abuse.resolved_at and not abuse.accepted %}Отклонено
                 {% endif %}
-                <br/><br/>
-            </li>
-        {% endif %}
-        {% endfor %}
-        </ul>
+            </td>
 
-        {% if filter != 'ignored' %}
-            <a href="{{ url_for('admin_abuse_reports.index_ignored') }}">Список проигнорированных жалоб</a>
-        {% endif %}
+            <td>
+                <time datetime="{{ abuse.created_at.strftime('%Y-%m-%dT%H:%M:%SZ') }}">
+                    {{ abuse.created_at|datetimeformat('d MMMM Y, HH:mm') }}
+                </time>
+            </td>
+        </tr>{% endfor -%}
+        </tbody>
+        <tfoot><tr><td colspan="5">
+            Статус выбранных жалоб:
+            <select name="status" style="margin: 0;">
+                <option value="none">Не решено</option>
+                <option value="accepted">Подтверждено</option>
+                <option value="rejected">Отклонено</option>
+                <option value="ignored">Игнорируется</option>
+            </select>
+            <input type="hidden" name="return_path" value="{{ url_for('admin_abuse_reports.index', **args) }}" />
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+            <button type="submit" class="btn btn-primary">Изменить</button>
+        </td></tr></tfoot>
+        </table>
 
-        <!-- Пагинация: начало вывода -->
-        <div class="pagination center">
-            {% for page_id in page_obj.iter_pages() %}
-                <a href="{{ url_for('admin_abuse_reports.index', page=page_id) }}" class="btn{% if page_id == page_obj.number %} btn-primary{% endif %}" name="page">{{ page_id }}</a>
-            {% endfor %}
+        </form>
+
+        <div class="admin-index-filters">
+            <form action="{{ url_for('admin_abuse_reports.index') }}" method="GET">
+                {% for k, v in args.items() if k not in ['target_type', 'target_id', 'username', 'status', 'page'] %}
+                    <input type="hidden" name="{{ k }}" value="{{ v }}" />
+                {%- endfor %}
+
+                <label for="target_type">Тип объекта:</label>
+                <select name="target_type" id="target_type" class="admin-input-select-full">
+                    <option value="">{{ _('All') }}</option>
+                    <option value="story"{% if args.target_type == "story" %} selected{% endif %}>Рассказ</option>
+                    <option value="storycomment"{% if args.target_type == "storycomment" %} selected{% endif %}>Комментарий к рассказу</option>
+                    <option value="newscomment"{% if args.target_type == "newscomment" %} selected{% endif %}>Комментарий к новости</option>
+                </select><br/>
+
+                <label for="target_id">ID объекта:</label>
+                <input type="text" id="target_id" name="target_id" class="admin-input-text-full" value="{{ args.target_id or '' }}" /><br/>
+
+                <label for="username">{{ _('Username') }}:</label>
+                <input type="text" id="username" name="username" class="admin-input-text-full" value="{{ args.username or '' }}" /><br/>
+
+                <label for="status">Статус:</label>
+                <select name="status" id="status" class="admin-input-select-full">
+                    <option value="">{{ _('All') }}</option>
+                    <option value="none"{% if args.status == "none" %} selected{% endif %}>Не решено</option>
+                    <option value="accepted"{% if args.status == "accepted" %} selected{% endif %}>Подтверждено</option>
+                    <option value="rejected"{% if args.status == "rejected" %} selected{% endif %}>Отклонено</option>
+                    <option value="ignored"{% if args.status == "ignored" %} selected{% endif %}>Игнорируется</option>
+                </select>
+
+                <button type="submit" class="btn btn-primary">{{ _('Search') }}</button>
+            </form>
         </div>
-        <!-- Пагинация: конец вывода -->
 
-        {{- breadcrumbs([[url_for('admin_index.index'), _('Administration')]]) }}
+        <br style="clear: both;" />
     </div>
-</div>
+
+    <!-- Пагинация: начало вывода -->
+    <div class="pagination center">
+        {% for page_id in page_obj.iter_pages() %}
+            <a href="{{ modified_url('admin_abuse_reports.index', args, page=page_id) }}" class="btn{% if page_id == page_obj.number %} btn-primary{% endif %}">{{ page_id }}</a>
+        {% endfor %}
+    </div>
+    <!-- Пагинация: конец вывода -->
+
+    {{- breadcrumbs([[url_for('admin_index.index'), _('Administration')]]) }}
+</div></div>
 {% endblock %}

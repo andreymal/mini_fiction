@@ -405,8 +405,8 @@ def words_count(s, html=True):
         s = re.sub(r'&#?[A-Za-z0-9]{1,16};?', '', s)
 
     # Знаки препинания за слова не считаются
-    s = re.sub(r'[/-]+', '', s)
-    s = re.sub(r'[.,?!@:;_—…–$%*&<>]+', ' ', s)
+    s = re.sub(r'[\-\/]+', '', s)
+    s = re.sub(r'[.,?!@:;_—…–$%*&<>"«»()]+', ' ', s)
 
     words = s.split()
     return len(words)

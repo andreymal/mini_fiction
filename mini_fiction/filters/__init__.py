@@ -31,11 +31,11 @@ def filter_html(text, tags=None, attributes=None):
 def filtered_html_property(name, filter_):
     def fn(self):
         try:
-            return Markup(html_doc_to_string(filter_(getattr(self, name))))
+            return Markup(html_doc_to_string(filter_(getattr(self, name) or '')))
         except Exception:
             import sys
             import traceback
-            print("filter_html", type(self), self.pk, name, filter_, file=sys.stderr)
+            print("filter_html", type(self).__name__, self.get_pk(), name, filter_, file=sys.stderr)
             traceback.print_exc()
             return "#ERROR#"
     return property(fn)

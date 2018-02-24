@@ -17,9 +17,7 @@ def html_doc_transform(fn):
     @wraps(fn)
     def wrapper(doc, **kw):
         if isinstance(doc, str):
-            doc = etree.HTML(doc.strip() or '')
-        if doc is None:
-            doc = etree.HTML('<body></body>')
+            doc = etree.HTML('<body>' + doc + '</body>')
         return fn(doc, **kw)
     return wrapper
 

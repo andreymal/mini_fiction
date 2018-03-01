@@ -154,3 +154,34 @@
         </div>
     {%- endif -%}
 {% endmacro %}
+
+
+{% macro author_profile_links(author, tab) -%}
+    <ul class="author-profile-links">
+        <li{% if tab == 'profile' %} class="active"{% endif %}>
+            <a href="{{ url_for('author.info', user_id=author.id) }}">Информация</a>
+        </li>
+
+        <li{% if tab == 'favorites' %} class="active"{% endif %}>
+            <a href="{{ url_for('object_lists.favorites', user_id=author.id) }}">
+                Избранное ({{ author.favorites|length }})
+            </a>
+        </li>
+
+        {% if current_user.id == author.id -%}
+        <li{% if tab == 'bookmarks' %} class="active"{% endif %}>
+            <a href="{{ url_for('object_lists.bookmarks') }}">
+                Прочитать позже ({{ author.bookmarks|length }})
+            </a>
+        </li>
+        {%- endif %}
+
+        {% if current_user.is_superuser -%}
+        <li>
+            <a href="{{ url_for('admin_authors.update', pk=author.id) }}">
+                Админка
+            </a>
+        </li>
+        {%- endif %}
+    </ul>
+{%- endmacro %}

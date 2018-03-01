@@ -36,6 +36,7 @@ def favorites(user_id, page):
         objects,
         count=objects.count(),
         page_title=page_title,
+        author=user,
         objlistname='stories',
     )
 

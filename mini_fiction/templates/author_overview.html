@@ -1,17 +1,19 @@
 {% extends base %}
-{% from 'macro.html' import breadcrumbs with context %}
+{% from 'macro.html' import breadcrumbs, author_profile_links with context %}
 {% block content %}
 
 <div class="row">
     <div class="span12">
         {{- breadcrumbs(current=('Автор: ' if author.stories.count() > 0 else 'Читатель: ') + author.username) }}
     </div>
-    <div class="span8">
+</div>
+<div class="row">
+    <div class="{% if not is_system_user %}span8{% else %}span12{% endif %}">
+        {% if not is_system_user %}
         <h1 id="author-name">
             <img src="{{ author.bl.get_avatar_url() }}" width="42" title="{{ author.username }}" alt="{{ author.username }}" class="userpic"/>
             {{ author.username }}
-            {% if current_user.is_staff and not is_system_user and current_user.id != author.id %}
-                {# <a href="{% url 'author_approve' author.id %}" id="author_approve" class="btn btn-small{% if author.approved %} btn-primary{% endif %}">{% if author.approved %}Проверен{% else %}Не проверен{% endif %}</a> #}
+            {% if current_user.is_staff and current_user.id != author.id %}
                 <form style="margin: 0; display: inline-block;" method="POST" action="{{ url_for('author.ban', user_id=author.id) }}" id="author_ban">
                     <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
                     <input type="submit" class="btn btn-small{% if not author.is_active %} btn-danger {% endif %}" value="{% if author.is_active %}Не забанен{% else %}Забанен{% endif %}" />
@@ -25,29 +27,20 @@
                 <sup><a class="edit-link" href="{{ url_for('author.edit') }}">Редактировать профиль</a></sup>
             {% endif %}
         </h1>
-        {% if not is_system_user %}
-        <p>
-            {% if stories|length > 0 %}
-                Написал <b>{{ ngettext("%(num)d story", "%(num)d stories", stories|length) }}</b>
-            {% else %}
-                Пока ничего не написал
-            {% endif %}
-             и
-            {% if comments_count > 0 %}
-                оставил <b>{{ ngettext("%(num)d comment", "%(num)d comments", comments_count) }}</b>.
-            {% else %}
-                ничего не комментировал.
-            {% endif %}
-            {% if author.favorites|length > 0 %}
-                Занес в избранное <a href="{{ url_for('object_lists.favorites', user_id=author.id) }}">{{ ngettext("%(num)d story", "%(num)d stories", author.favorites|length) }}</a>.
-            {% endif %}
-        </p>
-        <p class="author-description">{{ author.bio_as_html }}</p>
+            <div class="author-description">{{ author.bio_as_html }}</div>
         {% else %}
             <div class="system-user-description">{{ html_block('system_user') }}</div>
         {% endif %}
         {% with contacts=author.contacts.select().order_by('c.id')[:] %}{% include 'includes/author_contacts.html' %}{% endwith %}
     </div>
+    {% if not is_system_user or author.id == current_user.id %}
+    <div class="span4">
+        {{ author_profile_links(author, 'profile') }}
+    </div>
+    {% endif %}
+</div>
+
+<div class="row">
     <div class="span8">
         {% if series %}
             <h2>Сборники автора ({{ series|length }})</h2>
@@ -55,7 +48,7 @@
         {% endif %}
 
         {% if not is_system_user or stories %}
-            <h2>Рассказы автора</h2>
+            <h2>{% if not is_system_user %}Рассказы автора{% else %}Чьи-то рассказы{% endif %} ({{ stories|length }})</h2>
             {% include "includes/stories.html" %}
         {% endif %}
     </div>

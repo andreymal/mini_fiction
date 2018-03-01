@@ -1,4 +1,7 @@
 {% extends "stories_list_common.html" %}
+
+{% from 'macro.html' import author_profile_links with context %}
+
 {% block after_list %}
     {% if stories %}
         <!-- Пагинация: начало вывода -->
@@ -15,4 +18,10 @@
               </div>
            <!-- Пагинация: конец вывода -->
     {% endif %}
+{% endblock %}
+
+{% block after_list_block %}
+    <div class="span4">
+        {{ author_profile_links(current_user, 'bookmarks') }}
+    </div>
 {% endblock %}

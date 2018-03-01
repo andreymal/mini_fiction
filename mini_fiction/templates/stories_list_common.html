@@ -2,14 +2,24 @@
 {% from 'macro.html' import breadcrumbs with context %}
 {% block content %}
 <div class="row">
-    <div class="span8">
+    <div class="span12">
         {{- breadcrumbs() }}
+    </div>
+</div>
+
+<div class="row">
+    <div class="span8">
         <h2>{{ page_title }}</h2>
         {% block before_list %}{% endblock %}
         <div id="stories-list">
             {% include "includes/stories.html" %}
         </div>
         {% block after_list %}{% endblock %}
+    </div>
+    {% block after_list_block %}{% endblock %}
+</div>
+<div class="row">
+    <div class="span12">
         {{- breadcrumbs() }}
     </div>
 </div>

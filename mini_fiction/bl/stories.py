@@ -32,6 +32,7 @@ class StoryBL(BaseBL, Commentable):
         2: "words DESC",
         3: "vote_value DESC",
         4: "comments_count DESC",
+        5: "RAND()",
     }
 
     _contributors = None
@@ -959,6 +960,7 @@ class ChapterBL(BaseBL):
         2: "words DESC",
         3: "vote_value DESC",
         4: "comments_count DESC",
+        5: "RAND()",
     }
 
     def create(self, story, editor, data):

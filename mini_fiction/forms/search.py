@@ -198,7 +198,7 @@ class SearchForm(Form):
     sort = SelectField(
         '',
         [validators.InputRequired()],
-        choices=[(0, 'По релевантности'), (1, 'По дате'), (2, 'По размеру'), (3, 'По рейтингу'), (4, 'По комментам')],
+        choices=[(0, 'По релевантности'), (1, 'По дате'), (2, 'По размеру'), (3, 'По рейтингу'), (4, 'По комментам'), (5, 'Случайно')],
         widget=StoriesButtons(),
         coerce=int,
         render_kw=radio_attrs,

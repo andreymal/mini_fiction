@@ -236,6 +236,7 @@ class StoryBL(BaseBL, Commentable):
                 c.story_published = story.published
 
             current_app.cache.delete('index_updated_chapters')
+            current_app.cache.delete('index_comments_html')
 
         if changed_sphinx_fields:
             later(current_app.tasks['sphinx_update_story'].delay, story.id, tuple(changed_sphinx_fields))
@@ -321,6 +322,7 @@ class StoryBL(BaseBL, Commentable):
                     c.story_published = story.published
 
                 current_app.cache.delete('index_updated_chapters')
+                current_app.cache.delete('index_comments_html')
 
             later(current_app.tasks['sphinx_update_story'].delay, story.id, tuple(changed_sphinx_fields))
 

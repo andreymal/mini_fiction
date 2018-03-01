@@ -14,6 +14,12 @@
             {% if tab != 'news' %}<a href="{{ url_for('stream.newscomments') }}">{% endif -%}
                 К новостям
             {%- if tab != 'news' %}</a>{% endif %}
+            {% if current_user.is_staff %}
+            &nbsp; &nbsp;
+            {% if tab != 'local' %}<a href="{{ url_for('stream.storylocalcomments') }}">{% endif -%}
+                В редакторской
+            {%- if tab != 'local' %}</a>{% endif %}
+            {% endif %}
         </div>
         <br/>
 

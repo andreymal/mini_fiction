@@ -3,10 +3,10 @@
 
 from pony import orm
 from pony.orm import db_session
-from flask import Blueprint, current_app, render_template
+from flask import Blueprint, current_app, render_template, abort
 from flask_login import current_user
 
-from mini_fiction.models import Story, Chapter, StoryContributor, StoryComment, NewsComment
+from mini_fiction.models import Story, Chapter, StoryContributor, StoryComment, StoryLocalComment, NewsComment
 from mini_fiction.utils.views import cached_lists
 from mini_fiction.utils.misc import Paginator
 
@@ -75,6 +75,33 @@ def comments(page):
         'stream/comments.html',
         page_title='Лента комментариев',
         tab='story',
+        comments=objects,
+        with_target_link=True,
+        comment_votes_cache=comment_votes_cache,
+        page_obj=page_obj,
+        robots_noindex=True,
+    )
+
+
+@bp.route('/localcomments/page/last/', defaults={'page': -1})
+@bp.route('/localcomments/', defaults={'page': 1})
+@bp.route('/localcomments/page/<int:page>/')
+@db_session
+def storylocalcomments(page):
+    if not current_user.is_staff:
+        abort(403)
+
+    objects = StoryLocalComment.select(lambda x: not x.deleted).order_by(StoryLocalComment.id.desc())
+
+    page_obj = Paginator(page, objects.count(), per_page=current_app.config['COMMENTS_COUNT']['stream'])
+    objects = [('local', x) for x in page_obj.slice_or_404(objects)]
+
+    comment_votes_cache = {}  # FIXME: здесь пересечение айдишников с айдшниками комментов к рассказам
+
+    return render_template(
+        'stream/comments.html',
+        page_title='Лента комментариев',
+        tab='local',
         comments=objects,
         with_target_link=True,
         comment_votes_cache=comment_votes_cache,

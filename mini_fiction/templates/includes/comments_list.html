@@ -8,6 +8,11 @@
                 к рассказу
                 <a href="{{ url_for('story.view', pk=comment.story.id) }}"><b>{{ comment.story.title }}</b></a>
                 </span>
+            {% elif ctype == 'local' %}
+                <span class="comment-story-link">
+                в редакторской рассказа
+                <a href="{{ url_for('story.view', pk=comment.local.story.id) }}"><b>{{ comment.local.story.title }}</b></a>
+                </span>
             {% elif ctype == 'news' %}
                 <span class="comment-newsitem-link">
                 к новости

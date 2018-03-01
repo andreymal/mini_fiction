@@ -25,7 +25,11 @@ class StarVoting(BaseVoting):
         return int(current_app.config['VOTES_MID'] * 100)
 
     def get_default_vote_extra(self):
-        return '{"average": 3.0, "stddev": 0.0}'
+        extra = {
+            'average': round(current_app.config['VOTING_MAX_VALUE'] / 2.0 + 0.1),
+            'stddev': 0.0,
+        }
+        return json.dumps(extra, ensure_ascii=False, sort_keys=True)
 
     def validate_value(self, value):
         return isinstance(value, int) and value >= 1 and value <= current_app.config['VOTING_MAX_VALUE']

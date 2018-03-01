@@ -2130,11 +2130,19 @@ ul.editlog .editlog-item:nth-child(2n+1) {
 
 .admin-index-table tbody tr {
     border-bottom: 1px solid #eee;
-    line-height: 28px;
 }
 
-.admin-index-table .col-user-id-title,
-.admin-index-table .col-user-id {
+.admin-index-table th, .admin-index-table td {
+    border-bottom: 1px solid #eee;
+    padding: 4px 2px;
+}
+
+.admin-index-table .col-nowrap {
+    white-space: nowrap;
+}
+
+.admin-index-table th.col-user-id-title,
+.admin-index-table td.col-user-id {
     text-align: right;
     padding-right: 4px;
 }
@@ -2150,12 +2158,17 @@ ul.editlog .editlog-item:nth-child(2n+1) {
     line-height: 28px;
 }
 
-.admin-index-table .col-user-name img {
-    margin: 2px 2px 2px 0;
+.admin-index-table td.col-user-name {
+    padding: 2px 2px;
+}
+
+.admin-index-table td.col-user-name img {
+    margin-right: 2px;
     width: 24px;
     height: 24px;
     vertical-align: middle;
     border: 0;
+    border-radius: 2px;
 }
 
 .admin-index-table .col-user-name a {

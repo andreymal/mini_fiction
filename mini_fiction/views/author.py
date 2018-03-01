@@ -267,12 +267,15 @@ def ban(user_id):
     except Exception:
         abort(404)
 
-    if current_user.is_staff and user_id != current_app.config['SYSTEM_USER_ID']:
+    if current_user.is_staff and user_id not in (current_app.config['SYSTEM_USER_ID'], current_user.id):
         author = Author.get(id=user_id)
         if not author:
             abort(404)
-        if author.id != current_user.id:
-            author.is_active = not author.is_active
+        author.bl.update(
+            {'is_active': not author.is_active},
+            modified_by_user=current_user._get_current_object(),
+            fill_admin_log=True,
+        )
         return redirect(url_for('author.info', user_id=user_id))
     else:
         abort(403)

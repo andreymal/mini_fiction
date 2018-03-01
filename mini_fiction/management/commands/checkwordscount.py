@@ -21,7 +21,7 @@ def story_check_words_count(story, verbose=True):
         if verbose:
             print('Chapter {}/{} ({}):'.format(chapter.story.id, chapter.order, chapter.id), end=' ', flush=True)
 
-        old_words, new_words = Chapter.bl.update_words_count(chapter)
+        old_words, new_words = Chapter.bl.update_words_count(chapter, update_story_words=False)
         if verbose:
             print('{} -> {}'.format(old_words, new_words), end='', flush=True)
         all_words += new_words
@@ -30,7 +30,7 @@ def story_check_words_count(story, verbose=True):
             if verbose:
                 print(' (changed)', end='', flush=True)
             orm.commit()
-            current_app.tasks['sphinx_update_chapter'].delay(chapter.id)
+            current_app.tasks['sphinx_update_chapter'].delay(chapter.id, update_story_words=False)
 
         if verbose:
             print()

@@ -1073,12 +1073,12 @@ class ChapterBL(BaseBL):
         later(current_app.tasks['sphinx_update_chapter'].delay, chapter.id)
         return chapter
 
-    def update_words_count(self, chapter):
+    def update_words_count(self, chapter, update_story_words=True):
         old_words = chapter.words
         new_words = words_count(chapter.text, html=True)
         if new_words != chapter.words:
             chapter.words = new_words
-            if not chapter.draft:
+            if update_story_words and not chapter.draft:
                 story = chapter.story
                 story.words = story.words - old_words + new_words
         return old_words, new_words

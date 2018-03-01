@@ -56,7 +56,7 @@ def view(pk, comments_page):
         )
 
     chapters = story.chapters.select().order_by(Chapter.order, Chapter.id)[:]
-    if not story.bl.is_contributor(user):
+    if not user.is_staff and not story.bl.is_contributor(user):
         chapters = [x for x in chapters if not x.draft]
 
     if user.is_authenticated:
@@ -231,34 +231,34 @@ def publish(pk):
 @db_session
 @login_required
 def favorite(pk):
-    story = get_story(pk)
     user = current_user._get_current_object()
-    f = story.favorites.select(lambda x: x.author == user).first()
+    f = Favorites.select(lambda x: x.author == user and x.story.id == pk).first()
     if f:
-        f.delete()
+        f.delete()  # без проверки доступа
         f = None
     else:
+        story = get_story(pk)  # проверка доступа
         f = Favorites(author=user, story=story)
     if g.is_ajax:
-        return jsonify({'success': True, 'story_id': story.id, 'favorited': f is not None})
-    return redirect(url_for('story.view', pk=story.id))
+        return jsonify({'success': True, 'story_id': pk, 'favorited': f is not None})
+    return redirect(url_for('story.view', pk=pk))
 
 
 @bp.route('/<int:pk>/bookmark/', methods=('POST',))
 @db_session
 @login_required
 def bookmark(pk):
-    story = get_story(pk)
     user = current_user._get_current_object()
-    b = story.bookmarks.select(lambda x: x.author == user).first()
+    b = Bookmark.select(lambda x: x.author == user and x.story.id == pk).first()
     if b:
-        b.delete()
+        b.delete()  # без проверки доступа
         b = None
     else:
+        story = get_story(pk)  # проверка доступа
         b = Bookmark(author=user, story=story)
     if g.is_ajax:
-        return jsonify({'success': True, 'story_id': story.id, 'bookmarked': b is not None})
-    return redirect(url_for('story.view', pk=story.id))
+        return jsonify({'success': True, 'story_id': pk, 'bookmarked': b is not None})
+    return redirect(url_for('story.view', pk=pk))
 
 
 @bp.route('/<int:pk>/vote/', methods=('POST',))

@@ -185,6 +185,7 @@ class StoryBL(BaseBL, Commentable):
         return story
 
     def approve(self, user, approved):
+        # TODO: с publish() очень много общего, можно вынести общее в отдельную функцию
         story = self.model
         tm = datetime.utcnow()
 
@@ -240,6 +241,7 @@ class StoryBL(BaseBL, Commentable):
             later(current_app.tasks['sphinx_update_story'].delay, story.id, tuple(changed_sphinx_fields))
 
     def publish(self, user, published):
+        # TODO: с approve() очень много общего, можно вынести общее в отдельную функцию
         story = self.model
         old_published = story.published
 

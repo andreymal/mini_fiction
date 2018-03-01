@@ -258,6 +258,8 @@ def notify_story_chapters(chapter_ids, publisher_user_id=None):
 
     # Перебираем все подписки
     for sub in subs:
+        # Проверка доступа не нужна; этот таск вызывается только при публикации
+        # главы в опубликованном рассказе или при публикации самого рассказа
         user = sub.user
 
         # Если этот юзер и опубликовал главы, то его уведомлять не надо
@@ -276,6 +278,7 @@ def notify_story_chapters(chapter_ids, publisher_user_id=None):
     # Отправляем письмо по собранным адресам
     _sendmail_notify(sendto, 'story_chapter', {'story': story, 'chapters': chapters})
 
+
 @task()
 @db_session
 def notify_story_comment(comment_id):
@@ -292,13 +295,15 @@ def notify_story_comment(comment_id):
 
     if parent and parent.author and (not comment.author or parent.author.id != comment.author.id):
         # Уведомляем автора родительского комментария, что ему ответили
-        if 'story_reply' not in parent.author.silent_tracker_list:
-            _notify(parent.author, 'story_reply', comment, by=comment.author)
-            reply_sent_tracker = True
+        # Не забываем про проверку доступа
+        if story.bl.has_access(parent.author):
+            if 'story_reply' not in parent.author.silent_tracker_list:
+                _notify(parent.author, 'story_reply', comment, by=comment.author)
+                reply_sent_tracker = True
 
-        if 'story_reply' not in parent.author.silent_email_list and parent.author.email:
-            _sendmail_notify([parent.author.email], 'story_reply', ctx)
-            reply_sent_email = True
+            if 'story_reply' not in parent.author.silent_email_list and parent.author.email:
+                _sendmail_notify([parent.author.email], 'story_reply', ctx)
+                reply_sent_email = True
 
     # Уведомляем остальных подписчиков о появлении нового комментария
     subs = models.Subscription.select(lambda x: x.type == 'story_comment' and x.target_id == story.id)[:]
@@ -350,13 +355,15 @@ def notify_story_lcomment(comment_id):
 
     if parent and parent.author and (not comment.author or parent.author.id != comment.author.id):
         # Уведомляем автора родительского комментария, что ему ответили
-        if 'story_lreply' not in parent.author.silent_tracker_list:
-            _notify(parent.author, 'story_lreply', comment, by=comment.author, extra=extra)
-            reply_sent_tracker = True
+        # Не забываем про проверку доступа
+        if parent.author.is_staff or story.bl.is_contributor(parent.author):
+            if 'story_lreply' not in parent.author.silent_tracker_list:
+                _notify(parent.author, 'story_lreply', comment, by=comment.author, extra=extra)
+                reply_sent_tracker = True
 
-        if 'story_lreply' not in parent.author.silent_email_list and parent.author.email:
-            _sendmail_notify([parent.author.email], 'story_lreply', ctx)
-            reply_sent_email = True
+            if 'story_lreply' not in parent.author.silent_email_list and parent.author.email:
+                _sendmail_notify([parent.author.email], 'story_lreply', ctx)
+                reply_sent_email = True
 
     # Уведомляем остальных подписчиков о появлении нового комментария
     subs = models.Subscription.select(lambda x: x.type == 'story_lcomment' and x.target_id == story.id)[:]

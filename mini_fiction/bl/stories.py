@@ -334,11 +334,13 @@ class StoryBL(BaseBL, Commentable):
         story = self.model
         published_chapter_ids = []
         tm = datetime.utcnow()
+
         for c in sorted(story.chapters, key=lambda x: x.order):
             if not c.draft:
                 continue
-            story.words += c.words
             c.draft = False
+            c.bl.edit_log(user, 'edit', {'draft': [True, False]})
+            story.words += c.words
             later(current_app.tasks['sphinx_update_chapter'].delay, c.id)
             if story.published and not c.first_published_at:
                 c.first_published_at = tm

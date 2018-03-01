@@ -493,12 +493,10 @@ class AuthorBL(BaseBL):
     def is_email_busy(self, email):
         return self.model.select(lambda x: x.email.lower() == email.lower()).exists()
 
-    def reset_password_by_email(self):
+    def generate_password_reset_profile(self):
         from mini_fiction.models import PasswordResetProfile
 
         user = self.model
-        if not user.email:
-            raise ValueError('User has no email')
 
         prp = PasswordResetProfile.select(
             lambda x: x.user == user and not x.activated and x.date > datetime.utcnow() - timedelta(days=current_app.config['ACCOUNT_ACTIVATION_DAYS'])
@@ -512,6 +510,16 @@ class AuthorBL(BaseBL):
             activated=False,
         )
         prp.flush()
+
+        return prp
+
+
+    def reset_password_by_email(self):
+        user = self.model
+        if not user.email:
+            raise ValueError('User has no email')
+
+        prp = self.generate_password_reset_profile()
 
         later(
             current_app.tasks['sendmail'].delay,

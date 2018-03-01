@@ -77,10 +77,28 @@
             </div>
         </div>
 
+        {% if prp_links %}
+        <div class="control-group">
+            <label class="control-label">{{ _('Password reset link') }}</label>
+            <div class="controls">
+                {% for prp_link in prp_links %}
+                    <a href="{{ prp_link }}" target="_blank">{{ prp_link }}</a><br/>
+                {% endfor %}
+            </div>
+        </div>
+        {% endif %}
+
         {{ form_fields(password_edit_form) }}
         <div class="controls">
             <span class="help-inline">При смене пароля на странице администрирования пользователь не будет разлогинен.</span><br/><br/>
             <button type="submit" name="act" value="change_password" class="btn btn-primary">{{ _('Change password') }}</button>
+        </div>
+        </form>
+
+        <form action="{{ url_for('admin_authors.password_reset_link', pk=author.id) }}" class="form-horizontal" method="POST" target="_blank">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+        <div class="controls">
+            <input type="submit" value="{{ _('Generate a password reset link') }}" class="btn" />
         </div>
         </form>
         {% endif %}

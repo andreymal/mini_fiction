@@ -1,6 +1,8 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
+from datetime import datetime, timedelta
+
 from flask import Blueprint, current_app, render_template, abort, redirect, url_for, request
 from flask_babel import gettext
 from flask_login import login_user, current_user
@@ -8,7 +10,7 @@ from pony.orm import db_session
 
 from mini_fiction.validation import ValidationError
 from mini_fiction.forms.admin.authors import AdminAuthorForm, AdminEditPasswordForm
-from mini_fiction.models import Author
+from mini_fiction.models import Author, PasswordResetProfile
 from mini_fiction.utils.misc import Paginator
 from mini_fiction.utils.views import admin_sort
 
@@ -123,6 +125,11 @@ def update(pk):
             author.bl.set_password(password_edit_form.data['new_password_1'])
             saved = True
 
+    prps = PasswordResetProfile.select(
+        lambda x: x.user == author and not x.activated and x.date > datetime.utcnow() - timedelta(days=current_app.config['ACCOUNT_ACTIVATION_DAYS'])
+    )[:]
+    prp_links = [url_for('auth.password_reset_confirm', activation_key=prp.activation_key, _external=True) for prp in prps]
+
     return render_template(
         'admin/authors/update.html',
         page_title=author.username,
@@ -130,6 +137,7 @@ def update(pk):
         is_system_user=author.id == current_app.config['SYSTEM_USER_ID'],
         form=form,
         password_edit_form=password_edit_form,
+        prp_links=prp_links,
         saved=saved,
     )
 
@@ -153,3 +161,26 @@ def login(pk):
 
     login_user(author)
     return redirect(url_for('author.info'))
+
+
+
+@bp.route('/<pk>/password_reset_link/', methods=('POST',))
+@db_session
+def password_reset_link(pk):
+    if not current_user.is_superuser:
+        abort(403)
+
+    try:
+        pk = int(pk)
+    except Exception:
+        abort(404)
+
+    author = Author.get(id=pk)
+    if not author:
+        abort(404)
+    if not author.is_active:
+        abort(403)
+
+    author.bl.generate_password_reset_profile()
+
+    return redirect(url_for('admin_authors.update', pk=pk))

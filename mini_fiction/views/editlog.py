@@ -42,7 +42,7 @@ def show(editlog_id):
     if not edit_log.story.bl.can_view_editlog(current_user._get_current_object()):
         abort(403)
 
-    extra = get_editlog_extra_info(edit_log, prepare_chapter_diff=True)
+    extra = get_editlog_extra_info(edit_log, prepare_chapter_diff=True, show_newlines=True)
 
     data = {
         'page_title': _('Edit log'),

@@ -118,7 +118,7 @@ def calc_comment_threshold(user):
     return current_app.config['COMMENT_SPOILER_THRESHOLD']
 
 
-def get_editlog_extra_info(log_item, prepare_chapter_diff=False):
+def get_editlog_extra_info(log_item, prepare_chapter_diff=False, show_newlines=False):
     if not log_item.chapter_action:
         # Изменение рассказа
         log_extra_item = {'mode': 'story', 'list_items': False, 'label': pgettext('story_edit_log', 'edited story')}
@@ -170,17 +170,20 @@ def get_editlog_extra_info(log_item, prepare_chapter_diff=False):
             chapter_text = utils_diff.revert_diff(chapter_text, json.loads(log_item.chapter_text_diff))
 
             # Теперь у нас есть старый текст, и можно отрисовать данный дифф к нему
-            log_extra_item['diff_html'] = diff2html(chapter_text, json.loads(log_item.chapter_text_diff))
+            log_extra_item['diff_html'] = diff2html(chapter_text, json.loads(log_item.chapter_text_diff), show_newlines=show_newlines)
 
     return log_extra_item
 
 
-def diff2html(s, diff):
+def diff2html(s, diff, show_newlines=False):
     result = []
     ctx = max(0, current_app.config['DIFF_CONTEXT_SIZE'])
     offset = 0
     for i, item in enumerate(diff):
         act, data = item
+
+        if act != '=' and show_newlines:
+            data = data.replace('\n', '⏎\n')
 
         if act == '=':
             data = s[offset:offset + data]

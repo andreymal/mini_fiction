@@ -463,17 +463,23 @@ class StoryBL(BaseBL, Commentable):
                 story=story,
                 vote_value=value,
                 ip=ip,
+                revoked_at=None,
             )
         elif value != vote.vote_value:
             vote.vote_value = value
             vote.ip = ip
+            vote.updated = datetime.utcnow()
         vote.flush()
-        current_app.story_voting.update_rating(self.model)
-        self.model.flush()
-
-        later(current_app.tasks['sphinx_update_story'].delay, story.id, ('vote_total', 'vote_value'))
-
+        self.update_rating()
         return vote
+
+    def update_rating(self):
+        if not current_app.story_voting:
+            return
+        story = self.model
+        current_app.story_voting.update_rating(story)
+        story.flush()
+        later(current_app.tasks['sphinx_update_story'].delay, story.id, ('vote_total', 'vote_value'))
 
     def vote_view_html(self, user=None, full=False):
         if not current_app.story_voting:

@@ -7,18 +7,25 @@
     <h1>{{ page_title }}</h1>
 
     <div class="admin-index">
+        <form method="POST" action="{{ url_for('admin_votes.manyupdate') }}">
         <table class="admin-index-table">
         <thead><tr>
+            <th>&nbsp;</th>
             <th>Рассказ</th>
             <th>{{ _('Username') }}</th>
             <th>Оценка</th>
+            <th>IP</th>
             <th>Дата</th>
         </tr></thead>
 
         <tbody>
-        {%- for vote in votes %}<tr data-id="{{ vote.id }}">
+        {%- for vote in votes %}<tr data-id="{{ vote.id }}"{% if vote.revoked_at %} style="opacity: 0.5"{% endif %}>
+            <td>
+                <input type="checkbox" name="vote" value="{{ vote.id }}" />
+            </td>
+
             <td class="col-vote-story-title">
-                <strong><a href="{{ url_for('story.view', pk=vote.story.id) }}">{{ vote.story.title }}</a></strong>
+                <strong><a title="{{ vote.story.title }}" href="{{ url_for('story.view', pk=vote.story.id) }}">{{ vote.story.title|truncate(32) }}</a></strong>
             </td>
 
             <td class="col-user-name">
@@ -30,18 +37,30 @@
 
             <td>{{ vote.vote_value }}</td>
 
-            <td>
+            <td title="{{ vote.ip }}">{{ vote.ip|truncate(20) }}</td>
+
+            <td class="col-nowrap">
                 <time datetime="{{ vote.updated.strftime('%Y-%m-%dT%H:%M:%SZ') }}">
                     {{ vote.updated|datetimeformat('d MMMM Y, HH:mm') }}
                 </time>
             </td>
         </tr>{% endfor -%}
         </tbody>
+        {% if current_user.is_superuser %}
+        <tfoot><tr><td colspan="6">
+            <input type="hidden" name="return_path" value="{{ url_for('admin_votes.index', **args) }}" />
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+            <button type="submit" class="btn btn-primary" name="act" value="revoke">Отозвать</button>
+            <button type="submit" class="btn btn-primary" name="act" value="restore">Вернуть</button>
+        </td></tr></tfoot>
+        {% endif %}
         </table>
+
+        </form>
 
         <div class="admin-index-filters">
             <form action="{{ url_for('admin_votes.index') }}" method="GET">
-                {% for k, v in args.items() if k not in ['story_id', 'username', 'page'] %}
+                {% for k, v in args.items() if k not in ['story_id', 'username', 'ip', 'revoked', 'page'] %}
                     <input type="hidden" name="{{ k }}" value="{{ v }}" />
                 {%- endfor %}
 
@@ -50,6 +69,16 @@
 
                 <label for="username">{{ _('Username') }}:</label>
                 <input type="text" id="username" name="username" class="admin-input-text-full" value="{{ args.username or '' }}" /><br/>
+
+                <label for="ip">IP:</label>
+                <input type="text" id="ip" name="ip" class="admin-input-text-full" value="{{ args.ip or '' }}" /><br/>
+
+                <label for="revoked">Отозваны:</label>
+                <select name="revoked" id="revoked" class="admin-input-select-full">
+                    <option value="">{{ _('All') }}</option>
+                    <option value="yes"{% if args.revoked == "yes" %} selected{% endif %}>Да</option>
+                    <option value="no"{% if args.revoked == "no" %} selected{% endif %}>Нет</option>
+                </select>
 
                 <button type="submit" class="btn btn-primary">{{ _('Search') }}</button>
             </form>

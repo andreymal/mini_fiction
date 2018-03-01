@@ -1,7 +1,9 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-from flask import Blueprint, render_template, abort, request
+from datetime import datetime
+
+from flask import Blueprint, current_app, render_template, abort, request, redirect, url_for
 from flask_login import current_user
 from pony.orm import db_session, select
 
@@ -39,6 +41,17 @@ def index(page):
         user_ids = select(x.id for x in Author if args['username'].lower() in x.username.lower())[:]
         objects = objects.filter(lambda x: x.author.id in user_ids)
 
+    if request.args.get('ip'):
+        args['ip'] = request.args['ip']
+        objects = objects.filter(lambda x: x.ip == args['ip'])
+
+    if request.args.get('revoked') == 'no':
+        args['revoked'] = 'no'
+        objects = objects.filter(lambda x: x.revoked_at is None)
+    elif request.args.get('revoked') == 'yes':
+        args['revoked'] = 'yes'
+        objects = objects.filter(lambda x: x.revoked_at is not None)
+
     objects = objects.prefetch(Vote.story, Vote.author)
 
     page_obj = Paginator(page, objects.count(), per_page=100)
@@ -51,3 +64,36 @@ def index(page):
         endpoint=request.endpoint,
         args=args,
     )
+
+
+@bp.route('/manyupdate/', methods=['GET', 'POST'])
+@db_session
+def manyupdate():
+    if request.method != 'POST':
+        return redirect(url_for('admin_votes.index'))
+    if not current_user.is_superuser:
+        abort(403)
+
+    return_path = request.form.get('return_path')
+    if not return_path or return_path.startswith('//') or not return_path.startswith('/'):
+        return_path = url_for('admin_votes.index')
+
+    vote_ids = [int(x) for x in request.form.getlist('vote') if x and x.isdigit()]
+    all_votes = Vote.select(lambda x: x.id in vote_ids)[:]
+
+    act = request.form.get('act')
+
+    update_stories_rating = set()
+    for vote in all_votes:
+        if act == 'revoke' and not vote.revoked_at:
+            vote.revoked_at = datetime.utcnow()
+            update_stories_rating.add(vote.story)
+        if act == 'restore' and vote.revoked_at:
+            vote.revoked_at = None
+            update_stories_rating.add(vote.story)
+        vote.flush()
+
+    for story in update_stories_rating:
+        story.bl.update_rating()
+
+    return redirect(return_path)

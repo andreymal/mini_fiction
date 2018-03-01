@@ -698,12 +698,10 @@ class Vote(db.Entity):
     updated = orm.Required(datetime, 6, default=datetime.utcnow, optimistic=False)
     ip = orm.Required(str, 50, default=ipaddress.ip_address('::1').exploded, optimistic=False)
     vote_value = orm.Required(int, default=0, optimistic=False)
+    revoked_at = orm.Optional(datetime, 6)
     extra = orm.Required(orm.LongStr, lazy=False, default='{}')
 
     orm.composite_key(author, story)
-
-    def before_update(self):
-        self.updated = datetime.utcnow()
 
 
 class Favorites(db.Entity):

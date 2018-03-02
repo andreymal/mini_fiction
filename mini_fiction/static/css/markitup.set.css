@@ -28,3 +28,63 @@
 .markItUp .edit-small a			{background-image:url(images/edit-small.png);}
 
 .markItUp .edit-tag a			{background-image:url(images/edit-tag.png);}
+
+
+.markItUpHeader {
+    overflow: hidden;
+}
+
+.markItUp {
+    width: 812px;
+}
+
+.markItUpHeader ul .markItUpSeparator {
+    margin-bottom: 6px;  /* fix for mobile */
+}
+
+.markItUpEditor {
+    width: 800px !important;
+    padding: 4px 6px !important;
+}
+
+@media (max-width: 1100px) {
+    .markItUp {
+        width: 542px;
+    }
+
+    .markItUpEditor {
+        width: 530px !important;
+    }
+}
+
+
+@media (max-width: 767px) {
+    .markItUp {
+        width: 90%;
+        width: calc(100% - 12px);
+    }
+
+    .markItUpEditor {
+        width: 90% !important;
+        width: calc(100% - 12px) !important;
+    }
+}
+
+.comment-form-content .markItUp {
+    width: auto;
+}
+
+.comment-form-content .markItUpEditor {
+    width: 95% !important;
+    width: calc(100% - 12px) !important;
+    max-width: none;
+}
+
+.comment-form-content #markItUpId_text {
+    margin-top: 0;
+    padding-top: 5px;
+}
+
+.comment-form .markItUp textarea {
+    height: 9em;
+}

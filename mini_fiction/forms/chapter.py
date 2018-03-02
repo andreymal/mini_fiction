@@ -8,8 +8,8 @@ from mini_fiction.forms.form import Form
 
 class ChapterForm(Form):
     """ Форма добавления новой главы к рассказу """
-    textarea_dict = {'class': 'input-xxlarge chapter-textarea with-markitup js-form-saving'}
-    attrs_dict = {'class': 'input-xxlarge js-form-saving'}
+    textarea_dict = {'class': 'input-xxxlarge chapter-textarea with-markitup js-form-saving'}
+    attrs_dict = {'class': 'input-xxxlarge js-form-saving'}
 
     title = TextField(
         'Название',

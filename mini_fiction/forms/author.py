@@ -30,6 +30,7 @@ class ContactForm(Form):
 
 class AuthorEditProfileForm(Form):
     attrs_dict = {'class': 'input-xlarge'}
+    attrs_bio_dict = {'class': 'input-xxxlarge with-markitup'}
 
     avatar = FileField(
         lazy_gettext('Avatar'),
@@ -47,7 +48,7 @@ class AuthorEditProfileForm(Form):
             validators.Optional(),
             validators.Length(max=2048)
         ],
-        render_kw=dict(attrs_dict, placeholder='Небольшое описание, отображается в профиле', cols=40, rows=10),
+        render_kw=dict(attrs_bio_dict, placeholder='Небольшое описание, отображается в профиле', cols=40, rows=10),
     )
 
     contacts = FieldList(

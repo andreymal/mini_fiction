@@ -11,8 +11,8 @@ from mini_fiction.forms.form import Form
 
 
 class StoryForm(Form):
-    attrs_dict = {'class': 'input-xxlarge'}
-    attrs_markitup_dict = {'class': 'input-xxlarge with-markitup'}
+    attrs_dict = {'class': 'input-xxxlarge'}
+    attrs_markitup_dict = {'class': 'input-xxxlarge with-markitup'}
     img_attrs = {
            'group_container_class': 'characters-group group-',
            'data_attrs': {'class': 'hidden'},

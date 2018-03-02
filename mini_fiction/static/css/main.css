@@ -15,6 +15,7 @@ a {
     box-shadow: 0 0 10px -5px #000000;
     margin-bottom: 20px;
     border-radius: 0 0 8px 8px;
+    width: 960px;
 }
 
 /* Header */
@@ -1378,7 +1379,13 @@ p.meta .chapter-controls {
   width: 100px;
 }
 /* === Editing, Forms, Active elements, Buttons === */
+
 /* Forms and stuff */
+
+.input-xxxlarge {
+    width: 800px;
+}
+
 .checkbox.inline+.checkbox.inline {
     margin-left: 0;
 }
@@ -1843,16 +1850,6 @@ a.btn {
     width: 70%;
     padding: 8px 12px 8px;
     box-sizing: border-box;
-}
-
-/* Костыли */
-.comment-form-content #markItUpId_text {
-    margin-top: 0;
-    padding-top: 5px;
-}
-
-.comment-form .markItUp textarea {
-    height: 9em;
 }
 
 /* Pagination */
@@ -2387,6 +2384,19 @@ ul.editlog .editlog-item:nth-child(2n+1) {
 
 
 /* === Adaptive overrides === */
+
+@media (min-width: 1200px) {
+    .container {
+        width: 1170px;
+    }
+}
+
+@media (max-width: 1100px) {
+    .input-xxxlarge {
+        width: 530px;
+    }
+}
+
 /* Tablets */
 @media ( min-width : 768px) and (max-width: 979px) {
     .container {
@@ -2433,6 +2443,9 @@ ul.editlog .editlog-item:nth-child(2n+1) {
         width: 96%;
         width: calc(100% - 20px);
         margin: 0;
+    }
+    .story-panel {
+        margin-right: 0;
     }
 }
 
@@ -2492,7 +2505,7 @@ ul.editlog .editlog-item:nth-child(2n+1) {
         padding: 6px 8px;
     }
     .story-panel {
-        padding: 10px 0 10px 14px;
+        margin-right: -1%;
     }
     .story-panel.story-panel-floating {
         opacity: 1;
@@ -2517,18 +2530,22 @@ ul.editlog .editlog-item:nth-child(2n+1) {
     .story-chapter-page .story-panel .chapter-controls {
         float: none;
     }
-    .markItUpHeader ul li {
-        float: left;
-    }
-    .markItUpHeader ul li:nth-child(20n) {
-        clear: both;
-    }
     .comments-tree .comment-item {
-        width: 90%;
+        max-width: 100%;
+    }
+    .comment-form-content {
+        width: auto;
+    }
+    .comment-add-link {
+        font-size: 16px;
     }
     #comment-add-link + .comment-form {
         background-image: none;
         min-height: auto;
+    }
+    .input-xxxlarge {
+        width: 95%;
+        width: calc(100% - 12px - 12px);
     }
 }
 
@@ -2545,7 +2562,8 @@ ul.editlog .editlog-item:nth-child(2n+1) {
         padding-top: 12px;
     }
     .controls textarea {
-        width: 100%;
+        width: 95%;
+        width: calc(100% - 12px - 12px);
     }
     .main-menu .logolink {
         font-size: 15px;
@@ -2580,12 +2598,6 @@ ul.editlog .editlog-item:nth-child(2n+1) {
     }
     .padded>.bootstrap.radio {
         display: none;
-    }
-    .markItUpHeader ul li {
-        float: left;
-    }
-    .markItUpHeader ul li:nth-child(15n) {
-        clear: both;
     }
 }
 

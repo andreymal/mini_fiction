@@ -72,9 +72,12 @@ var story = {
         // Обработчики для кнопок работы с рассказом
 
         // Публикация
-        core.bind('#content .story_publish', 'click', function(event) {
+        core.bind('#content .js-story-publish-btn', 'click', function(event) {
             event.stopImmediatePropagation();
             event.preventDefault();
+            if (this.classList.contains('loading')) {
+                return;
+            }
             var url = this.href;
             core.ajax.post(url)
                 .then(function(response) {
@@ -88,13 +91,19 @@ var story = {
                     if (response.modal) {
                         core.modal(response.modal);
                     }
-                }).catch(core.handleError);
+                }).then(null, core.handleError).then(function() {
+                    this.classList.remove('loading');
+                }.bind(this));
+            this.classList.add('loading');
         });
 
         // Публикация главы
         core.bind('#content .js-btn-publish-chapter', 'click', function(event) {
             event.stopImmediatePropagation();
             event.preventDefault();
+            if (this.classList.contains('loading')) {
+                return;
+            }
             var link = this;
             var url = link.href;
             core.ajax.post(url)
@@ -106,13 +115,19 @@ var story = {
                         return;
                     }
                     story.setChapterPublished(link, response.published);
-                }).catch(core.handleError);
+                }).then(null, core.handleError).then(function() {
+                    this.classList.remove('loading');
+                }.bind(this));
+            this.classList.add('loading');
         });
 
         // Одобрение
-        core.bind('#content .story_approve', 'click', function(event) {
+        core.bind('#content .js-story-approve-btn', 'click', function(event) {
             event.stopImmediatePropagation();
             event.preventDefault();
+            if (this.classList.contains('loading')) {
+                return;
+            }
             var url = this.href;
             core.ajax.post(url)
                 .then(function(response) {
@@ -123,7 +138,10 @@ var story = {
                         return;
                     }
                     story.setApproved(response.story_id, response.approved);
-                }).catch(core.handleError);
+                }).then(null, core.handleError).then(function() {
+                    this.classList.remove('loading');
+                }.bind(this));
+            this.classList.add('loading');
         });
 
         // Закрепление на главной
@@ -215,7 +233,7 @@ var story = {
         if (!story) {
             return false;
         }
-        var btn = story.querySelector('.story_publish');
+        var btn = story.querySelector('.js-story-publish-btn');
         if (btn) {
             if (published) {
                 btn.classList.remove('btn-primary');
@@ -250,7 +268,7 @@ var story = {
         if (!story) {
             return false;
         }
-        var btn = story.querySelector('.story_approve');
+        var btn = story.querySelector('.js-story-approve-btn');
         if (btn) {
             if (approved) {
                 btn.classList.remove('btn-success');

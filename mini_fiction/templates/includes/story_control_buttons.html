@@ -2,12 +2,12 @@
     {% if story.bl.editable_by(current_user) %}
         <div class="story-control-btn btn-group">
             {% if current_user.is_staff %}
-                <a class="btn {{ '' if story.approved else 'btn-success' }} btn-mini story_approve" href="{{ url_for('story.approve', pk=story.id) }}">
+                <a class="btn {{ '' if story.approved else 'btn-success' }} btn-mini story-approve-btn js-story-approve-btn" href="{{ url_for('story.approve', pk=story.id) }}">
                     {{ 'Отозвать' if story.approved else 'Одобрить' }}
                 </a>
             {% endif %}
             {% if story.bl.publishable_by(current_user) %}
-                <a class="btn btn-mini story_publish{% if story.publishable and story.draft %} btn-primary{% endif %}" href="{{ url_for('story.publish', pk=story.id) }}">
+                <a class="btn btn-mini story-publish-btn js-story-publish-btn{% if story.publishable and story.draft %} btn-primary{% endif %}" href="{{ url_for('story.publish', pk=story.id) }}">
                     {{ 'Опубликовать' if story.draft else 'В черновики' }}
                 </a>
             {% endif %}

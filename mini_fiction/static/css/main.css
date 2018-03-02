@@ -621,6 +621,13 @@ img.avatar-small, .character-list img {
     text-decoration: none;
 }
 
+.story-control-btn .story-approve-btn.loading,
+.story-control-btn .story-publish-btn.loading,
+.publish-chapter-btn.loading {
+    opacity: 0.5;
+    cursor: default;
+}
+
 /* Vote-buttons */
 
 .vote-area-1 {

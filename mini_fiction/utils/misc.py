@@ -212,14 +212,10 @@ def diff2html(s, diff, show_newlines=False):
     for i, item in enumerate(diff):
         act, data = item
 
-        fancy_data = data
-        if act != '=' and show_newlines:
-            fancy_data = fancy_data.replace('\n', '⏎\n')
-
         if act == '=':
             data = s[offset:offset + data]
             if len(data) < ctx * 3:
-                result.append(escape(fancy_data))
+                result.append(escape(data))
             else:
                 if ctx == 0:
                     l, mid, r = '', data, ''
@@ -248,16 +244,21 @@ def diff2html(s, diff, show_newlines=False):
                 result.append(escape(r))
             offset += len(data)
 
-        elif act == '+':
-            result.append('<ins>')
-            result.append(escape(fancy_data))
-            result.append('</ins>')
+        else:
+            fancy_data = data
+            if show_newlines:
+                fancy_data = fancy_data.replace('\n', '⏎\n')
 
-        elif act == '-':
-            result.append('<del>')
-            result.append(escape(fancy_data))
-            result.append('</del>')
-            offset += len(data)
+            if act == '+':
+                result.append('<ins>')
+                result.append(escape(fancy_data))
+                result.append('</ins>')
+
+            elif act == '-':
+                result.append('<del>')
+                result.append(escape(fancy_data))
+                result.append('</del>')
+                offset += len(data)
 
     return ''.join(result)
 

@@ -1,0 +1,47 @@
+<form action="#" method="POST" class="story-formatting-window hidden js-story-formatting-form">
+<div class="story-formatting-window-title">
+    <button type="button" class="close">×</button>
+    Настройки форматирования
+</div>
+
+<div class="story-formatting-window-content">
+
+<label>Гарнитура:</label>
+<select name="font">
+    <option value="sans">Без засечек</option>
+    <option value="serif">С засечками</option>
+    <option value="monospace">Моноширинная</option>
+</select>
+
+<label>Выравнивание:</label>
+<select name="align">
+    <option value="left">По левому краю</option>
+    <option value="justify">По ширине</option>
+</select>
+
+<label>Размер шрифта:</label>
+<select name="size">
+    <option value="normal">Обычный</option>
+    <option value="small">Маленький</option>
+    <option value="big">Большой</option>
+</select>
+
+<label>Перенос строк:</label>
+<select name="hyphens">
+    <option value="no">По словам</option>
+    <option value="yes">По слогам</option>
+</select>
+
+<label>Разделение абзацев:</label>
+<select name="paragraph">
+    <option value="space">Пустая строка</option>
+    <option value="indent">Отступ у первой строки</option>
+    <option value="both">Всё сразу</option>
+</select>
+
+<div class="formatting-reset-btn-wrap">
+    <button type="button" class="btn btn-mini formatting-reset-btn js-formatting-reset-btn">Сбросить</button>
+</div>
+
+</div>
+</form>

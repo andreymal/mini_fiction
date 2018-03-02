@@ -264,7 +264,7 @@ var common = {
      * - HTMLElement: сам элемент
      *
      * Данная информация позволяет восстановить прокрутку относительно
-     * найденного эелмента с помощью метода restoreScrollByOrigin.
+     * найденного элемента с помощью метода restoreScrollByOrigin.
      */
     getOrigin: function(elem, topOffset) {
         topOffset = topOffset || 0;

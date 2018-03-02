@@ -5,8 +5,6 @@
 
 var story = {
     panel: null,
-    justifyBtn: null,
-    indentBtn: null,
     contributorsForm: null,
     _contributorsSendEventBinded: null,
     _contributorsChangeEventBinded: null,
@@ -23,6 +21,19 @@ var story = {
         textInput: null,
         textInputSelectEvent: null,
         selection: null,
+    },
+
+    _formatting: {
+        form: null,
+        visible: false,
+        bodyClickEvent: null,
+        current: {
+            font: null,
+            align: null,
+            size: null,
+            hyphens: null,
+            paragraph: null
+        },
     },
 
     init: function() {
@@ -62,12 +73,18 @@ var story = {
 
         // Обработка нажатия кнопок голосования за рассказ
         core.utils.addLiveClickListener('js-vote-button', this._voteButtonClickEvent.bind(this));
+
+        this.initStoryFormatting();
     },
 
     load: function() {
         this.panelStuff();
         this.chapterPreviewStuff();
         this.chapterLinterStuff();
+
+        // Применяем форматирование глав
+        // (из localStorage, чтобы синхронизироваться с изменениями в соседних вкладках)
+        this.applyFormattingFromLocalStorage();
 
         // Обработчики для кнопок работы с рассказом
 
@@ -539,45 +556,6 @@ var story = {
         var scrollDiv = document.getElementById('toTop');
         scrollDiv.addEventListener('click', this.panel.eventToTop);
 
-        // Переключение размера и типа шрифта
-        var font_selector = $('.select-font');
-        var size_selector = $('.select-size');
-        var chapter_text = $('.chapter-text');
-        font_selector.change(function() {
-            if (font_selector.val() == '1')
-                chapter_text.removeClass('mono-font serif-font');
-            else if (font_selector.val() == '2')
-                chapter_text.removeClass('mono-font').addClass('serif-font');
-            else if (font_selector.val() == '3')
-                chapter_text.removeClass('serif-font').addClass('mono-font');
-        });
-        size_selector.change(function() {
-            if (size_selector.val() == '1')
-                chapter_text.removeClass('small-font big-font');
-            else if (size_selector.val() == '2')
-                chapter_text.removeClass('big-font').addClass('small-font');
-            else if (size_selector.val() == '3')
-                chapter_text.removeClass('small-font').addClass('big-font');
-        });
-
-        // Переключение выравнивания и переноса
-        this.justifyBtn = panelElem.getElementsByClassName('js-story-style-align-btn')[0];
-        if (this.justifyBtn) {
-            this.justifyBtn.addEventListener('click', function() {
-                this.toggleChapterJustify();
-            }.bind(this));
-        }
-        this.setChapterJustifyFromLocalStorage();
-
-        // Переключение режима разделения абзацев
-        this.indentBtn = panelElem.getElementsByClassName('js-story-style-indent-btn')[0];
-        if (this.indentBtn) {
-            this.indentBtn.addEventListener('click', function() {
-                this.toggleChapterIndent();
-            }.bind(this));
-        }
-        this.setChapterIndentFromLocalStorage();
-
         panelElem.classList.remove('no-js');
 
         // Из-за того, что панель занимает место вверху страницы, прокрутка
@@ -591,9 +569,6 @@ var story = {
         if (!this.panel) {
             return;
         }
-
-        this.indentBtn = null;
-        this.justifyBtn = null;
 
         var scrollDiv = document.getElementById('toTop');
         scrollDiv.removeEventListener('click', this.panel.eventToTop);
@@ -683,145 +658,6 @@ var story = {
             }).catch(core.handleError);
     },
 
-    /** Включает или выключает выравнивание текста главы по ширине согласно информации из localStorage */
-    setChapterJustifyFromLocalStorage: function(dom) {
-        this.toggleChapterJustify(dom, window.localStorage && window.localStorage.chapterJustify == '1');
-    },
-
-    /** Меняет режим красной строки текста главы согласно информации из localStorage */
-    setChapterIndentFromLocalStorage: function(dom) {
-        this.toggleChapterIndent(dom, window.localStorage && window.localStorage.chapterIndentLeft == '1');
-    },
-
-    /**
-     * Переключает режим выравнивания текста главы.
-     * @param {object} dom - элемент или список элементов глав. По умолчанию
-     *   все элементы с классом chapter-text
-     * @param {object} justify - true: по ширине, false: по левому краю,
-       null/undefined: переключить на другой
-     */
-    toggleChapterJustify: function(dom, justify) {
-        var texts = dom;
-        if (dom instanceof HTMLElement) {
-            texts = [dom];
-        } else if (!dom) {
-            texts = document.getElementsByClassName('chapter-text');
-        }
-
-        if (texts.length < 1) {
-            return;
-        }
-
-        if (justify === null || justify === undefined) {
-            justify = !texts[0].classList.contains('mode-justify');
-        }
-
-        var scrollingOrigin = common.getOrigin(texts[0], 50);
-
-        var i, text;
-        if (justify) {
-            for (i = 0; i < texts.length; i++) {
-                text = texts[i];
-                if (!text.classList.contains('with-hypher')) {
-                    // TODO: internationalization
-                    Hypher.languages.ru.hyphenateDOM(text);
-                    text.classList.add('with-hypher');
-                }
-                text.classList.add('mode-justify');
-            }
-
-            if (this.justifyBtn) {
-                this.justifyBtn.classList.remove('story-style-align-left');
-                this.justifyBtn.classList.add('story-style-align-justify');
-            }
-
-            if (window.localStorage) {
-                window.localStorage.chapterJustify = '1';
-            }
-
-        } else {
-            for (i = 0; i < texts.length; i++) {
-                text = texts[i];
-                text.classList.remove('mode-justify');
-            }
-
-            if (this.justifyBtn) {
-                this.justifyBtn.classList.remove('story-style-align-justify');
-                this.justifyBtn.classList.add('story-style-align-left');
-            }
-
-            if (window.localStorage) {
-                window.localStorage.chapterJustify = '0';
-            }
-        }
-
-        if (scrollingOrigin !== null) {
-            common.restoreScrollByOrigin(scrollingOrigin[0], scrollingOrigin[1], scrollingOrigin[2]);
-        }
-    },
-
-    /**
-     * Переключает режим разделения абзацев в тексте главы.
-     * @param {object} dom - элемент или список элементов глав. По умолчанию
-     *   все элементы с классом chapter-text
-     * @param {object} indentLeft - true: абзацный отступ, false: интервал
-       между абзацами, null/undefined: переключить на другой
-     */
-    toggleChapterIndent: function(dom, indentLeft) {
-        var texts = dom;
-        if (dom instanceof HTMLElement) {
-            texts = [dom];
-        } else if (!dom) {
-            texts = document.getElementsByClassName('chapter-text');
-        }
-
-        if (texts.length < 1) {
-            return;
-        }
-
-        if (indentLeft === null || indentLeft === undefined) {
-            indentLeft = !texts[0].classList.contains('mode-indent-left');
-        }
-
-        var scrollingOrigin = common.getOrigin(texts[0], 50);
-
-        var i, text;
-        if (indentLeft) {
-            for (i = 0; i < texts.length; i++) {
-                text = texts[i];
-                text.classList.add('mode-indent-left');
-            }
-
-            if (this.indentBtn) {
-                this.indentBtn.classList.remove('story-style-indent-bottom');
-                this.indentBtn.classList.add('story-style-indent-left');
-            }
-
-            if (window.localStorage) {
-                window.localStorage.chapterIndentLeft = '1';
-            }
-
-        } else {
-            for (i = 0; i < texts.length; i++) {
-                text = texts[i];
-                text.classList.remove('mode-indent-left');
-            }
-
-            if (this.indentBtn) {
-                this.indentBtn.classList.remove('story-style-indent-left');
-                this.indentBtn.classList.add('story-style-indent-bottom');
-            }
-
-            if (window.localStorage) {
-                window.localStorage.chapterIndentLeft = '0';
-            }
-        }
-
-        if (scrollingOrigin !== null) {
-            common.restoreScrollByOrigin(scrollingOrigin[0], scrollingOrigin[1], scrollingOrigin[2]);
-        }
-    },
-
     _hashChangeEvent: function() {
         if (!this.panel || !this.panel.isFixed) {
             return;
@@ -839,8 +675,7 @@ var story = {
         // редактирования главы нету)
         var chapterText = this._preview.area ? this._preview.area.getElementsByClassName('chapter-text')[0] : null;
         if (chapterText) {
-            this.setChapterJustifyFromLocalStorage(chapterText);
-            this.setChapterIndentFromLocalStorage(chapterText);
+            this.applyFormattingForElement(chapterText);
         }
 
         if (!window.FormData) {
@@ -990,8 +825,7 @@ var story = {
                     // редактирования главы нету)
                     var chapterText = this._preview.area.getElementsByClassName('chapter-text')[0];
                     if (chapterText) {
-                        this.setChapterJustifyFromLocalStorage(chapterText);
-                        this.setChapterIndentFromLocalStorage(chapterText);
+                        this.applyFormattingForElement(chapterText);
                     }
                 }
             }.bind(this)).then(null, function(exc) {
@@ -1002,6 +836,297 @@ var story = {
             });
 
         loadingImg.style.display = '';
+    },
+
+    // formatting stuff
+
+    initStoryFormatting: function() {
+        this._formatting.form = document.getElementsByClassName('js-story-formatting-form')[0];
+        if (!this._formatting.form) {
+            console.warn('Formatting form not found');
+            return;
+        }
+
+        this.applyFormattingFromLocalStorage();
+        this._formatting.form.addEventListener('change', this._formattingFormChange.bind(this));
+
+        core.utils.addLiveClickListener('js-formatting-btn', this.toggleFormattingFormVisibility.bind(this));
+        core.utils.addLiveClickListener('js-formatting-reset-btn', this.resetFormatting.bind(this));
+        this._formatting.form.getElementsByClassName('close')[0].addEventListener('click', this.hideFormattingForm.bind(this));
+    },
+
+    /**
+     * Переключает видимость окна форматирования текста глав.
+     */
+    toggleFormattingFormVisibility: function() {
+        if (!this._formatting.form) {
+            return;
+        }
+        if (this._formatting.visible) {
+            this.hideFormattingForm();
+        } else {
+            this.showFormattingForm();
+        }
+    },
+
+    /**
+     * Отображает окно форматирования текста глав. Попутно активирует
+     * все кнопки, включающие отображение, и вешает обработку клика на body,
+     * чтобы при клике за пределами окна закрыть его.
+     */
+    showFormattingForm: function() {
+        if (!this._formatting.form || this._formatting.visible) {
+            return;
+        }
+        this._formatting.form.classList.add('hiding');
+        this._formatting.form.classList.remove('hidden');
+        this._formatting.form.offsetWidth; // force reflow
+        this._formatting.form.classList.remove('hiding');
+        this._formatting.visible = true;
+
+        var btns = document.getElementsByClassName('js-formatting-btn');
+        for (var i = 0; i < btns.length; i++) {
+            btns[i].classList.add('active');
+        }
+
+        if (!this._formatting.bodyClickEvent) {
+            this._formatting.bodyClickEvent = function(event) {
+                if (event.target.classList.contains('js-formatting-btn')) {
+                    return;
+                }
+                if (event.target.parentNode && event.target.parentNode.classList.contains('js-formatting-btn')) {
+                    return;
+                }
+                if (!this._formatting.form.contains(event.target)) {
+                    this.hideFormattingForm();
+                }
+            }.bind(this);
+            document.body.addEventListener('mousedown', this._formatting.bodyClickEvent);
+        }
+    },
+
+    /**
+     * Скрывает окно форматирования текста глав. Попутно деактивирует
+     * все кнопки, включающие отображение, и убирает обработчик body,
+     * который был нужен для закрытия окна по клику.
+     */
+    hideFormattingForm: function() {
+        if (!this._formatting.form || !this._formatting.visible) {
+            return;
+        }
+        this._formatting.form.classList.add('hiding');
+        this._formatting.visible = false;
+
+        var btns = document.getElementsByClassName('js-formatting-btn');
+        for (var i = 0; i < btns.length; i++) {
+            btns[i].classList.remove('active');
+        }
+
+        setTimeout(function() {
+            if (this._formatting.visible) {
+                return;
+            }
+            this._formatting.form.classList.add('hidden');
+            this._formatting.form.classList.remove('hiding');
+        }.bind(this), 150);
+
+        if (this._formatting.bodyClickEvent) {
+            document.body.removeEventListener('mousedown', this._formatting.bodyClickEvent);
+            this._formatting.bodyClickEvent = null;
+        }
+    },
+
+    /**
+     * Применяет форматирование к указанному массиву элементов. Если массив
+     * не указан, применяет ко всем элементам с классом js-story-formatting.
+     * Вызывает applyFormattingForElement для каждого элемента.
+     */
+    applyFormatting: function(elements) {
+        if (elements === undefined || elements === null) {
+            elements = Array.prototype.slice.call(document.getElementsByClassName('js-story-formatting'));
+        }
+
+        for (var i = 0; i < elements.length; i++) {
+            this.applyFormattingForElement(elements[i]);
+        }
+    },
+
+    /**
+     * Применяет форматирование текста к указанном элементу согласно
+     * настройкам. Попутно проводит валидацию настроек: некорректные значения
+     * сбрасывает на значения по умолчанию (точнее, на null). После применения
+     * пытается вернуть прокрутку страницы к тому месту текста, где он был
+     * перед форматированием.
+     */
+    applyFormattingForElement: function(element) {
+        var scrollingOrigin = common.getOrigin(element, 50);
+
+        var current = this._formatting.current;
+
+        // font
+        if (current.font == 'serif') {
+            element.classList.remove('mono-font');
+            element.classList.add('serif-font');
+        } else if (current.font == 'monospace') {
+            element.classList.add('mono-font');
+            element.classList.remove('serif-font');
+        } else {
+            if (current.font != 'sans') {
+                current.font = null;
+            }
+            element.classList.remove('mono-font');
+            element.classList.remove('serif-font');
+        }
+
+        // align
+        if (current.align == 'justify') {
+            element.classList.add('mode-justify');
+        } else {
+            if (current.align != 'left') {
+                current.align = null;
+            }
+            element.classList.remove('mode-justify');
+        }
+
+        // size
+        if (current.size == 'small') {
+            element.classList.remove('big-font');
+            element.classList.add('small-font');
+        } else if (current.size == 'big') {
+            element.classList.add('big-font');
+            element.classList.remove('small-font');
+        } else {
+            if (current.size != 'normal') {
+                current.size = null;
+            }
+            element.classList.remove('big-font');
+            element.classList.remove('small-font');
+        }
+
+        // hyphens
+        if (current.hyphens == 'yes') {
+            if (!element.classList.contains('with-hypher') && window.Hypher) {
+                // TODO: internationalization
+                Hypher.languages.ru.hyphenateDOM(element);
+                element.classList.add('with-hypher');
+            }
+            element.classList.add('mode-hyphens');
+        } else {
+            if (current.hyphens != 'no') {
+                current.hyphens = null;
+            }
+            element.classList.remove('mode-hyphens');
+        }
+
+        // paragraph
+        if (current.paragraph == 'indent') {
+            element.classList.remove('mode-indent-both');
+            element.classList.add('mode-indent-left');
+        } else if (current.paragraph == 'both') {
+            element.classList.add('mode-indent-both');
+            element.classList.remove('mode-indent-left');
+        } else {
+            if (current.paragraph != 'space') {
+                current.paragraph = null;
+            }
+            element.classList.remove('mode-indent-both');
+            element.classList.remove('mode-indent-left');
+        }
+
+        if (scrollingOrigin !== null) {
+            common.restoreScrollByOrigin(scrollingOrigin[0], scrollingOrigin[1], scrollingOrigin[2]);
+        }
+    },
+
+    /**
+     * Загружает параметры форматирования из localStorage, обновляет поля
+     * в окне форматирования и применяет форматирование ко всем
+     * js-story-formatting.
+     */
+    applyFormattingFromLocalStorage: function() {
+        if (!this._formatting.form) {
+            return;
+        }
+
+        try {
+            var newStyle = JSON.parse(window.localStorage.formatting || '{}');
+        } catch (e) {
+            console.warn('Cannot load formatting from local storage: ' + e);
+            return;
+        }
+
+        this.loadFormattingFromObject(newStyle);
+    },
+
+    /**
+     * Загружает и применяет форматирование из указанного словаря.
+     * в localStorage не сохраняет, но форму в окне обновляет.
+     */
+    loadFormattingFromObject: function(newStyle) {
+        if (!this._formatting.form) {
+            return;
+        }
+
+        var form = this._formatting.form;
+        var current = this._formatting.current;
+
+        // null означает значение по умолчанию, которое в будущем может меняться,
+        // поэтому именно null, а не 'sans'
+        current.font = newStyle.font || null;
+        form.font.value = current.font || 'sans';
+
+        current.align = newStyle.align || null;
+        form.align.value = current.align || 'left';
+
+        current.size = newStyle.size || null;
+        form.size.value = current.size || 'normal';
+
+        current.hyphens = newStyle.hyphens || null;
+        form.hyphens.value = current.hyphens || 'no';
+
+        current.paragraph = newStyle.paragraph || null;
+        form.paragraph.value = current.paragraph || 'space';
+
+        this.applyFormatting();
+    },
+
+    /**
+     * Обновляет указанный параметр форматированияи, применяет форматирование
+     * ко всем js-story-formatting и сохраняет это всё дело в localStorage.
+     */
+    setFormattingProperty: function(name, value) {
+        if (this._formatting.current.hasOwnProperty(name) && this._formatting.current[name] != value) {
+            this._formatting.current[name] = value;
+            this.applyFormatting();
+            if (window.localStorage) {
+                window.localStorage.formatting = JSON.stringify(this._formatting.current);
+            }
+        }
+    },
+
+    /**
+     * Сбрасывает форматирование на значения по умолчанию, применяет
+     * и сохраняет это.
+     */
+    resetFormatting: function() {
+        if (!this._formatting.form) {
+            return;
+        }
+
+        this.loadFormattingFromObject({
+            font: null,
+            align: null,
+            size: null,
+            hyphens: null,
+            paragraph: null
+        });
+        if (window.localStorage) {
+            window.localStorage.formatting = JSON.stringify(this._formatting.current);
+        }
+    },
+
+    _formattingFormChange: function(event) {
+        this.setFormattingProperty(event.target.name, event.target.value);
     }
 };
 

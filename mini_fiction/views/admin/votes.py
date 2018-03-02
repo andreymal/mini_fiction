@@ -54,7 +54,7 @@ def index(page):
 
     objects = objects.prefetch(Vote.story, Vote.author)
 
-    page_obj = Paginator(page, objects.count(), per_page=100)
+    page_obj = Paginator(page, objects.count(), per_page=100, endpoint=request.endpoint, view_args=args)
 
     return render_template(
         'admin/votes/index.html',

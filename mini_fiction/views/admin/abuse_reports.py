@@ -60,7 +60,7 @@ def index(page):
 
     objects = objects.prefetch(models.AbuseReport.user)
 
-    page_obj = Paginator(page, objects.count(), per_page=100)
+    page_obj = Paginator(page, objects.count(), per_page=100, endpoint=request.endpoint, view_args=args)
     abuse_reports = page_obj.slice_or_404(objects)
 
     # Предзагружаем таргеты (prefetch для них не вызвать, к сожалению)

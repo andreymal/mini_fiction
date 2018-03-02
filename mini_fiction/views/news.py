@@ -50,6 +50,7 @@ def show(name, comments_page):
     maxdepth = None if request.args.get('fulltree') == '1' else calc_maxdepth(current_user)
 
     comments_count, paged, comments_tree_list = newsitem.bl.paginate_comments(comments_page, per_page, maxdepth)
+    paged.page_arg_name = 'comments_page'
     if not comments_tree_list and paged.number != 1:
         abort(404)
 

@@ -7,21 +7,20 @@ import json
 import math
 import time
 
-from flask import current_app, g, escape, render_template, abort
+from flask import current_app, g, escape, render_template, abort, url_for, request
 from flask_babel import pgettext, ngettext
 
 from mini_fiction.utils import diff as utils_diff
 
 
 class Paginator(object):
-    def __init__(self, number=1, total=0, per_page=50, begin_pages=3, end_pages=3, current_pages=5):
+    def __init__(self, number=1, total=0, per_page=50, endpoint=None, view_args=None, page_arg_name='page'):
         self.number = number
         self.total = total
         self.per_page = per_page
-
-        self.begin_pages = max(1, begin_pages)
-        self.end_pages = max(1, end_pages)
-        self.current_pages = max(1, current_pages)
+        self.endpoint = endpoint
+        self.view_args = view_args
+        self.page_arg_name = page_arg_name
 
         self.num_pages = max(1, math.ceil(total / self.per_page))
         if self.number == -1:
@@ -32,6 +31,15 @@ class Paginator(object):
         if self.offset < 0:
             return []
         return objlist[self.offset:self.offset + self.per_page]
+
+    def url_for_page(self, number=None):
+        if number is None:
+            number = self.number
+
+        endpoint = self.endpoint or request.endpoint
+        view_args = dict(self.view_args) if self.view_args is not None else dict(request.view_args or {})
+        view_args[self.page_arg_name] = number
+        return url_for(endpoint, **view_args)
 
     def slice_or_404(self, objlist):
         result = self.slice(objlist)
@@ -54,26 +62,48 @@ class Paginator(object):
     def next_page_number(self):
         return self.number + 1 if self.number < self.num_pages else None
 
-    def iter_pages(self):
-        if self.num_pages <= (self.begin_pages + self.end_pages):
-            for i in range(1, self.num_pages + 1):
-                yield i
+    def iter_pages(self, begin_pages=2, end_pages=2, center_pages=1, current_pages=5):
+        begin_pages = max(1, int(begin_pages))
+        end_pages = max(1, int(end_pages))
+        center_pages = max(1, int(center_pages))
+        current_pages = max(1, int(current_pages))
+
+        if self.num_pages <= (begin_pages + end_pages):
+            for page in range(1, self.num_pages + 1):
+                yield page
             return
 
         # first pages
-        page = 1
-        for page in range(1, 1 + self.begin_pages):
+        for page in range(1, 1 + begin_pages):
             yield page
+        last_page = begin_pages
+
+        # first center
+        center1 = (self.number - begin_pages) // 2 + begin_pages
+        for page in range(center1 - center_pages // 2, center1 + center_pages // 2 + 1):
+            if page > last_page and page <= self.num_pages:
+                last_page = page
+                yield page
 
         # current page
-        cur_begin = self.number - self.current_pages // 2
-        end_begin = self.num_pages - self.end_pages + 1
-        for page in range(max(page + 1, cur_begin), min(end_begin, cur_begin + self.current_pages)):
-            yield page
+        for page in range(self.number - current_pages // 2, self.number + current_pages // 2 + 1):
+            if page > last_page and page <= self.num_pages:
+                last_page = page
+                yield page
+
+        # second center
+        end_begin = self.num_pages - end_pages + 1
+        center2 = (end_begin - last_page) // 2 + last_page
+        for page in range(center2 - center_pages // 2, center2 + center_pages // 2 + 1):
+            if page > last_page and page <= self.num_pages:
+                last_page = page
+                yield page
 
         # last pages
         for page in range(end_begin, self.num_pages + 1):
-            yield page
+            if page > last_page and page <= self.num_pages:
+                last_page = page
+                yield page
 
 
 def sitename():

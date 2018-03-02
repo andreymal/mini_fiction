@@ -191,3 +191,12 @@
         {%- endif %}
     </ul>
 {%- endmacro %}
+
+
+{% macro paginator(page_obj) -%}
+    <div class="pagination">
+        {% for page_id in page_obj.iter_pages() %}
+            <a href="{{ page_obj.url_for_page(page_id) }}" class="btn{% if page_id == page_obj.number %} btn-primary{% endif %}">{{ page_id }}</a>
+        {% endfor %}
+    </div>
+{%- endmacro %}

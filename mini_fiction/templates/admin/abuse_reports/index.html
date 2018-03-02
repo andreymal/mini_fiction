@@ -1,5 +1,5 @@
 {% extends base %}
-{% from 'macro.html' import breadcrumbs with context %}
+{% from 'macro.html' import breadcrumbs, paginator with context %}
 {% block content %}
 
 <div class="row"><div class="span12">
@@ -112,13 +112,7 @@
         <br style="clear: both;" />
     </div>
 
-    <!-- Пагинация: начало вывода -->
-    <div class="pagination center">
-        {% for page_id in page_obj.iter_pages() %}
-            <a href="{{ modified_url('admin_abuse_reports.index', args, page=page_id) }}" class="btn{% if page_id == page_obj.number %} btn-primary{% endif %}">{{ page_id }}</a>
-        {% endfor %}
-    </div>
-    <!-- Пагинация: конец вывода -->
+    {{ paginator(page_obj) }}
 
     {{- breadcrumbs([[url_for('admin_index.index'), _('Administration')]]) }}
 </div></div>

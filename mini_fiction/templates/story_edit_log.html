@@ -1,5 +1,5 @@
 {% extends base %}
-{% from 'macro.html' import breadcrumbs with context %}
+{% from 'macro.html' import breadcrumbs, paginator with context %}
 
 {% block content %}
 
@@ -13,19 +13,7 @@
     </li>
 {% endfor %}</ul>
 
-{% if page_obj %}
-    <div id="stories-pagination" class="pagination center">
-        {% if page_obj.has_previous() %}
-            <a class="btn" href="{{ url_for(endpoint, page=page_obj.number - 1, **view_args) }}">← Назад</a>
-        {% endif %}
-        <span class="btn btn-primary">
-            {{ page_obj.number }} / {{ page_obj.num_pages }}
-        </span>
-        {% if page_obj.has_next() %}
-            <a class="btn" href="{{ url_for(endpoint, page=page_obj.number + 1, **view_args) }}">Вперед →</a>
-        {% endif %}
-      </div>
-{% endif %}
+{% if page_obj %}{{ paginator(page_obj) }}{% endif %}
 
 {{- breadcrumbs() }}
 </div>

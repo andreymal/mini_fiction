@@ -1,5 +1,5 @@
 {% extends base %}
-{% from 'macro.html' import breadcrumbs with context %}
+{% from 'macro.html' import breadcrumbs, paginator with context %}
 {% block content %}
 <div class="row">
     <div class="span8">
@@ -26,21 +26,7 @@
         <div id="comments-list">
             {% include "includes/comments_list.html" %}
         </div>
-        {% if comments %}
-            <!-- Пагинация: начало вывода -->
-                  <div id="comments-pagination" class="pagination center">
-                      {% if page_obj.has_previous() %}
-                          <a class="btn" href="{{ modified_url(page=page_obj.number - 1) }}">← Назад</a>
-                      {% endif %}
-                      <span class="btn btn-primary">
-                          {{ page_obj.number }} / {{ page_obj.num_pages }}
-                      </span>
-                      {% if page_obj.has_next() %}
-                          <a class="btn" href="{{ modified_url(page=page_obj.number + 1) }}">Вперед →</a>
-                      {% endif %}
-                    </div>
-               <!-- Пагинация: конец вывода -->
-        {% endif %}
+        {% if comments %}{{ paginator(page_obj) }}{% endif %}
         {{- breadcrumbs() }}
     </div>
 </div>

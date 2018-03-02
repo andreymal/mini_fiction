@@ -1344,6 +1344,20 @@ class ChapterBL(BaseBL):
         later(current_app.tasks['sphinx_update_chapter'].delay, chapter.id)
         current_app.cache.delete('index_updated_chapters')
 
+    def is_viewed_by(self, user):
+        from mini_fiction.models import StoryView
+
+        if not user or not user.is_authenticated:
+            return None
+
+        chapter = self.model
+        story = chapter.story
+
+        # Так надо, чтобы поня закэшировала SQL-запрос и списки рассказов не тормозили
+        viewed_chapters = StoryView.select(lambda x: x.author.id == user.id and x.story == story)
+        viewed_chapters = {x.chapter.id: x.date for x in viewed_chapters if x.chapter}
+        return viewed_chapters.get(chapter.id)
+
     def viewed(self, user):
         if not user.is_authenticated:
             return

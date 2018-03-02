@@ -2,10 +2,11 @@
 # -*- coding: utf-8 -*-
 
 from pony.orm import select, db_session
-from flask import Blueprint, current_app, abort
+from flask import Blueprint, current_app, abort, render_template
 from flask_login import current_user, login_required
 
-from mini_fiction.models import Author, Story, StoryContributor, Favorites, Bookmark
+from mini_fiction.models import Author, Story, StoryContributor, Favorites, Bookmark, StoryView
+from mini_fiction.utils.misc import Paginator
 from mini_fiction.utils.views import paginate_view, cached_lists
 
 
@@ -73,6 +74,31 @@ def bookmarks(page):
         count=objects.count(),
         page_title='Прочитать позже',
         objlistname='stories',
+    )
+
+
+@bp.route('/viewed/page/last/', defaults={'page': -1})
+@bp.route('/viewed/', defaults={'page': 1})
+@bp.route('/viewed/page/<int:page>/')
+@db_session
+@login_required
+def viewed(page):
+    views = select(
+        (x.story, min(x.id)) for x in StoryView if x.author.id == current_user.id and x.story
+    )
+    views = views.prefetch(StoryView.story, Story.characters, Story.categories, Story.contributors, StoryContributor.user)
+    views = views.order_by(-2)
+
+    page_obj = Paginator(page, views.count(), per_page=10)
+
+    stories = [x[0] for x in page_obj.slice_or_404(views)]
+
+    return render_template(
+        'viewed.html',
+        stories=stories,
+        page_obj=page_obj,
+        page_title='Просмотренные рассказы',
+        stories_detail_view=True,
     )
 
 

@@ -555,6 +555,20 @@ h4 {
     color: #999;
 }
 
+.chapter-viewed-icon {
+    display: inline-block;
+    vertical-align: baseline;
+}
+
+.chapter-viewed-icon:before {
+    display: inline-block;
+    content: '';
+    width: 12px;
+    height: 12px;
+    background-image: url('../i/chapter-viewed.png');
+    background-size: 12px 12px;
+}
+
 a.authorlink,a.edit-link {
     color: #999;
 }

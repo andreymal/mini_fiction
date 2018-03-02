@@ -121,8 +121,12 @@
                 {% for chapter in chapters %}
                     <li>
                         <h4>
-                            <a href="{{ url_for('chapter.view', story_id=story.id, chapter_order=chapter.order) }}">{{ chapter.autotitle }}</a>
-                            {% if chapter.draft %}<sup class="draft">{{ _('Draft') }}</sup>{% endif %}
+                            <a href="{{ url_for('chapter.view', story_id=story.id, chapter_order=chapter.order) }}">
+                                {{- chapter.autotitle -}}
+                            </a>
+                            {%- set viewed_at = chapter.bl.is_viewed_by(current_user) -%}
+                            {%- if viewed_at %} <i class="chapter-viewed-icon" title="Вы просматривали эту главу {{ viewed_at|datetimeformat('d MMMM Y, HH:MM') }}"></i>{% endif %}
+                            {%- if chapter.draft %} <sup class="draft">{{ _('Draft') }}</sup>{% endif %}
                             {% if story.bl.editable_by(current_user) %}<sup><a class="edit-link" href="{{ url_for('chapter.edit', pk=chapter.id) }}">Редактировать</a></sup>{% endif %}
                         </h4>
                       {{ ngettext("%(num)d word", "%(num)d words", chapter.words) }}, {{ ngettext("%(num)d view", "%(num)d views", chapter.views) }}<li>

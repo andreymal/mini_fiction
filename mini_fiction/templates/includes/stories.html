@@ -32,13 +32,18 @@
                 {% endif %}
         </p>
         <p>{{ story.summary_as_html|striptags }}</p>
-        {% if current_user.detail_view and story_chapters_count > 1 %}
+        {% if (stories_detail_view or current_user.detail_view) and story_chapters_count > 1 %}
             <button class="btn btn-collapse btn-small" data-toggle="collapse" data-target="#story-{{ story.id }}">{{ ngettext("Show %(num)d chapter", "Show %(num)d chapters", story_chapters_count) }}</button>
             <div id="story-{{ story.id }}" class="collapse">
                 <ul class="chapters-list">
                     {% for chapter in story.bl.select_accessible_chapters(current_user)|sort(attribute='order') %}
                         <li>
-                            <a class="chapter-title" href="{{ url_for('chapter.view', story_id=story.id, chapter_order=chapter.order) }}">{{ chapter.autotitle }}</a>{% if chapter.draft %} <sup class="draft">{{ _('Draft') }}</sup>{% endif %}
+                            <a class="chapter-title" href="{{ url_for('chapter.view', story_id=story.id, chapter_order=chapter.order) }}">
+                                {{- chapter.autotitle -}}
+                            </a>
+                            {%- set viewed_at = chapter.bl.is_viewed_by(current_user) -%}
+                            {%- if viewed_at %} <i class="chapter-viewed-icon" title="Вы просматривали эту главу {{ viewed_at|datetimeformat('d MMMM Y, HH:MM') }}"></i>{% endif %}
+                            {%- if chapter.draft %} <sup class="draft">{{ _('Draft') }}</sup>{% endif %}
                             {% if story.bl.editable_by(current_user) %}
                                 <sup><a class="edit-link" href="{{ url_for('chapter.edit', pk=chapter.id) }}">Редактировать</a></sup>
                             {% endif %}

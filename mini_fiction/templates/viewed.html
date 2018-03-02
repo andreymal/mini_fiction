@@ -1,0 +1,27 @@
+{% extends "stories_list_common.html" %}
+
+{% from 'macro.html' import author_profile_links with context %}
+
+{% block after_list %}
+    {% if stories %}
+        <!-- Пагинация: начало вывода -->
+            <div id="bookmarks-pagination" class="pagination center">
+                {% if page_obj.has_previous() %}
+                    <a class="btn" href="{{ modified_url(page=page_obj.number - 1) }}">← Назад</a>
+                {% endif %}
+                <span class="btn btn-primary">
+                    {{ page_obj.number }} / {{ page_obj.num_pages }}
+                </span>
+                {% if page_obj.has_next() %}
+                    <a class="btn" href="{{ modified_url(page=page_obj.number + 1) }}">Вперед →</a>
+                {% endif %}
+              </div>
+           <!-- Пагинация: конец вывода -->
+    {% endif %}
+{% endblock %}
+
+{% block after_list_block %}
+    <div class="span4">
+        {{ author_profile_links(current_user, 'viewed') }}
+    </div>
+{% endblock %}

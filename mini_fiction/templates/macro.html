@@ -137,19 +137,19 @@
             </time>
 
             {% if not short %}
-            <a class="comment-link" href="{{ comment.bl.get_permalink() }}" rel="nofollow" title="Постоянная ссылка на комментарий">#{{ comment.local_id }}</a>
+                <a class="comment-link" href="{{ comment.bl.get_permalink() }}" rel="nofollow" title="Постоянная ссылка на комментарий">#{{ comment.local_id }}</a>
 
-            {%- if comment.parent %}
-            <a class="comment-parent-link" href="{{ comment.parent.bl.get_permalink() }}" title="Ответ на комментарий #{{ comment.parent.local_id }} от {{ comment.parent.author.username if comment.parent.author else (comment.parent.author_username or 'гостя') }}">↑</a>
-            {%- endif %}
+                {%- if comment.parent -%}
+                    <a class="comment-parent-link" href="{{ comment.parent.bl.get_permalink() }}" title="Ответ на комментарий #{{ comment.parent.local_id }} от {{ comment.parent.author.username if comment.parent.author else (comment.parent.author_username or 'гостя') }}">↑</a>
+                {%- endif %}
 
-            {%- if comment.bl.access_for_answer_by(current_user) %}
-            <a class="comment-answer-link" data-parent="{{ comment.local_id }}" href="{{ comment.bl.get_answer_link() }}">Ответить</a>
-            {{ caller() if caller else '' }}
-            {%- endif %}
+                {%- if comment.bl.access_for_answer_by(current_user) %}
+                    <a class="comment-answer-link" data-parent="{{ comment.local_id }}" href="{{ comment.bl.get_answer_link() }}">Ответить</a>
+                {%- endif %}
+                {{ caller() if caller else '' }}
             {% else %}
-            {{ caller() if caller else '' }}
-            <a class="comment-link" href="{{ comment.bl.get_permalink() }}" rel="nofollow" title="Постоянная ссылка на комментарий">#</a>
+                {{ caller() if caller else '' }}
+                <a class="comment-link" href="{{ comment.bl.get_permalink() }}" rel="nofollow" title="Постоянная ссылка на комментарий">#</a>
             {% endif %}
         </div>
     {%- endif -%}

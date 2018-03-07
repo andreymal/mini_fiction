@@ -10,7 +10,7 @@
                 </span>
             {% elif ctype == 'local' %}
                 <span class="comment-story-link">
-                в редакторской рассказа
+                в <a href="{{ url_for('story_local_comment.view', story_id=comment.local.story.id) }}" class="link-inline">редакторской</a> рассказа
                 <a href="{{ url_for('story.view', pk=comment.local.story.id) }}"><b>{{ comment.local.story.title }}</b></a>
                 </span>
             {% elif ctype == 'news' %}

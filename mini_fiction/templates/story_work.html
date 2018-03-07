@@ -49,6 +49,7 @@
                      </div>
                 </div>
                 <!-- Персонажи -->
+                {% if form.characters.choices %}
                 <div class="control-group{% if form.characters.errors %} error{% endif %}">
                     {{ form.characters.label(class_='control-label', for=False) }}
                     <div class="controls characters-select">
@@ -62,6 +63,7 @@
                           {{ form.characters }}
                       </div>
                 </div>
+                {% endif %}
                 <!-- Общее описание -->
                 <div class="control-group{% if form.summary.errors %} error{% endif %}">
                     {{ form.summary.label(class_='control-label') }}
@@ -153,6 +155,7 @@
                       </div>
                 </div>
                 <!-- События -->
+                {% if form.classifications.choices %}
                 <div class="control-group{% if form.classifications.errors %} error{% endif %}">
                     {{ form.classifications.label(class_='control-label', for=False) }}
                     <div class="controls events">
@@ -166,6 +169,7 @@
                           {{ form.classifications }}
                       </div>
                 </div>
+                {% endif %}
                 <!-- Действия -->
                   <div class="form-actions">
                 {% if story_edit %}

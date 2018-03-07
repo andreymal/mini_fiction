@@ -312,8 +312,8 @@ def edit_log(pk):
 @login_required
 def add():
     user = current_user._get_current_object()
-    rating = Rating.select().order_by(Rating.id.desc()).first().id
-    form = StoryForm(data={'status': 0, 'original': 1, 'rating': rating})
+    rating = Rating.select().order_by(Rating.id.desc()).first()
+    form = StoryForm(data={'status': 0, 'original': 1, 'rating': rating.id if rating else 1})
     if form.validate_on_submit():
         formdata = dict(form.data)
         if formdata['status'] == 0:

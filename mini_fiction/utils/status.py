@@ -92,6 +92,12 @@ class ProjectStatus(Status):
         'diff': 'google-diff-match-patch',
         'linter': 'Chapter linter',
         'captcha': 'Captcha',
+        'genres': 'Genres count',
+        'characters': 'Characters count',
+        'classifications': 'Classifications count',
+        'ratings': 'Ratings count',
+        'nsfw_ratings': 'NSFW ratings count',
+        'staticpages': 'Static pages count',
     }
 
     def cache(self):
@@ -292,6 +298,54 @@ class ProjectStatus(Status):
             return self._fail('captcha', self.app.config['CAPTCHA_CLASS'] + ' (fail: {})'.format(exc))
         return self._ok('captcha', self.app.config['CAPTCHA_CLASS'])
 
+    def genres(self):
+        cnt = models.Category.select().count()
+        if cnt < 1:
+            return self._fail('genres', '0 (please create at least one genre using administration page)')
+        return self._ok('genres', str(cnt))
+
+    def characters(self):
+        return self._ok('characters', str(models.Character.select().count()))
+
+    def classifications(self):
+        return self._ok('classifications', str(models.Classifier.select().count()))
+
+    def ratings(self):
+        cnt = models.Rating.select().count()
+        if cnt < 1:
+            return self._fail('ratings', '0 (forgot to seed the database?)')
+        return self._ok('ratings', str(cnt))
+
+    def nsfw_ratings(self):
+        ids = self.app.config.get('NSFW_RATING_IDS')
+        try:
+            ids = set([int(x) for x in ids])
+        except Exception:
+            return self._fail('nsfw_ratings', 'NSFW_RATING_IDS value is invalid')
+
+        if not ids:
+            return self._ok('nsfw_ratings', '0')
+
+        cnt = models.Rating.select(lambda x: x.id in ids).count()
+        if cnt != len(ids):
+            return self._fail('nsfw_ratings', '{} != {}'.format(len(ids), cnt))
+        return self._ok('nsfw_ratings', str(cnt))
+
+    def staticpages(self):
+        notfound = set()
+        for system_page in ('help', 'terms', 'robots.txt'):
+            if not models.StaticPage.get(name=system_page, lang='none'):
+                notfound.add(system_page)
+
+        cnt = models.StaticPage.select().count()
+
+        if notfound:
+            return self._fail('staticpages', '{} (not found: {}; forgot to seed the database?)'.format(
+                cnt, ', '.join(notfound)
+            ))
+
+        return self._ok('staticpages', str(cnt))
+
     def generate(self):
         yield self.cache()
         yield self.cache_working()
@@ -307,6 +361,12 @@ class ProjectStatus(Status):
         yield self.diff()
         yield self.linter()
         yield self.captcha()
+        yield self.genres()
+        yield self.characters()
+        yield self.classifications()
+        yield self.ratings()
+        yield self.nsfw_ratings()
+        yield self.staticpages()
 
 
 class UsersStatus(Status):

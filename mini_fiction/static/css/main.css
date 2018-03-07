@@ -814,17 +814,18 @@ label.gen input {
     font-weight: 300;
 }
 
-#story_chapters {
+.story-chapters-list {
     list-style-type: none;
     margin-left: 0;
+    margin-top: 6px;
 }
 
-#story_chapters li {
+.story-chapters-list li {
     padding: 0 0 6px;
     font-size: 12px;
 }
 
-#story_chapters h4 {
+.story-chapters-list h4 {
     margin-bottom: 0;
 }
 
@@ -988,9 +989,9 @@ hr {
     margin-left: -12px;
     margin-right: -12px;
     background-color: #fff;
-    padding: 10px 10px 10px 14px;
+    padding: 6px 10px 6px 14px;
     border-radius: 10px;
-    line-height: 16px;
+    line-height: 24px;
     font-size: 12px;
     box-sizing: border-box;
     z-index: 10;
@@ -1070,7 +1071,7 @@ select.select-size {
     position: fixed;
     z-index: 15;
     width: 300px;
-    top: 37px;
+    top: 36px;
     max-height: 90%;
     max-height: calc(100% - 37px);
     overflow-y: auto;
@@ -1195,7 +1196,19 @@ select.select-size {
     margin-right: 0;
 }
 
-.chapter-switch, .chapter-switch .left {
+.chapter-controls .scon.up {
+    margin-right: 20px;
+}
+
+.chapters-all-link {
+    display: inline-block;
+}
+
+.chapter-switch {
+    display: inline-block;
+}
+
+.chapter-switch .left {
     margin-right: 20px;
 }
 
@@ -2521,11 +2534,6 @@ ul.editlog .editlog-item:nth-child(2n+1) {
     }
     .story-chapter-page .story-panel {
         height: auto;
-        line-height: 16px;
-    }
-    .story-chapter-page .story-panel .chapter-switch {
-        display: block;
-        padding-bottom: 6px;
     }
     .story-chapter-page .story-panel .chapter-controls {
         float: none;

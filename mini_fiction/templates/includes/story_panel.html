@@ -9,15 +9,6 @@
         <a title="Подписаться на новые главы по RSS" href="{{ url_for('feeds.story', story_id=story.id) }}" class="scon feed" data-noajax="1"></a>
     {% endif %}
 
-    {% if prev_chapter or next_chapter %}
-    <span class="chapter-switch">
-        {% if prev_chapter %}← <a class="left" href="{{ url_for('chapter.view', story_id=story.id, chapter_order=prev_chapter.order) }}">{{ prev_chapter.autotitle }}</a>{% endif %}
-        {% if next_chapter %}<a href="{{ url_for('chapter.view', story_id=story.id, chapter_order=next_chapter.order) }}">{{ next_chapter.autotitle }}</a> →{% endif %}
-    </span>
-    {% endif %}
-    {% if not chapter and not allchapters %}
-        <a href="{{ url_for('chapter.view', story_id=story.id) }}">Все главы одной страницей</a>
-    {% endif %}
     <span class="chapter-controls">
         {% for d in story.list_downloads() %}
             <a title="Скачать в {{ d.format.name }}" href="{{ d.url }}" class="get {{ d.format.slug }}" data-noajax="1"></a>
@@ -30,6 +21,17 @@
         <a title="Вниз" href="#" class="scon down" id="toDown"></a>
     #}
         <a title="Вверх" href="#" class="scon up" id="toTop"></a>
+    </span>
+    {% endif %}
+
+    {% if not chapter and not allchapters %}
+        <a href="{{ url_for('chapter.view', story_id=story.id) }}" class="chapters-all-link">Все главы одной страницей</a>
+    {% endif %}
+
+    {% if prev_chapter or next_chapter %}
+    <span class="chapter-switch">
+        {% if prev_chapter %}← <a class="left" href="{{ url_for('chapter.view', story_id=story.id, chapter_order=prev_chapter.order) }}">{{ prev_chapter.autotitle }}</a>{% endif %}
+        {% if next_chapter %}<a href="{{ url_for('chapter.view', story_id=story.id, chapter_order=next_chapter.order) }}">{{ next_chapter.autotitle }}</a> →{% endif %}
     </span>
     {% endif %}
 </div>

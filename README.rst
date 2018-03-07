@@ -8,13 +8,14 @@ mini_fiction
 
 Library CMS on Python for fanfics. Currently in development.
 
-Short feature list: fanfics with genres, characters and events; comments with trees;
-search (by Sphinx); user profiles with contacts; moderation of fanfics and comments;
-favorites and bookmarks; notices from administrator; PJAX-like loading of page content;
-customizable design; primitive plugin system.
+Short feature list: fanfics with genres, characters and events; comments
+with trees; search (using `Sphinx <http://sphinxsearch.com/>`_); user profiles
+with contacts; premoderation of fanfics; favorites and bookmarks; notices
+from administrator; PJAX-like loading of page content; customizable design;
+primitive plugin system.
 
-CMS currently in Russian, and we would be grateful for the translation of all phrases
-in English.
+CMS currently in Russian, and we would be grateful for the translation
+of all phrases in English.
 
 
 Quick start
@@ -48,5 +49,7 @@ If you want to change domain (e.g. ``127.0.0.1:5000`` or ``example.com``
 instead of default ``localhost:5000``), change ``SERVER_NAME`` option.
 
 You can run ``mini_fiction status`` to check some configuration variables.
+
+Search, avatars and captcha are disabled by default.
 
 For more information see ``INSTALL.md`` (in Russian).

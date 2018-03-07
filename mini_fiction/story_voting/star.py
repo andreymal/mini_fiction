@@ -22,7 +22,7 @@ class StarVoting(BaseVoting):
     '''
 
     def get_default_vote_value(self):
-        return int(current_app.config['VOTES_MID'] * 100)
+        return int(current_app.config['VOTES_MID'] * 10000)
 
     def get_default_vote_extra(self):
         extra = {
@@ -50,7 +50,7 @@ class StarVoting(BaseVoting):
 
         v1 = count / (count + n) * m
         v2 = n / (count + n) * votes_mid
-        story.vote_value = int((v1 + v2) * 100)
+        story.vote_value = int((v1 + v2) * 10000)
 
         story.vote_total = count
 

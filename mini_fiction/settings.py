@@ -262,6 +262,25 @@ class Config(object):
             'link_template': 'skype:{value}',
             'title_template': '{value}',
         },
+        {
+            'name': 'telegram',
+            'label': {
+                'default': 'Telegram',
+            },
+            'schema': {'regex': r'^[a-zA-Z0-9\._-]+$'},
+            'link_template': 'https://t.me/{value}',
+            'title_template': '{value}',
+        },
+        {
+            'name': 'vk',
+            'label': {
+                'default': 'VK login',
+                'ru': 'Логин ВКонтакте',
+            },
+            'schema': {'regex': r'^[a-zA-Z0-9\._-]+$'},
+            'link_template': 'https://vk.com/{value}',
+            'title_template': '{value}',
+        },
     ]
 
     CELERY_CONFIG = {

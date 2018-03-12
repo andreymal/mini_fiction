@@ -18,7 +18,7 @@ bp = Blueprint('search', __name__)
 @db_session
 def main():
     if current_app.config['SPHINX_DISABLED']:
-        return render_template('search_disabled.html', page_title=gettext('Search of stories'))
+        return render_template('search_disabled.html', page_title=gettext('Search of stories'), robots_noindex=True)
 
     postform = SearchForm(request.args, data={'type': 0, 'sort': 0})
     return search_action(postform)
@@ -26,7 +26,7 @@ def main():
 
 def search_form():
     form = SearchForm()
-    data = {'form': form, 'page_title': gettext('Search of stories')}
+    data = {'form': form, 'page_title': gettext('Search of stories'), 'robots_noindex': True}
     return render_template('search.html', **data)
 
 
@@ -34,7 +34,7 @@ def search_action(postform):
     from mini_fiction.apis.amsphinxql import SphinxError
 
     if not postform.validate():
-        data = {'form': postform, 'page_title': gettext('Search of stories')}
+        data = {'form': postform, 'page_title': gettext('Search of stories'), 'robots_noindex': True}
         return render_template('search.html', **data)
 
     try:
@@ -47,7 +47,7 @@ def search_action(postform):
     search_type = postform.data['type']
     sort_type = postform.data['sort']
 
-    data = {'page_title': query.strip() or gettext('Search results'), 'search_type': search_type}
+    data = {'page_title': query.strip() or gettext('Search results'), 'search_type': search_type, 'robots_noindex': True}
 
     if search_type == 0:
         if current_user.is_authenticated:
@@ -119,7 +119,7 @@ def search_action(postform):
 @db_session
 def simple(search_type, search_id):
     if current_app.config['SPHINX_DISABLED']:
-        return render_template('search_disabled.html', page_title=gettext('Search of stories'))
+        return render_template('search_disabled.html', page_title=gettext('Search of stories'), robots_noindex=True)
 
     bound_data = {'type': '0', 'sort': '1'}
     if search_type == 'character':

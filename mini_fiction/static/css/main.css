@@ -2225,6 +2225,56 @@ ul.editlog .editlog-item:nth-child(2n+1) {
 
 /* admin pages */
 
+.admin-dashboard {
+    width: 100%;
+    text-align: justify;
+    text-align-last: justify;
+    font-size: 12px;
+    line-height: 16px;
+}
+
+.admin-dashboard > a {
+    display: inline-block;
+    vertical-align: top;
+    width: 49%;
+    width: calc(50% - 8px);
+    min-height: 98px;
+    box-sizing: border-box;
+    margin: 0 0 16px 0;
+    padding: 16px;
+
+    background-color: white;
+    border-radius: 4px;
+    box-shadow: 0 0 2px #d5d5d5;
+
+    text-align: center;
+    text-align-last: center;
+    text-decoration: none;
+    color: inherit;
+}
+
+.admin-dashboard > a.short {
+    min-height: 0;
+}
+
+.admin-dashboard > a:hover {
+    background-color: #f8f8f8;
+}
+
+.admin-dashboard-label {
+    font-weight: bold;
+    font-size: 14px;
+    line-height: 18px;
+}
+
+.admin-dashboard > a:hover .admin-dashboard-label {
+    text-decoration: underline;
+}
+
+.admin-dashboard-desc {
+    margin-top: 16px;
+}
+
 .admin-index {
     min-width: 460px;
 }
@@ -2554,6 +2604,17 @@ ul.editlog .editlog-item:nth-child(2n+1) {
     .input-xxxlarge {
         width: 95%;
         width: calc(100% - 12px - 12px);
+    }
+    .admin-dashboard > a {
+        display: block;
+        width: auto;
+        min-height: 0;
+        margin-right: 8px;
+        margin-right: calc(12px - 1%);
+    }
+    .admin-log-list {
+        margin-right: 8px;
+        margin-right: calc(12px - 1%);
     }
 }
 

@@ -4,8 +4,36 @@
 {% block content %}
 
 <div class="row">
-<div class="span8">
+<div class="span12">
 {{- breadcrumbs() }}
+<h1>{{ page_title }}</h1>
+</div>
+
+<div class="span8">
+
+{% if not story %}
+<div>
+    {% if not filter_staff %}<a href="{{ modified_url(view_args=view_args, staff='1') }}">{% endif -%}
+        Изменения от модераторов
+    {%- if not filter_staff %}</a>{% endif %}
+    &nbsp; &nbsp;
+    {% if filter_staff %}<a href="{{ modified_url(view_args=view_args, staff=None) }}">{% endif -%}
+        Все изменения
+    {%- if filter_staff %}</a>{% endif %}
+
+    {% if current_user.is_staff %}
+        <br/><br/>
+        {% if not filter_all %}<a href="{{ modified_url(view_args=view_args, all='1') }}">{% endif -%}
+            Все рассказы
+        {%- if not filter_all %}</a>{% endif %}
+        &nbsp; &nbsp;
+        {% if filter_all %}<a href="{{ modified_url(view_args=view_args, all=None) }}">{% endif -%}
+            Ваши рассказы
+        {%- if filter_all %}</a>{% endif %}
+    {% endif %}
+    <br/><br/>
+</div>
+{% endif %}
 
 <ul class="editlog">{% for item, extra in prepare_editlog(edit_log) %}
     <li class="editlog-item" id="edit_log_{{ item.id }}">
@@ -14,7 +42,9 @@
 {% endfor %}</ul>
 
 {% if page_obj %}{{ paginator(page_obj) }}{% endif %}
+</div>
 
+<div class="span12">
 {{- breadcrumbs() }}
 </div>
 </div>

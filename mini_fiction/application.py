@@ -19,7 +19,7 @@ from flask import Flask, current_app, request, g, jsonify
 from flask import json as flask_json
 import flask_babel
 from flask_login import LoginManager
-from flask_wtf.csrf import CSRFProtect
+from flask_wtf.csrf import CSRFProtect, CSRFError
 
 from mini_fiction import models  # pylint: disable=unused-import
 from mini_fiction import database, tasks, context_processors
@@ -317,7 +317,9 @@ def configure_errorpages(app):
     from pony.orm import db_session
 
     def _error_common(template, template_modal, code, e):
-        if getattr(g, 'is_ajax', False):
+        # g.is_ajax здесь не всегда присутствует, так что так
+        is_ajax = request.headers.get('X-AJAX') == '1' or request.args.get('isajax') == '1'
+        if is_ajax:
             html = render_template(template_modal, error=e, error_code=code)
             response = jsonify({'page_content': {'modal': html}})
             response.status_code = code
@@ -337,12 +339,16 @@ def configure_errorpages(app):
     def _page500(e):
         return _error_common('500.html', '500_modal.html', 500, e)
 
+    def _pagecsrf(e):
+        return _error_common('csrf.html', 'csrf_modal.html', 400, e)
+
     def _pageall(e):
         return _error_common('error.html', 'error_modal.html', e.code or 500, e)
 
     app.errorhandler(403)(db_session(_page403))
     app.errorhandler(404)(db_session(_page404))
     app.errorhandler(500)(db_session(_page500))
+    app.errorhandler(CSRFError)(db_session(_pagecsrf))
 
     # Здесь должно было быть HTTPException, но https://github.com/mitsuhiko/flask/issues/941
     app.errorhandler(405)(db_session(_pageall))

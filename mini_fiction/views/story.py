@@ -11,7 +11,7 @@ from pony.orm import db_session
 
 from mini_fiction.forms.story import StoryForm
 from mini_fiction.forms.comment import CommentForm
-from mini_fiction.models import Author, Story, Chapter, Rating, StoryLog, Favorites, Bookmark, Activity
+from mini_fiction.models import Author, Story, Chapter, Rating, StoryLog, Favorites, Bookmark
 from mini_fiction.validation import ValidationError
 from mini_fiction.utils.misc import calc_maxdepth
 
@@ -42,9 +42,7 @@ def view(pk, comments_page):
     if not comments_tree_list and paged.number != 1:
         abort(404)
 
-    act = None
-    if user.is_authenticated:
-        act = Activity.get(story=story, author=user)
+    act = story.bl.get_activity(user)
 
     local_comments_count = 0
     new_local_comments_count = 0

@@ -422,6 +422,16 @@ class StoryBL(BaseBL, Commentable):
         orm.flush()
         current_app.cache.delete('index_updated_chapters')
 
+    def get_activity(self, user):
+        from mini_fiction.models import Activity
+
+        if not user.is_authenticated:
+            return
+        story = self.model
+        # Если по каким-то причинам сайт лаганул и насоздавал активитей, то используем
+        # select/first вместо get, чтоб ошибки 500 не было
+        return Activity.select(lambda x: x.story == story and x.author == user).first()
+
     def viewed(self, user):
         if not user.is_authenticated:
             return
@@ -435,7 +445,17 @@ class StoryBL(BaseBL, Commentable):
             'last_comments': story.comments_count,
             'last_comment_id': last_comment.id if last_comment else 0,
         }
-        act = Activity.get(story=story, author=user)
+
+        acts = Activity.select(lambda x: x.story == story and x.author == user)[:]
+        if acts:
+            for act in acts[1:]:
+                # Если по каким-то причинам сайт лаганул и насоздавал активитей, то удаляем лишнее
+                act.delete()
+            act = acts[0]
+        else:
+            act = None
+        del acts
+
         if not act:
             act = Activity(story=story, author=user, **data)
         else:
@@ -900,9 +920,7 @@ class StoryBL(BaseBL, Commentable):
         if not user or not user.is_authenticated:
             return
 
-        from mini_fiction.models import Activity
-
-        act = Activity.get(story=self.model, author=user)
+        act = self.get_activity(user)
         if not act:
             return
 
@@ -1367,8 +1385,10 @@ class ChapterBL(BaseBL):
         chapter = self.model
         story = chapter.story
 
-        story_view = view = StoryView.select(lambda x: x.story == story and x.author == user).first()
-        view = StoryView.get(story=story, chapter=chapter, author=user)
+        story_view = StoryView.select(lambda x: x.story == story and x.author == user).first()
+        # Из-за всяких легаси у одной главы от одного юзера может быть несколько просмотров,
+        # поэтому select/first вместо get
+        view = StoryView.select(lambda x: x.story == story and x.chapter == chapter and x.author == user).first()
 
         if not view:
             view = StoryView(

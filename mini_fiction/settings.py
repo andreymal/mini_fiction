@@ -184,6 +184,8 @@ class Config(object):
 
     STORY_NOTIFICATIONS_INTERVAL = 3600
 
+    WTF_CSRF_TIME_LIMIT = 3600 * 24 * 7  # 1 week
+
     ALLOWED_TAGS = [
         'b', 'i', 'strong', 'em', 's', 'u',
         'p', 'br', 'hr',

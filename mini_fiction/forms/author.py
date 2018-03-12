@@ -105,6 +105,7 @@ class AuthorEditPrefsForm(Form):
         '',
         [
             validators.InputRequired(),
+            validators.NumberRange(min=1, max=1000),
         ],
         render_kw=dict(attrs_dict, type='number', min=1, max=1000),
     )
@@ -113,16 +114,18 @@ class AuthorEditPrefsForm(Form):
         '',
         [
             validators.InputRequired(),
+            validators.NumberRange(min=0, max=32767),
         ],
-        render_kw=dict(attrs_dict, type='number', min=0),
+        render_kw=dict(attrs_dict, type='number', min=0, max=32767),
     )
 
     comment_spoiler_threshold = IntegerField(
         '',
         [
             validators.InputRequired(),
+            validators.NumberRange(min=-32768, max=32767),
         ],
-        render_kw=dict(attrs_dict, type='number'),
+        render_kw=dict(attrs_dict, type='number', min=-32768, max=32767),
     )
 
 

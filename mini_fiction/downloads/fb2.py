@@ -11,11 +11,11 @@ class FB2BaseDownload:
         from mini_fiction.models import Chapter
 
         chapters = story.chapters.select().order_by(Chapter.order, Chapter.id)
-        chapters = [fb2.html_to_fb2(c.get_filtered_chapter_text(), title=c.autotitle) for c in chapters]
-        chapters = [self._get_annotation_doc(story)] + chapters
+        chapters = [fb2.html_to_fb2(c.get_fb2_chapter_text(), title=c.autotitle) for c in chapters]
+        subdocs = [self._get_annotation_doc(story)] + chapters
 
         doc = fb2.join_fb2_docs(
-            chapters,
+            subdocs,
             title=story.title,
             author_name=story.authors[0].username,  # TODO: multiple authors
         )
@@ -24,7 +24,11 @@ class FB2BaseDownload:
     def _get_annotation_doc(self, story):
         from ..filters import fb2
 
-        doc = fb2.html_to_fb2('<annotation>%s</annotation>' % story.summary_as_html)
+        if story.notes:
+            html = '<annotation>%s%s</annotation>' % (story.summary_as_html, story.notes_as_html)
+        else:
+            html = '<annotation>%s</annotation>' % story.summary_as_html
+        doc = fb2.html_to_fb2(html)
         for body in doc.xpath('//fb2:body', namespaces={'fb2': 'http://www.gribuser.ru/xml/fictionbook/2.0'}):
             body.getparent().remove(body)
 

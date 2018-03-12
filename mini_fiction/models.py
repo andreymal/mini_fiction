@@ -515,6 +515,17 @@ class Chapter(db.Entity):
     def get_filtered_chapter_text(self):
         return self.bl.filter_text(self.text)
 
+    def get_fb2_chapter_text(self):
+        # TODO: отрефакторить
+        doc = self.bl.filter_text(self.text)
+        if self.notes:
+            body = doc.xpath('//body')[0]
+            ann = self.bl.filter_text(self.notes).xpath('//body')[0]
+            ann.tag = 'annotation'
+            body.insert(0, ann)
+        import lxml.etree
+        return doc
+
 
 class StoryContributor(db.Entity):
     """ Промежуточная модель хранения всех пользователей, участвовавших в написании рассказов """

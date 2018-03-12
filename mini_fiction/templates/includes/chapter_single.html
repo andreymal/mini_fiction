@@ -11,7 +11,7 @@
         <h1><a class="btn btn-warning btn-mini" href="{{ url_for('chapter.edit', pk=chapter.id) }}">Редактировать главу</a></h1>
     {%- endif %}
     {% if chapter.notes %}
-        <blockquote>{{ chapter.notes_as_html }}</blockquote>
+        <blockquote class="chapter-notes">{{ chapter.notes_as_html }}</blockquote>
     {% endif %}
     {{ chapter.text_as_html }}
     {% if not chapter_edit_mode %}

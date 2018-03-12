@@ -6,6 +6,7 @@
 </head>
 <body>
     <h2>{{ chapter.autotitle }}</h2>
+    {% if chapter.notes %}<blockquote class="chapter-notes">{{ chapter.notes_as_html }}</blockquote>{% endif %}
     {{ chapter.text_as_html }}
 </body>
 </html>

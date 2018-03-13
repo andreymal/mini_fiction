@@ -20,7 +20,8 @@ def feed_stories():
         feed_url=request.url,
         url=request.url_root
     )
-    stories = Story.select_published().order_by(Story.first_published_at.desc(), Story.id.desc())[:current_app.config['RSS']['stories']]
+    count_stories = current_app.config['RSS']['stories']
+    stories = Story.select_published().order_by(Story.first_published_at.desc(), Story.id.desc())[:count_stories]
     for story in stories:
         author = story.authors[0]
         feed.add(

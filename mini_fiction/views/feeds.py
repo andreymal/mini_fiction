@@ -5,7 +5,7 @@ from flask import Blueprint, Markup, current_app, url_for, request, abort
 from werkzeug.contrib.atom import AtomFeed
 from pony.orm import select, db_session
 
-from mini_fiction.models import Story, Chapter
+from mini_fiction.models import Story, Chapter, Author
 from mini_fiction.utils.misc import sitename
 
 bp = Blueprint('feeds', __name__)
@@ -20,10 +20,38 @@ def feed_stories():
         feed_url=request.url,
         url=request.url_root
     )
-    count_stories = current_app.config['RSS']['stories']
-    stories = Story.select_published().order_by(Story.first_published_at.desc(), Story.id.desc())[:count_stories]
+    count = current_app.config['RSS'].get('stories', 20)
+    stories = Story.select_published().order_by(Story.first_published_at.desc(), Story.id.desc())[:count]
     for story in stories:
         author = story.authors[0]
+        feed.add(
+            story.title,
+            Markup(story.summary).striptags(),
+            content_type='text',
+            author=author.username,
+            url=url_for('story.view', pk=story.id, _external=True),
+            updated=story.updated,
+            published=story.date
+        )
+    return feed.get_response()
+
+
+@bp.route('/accounts/<int:user_id>/', endpoint='accounts')
+@db_session
+def feed_accounts(user_id):
+    author = Author.get(id=user_id)
+    if not author:
+        abort(404)
+
+    feed = AtomFeed(
+        title='Новые рассказы автора {} — {}'.format(author.username, sitename()),
+        subtitle='Новые фанфики',
+        feed_url=request.url,
+        url=request.url_root
+    )
+    count = current_app.config['RSS'].get('accounts', 10)
+    stories = Story.bl.select_by_author(author).order_by(Story.first_published_at.desc(), Story.id.desc())[:count]
+    for story in stories:
         feed.add(
             story.title,
             Markup(story.summary).striptags(),
@@ -48,7 +76,8 @@ def feed_chapters():
 
     chapters = select(c for c in Chapter if not c.draft and c.story_published)
     chapters = chapters.order_by(Chapter.first_published_at.desc(), Chapter.order.desc())
-    chapters = chapters.prefetch(Chapter.story)[:current_app.config['RSS']['chapters']]
+    count = current_app.config['RSS'].get('chapters', 20)
+    chapters = chapters.prefetch(Chapter.story)[:count]
 
     for chapter in chapters:
         story = chapter.story

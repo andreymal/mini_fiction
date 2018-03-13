@@ -153,7 +153,12 @@ class Config(object):
     COMMENT_SPOILER_THRESHOLD = -5
     COMMENTS_TREE_MAXDEPTH = 4
 
-    RSS = {'stories': 20, 'chapters': 20, 'comments': 100}
+    RSS = {
+        'stories': 20,
+        'accounts': 10,
+        'chapters': 20,
+        'comments': 100,
+    }
 
     EMAIL_HOST = None
     EMAIL_PORT = 25

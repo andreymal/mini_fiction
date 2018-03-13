@@ -25,7 +25,7 @@ def info(user_id=None, comments_page=1):
     if user_id is not None:
         try:
             user_id = int(user_id)
-        except Exception:
+        except ValueError:
             abort(404)
 
     data = {}

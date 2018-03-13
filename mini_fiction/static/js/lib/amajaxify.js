@@ -87,7 +87,7 @@ var amajaxify = {
         'cc.bingj.com', 'nova.rambler.ru'
     ],
 
-    // костыль для Safari по вычислению активной кнопки формы
+    // костыль по вычислению активной кнопки формы
     _clickedBtn: null,
     _clickedBtnTimer: null,
 
@@ -306,7 +306,7 @@ var amajaxify = {
     },
 
     /**
-     * Костыль для всяких старых Safari. Чтобы узнать, какую кнопку кликнули
+     * Костыль для Safari и хитрых кнопок. Чтобы узнать, какую кнопку кликнули
      * для отправки формы, перехватываем событие onclick и из него вызываем
      * этот метод, который запомнит нам кликнутую кнопку, которую мы потом
      * достанем в _submitEvent.
@@ -371,7 +371,7 @@ var amajaxify = {
         var target = event.target || event.srcElement;
         while (target && target.tagName.toLowerCase() != 'a' && target !== document.body) {
             if (target.tagName.toLowerCase() == 'input' || target.tagName.toLowerCase() == 'button') {
-                // Отвлекаемся на костыль для Safari: вычисление кнопки, которой отправляют форму
+                // Отвлекаемся на костыль: вычисление кнопки, которой отправляют форму
                 this.handleSubmitBtnWorkaround(target);
             }
             target = target.parentNode || parent.srcElement;
@@ -775,11 +775,12 @@ var amajaxify = {
      */
     _getSubmitButton: function(form) {
         // Простейший случай: в современных браузерах есть :focus по мышке
-        // FIXME: для <input form="formid" /> за пределами формы не работает, разумеется
+        // Для <input form="formid" /> за пределами формы не работает,
+        // разумеется (но ниже на этот случай есть костыль)
         var submitButton = form.querySelector('input[type="submit"]:focus, button[type="submit"]:focus');
         if (!submitButton) {
-            // Костыль для Safari: мы, возможно, перехватили кнопку ранее
-            // в событии onclick
+            // Костыль для Safari и для кнопок за пределами формы:
+            // мы, возможно, перехватили кнопку ранее в событии onclick
             // (что интересно, onclick вызывается и при нажатии Enter, когда
             // фокус на текстовом поле)
             submitButton = this._clickedBtn;

@@ -123,7 +123,7 @@ class Author(db.Entity, UserMixin):
 
     def get_id(self):
         # for flask-login
-        return str(self.id) + '#' + self.session_token
+        return '{}#{}'.format(self.id, self.session_token)
 
     @property
     def contributing_stories(self):

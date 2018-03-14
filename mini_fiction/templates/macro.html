@@ -189,6 +189,12 @@
             </a>
         </li>
         {%- endif %}
+
+        <li>
+            <a href="{{ url_for('feeds.accounts', user_id=author.id) }}" title="Новые рассказы автора" data-noajax="1">
+                RSS
+            </a>
+        </li>
     </ul>
 {%- endmacro %}
 

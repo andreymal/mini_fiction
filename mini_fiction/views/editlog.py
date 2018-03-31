@@ -37,6 +37,14 @@ def index(page):
         view_args['staff'] = '1'
         queryset = queryset.filter(lambda l: l.by_staff)
 
+    # TODO: это довольно медленно, стоит оптимизировать
+    if request.args.get('published') == '1':
+        view_args['published'] = '1'
+        queryset = queryset.filter(lambda l: l.story.approved and not l.story.draft)
+    elif request.args.get('published') == '0':
+        view_args['published'] = '0'
+        queryset = queryset.filter(lambda l: not l.story.approved or l.story.draft)
+
     queryset = queryset.order_by(StoryLog.created_at.desc()).prefetch(StoryLog.story, StoryLog.user)
 
     page_obj = Paginator(
@@ -53,6 +61,7 @@ def index(page):
         view_args=view_args,
         filter_all=view_args.get('all') == '1',
         filter_staff=view_args.get('staff') == '1',
+        filter_published=view_args.get('published'),
     )
 
 

@@ -21,6 +21,19 @@
         Все изменения
     {%- if filter_staff %}</a>{% endif %}
 
+    <br/><br/>
+    {% if filter_published != None %}<a href="{{ modified_url(view_args=view_args, published=None) }}">{% endif -%}
+        Любые
+    {%- if filter_published != None %}</a>{% endif %}
+    &nbsp; &nbsp;
+    {% if filter_published != '1' %}<a href="{{ modified_url(view_args=view_args, published='1') }}">{% endif -%}
+        Опубликованные
+    {%- if filter_published != '1' %}</a>{% endif %}
+    &nbsp; &nbsp;
+    {% if filter_published != '0' %}<a href="{{ modified_url(view_args=view_args, published='0') }}">{% endif -%}
+        Неопубликованные
+    {%- if filter_published != '0' %}</a>{% endif %}
+
     {% if current_user.is_staff %}
         <br/><br/>
         {% if not filter_all %}<a href="{{ modified_url(view_args=view_args, all='1') }}">{% endif -%}

@@ -97,7 +97,7 @@ zip_dump_params = {
         'exclude': ('stories',),
     },
     'rating': {
-        'include': ('id', 'name', 'description'),
+        'include': ('id', 'name', 'description', 'nsfw'),
         'exclude': ('stories',),
     },
     'staticpage': {

@@ -93,7 +93,7 @@
     </div>
     <div class="span12" id="chapter-preview">
     {%- if preview_html -%}
-        {%- include 'chapter_preview.html' -%}
+        {%- include 'includes/chapter_preview.html' -%}
     {%- elif chapter -%}
         {%- with story=chapter.story, chapter_edit_mode=True %}{% include "includes/chapter_single.html" %}{% endwith -%}
     {%- endif -%}

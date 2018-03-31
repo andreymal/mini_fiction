@@ -696,7 +696,7 @@ msgstr "Группы персонажей"
 
 #: mini_fiction/templates/admin/index.html:72
 msgid "Classifications (events)"
-msgstr "Классифкаторы (события)"
+msgstr "Классификаторы (события)"
 
 #: mini_fiction/templates/admin/htmlblocks/delete.html:9
 #: mini_fiction/templates/admin/htmlblocks/delete.html:26

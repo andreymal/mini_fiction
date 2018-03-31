@@ -307,8 +307,6 @@ class Config(object):
     ZIP_DUMP_PATH = 'mini_fiction_dump.zip'  # relative to /media/
     ZIP_TMP_DUMP_PATH = None  # default ZIP_DUMP_PATH + '.tmp'
 
-    NSFW_RATING_IDS = (1,)
-
     CAPTCHA_CLASS = None
     CAPTCHA_FOR_GUEST_COMMENTS = False
 

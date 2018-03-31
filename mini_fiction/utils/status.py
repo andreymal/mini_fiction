@@ -317,18 +317,7 @@ class ProjectStatus(Status):
         return self._ok('ratings', str(cnt))
 
     def nsfw_ratings(self):
-        ids = self.app.config.get('NSFW_RATING_IDS')
-        try:
-            ids = set([int(x) for x in ids])
-        except Exception:
-            return self._fail('nsfw_ratings', 'NSFW_RATING_IDS value is invalid')
-
-        if not ids:
-            return self._ok('nsfw_ratings', '0')
-
-        cnt = models.Rating.select(lambda x: x.id in ids).count()
-        if cnt != len(ids):
-            return self._fail('nsfw_ratings', '{} != {}'.format(len(ids), cnt))
+        cnt = models.Rating.select(lambda x: x.nsfw).count()
         return self._ok('nsfw_ratings', str(cnt))
 
     def staticpages(self):

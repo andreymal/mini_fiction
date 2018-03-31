@@ -259,6 +259,7 @@ class Rating(db.Entity):
 
     description = orm.Optional(orm.LongStr)
     name = orm.Required(str, 256)
+    nsfw = orm.Required(bool, default=False)
 
     stories = orm.Set('Story')
 
@@ -406,7 +407,7 @@ class Story(db.Entity):
 
     @property
     def nsfw(self):
-        return True if self.rating.id in current_app.config['NSFW_RATING_IDS'] else False
+        return self.rating.nsfw
 
     summary_as_html = filtered_html_property('summary', filter_html)
     notes_as_html = filtered_html_property('notes', filter_html)

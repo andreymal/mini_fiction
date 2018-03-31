@@ -445,3 +445,49 @@ def words_count(s, html=True):
 
     words = s.split()
     return len(words)
+
+
+def htmlcrop(text, length, end='...', spaces=' \t\r\n\xa0'):
+    '''Безопасная обрезалка текста, которая не разрежет посреди HTML-тега
+    (но валидацию кода не проводит и корректный результат не обещает).
+    А ещё вырезает HTML-комменты и умеет обрезать слова по пробелам.
+
+    :param str text: что обрезаем
+    :param int length: длина, под которую обрезаем (будет подогнана, если
+      место обрезки окажется внутри HTML-тега)
+    :param str end: строка, которая добавится к обрезанному результату
+    :param str spaces: что считать пробелами; если пусто, будет резать
+      по буквам, а не по словам
+    :rtype: str
+    '''
+
+    if not text:
+        return ''
+    if length < 1:
+        return end
+    elif length >= len(text):
+        return text
+
+    # Вырезаем все комменты, они нам мешаются
+    text = re.sub(r'<!--.+-->', '', text)
+
+    # Ищем начало HTML-тега перед местом обрезки
+    f1 = text.rfind('<', 0, length)
+    # Ищем конец HTML-тега
+    f2 = -1
+    if f1 >= 0:
+        f2 = text.find('>', f1)
+
+    # Если конец тега после места обрезки, значит попали внутрь тега
+    if f2 >= length:
+        length = f2 + 1
+    elif spaces and length < len(text) and text[length] not in spaces:
+        # Если не попали, то обрезаем просто по слову
+        f3 = max(text.rfind(x, 0, length) for x in spaces)
+        if f3 > 0:
+            length = f3
+
+
+    if length >= len(text):
+        return text
+    return text[:length] + end

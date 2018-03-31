@@ -13,6 +13,7 @@ from flask_login import AnonymousUserMixin, UserMixin
 from mini_fiction.database import db
 from mini_fiction.bl.registry import Resource
 from mini_fiction.filters import filter_html, filtered_html_property
+from mini_fiction.utils.misc import htmlcrop
 
 
 class Logopic(db.Entity):
@@ -598,10 +599,7 @@ class StoryComment(db.Entity):
 
     @property
     def brief_text(self):
-        text = self.text
-        if len(text) > current_app.config['BRIEF_COMMENT_LENGTH']:
-            text = text[:current_app.config['BRIEF_COMMENT_LENGTH']] + '...'
-        return text
+        return htmlcrop(self.text, current_app.config['BRIEF_COMMENT_LENGTH'])
 
     @property
     def text_as_html(self):
@@ -678,10 +676,7 @@ class StoryLocalComment(db.Entity):
 
     @property
     def brief_text(self):
-        text = self.text
-        if len(text) > current_app.config['BRIEF_COMMENT_LENGTH']:
-            text = text[:current_app.config['BRIEF_COMMENT_LENGTH']] + '...'
-        return text
+        return htmlcrop(self.text, current_app.config['BRIEF_COMMENT_LENGTH'])
 
     text_as_html = filtered_html_property('text', filter_html)
     brief_text_as_html = filtered_html_property('brief_text', filter_html)
@@ -850,10 +845,7 @@ class NewsComment(db.Entity):
 
     @property
     def brief_text(self):
-        text = self.text
-        if len(text) > current_app.config['BRIEF_COMMENT_LENGTH']:
-            text = text[:current_app.config['BRIEF_COMMENT_LENGTH']] + '...'
-        return text
+        return htmlcrop(self.text, current_app.config['BRIEF_COMMENT_LENGTH'])
 
     text_as_html = filtered_html_property('text', filter_html)
     brief_text_as_html = filtered_html_property('brief_text', filter_html)

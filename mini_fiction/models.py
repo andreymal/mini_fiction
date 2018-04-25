@@ -749,7 +749,7 @@ class Activity(db.Entity):
 
 class StoryLog(db.Entity):
     created_at = orm.Required(datetime, 6, default=datetime.utcnow, index=True)
-    user = orm.Required(Author)
+    user = orm.Optional(Author)
     story = orm.Required(Story)
 
     chapter_action = orm.Optional(str, 12, py_check=lambda x: x in {'', 'add', 'edit', 'delete'})

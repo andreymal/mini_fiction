@@ -447,7 +447,7 @@ def words_count(s, html=True):
     return len(words)
 
 
-def htmlcrop(text, length, end='...', spaces=' \t\r\n\xa0'):
+def htmlcrop(text, length, end='...', spaces=' \t\r\n\xa0', max_overflow=300):
     '''Безопасная обрезалка текста, которая не разрежет посреди HTML-тега
     (но валидацию кода не проводит и корректный результат не обещает).
     А ещё вырезает HTML-комменты и умеет обрезать слова по пробелам.
@@ -458,6 +458,11 @@ def htmlcrop(text, length, end='...', spaces=' \t\r\n\xa0'):
     :param str end: строка, которая добавится к обрезанному результату
     :param str spaces: что считать пробелами; если пусто, будет резать
       по буквам, а не по словам
+    :param int max_overflow: неотрицательное число означает, насколько можно
+      вылезать за указанный length; если тег вылезет за length+overflow, то он
+      не будет оставлен, а обрежется. Нуль означает выкидывание тега всегда,
+      отрицательное число означает оставление тега в покое. По умолчанию
+      значение 300 — должно хватить любым нормальным ссылкам на картинки
     :rtype: str
     '''
 
@@ -478,16 +483,22 @@ def htmlcrop(text, length, end='...', spaces=' \t\r\n\xa0'):
     if f1 >= 0:
         f2 = text.find('>', f1)
 
+    final_length = length
+
     # Если конец тега после места обрезки, значит попали внутрь тега
     if f2 >= length:
-        length = f2 + 1
+        final_length = f2 + 1
+        # Если тег слишком длинный, то выкидываем его
+        if max_overflow >= 0 and (max_overflow == 0 or final_length > length + max_overflow):
+            final_length = f1
+
     elif spaces and length < len(text) and text[length] not in spaces:
         # Если не попали, то обрезаем просто по слову
         f3 = max(text.rfind(x, 0, length) for x in spaces)
         if f3 > 0:
-            length = f3
+            final_length = f3
 
 
-    if length >= len(text):
+    if final_length >= len(text):
         return text
-    return text[:length] + end
+    return text[:final_length] + end

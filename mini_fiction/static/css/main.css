@@ -2087,6 +2087,27 @@ ul.editlog .editlog-item:nth-child(2n+1) {
     border-bottom: 1px dotted #555;
 }
 
+.editlog-contributors-table {
+    overflow: hidden;
+}
+
+.editlog-contributors-table-old,
+.editlog-contributors-table-new {
+    float: left;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+.editlog-contributors-arrow {
+    margin: 0 32px;
+    float: left;
+}
+
+.editlog-contributors-invisible {
+    opacity: 0.5;
+}
+
 
 /* news */
 

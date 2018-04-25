@@ -548,20 +548,33 @@ class StoryBL(BaseBL, Commentable):
             return self.model.chapters
         return default_queryset
 
-    def edit_contributors(self, contributors):
+    def edit_contributors(self, editor, contributors):
         from mini_fiction.models import Author, StoryContributor
 
+        # Собираем старых участников для записи в лог изменений
+        old_contributors = [{
+            'user': x.user.id,
+            'visible': x.visible,
+            'is_editor': x.is_editor,
+            'is_author': x.is_author,
+        } for x in self.get_contributors()]
+
+        # {user_id: StoryContributor object}
         objs = {x.user.id: x for x in self.get_contributors()}
+
+        # Собираем обновления участников
         for user_id, acc in contributors.items():
             user = Author.get(id=user_id)
             if not user:
                 raise ValueError('User not found')
 
+            # None означает, что доступ этому участнику нужно удалить
             if acc is None:
                 if user_id in objs:
                     objs.pop(user_id).delete()
                 continue
 
+            # Если не None, то создаём или обновляем права доступа
             if user_id not in objs:
                 objs[user_id] = StoryContributor(
                     story=self.model,
@@ -578,6 +591,17 @@ class StoryBL(BaseBL, Commentable):
 
         self._contributors = None
 
+        # Собираем новых участников для записи в лог изменений
+        new_contributors = [{
+            'user': x.user.id,
+            'visible': x.visible,
+            'is_editor': x.is_editor,
+            'is_author': x.is_author,
+        } for x in self.get_contributors()]
+
+        # Если разница есть, то записываем в лог
+        if old_contributors != new_contributors:
+            self.edit_log(editor, {'contributors': [old_contributors, new_contributors]})
 
     # access control
 

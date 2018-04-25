@@ -1,0 +1,36 @@
+<strong class="editlog-key">Доступ к рассказу:</strong>
+<div class="editlog-contributors-table">
+    <ul class="editlog-contributors-table-old">{% for citem in v[0] %}
+        <li{% if not citem.visible %} class="editlog-contributors-invisible"{% endif %}>
+            {%- if citem.user in edit_log_users -%}
+                {%- with user=edit_log_users.get(citem.user) %}{% include 'includes/userlink.html' %}{% endwith -%}
+            {%- else %}user{{ citem.user }}{% endif %}
+
+            {% if citem.is_author -%}
+                (автор)
+            {%- elif citem.is_editor -%}
+                (редактор)
+            {%- else -%}
+                (бета)
+            {%- endif %}
+        </li>
+    {% endfor %}</ul>
+
+    <div class="editlog-contributors-arrow">→</div>
+
+    <ul class="editlog-contributors-table-new">{% for citem in v[1] %}
+        <li{% if not citem.visible %} class="editlog-contributors-invisible"{% endif %}>
+            {%- if citem.user in edit_log_users -%}
+                {%- with user=edit_log_users.get(citem.user) %}{% include 'includes/userlink.html' %}{% endwith -%}
+            {%- else %}user{{ citem.user }}{% endif %}
+
+            {% if citem.is_author -%}
+                (автор)
+            {%- elif citem.is_editor -%}
+                (редактор)
+            {%- else -%}
+                (бета)
+            {%- endif %}
+        </li>
+    {% endfor %}</ul>
+</div>

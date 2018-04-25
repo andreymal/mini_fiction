@@ -14,6 +14,7 @@ from mini_fiction.forms.comment import CommentForm
 from mini_fiction.models import Author, Story, Chapter, Rating, StoryLog, Favorites, Bookmark
 from mini_fiction.validation import ValidationError
 from mini_fiction.utils.misc import calc_maxdepth
+from mini_fiction.views.editlog import load_users_for_editlog
 
 bp = Blueprint('story', __name__)
 
@@ -297,8 +298,11 @@ def edit_log(pk):
     if not story.bl.can_view_editlog(user):
         abort(403)
 
+    edit_log = story.edit_log.select().order_by(StoryLog.created_at.desc()).prefetch(StoryLog.user)
+
     data = dict(
-        edit_log=story.edit_log.select().order_by(StoryLog.created_at.desc()).prefetch(StoryLog.user),
+        edit_log=edit_log,
+        edit_log_users=load_users_for_editlog(edit_log),
         page_title='История редактирования рассказа «{}»'.format(story.title),
         story=story,
     )
@@ -448,7 +452,7 @@ def edit(pk):
             return render_template('story_work.html', **data)
 
         else:
-            story.bl.edit_contributors(access)
+            story.bl.edit_contributors(user, access)
             data['contr_saved'] = True
             if request.args.get('short') == '1':
                 html = render_template('includes/story_edit_contributors_form.html', **data)

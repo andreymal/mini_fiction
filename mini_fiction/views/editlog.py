@@ -6,7 +6,7 @@ from flask_login import current_user, login_required
 from flask_babel import gettext as _
 from flask import Blueprint, current_app, abort, render_template, g, jsonify, request
 
-from mini_fiction.models import StoryLog, StoryContributor
+from mini_fiction.models import Author, StoryLog, StoryContributor
 from mini_fiction.utils.misc import Paginator, get_editlog_extra_info
 
 
@@ -53,9 +53,12 @@ def index(page):
         view_args=view_args,
     )
 
+    edit_log = page_obj.slice_or_404(queryset)
+
     return render_template(
         'story_edit_log.html',
-        edit_log=page_obj.slice_or_404(queryset),
+        edit_log=edit_log,
+        edit_log_users=load_users_for_editlog(edit_log),
         page_obj=page_obj,
         page_title=_('Edit log'),
         view_args=view_args,
@@ -79,6 +82,7 @@ def show(editlog_id):
     data = {
         'page_title': _('Edit log'),
         'item': edit_log,
+        'edit_log_users': load_users_for_editlog([edit_log]),
         'extra': extra,
     }
 
@@ -86,3 +90,15 @@ def show(editlog_id):
         html = render_template('story_edit_log_show_modal.html', **data)
         return jsonify({'page_content': {'modal': html}})
     return render_template('story_edit_log_show.html', **data)
+
+
+def load_users_for_editlog(edit_log):
+    user_ids = set()
+    for item in edit_log:
+        user_ids.add(item.user.id)
+        item_data = item.data
+        if 'contributors' in item_data:
+            for v in item_data['contributors']:
+                user_ids |= {x['user'] for x in v}
+    edit_log_users = {x.id: x for x in Author.select(lambda x: x.id in user_ids)}
+    return edit_log_users

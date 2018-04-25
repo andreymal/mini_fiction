@@ -54,13 +54,13 @@ class Author(db.Entity, UserMixin):
     last_password_change = orm.Optional(datetime, 6, optimistic=False, default=datetime.utcnow)
     last_login = orm.Optional(datetime, 6, optimistic=False)
     last_visit = orm.Optional(datetime, 6, optimistic=False)
-    is_superuser = orm.Required(bool, default=False)
+    is_superuser = orm.Required(bool, default=False, optimistic=False)
     username = orm.Required(str, 32, unique=True, autostrip=False)
     first_name = orm.Optional(str, 30)
     last_name = orm.Optional(str, 30)
     email = orm.Optional(str, 254, index=True)
-    is_staff = orm.Required(bool, default=False)
-    is_active = orm.Required(bool, default=True)
+    is_staff = orm.Required(bool, default=False, optimistic=False)
+    is_active = orm.Required(bool, default=True, optimistic=False)
     date_joined = orm.Required(datetime, 6, default=datetime.utcnow, optimistic=False)  # Дата отправки формы регистрации
     activated_at = orm.Optional(datetime, 6, optimistic=False)  # Дата перехода по ссылке активации из письма
     session_token = orm.Required(str, 32, optimistic=False)

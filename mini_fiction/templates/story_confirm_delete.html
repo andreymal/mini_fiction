@@ -22,7 +22,8 @@
                 {%- if story.vote_total %}Он собрал {{ ngettext("%(num)d vote", "%(num)d votes", story.vote_total) }}{%- endif %}
                 {%- if story.comments_count %}
                     {%- if story.vote_total %} и {% else %}Он собрал{% endif %} {{ ngettext("%(num)d comment", "%(num)d comments", story.comments_count) }}
-                {%- endif %}.
+                {%- endif %}
+                {%- if story.vote_total or story.comments_count %}.{% endif %}
             </p>
             <p>&nbsp;</p>
         {% endif %}

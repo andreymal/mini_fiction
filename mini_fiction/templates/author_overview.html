@@ -32,6 +32,16 @@
             <div class="system-user-description">{{ html_block('system_user') }}</div>
         {% endif %}
         {% with contacts=author.contacts.select().order_by('c.id')[:] %}{% include 'includes/author_contacts.html' %}{% endwith %}
+
+        {% if not is_system_user and current_user.is_authenticated and author.id != current_user.id -%}
+            <form method="POST" action="{{ url_for('author.subscribe', user_id=author.id) }}" class="subscription-form js-subscription-form">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+                Подписаться на новые рассказы:
+                <label><input type="checkbox" name="email" value="1"{% if sub.email %} checked{% endif %} /> почта</label>
+                <label><input type="checkbox" name="tracker" value="1"{% if sub.tracker %} checked{% endif %} /> сайт</label>
+                <button type="submit" class="btn btn-mini js-subscription-form-submit">Сохранить</button>
+            </form>
+        {%- endif %}
     </div>
     {% if not is_system_user or author.id == current_user.id %}
     <div class="span4">

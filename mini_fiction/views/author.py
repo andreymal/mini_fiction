@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-from flask import Blueprint, current_app, request, render_template, abort, redirect, url_for
+from flask import Blueprint, current_app, request, render_template, abort, redirect, url_for, jsonify
 from flask_babel import gettext
 from flask_login import current_user, login_required, logout_user
 from pony.orm import db_session
@@ -73,6 +73,7 @@ def info(user_id=None, comments_page=1):
     data.update({
         'author': author,
         'is_system_user': author.id == current_app.config['SYSTEM_USER_ID'],
+        'sub': author.bl.get_stories_subscription(current_user._get_current_object()),
         'stories': stories,
         'contributing_stories': contributing_stories,
         'series': series,
@@ -279,3 +280,27 @@ def ban(user_id):
         return redirect(url_for('author.info', user_id=user_id))
     else:
         abort(403)
+
+
+@bp.route('/<user_id>/subscribe/', methods=('POST',))
+@db_session
+@login_required
+def subscribe(user_id):
+    try:
+        user_id = int(user_id)
+    except Exception:
+        abort(404)
+
+    author = Author.get(id=user_id)
+    if not author:
+        abort(404)
+
+    author.bl.subscribe_to_new_stories(
+        current_user._get_current_object(),
+        email=request.form.get('email') == '1',
+        tracker=request.form.get('tracker') == '1',
+    )
+
+    if request.form.get('short') == '1':
+        return jsonify(success=True)
+    return redirect(url_for('author.info', user_id=author.id))

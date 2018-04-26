@@ -2156,6 +2156,12 @@ ul.editlog .editlog-item:nth-child(2n+1) {
     margin-bottom: 4px;
 }
 
+.notification-story-meta {
+    margin: 0;
+    font-size: 12px;
+    color: #999;
+}
+
 .notification-viewed-line {
     position: relative;
     font-size: 12px;

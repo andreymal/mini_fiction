@@ -1,0 +1,23 @@
+{% extends 'email/base.html' %}
+{% import 'email/macro.html' as macro %}
+
+{% block body %}
+Опубликован новый рассказ:<br/>
+<br/>
+{{ macro.storylink(story.id, story.title) }}<br/>
+<span style="font-size: 12px; color: #999;">
+{{- ngettext("%(num)d word", "%(num)d words", story.words) }} от {% for author in story.authors %}
+    {%- if loop.first -%}
+       {{- macro.userlink(author.id, author.username) -}}
+       {%- if loop.length > 1 %} (в соавторстве с {% endif -%}
+    {%- endif -%}
+    {%- if not loop.first -%}
+        {{- macro.userlink(author.id, author.username) -}}
+        {%- if loop.revindex0 == 1 %} и {% endif %}{% if loop.revindex0 > 1 %}, {% endif -%}
+        {%- if loop.last and loop.length > 1 %}){% endif -%}
+    {%- endif -%}
+{% endfor -%}
+</span><br/><br/>
+
+<span>{{ story.summary_as_html|striptags }}</span>
+{% endblock %}

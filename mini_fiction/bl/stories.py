@@ -219,14 +219,14 @@ class StoryBL(BaseBL, Commentable):
 
         if old_published != story.published:
             if story.published and not story.first_published_at:
-                story.first_published_at = tm
+                story.bl.first_publish(tm=tm, caused_by_user=user)
                 changed_sphinx_fields.add('first_published_at')
 
             published_chapter_ids = []
             for c in sorted(story.chapters, key=lambda c: c.order):
                 c.story_published = story.published
                 if story.published and not c.draft and not c.first_published_at:
-                    c.first_published_at = tm
+                    c.bl.first_publish(tm=tm, notify=False, caused_by_user=user)  # Уведомления разошлём сами чуть ниже
                     published_chapter_ids.append(c.id)
 
             if published_chapter_ids:
@@ -244,6 +244,7 @@ class StoryBL(BaseBL, Commentable):
     def publish(self, user, published):
         # TODO: с approve() очень много общего, можно вынести общее в отдельную функцию
         story = self.model
+        tm = datetime.utcnow()
         old_published = story.published
 
         old_draft = story.draft
@@ -304,14 +305,14 @@ class StoryBL(BaseBL, Commentable):
             changed_sphinx_fields = {'draft',}
             if old_published != story.published:
                 if story.published and not story.first_published_at:
-                    story.first_published_at = datetime.utcnow()
+                    story.bl.first_publish(tm=tm, caused_by_user=user)
                     changed_sphinx_fields.add('first_published_at')
 
                 published_chapter_ids = []
                 for c in sorted(story.chapters, key=lambda c: c.order):
                     c.story_published = story.published
                     if story.published and not c.draft and not c.first_published_at:
-                        c.first_published_at = datetime.utcnow()
+                        c.bl.first_publish(tm=tm, notify=False, caused_by_user=user)  # Уведомления разошлём сами чуть ниже
                         published_chapter_ids.append(c.id)
                     later(current_app.tasks['sphinx_update_chapter'].delay, c.id)
 
@@ -330,6 +331,19 @@ class StoryBL(BaseBL, Commentable):
 
         return False
 
+    def first_publish(self, tm=None, caused_by_user=None):
+        # Метод для действий при первой публикации рассказа
+
+        story = self.model
+        assert story.first_published_at is None
+
+        if tm is None:
+            tm = datetime.utcnow()
+
+        story.first_published_at = tm
+
+        later(current_app.tasks['notify_author_story'].delay, story.id, caused_by_user.id if caused_by_user else None)
+
     def publish_all_chapters(self, user=None):
         story = self.model
         published_chapter_ids = []
@@ -343,7 +357,7 @@ class StoryBL(BaseBL, Commentable):
             story.words += c.words
             later(current_app.tasks['sphinx_update_chapter'].delay, c.id)
             if story.published and not c.first_published_at:
-                c.first_published_at = tm
+                c.bl.first_publish(tm=tm, notify=False, caused_by_user=user)  # Уведомления разошлём сами чуть ниже
                 published_chapter_ids.append(c.id)
 
         later(current_app.tasks['sphinx_update_story'].delay, story.id, ('words',))
@@ -386,7 +400,7 @@ class StoryBL(BaseBL, Commentable):
 
         # Неявная связь с уведомлениями
         Notification.select(
-            lambda x: x.type in ('story_publish', 'story_draft') and x.target_id == story_id
+            lambda x: x.type in ('story_publish', 'story_draft', 'author_story') and x.target_id == story_id
         ).delete(bulk=True)
 
         # Неявная связь с уведомлениями о новых главах
@@ -1363,6 +1377,7 @@ class ChapterBL(BaseBL):
     def publish(self, user, published):
         chapter = self.model
         story = chapter.story
+        tm = datetime.utcnow()
         if published == (not chapter.draft):
             return
 
@@ -1377,14 +1392,31 @@ class ChapterBL(BaseBL):
             story.words += chapter.words
 
         if not story.draft and story.published and not chapter.first_published_at:
-            chapter.first_published_at = datetime.utcnow()
-            later(current_app.tasks['notify_story_chapters'].delay, [chapter.id], user.id if user else None)
+            chapter.bl.first_publish(tm=tm, notify=True, caused_by_user=user)
 
         # Это необходимо, пока архивы для скачивания рассказа обновляются по этой дате
-        story.updated = datetime.utcnow()
+        story.updated = tm
 
         later(current_app.tasks['sphinx_update_chapter'].delay, chapter.id)
         current_app.cache.delete('index_updated_chapters')
+
+    def first_publish(self, tm=None, notify=True, caused_by_user=None):
+        # Метод для действий при первой публикации главы
+
+        chapter = self.model
+        assert chapter.first_published_at is None
+        assert chapter.story.first_published_at is not None
+
+        if tm is None:
+            tm = datetime.utcnow()
+
+        chapter.first_published_at = tm
+
+        # Уведомление пользователей о появлении новой главы. Его можно
+        # отключить для того, чтобы при публикации нескольких глав
+        # одновременно уведомить обо всех одним письмом (см. StoryBL)
+        if notify:
+            later(current_app.tasks['notify_story_chapters'].delay, [chapter.id], caused_by_user.id if caused_by_user else None)
 
     def is_viewed_by(self, user):
         from mini_fiction.models import StoryView

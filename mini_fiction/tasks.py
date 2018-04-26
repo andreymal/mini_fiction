@@ -240,6 +240,44 @@ def notify_story_publish_draft(story_id, staff_id, draft):
 
 @task()
 @db_session
+def notify_author_story(story_id, publisher_user_id=None):
+    story = models.Story.get(id=story_id)
+    if not story:
+        return
+
+    # Получаем авторов и соавторов
+    author_ids = [x.id for x in story.bl.get_authors()]
+
+    # Получаем подписчиков, ждущих новые рассказы автора
+    subs = models.Subscription.select(lambda x: x.type == 'author_story' and x.target_id in author_ids)[:]
+
+    sendto = set()  # Список почт для отправки
+
+    # Перебираем все подписки
+    for sub in subs:
+        user = sub.user
+
+        # Если этот юзер и опубликовал рассказ, то его уведомлять не надо
+        if user.id == publisher_user_id:
+            continue
+        # Если этот юзер и есть автор, то его уведомлять смысла тоже мало
+        if user.id in author_ids:
+            continue
+
+        # Если есть подписка на сайте, создаём уведомление
+        if sub.to_tracker:
+            _notify(user, 'author_story', story)
+
+        # Если есть подписка на почту, забираем адрес для последующей отправки
+        if sub.to_email and user.email:
+            sendto.add(user.email)
+
+    # Отправляем письмо по собранным адресам
+    _sendmail_notify(sendto, 'author_story', {'story': story})
+
+
+@task()
+@db_session
 def notify_story_chapters(chapter_ids, publisher_user_id=None):
     # Получаем главы и проверяем адекватность
     chapters = models.Chapter.select(lambda x: x.id in chapter_ids)[:]

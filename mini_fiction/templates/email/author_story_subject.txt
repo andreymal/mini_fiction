@@ -1,0 +1,1 @@
+Новый рассказ «{{ story.title|safe }}» — {{ EMAIL_SITE_NAME }}

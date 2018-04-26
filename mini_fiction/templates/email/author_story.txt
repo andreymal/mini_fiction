@@ -1,0 +1,24 @@
+{%- extends 'email/base.txt' -%}
+
+{%- block content -%}
+{%- autoescape false -%}
+На сайте {{ url_for('index.index', _external=True) }} опубликован новый рассказ:
+
+«{{ story.title }}»
+{{ url_for('story.view', pk=story.id, _external=True) }}
+
+{{ ngettext("%(num)d word", "%(num)d words", story.words) }} от {% for author in story.authors -%}
+    {%- if loop.first -%}
+       {{- author.username -}}
+       {%- if loop.length > 1 %} (в соавторстве с {% endif -%}
+    {%- endif -%}
+    {%- if not loop.first -%}
+        {{- author.username -}}
+        {%- if loop.revindex0 == 1 %} и {% endif %}{% if loop.revindex0 > 1 %}, {% endif -%}
+        {%- if loop.last and loop.length > 1 %}){% endif -%}
+    {%- endif -%}
+{%- endfor %}
+
+{{ story.summary_as_html|striptags }}
+{%- endautoescape -%}
+{%- endblock -%}

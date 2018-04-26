@@ -42,6 +42,19 @@
         </time>
     </div>
 
+{%- elif item.type == 'author_story' %}
+    Опубликован новый рассказ:<br/>
+    <a href="{{ url_for('story.view', pk=item.story.id) }}"><b>{{ item.story.title }}</b></a><br/>
+    <p class="notification-story-meta">
+        {{ ngettext("%(num)d word", "%(num)d words", item.story.words) }} от {% with story=item.story %}{% include 'includes/story_authors_list.html' %}{% endwith %}
+    </p>
+
+    <div class="notification-meta">
+        <time class="notification-time" datetime="{{ item.created_at.strftime('%Y-%m-%dT%H:%M:%SZ') }}">
+            {{ item.created_at|datetimeformat('d MMMM Y, HH:mm') }}
+        </time>
+    </div>
+
 {%- elif item.type == 'story_chapter' %}
     В рассказе <a href="{{ url_for('story.view', pk=item.story.id) }}">«{{ item.story.title }}»</a>
     опубликована новая глава <a href="{{ url_for('chapter.view', story_id=item.story.id, chapter_order=item.chapter.order) }}">«{{ item.chapter.autotitle }}»</a>

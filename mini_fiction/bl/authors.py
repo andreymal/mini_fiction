@@ -760,7 +760,7 @@ class AuthorBL(BaseBL):
         local_comment_ids = set()
         news_comment_ids = set()
         for n in items:
-            if n.type in ('story_publish', 'story_draft'):
+            if n.type in ('story_publish', 'story_draft', 'author_story'):
                 story_ids.add(n.target_id)
             elif n.type == 'story_chapter':
                 chapter_ids.add(n.target_id)
@@ -817,12 +817,18 @@ class AuthorBL(BaseBL):
                 'extra': json.loads(n.extra or '{}'),
             }
 
-            if n.type in ('story_publish', 'story_draft'):
+            if n.type in ('story_publish', 'story_draft', 'author_story'):
                 if n.target_id not in stories:
                     item['broken'] = True
                     result.append(item)
                     continue
-                item['story'] = {'id': n.target_id, 'title': stories[n.target_id].title}
+                item['story'] = {
+                    'id': n.target_id,
+                    'title': stories[n.target_id].title,
+                }
+                if n.type == 'author_story':
+                    item['story']['words'] = stories[n.target_id].words
+                    item['story']['authors'] = [{'id': x.id, 'username': x.username} for x in stories[n.target_id].authors]
 
             elif n.type == 'story_chapter':
                 c = chapters.get(n.target_id)
@@ -911,6 +917,19 @@ class AuthorBL(BaseBL):
         if not sub:
             return {'email': False, 'tracker': False}
         return {'email': sub.to_email, 'tracker': sub.to_tracker}
+
+    def get_stories_subscription(self, user):
+        # Возвращает информацию о подписке user'а на новые рассказы этого пользователя
+        if not user or not user.is_authenticated:
+            return {'email': False, 'tracker': False}
+        author = self.model
+        return user.bl.get_subscription('author_story', author.id)
+
+    def subscribe_to_new_stories(self, user, email=None, tracker=None):
+        if not user or not user.is_authenticated:
+            return False
+        author = self.model
+        return user.bl.edit_subscription('author_story', author.id, email=email, tracker=tracker)
 
     def edit_subscription(self, typ, target_id, email=None, tracker=None):
         from mini_fiction.models import Subscription

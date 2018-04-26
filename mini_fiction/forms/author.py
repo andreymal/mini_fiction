@@ -128,6 +128,15 @@ class AuthorEditPrefsForm(Form):
         render_kw=dict(attrs_dict, type='number', min=-32768, max=32767),
     )
 
+    header_mode = SelectField(
+        '',
+        [],
+        choices=[(0, 'Скрыть'), (1, 'Показать без рассказов'), (2, 'Показать с рассказами')],
+        coerce=int,
+        widget=StoriesButtons(),
+        render_kw=radio_attrs,
+    )
+
 
 class AuthorEditEmailForm(Form):
     attrs_dict = {'class': 'input-xlarge'}

@@ -45,6 +45,7 @@ class AnonymousUser(AnonymousUserMixin):
     comments_per_page = None
     comments_maxdepth = None
     comment_spoiler_threshold = None
+    header_mode = ''
 
 
 class Author(db.Entity, UserMixin):
@@ -74,6 +75,7 @@ class Author(db.Entity, UserMixin):
     comments_per_page = orm.Optional(int, size=16, unsigned=True, nullable=True, default=None)
     comments_maxdepth = orm.Optional(int, size=16, unsigned=True, nullable=True, default=None)
     comment_spoiler_threshold = orm.Optional(int, size=16, nullable=True, default=None)
+    header_mode = orm.Optional(str, 8, py_check=lambda x: x in {'', 'off', 'l', 'ls'})
 
     # Если хранить подписки наизнанку, проще регистрировать народ и добавлять
     # новые типы подписок

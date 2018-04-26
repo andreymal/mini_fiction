@@ -169,6 +169,10 @@
                                     </div>
                                 {% endif %}
                             </div>
+                            <div class="padded bootstrap radio">
+                                <label>Картинка в шапке:</label>
+                                {{ prefs_form.header_mode }}
+                            </div>
                             {% if prefs_form_errors %}
                                 <div class="control-group error">
                                     {% for error in prefs_form_errors %}

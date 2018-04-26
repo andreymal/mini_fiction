@@ -156,7 +156,16 @@ def edit():
         if 'save_prefs' in request.form:
             prefs_form = AuthorEditPrefsForm()
             if prefs_form.validate_on_submit():
-                author.bl.update(prefs_form.data)
+                prefs_data = dict(prefs_form.data)
+                if prefs_data.get('header_mode') == 0:
+                    prefs_data['header_mode'] = 'off'
+                elif prefs_data.get('header_mode') == 1:
+                    prefs_data['header_mode'] = 'l'
+                elif prefs_data.get('header_mode') == 2:
+                    prefs_data['header_mode'] = 'ls'
+                else:
+                    prefs_data.pop('header_mode', None)
+                author.bl.update(prefs_data)
                 data['prefs_ok'] = True
 
         if 'save_subs' in request.form:
@@ -218,7 +227,8 @@ def edit():
                     author.comment_spoiler_threshold
                     if author.comment_spoiler_threshold is not None
                     else current_app.config['COMMENT_SPOILER_THRESHOLD']
-                )
+                ),
+                'header_mode': {'': 2, 'off': 0, 'l': 1, 'ls': 2}[author.header_mode],
             }
         )
     if not subs_form:

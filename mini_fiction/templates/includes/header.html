@@ -1,19 +1,24 @@
 <header>
 {{ html_block('header') }}
 
+{%- if current_user.header_mode != 'off' -%}
 {%- set logo = get_current_logopic() -%}
 {% if logo -%}
 <!-- Logo image and carousel start -->
 <div class="logopic" style="background-image: url('{{ logo['url'] }}')">
+    {%- if current_user.header_mode == '' or current_user.header_mode == 'ls' -%}
     <div id="slides" class="stories-carousel carousel-inactive">
         {{ random_stories() }}
     </div>
+    {%- endif %}
     {% if logo.original_link and logo.original_link_label -%}
         <a class="logopic-sourcelink" href="{{ logo.original_link }}" target="_blank">{{ logo.original_link_label }}</a>
     {%- endif %}
 </div>
 <!-- Logo image and carousel end -->
-{%- endif %}
+{% endif -%}
+{%- endif -%}
+
 <!-- Menu start -->
 <div class="nav-main" id="nav-main">
 {% include 'includes/nav.html' %}

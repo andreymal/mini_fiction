@@ -133,6 +133,15 @@ class AuthorBL(BaseBL):
                 user.comment_spoiler_threshold = int(data['comment_spoiler_threshold'])
                 changed_fields |= {'comment_spoiler_threshold',}
 
+        if data.get('header_mode') in ('off', 'l', 'ls'):
+            # off - не показывать картинку в шапке
+            # l - показывать только картинку
+            # ls - показывать картинку с блоком случайных рассказов
+            # Если в базе пусто, то значение по умолчанию ls
+            if (user.header_mode or 'ls') != data['header_mode']:
+                user.header_mode = data['header_mode']
+                changed_fields |= {'header_mode',}
+
         if 'contacts' in data:
             contacts = [x for x in data['contacts'] if x.get('name') and x.get('value')]
             lenc = len(contacts)

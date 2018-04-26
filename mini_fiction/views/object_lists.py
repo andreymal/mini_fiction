@@ -1,8 +1,10 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
+from datetime import datetime, timedelta
+
 from pony.orm import select, db_session
-from flask import Blueprint, current_app, abort, render_template
+from flask import Blueprint, current_app, abort, render_template, request
 from flask_login import current_user, login_required
 
 from mini_fiction.models import Author, Story, StoryContributor, Favorites, Bookmark, StoryView
@@ -108,14 +110,36 @@ def viewed(page):
 @db_session
 def top(page):
     objects = Story.select_published().filter(lambda x: x.vote_total >= current_app.config['MINIMUM_VOTES_FOR_VIEW'])
+
+    period = request.args.get('period')
+    if period and period.isdigit():
+        period = int(period)
+    else:
+        period = 0
+
+    if period > 0:
+        since = datetime.utcnow() - timedelta(days=period)
+        objects = objects.filter(lambda x: x.first_published_at >= since)
+
     objects = objects.order_by(Story.vote_value.desc(), Story.id.desc())
     objects = objects.prefetch(Story.characters, Story.categories, Story.contributors, StoryContributor.user)
-    return paginate_view(
-        'stream/stories.html',
-        objects,
+
+    page_obj = Paginator(
+        page,
+        objects.count(),
+        per_page=current_app.config['STORIES_COUNT']['stream'],
+        view_args={'period': period} if period > 0 else None,
+    )
+
+    stories = page_obj.slice_or_404(objects)
+
+    data = dict(
+        stories=stories,
+        page_obj=page_obj,
         count=objects.count(),
         page_title='Топ рассказов',
-        objlistname='stories',
-        per_page=current_app.config['STORIES_COUNT']['stream'],
-        extra_context=lambda stories, _: cached_lists([x.id for x in stories])
+        period=period,
     )
+    data.update(cached_lists([x.id for x in stories]))
+
+    return render_template('stream/stories_top.html', **data)

@@ -1,0 +1,27 @@
+{% extends "stories_list_common.html" %}
+
+{% from 'macro.html' import paginator with context %}
+
+{% block before_list %}
+<div>
+    {% if period != 7 %}<a href="{{ modified_url(period='7') }}">{% endif -%}
+        За неделю
+    {%- if period != 7 %}</a>{% endif %}
+    &nbsp; &nbsp;
+    {% if period != 30 %}<a href="{{ modified_url(period='30') }}">{% endif -%}
+        За месяц
+    {%- if period != 30 %}</a>{% endif %}
+    &nbsp; &nbsp;
+    {% if period != 365 %}<a href="{{ modified_url(period='365') }}">{% endif -%}
+        За год
+    {%- if period != 365 %}</a>{% endif %}
+    &nbsp; &nbsp;
+    {% if period != 0 %}<a href="{{ modified_url(period=None) }}">{% endif -%}
+        За всё время
+    {%- if period != 0 %}</a>{% endif %}
+</div>
+{% endblock %}
+
+{% block after_list %}
+    {% if stories %}{{ paginator(page_obj) }}{% endif %}
+{% endblock %}

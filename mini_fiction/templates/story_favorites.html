@@ -1,0 +1,20 @@
+{% extends base %}
+{% from 'macro.html' import breadcrumbs with context %}
+{% block content %}
+<div class="row">
+    <div class="span8">
+        {{- breadcrumbs([[url_for('story.view', pk=story.id), story.title]], current='Избранное') }}
+        <h1>{{ story.title }}</h1>
+
+        <div>
+            {{ ngettext("Added to favorites by %(num)d user", "Added to favorites by %(num)d users", favorites_count) }}:<br/>
+            {% for fav in favorites -%}
+                {%- with user=fav.author %}{% include 'includes/userlink.html' %}{% endwith -%}
+                {%- if not loop.last %}, {% endif -%}
+            {%- endfor -%}
+        </div>
+
+        {{- breadcrumbs([[url_for('story.view', pk=story.id), story.title]], current='Избранное') }}
+    </div>
+</div>
+{% endblock %}

@@ -99,6 +99,10 @@
                         {{- story.updated|timesince }}
                     </time><br/>
                 {%- endif -%}
+
+                {% if favorites_count > 0 %}
+                <a href="{{ url_for('story.favorites', pk=story.id) }}">{{ ngettext("Added to favorites by %(num)d user", "Added to favorites by %(num)d users", favorites_count) }}</a><br/>
+                {% endif %}
             </p>
 
             {% if current_user.is_authenticated -%}

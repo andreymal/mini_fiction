@@ -92,6 +92,7 @@ def view(pk, comments_page):
         'sub': story.bl.get_subscription(user),
         'sub_comments': story.bl.get_comments_subscription(user),
         'robots_noindex': not story.published or story.robots_noindex,
+        'favorites_count': story.favorites.select().count(),
     }
 
     return render_template('story_view.html', **data)
@@ -308,6 +309,46 @@ def edit_log(pk):
         story=story,
     )
     return render_template('story_edit_log.html', **data)
+
+
+@bp.route('/<int:pk>/favorites/')
+@db_session
+def favorites(pk):
+    story = get_story(pk)
+
+    favorites_list = Favorites.select(lambda x: x.story == story).prefetch(Favorites.author)
+    favorites_list = favorites_list.order_by(Favorites.date)[:]
+
+    return render_template(
+        'story_favorites.html',
+        story=story,
+        favorites=favorites_list,
+        favorites_count=len(favorites_list),
+        page_title='«{}» в избранном'.format(story.title),
+    )
+
+    user = Author.get(id=user_id)
+    if not user:
+        abort(404)
+
+    objects = select(x.story for x in Favorites if x.author == user)
+    if not current_user.is_authenticated or (not current_user.is_staff and current_user.id != user.id):
+        objects = objects.filter(lambda story: not story.draft and story.approved)
+    objects = objects.without_distinct().order_by('-x.id')
+
+    if current_user.is_authenticated and user.id == current_user.id:
+        page_title = 'Мое избранное'
+    else:
+        page_title = 'Избранное автора %s' % user.username
+
+    return paginate_view(
+        'favorites.html',
+        objects,
+        count=objects.count(),
+        page_title=page_title,
+        author=user,
+        objlistname='stories',
+    )
 
 
 @bp.route('/add/', methods=('GET', 'POST'))

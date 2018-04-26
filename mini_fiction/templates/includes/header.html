@@ -5,7 +5,7 @@
 {% if logo -%}
 <!-- Logo image and carousel start -->
 <div class="logopic" style="background-image: url('{{ logo['url'] }}')">
-    <div id="slides" class="carousel">
+    <div id="slides" class="stories-carousel carousel-inactive">
         {{ random_stories() }}
     </div>
     {% if logo.original_link and logo.original_link_label -%}

@@ -38,38 +38,42 @@ var story = {
 
     init: function() {
         // Каруселька со случайными рассказами
-        $("#slides").slidesjs({
-            width: 524,
-            height: 200,
-            navigation: {
-                active: true,
-                effect: "fade",
-            },
-            pagination: {
-                active: false,
-            },
-            effect: {
-                slide: {
-                    speed: 1500,
+        var slides = document.getElementById('slides');
+        if (slides) {
+            $(slides).slidesjs({
+                width: 524,
+                height: 200,
+                navigation: {
+                    active: true,
+                    effect: 'fade',
                 },
-                fade: {
-                    speed: 300,
-                    crossfade: false,
+                pagination: {
+                    active: false,
+                },
+                effect: {
+                    slide: {
+                        speed: 1500,
+                    },
+                    fade: {
+                        speed: 300,
+                        crossfade: false,
+                    }
+                },
+                play: {
+                    active: false,
+                    effect: 'fade',
+                    interval: 7500,
+                    auto: true,
+                    swap: true,
+                    pauseOnHover: true,
+                    restartDelay: 3500
                 }
-            },
-            play: {
-                active: false,
-                effect: "fade",
-                interval: 5000,
-                auto: true,
-                swap: true,
-                pauseOnHover: true,
-                restartDelay: 2500
-            }
-        });
-        // TODO: расхардкодить
-        $('.slidesjs-previous').html('<img src="/static/i/arrow-left.png" />');
-        $('.slidesjs-next').html('<img src="/static/i/arrow-right.png" />');
+            });
+            // TODO: расхардкодить
+            $('#slides .slidesjs-previous').html('<img src="/static/i/arrow-left.png" />');
+            $('#slides .slidesjs-next').html('<img src="/static/i/arrow-right.png" />');
+            slides.classList.remove('carousel-inactive');
+        }
 
         // Обработка нажатия кнопок голосования за рассказ
         core.utils.addLiveClickListener('js-vote-button', this._voteButtonClickEvent.bind(this));

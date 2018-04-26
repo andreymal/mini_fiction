@@ -66,37 +66,43 @@ a {
     pointer-events: auto;
 }
 
-.carousel {
+.stories-carousel {
+    position: absolute;
+    top: 20px;
+    right: 87px;
     width: 500px;
-    float: right;
-    padding: 0 27px;
-    margin: 20px 40px 0 0;
     max-height: 200px;
     overflow: hidden;
-}
-
-.carousel .slidesjs-container {
+    background-color: white;
     background-color: rgba(255, 255, 255, 0.8);
 }
 
-.carousel h3 {
+.stories-carousel.carousel-inactive {
+    display: none;
+}
+
+.stories-carousel .slidesjs-container {
+    margin-bottom: -39px;
+}
+
+.stories-carousel h3 {
     padding-bottom: 4px;
 }
 
-.carousel p {
+.stories-carousel p {
     line-height: 20px;
     margin-bottom: 4px;
-    width: 97%;
 }
 
-.carousel .story-item {
+.stories-carousel .story-item {
     margin: 0px!important;
+    box-sizing: border-box;
 }
-.carousel p.meta .gen {
+.stories-carousel p.meta .gen {
     margin-bottom: 4px;
 }
 
-.carousel p.meta {
+.stories-carousel p.meta {
     margin-bottom: 0;
 }
 
@@ -105,10 +111,12 @@ a {
     height: 32px;
 }
 a.slidesjs-navigation {
+    display: inline-block;
     position: relative;
-    top: -37px;
+    top: 0px;
     left: 425px;
     padding: 2px;
+    margin-bottom: 3px;
 }
 
 

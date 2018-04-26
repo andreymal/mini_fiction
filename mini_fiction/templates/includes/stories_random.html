@@ -8,7 +8,7 @@
                     {%- endfor -%}
                 </span>
         </p>
-        <p>{{ random_story.summary_as_html|striptags|truncate(120) }}</p>
+        <p>{{ random_story.summary_as_html|striptags|truncate(200) }}</p>
         <p class="meta">
                 <span class="character-list">
                     {%- for character in random_story.characters|sort(attribute='id') -%}

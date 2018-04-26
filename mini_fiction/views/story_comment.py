@@ -123,6 +123,7 @@ def ajax(story_id, page):
         per_page,
         template_pagination='includes/comments_pagination_story.html',
         last_viewed_comment=last_viewed_comment,
+        extra_data={'author_ids': [x.id for x in story.authors]},
     )
 
 
@@ -147,6 +148,7 @@ def ajax_tree(story_id, local_id):
         comment,
         target=story,
         last_viewed_comment=last_viewed_comment,
+        extra_data={'author_ids': [x.id for x in story.authors]},
     )
 
 

@@ -1,2 +1,2 @@
 {%- from 'macro.html' import comment_html with context -%}
-{{ comment_html(comment, short=comments_short, with_controls=not comments_short and not without_comment_controls, with_vote=not comments_short) }}
+{{ comment_html(comment, short=comments_short, with_controls=not comments_short and not without_comment_controls, with_vote=not comments_short, author_ids=author_ids) }}

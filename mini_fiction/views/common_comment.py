@@ -307,7 +307,7 @@ def vote(target_attr, comment):
     })
 
 
-def ajax(target_attr, target, link, page, per_page, template_pagination, last_viewed_comment=None):
+def ajax(target_attr, target, link, page, per_page, template_pagination, last_viewed_comment=None, extra_data=None):
     if not target.bl.has_comments_access(current_user._get_current_object()):
         abort(403)
 
@@ -322,7 +322,9 @@ def ajax(target_attr, target, link, page, per_page, template_pagination, last_vi
         comment_votes_cache = target.bl.select_comment_votes(current_user._get_current_object(), comment_ids)
     else:
         comment_votes_cache = {i: 0 for i in comment_ids}
-    data = {
+
+    data = dict(extra_data or {})
+    data.update({
         target_attr: target,
         'comments_tree_list': comments_tree_list,
         'last_viewed_comment': last_viewed_comment,
@@ -330,7 +332,7 @@ def ajax(target_attr, target, link, page, per_page, template_pagination, last_vi
         'page_current': page,
         'page_obj': paged,
         'comment_votes_cache': comment_votes_cache,
-    }
+    })
 
     return jsonify({
         'success': True,
@@ -341,7 +343,7 @@ def ajax(target_attr, target, link, page, per_page, template_pagination, last_vi
     })
 
 
-def ajax_tree(target_attr, comment, target=None, last_viewed_comment=None):
+def ajax_tree(target_attr, comment, target=None, last_viewed_comment=None, extra_data=None):
     if not target:
         target = getattr(comment, target_attr)
     if not target.bl.has_comments_access(current_user._get_current_object()):
@@ -381,12 +383,13 @@ def ajax_tree(target_attr, comment, target=None, last_viewed_comment=None):
     else:
         comment_votes_cache = {i: 0 for i in comment_ids}
 
-    data = {
+    data = dict(extra_data or {})
+    data.update({
         target_attr: target,
         'comments_tree_list': tree,
         'last_viewed_comment': last_viewed_comment,
         'comment_votes_cache': comment_votes_cache,
-    }
+    })
 
     return jsonify({
         'success': True,

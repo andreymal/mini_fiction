@@ -76,6 +76,7 @@ def view(pk, comments_page):
         'story': story,
         'contributors': story.bl.get_contributors_for_view(),
         'vote': user_vote,
+        'author_ids': [x.id for x in story.authors],
         'comments_tree_list': comments_tree_list,
         'comments_count': comments_count,
         'comment_votes_cache': comment_votes_cache,

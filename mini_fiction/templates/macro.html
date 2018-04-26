@@ -81,7 +81,7 @@
 {% endmacro %}
 
 
-{% macro comment_html(comment, short=False, with_controls=True, with_vote=True) %}
+{% macro comment_html(comment, short=False, with_controls=True, with_vote=True, author_ids=None) %}
     {%- if comment.deleted and not current_user.is_staff -%}
         <div class="comment-text comment-text-deleted">
             Комментарий был отправлен на Луну
@@ -122,7 +122,7 @@
         {%- endif %}
 
         <div class="comment-meta">
-            <span class="comment-author">
+            <span class="comment-author{% if author_ids and comment.author and comment.author.id in author_ids %} comment-by-topic-author{% endif %}">
             {%- if comment.author -%}
                 {% with user=comment.author %}
                     {% include 'includes/userlink.html' %}

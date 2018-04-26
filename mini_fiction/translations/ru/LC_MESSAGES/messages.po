@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version:  0.0.3\n"
 "Report-Msgid-Bugs-To: andriyano-31@mail.ru\n"
-"POT-Creation-Date: 2018-03-12 19:59+0300\n"
+"POT-Creation-Date: 2018-04-26 20:12+0300\n"
 "Last-Translator: andreymal <andriyano-31@mail.ru>\n"
 "Language: ru\n"
 "Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && "
@@ -18,7 +18,7 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 2.5.3\n"
 
-#: mini_fiction/models.py:513 mini_fiction/models.py:771
+#: mini_fiction/models.py:517 mini_fiction/models.py:780
 msgid "Chapter {}"
 msgstr "Глава {}"
 
@@ -30,7 +30,7 @@ msgstr "Добавить новый"
 msgid "User already exists"
 msgstr "Пользователь уже существует"
 
-#: mini_fiction/bl/authors.py:52 mini_fiction/bl/authors.py:292
+#: mini_fiction/bl/authors.py:52 mini_fiction/bl/authors.py:301
 msgid "Email address is already in use"
 msgstr "Электропочта уже используется"
 
@@ -43,35 +43,35 @@ msgid "Please set only password or password hash"
 msgstr "Укажите только пароль или хэш пароля"
 
 #: mini_fiction/bl/authors.py:64 mini_fiction/views/auth.py:142
-#: mini_fiction/views/author.py:121
+#: mini_fiction/views/author.py:122
 msgid "Password is too bad, please change it"
 msgstr "Пароль слишком плохой, поменяйте его"
 
-#: mini_fiction/bl/authors.py:150
+#: mini_fiction/bl/authors.py:159
 msgid "Invalid contact type"
 msgstr "Неправильный тип контакта"
 
-#: mini_fiction/bl/authors.py:193
+#: mini_fiction/bl/authors.py:202
 msgid "Too big avatar; must be {value} KiB or smaller"
 msgstr "Слишком большой аватар; надо {value} КиБ или меньше"
 
-#: mini_fiction/bl/authors.py:200
+#: mini_fiction/bl/authors.py:209
 msgid "Cannot read avatar"
 msgstr "Не получилось прочитать аватар"
 
-#: mini_fiction/bl/authors.py:385
+#: mini_fiction/bl/authors.py:394
 msgid "Too small avatar; must be {w}x{h} or bigger"
 msgstr "Слишком маленький аватар; надо {w}x{h} или больше"
 
-#: mini_fiction/bl/authors.py:387
+#: mini_fiction/bl/authors.py:396
 msgid "Too big avatar; must be {w}x{h} or smaller"
 msgstr "Слишком большой аватар; надо {w}x{h} или меньше"
 
-#: mini_fiction/bl/authors.py:641
+#: mini_fiction/bl/authors.py:650
 msgid "Please enter a correct username and password."
 msgstr "Пожалуйста, введите правильные имя пользователя и пароль."
 
-#: mini_fiction/bl/authors.py:643
+#: mini_fiction/bl/authors.py:652
 msgid "Account is disabled"
 msgstr "Аккаунт отключен"
 
@@ -196,7 +196,7 @@ msgstr "Рекомендуемый размер 100x100 пикселей"
 msgid "Delete avatar"
 msgstr "Удалить аватар"
 
-#: mini_fiction/forms/admin/authors.py:55 mini_fiction/forms/author.py:168
+#: mini_fiction/forms/admin/authors.py:55 mini_fiction/forms/author.py:180
 #: mini_fiction/forms/register.py:26 mini_fiction/forms/register.py:57
 msgid "Passwords do not match"
 msgstr "Пароли не совпадают"
@@ -515,8 +515,8 @@ msgid "Moderation log"
 msgstr "Лог модерации"
 
 #: mini_fiction/templates/includes/story_control_buttons.html:33
-#: mini_fiction/templates/index.html:36 mini_fiction/views/editlog.py:52
-#: mini_fiction/views/editlog.py:71
+#: mini_fiction/templates/index.html:36 mini_fiction/views/editlog.py:63
+#: mini_fiction/views/editlog.py:83
 msgid "Edit log"
 msgstr "Лог изменений"
 
@@ -562,13 +562,24 @@ msgstr[0] "%(num)d голос"
 msgstr[1] "%(num)d голоса"
 msgstr[2] "%(num)d голосов"
 
+#: mini_fiction/templates/story_favorites.html:10
+#: mini_fiction/templates/story_view.html:104
+#, python-format
+msgid "Added to favorites by %(num)d user"
+msgid_plural "Added to favorites by %(num)d users"
+msgstr[0] "В избранном у %(num)d пользователя"
+msgstr[1] "В избранном у %(num)d пользователей"
+msgstr[2] "В избранном у %(num)d пользователей"
+
+#: mini_fiction/templates/email/author_story.html:9
 #: mini_fiction/templates/email/story_chapter.html:13
 #: mini_fiction/templates/includes/ajax/story_ajax_publish_warning.html:9
 #: mini_fiction/templates/includes/chapter_preview.html:4
+#: mini_fiction/templates/includes/notifications.html:49
 #: mini_fiction/templates/includes/stories.html:21
 #: mini_fiction/templates/includes/stories.html:51
 #: mini_fiction/templates/story_view.html:85
-#: mini_fiction/templates/story_view.html:132
+#: mini_fiction/templates/story_view.html:136
 #, python-format
 msgid "%(num)d word"
 msgid_plural "%(num)d words"
@@ -581,7 +592,7 @@ msgstr[2] "%(num)d слов"
 #: mini_fiction/templates/includes/stories.html:25
 #: mini_fiction/templates/includes/stories.html:51
 #: mini_fiction/templates/story_view.html:85
-#: mini_fiction/templates/story_view.html:132
+#: mini_fiction/templates/story_view.html:136
 #, python-format
 msgid "%(num)d view"
 msgid_plural "%(num)d views"
@@ -591,7 +602,7 @@ msgstr[2] "%(num)d просмотров"
 
 #: mini_fiction/templates/includes/chapter_single.html:5
 #: mini_fiction/templates/includes/stories.html:46
-#: mini_fiction/templates/story_view.html:129
+#: mini_fiction/templates/story_view.html:133
 msgid "Draft"
 msgstr "Черновик"
 
@@ -1022,12 +1033,12 @@ msgstr "Удалён:"
 msgid "(preview)"
 msgstr "(предпросмотр)"
 
-#: mini_fiction/templates/includes/edit_log_item.html:32
+#: mini_fiction/templates/includes/edit_log_item.html:46
 msgctxt "story_edit_log"
 msgid "of story"
 msgstr "рассказа"
 
-#: mini_fiction/templates/includes/edit_log_item.html:47
+#: mini_fiction/templates/includes/edit_log_item.html:61
 msgid "Show changes"
 msgstr "Показать изменения"
 
@@ -1343,15 +1354,15 @@ msgstr "Мой кабинет"
 msgid "Author: {author}"
 msgstr "Автор: {author}"
 
-#: mini_fiction/views/author.py:100
+#: mini_fiction/views/author.py:101
 msgid "Profile settings"
 msgstr "Настройки профиля"
 
-#: mini_fiction/views/author.py:119
+#: mini_fiction/views/author.py:120
 msgid "Old password is incorrect"
 msgstr "Старый пароль неверный"
 
-#: mini_fiction/views/author.py:147
+#: mini_fiction/views/author.py:148
 msgid "Password is incorrect"
 msgstr "Неверный пароль"
 
@@ -1385,7 +1396,7 @@ msgstr "Поиск рассказов"
 msgid "Search results"
 msgstr "Результаты поиска"
 
-#: mini_fiction/views/story.py:330
+#: mini_fiction/views/story.py:376
 msgid "New story"
 msgstr "Новый рассказ"
 

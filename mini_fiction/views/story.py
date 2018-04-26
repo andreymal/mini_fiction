@@ -300,11 +300,11 @@ def edit_log(pk):
     if not story.bl.can_view_editlog(user):
         abort(403)
 
-    edit_log = story.edit_log.select().order_by(StoryLog.created_at.desc()).prefetch(StoryLog.user)
+    edit_log_items = story.edit_log.select().order_by(StoryLog.created_at.desc()).prefetch(StoryLog.user)
 
     data = dict(
-        edit_log=edit_log,
-        edit_log_users=load_users_for_editlog(edit_log),
+        edit_log=edit_log_items,
+        edit_log_users=load_users_for_editlog(edit_log_items),
         page_title='История редактирования рассказа «{}»'.format(story.title),
         story=story,
     )

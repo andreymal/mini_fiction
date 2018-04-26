@@ -1484,6 +1484,7 @@ blockquote {
 }
 blockquote > p {
     line-height: inherit;
+    font-weight: inherit;
 }
 
 /* Registration form */
@@ -2218,6 +2219,7 @@ ul.editlog .editlog-item:nth-child(2n+1) {
 .subscription-form label {
     display: inline-block;
     font-size: inherit;
+    font-weight: inherit;
     line-height: inherit;
     margin: 0;
     padding: 0;

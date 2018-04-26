@@ -17,6 +17,7 @@ from flask import Markup, current_app
 from mini_fiction.bl.utils import BaseBL
 from mini_fiction.bl.commentable import Commentable
 from mini_fiction.utils.misc import words_count, call_after_request as later
+from mini_fiction.utils.misc import normalize_text_for_search_index, normalize_text_for_search_query
 from mini_fiction.utils import diff as utils_diff
 from mini_fiction.validation import Validator
 from mini_fiction.validation.stories import STORY
@@ -713,9 +714,9 @@ class StoryBL(BaseBL, Commentable):
         for story in stories:
             data = {
                 'id': story.id,
-                'title': story.title,
-                'summary': story.summary,
-                'notes': story.notes,
+                'title': normalize_text_for_search_index(story.title, html=False),
+                'summary': normalize_text_for_search_index(story.summary, html=True),
+                'notes': normalize_text_for_search_index(story.notes, html=True),
                 'match_author': ' '.join(x.username for x in story.authors),
 
                 'first_published_at': int(((story.first_published_at or story.date) - datetime(1970, 1, 1, 0, 0, 0)).total_seconds()),
@@ -817,6 +818,8 @@ class StoryBL(BaseBL, Commentable):
         if only_published:
             sphinx_filters['draft'] = 0
             sphinx_filters['approved'] = 1
+
+        query = normalize_text_for_search_query(query)
 
         # TODO: unused, remove it?
         # for ofilter in ('character', 'classifier', 'category', 'rating_id'):
@@ -1468,9 +1471,9 @@ class ChapterBL(BaseBL):
             data = {
                 'id': chapter.id,
 
-                'title': chapter.title,
-                'notes': chapter.notes,
-                'text': chapter.text,
+                'title': normalize_text_for_search_index(chapter.title, html=False),
+                'notes': normalize_text_for_search_index(chapter.notes, html=True),
+                'text': normalize_text_for_search_index(chapter.text, html=True),
 
                 'story_id': chapter.story.id,
                 'first_published_at': int(((chapter.first_published_at or chapter.date) - datetime(1970, 1, 1, 0, 0, 0)).total_seconds()),
@@ -1519,6 +1522,8 @@ class ChapterBL(BaseBL):
 
         if sort_by not in self.sort_types:
             sort_by = 0
+
+        query = normalize_text_for_search_query(query)
 
         sphinx_filters = {}
         if only_published:

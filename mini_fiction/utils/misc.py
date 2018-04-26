@@ -423,28 +423,57 @@ def fprint_substring(s, l=0, file=sys.stdout):
     return len(s)
 
 
-def words_count(s, html=True):
-    '''По-умному считает число слов в строке.'''
+def striptags(s):
+    # Простая удалялка тегов по регуляркам; не используйте как защиту от XSS
+
+    # Добавляем разделительные пробелы тем тегам, которые разделяют слова
+    s = re.sub(r'(</?(br|hr|footnote|p|blockquote|img|ul|ol|li|pre)[^>]*?>)', r' \1', s, flags=re.I)
+    # Для таких span прописан display: block
+    s = re.sub(r'(<span+[^>]{,127} +align=[^>]{,127}>)', r' \1', s, flags=re.I)
+    # Разделители добавлены, теперь теги можно удалить
+    s = re.sub(r'<!--.*?-->', '', s)
+    s = re.sub(r'<[^ <>][^<>]{,1500}?>', '', s)  # 1500 - защита от одиноко стоящих знаков больше/меньше
+    return s
+
+
+def words_split(s, html=True, strip_punctuation=False, strip_entities=False):
+    '''По-умному разделяет строку на слова.'''
 
     s = str(s)
 
     if html:
-        # Добавляем разделительные пробелы тем тегам, которые разделяют слова
-        s = re.sub(r'(</?(br|hr|footnote|p|blockquote|img|ul|ol|li|pre)[^>]*?>)', r' \1', s, flags=re.I)
-        # Для таких span прописан display: block
-        s = re.sub(r'(<span+[^>]{,127} +align=[^>]{,127}>)', r' \1', s, flags=re.I)
-        # Разделители добавлены, теперь теги можно удалить
-        s = re.sub(r'<!--.*?-->', '', s)
-        s = re.sub(r'<[^<>]*?>', '', s)
+        # Удаляем HTML-теги по умному
+        s = striptags(s)
         # HTML-сущности тоже не считаем за слова
-        s = re.sub(r'&#?[A-Za-z0-9]{1,16};?', '', s)
+        if strip_entities:
+            s = re.sub(r'&#?[A-Za-z0-9]{1,16};?', '', s)
+        else:
+            # Если сущности удалять не просят, заменяем самые популярные на оригинальные символы
+            for a, b in [('&lt;', '<'), ('&gt;', '>'), ('&quot;', '"'), ('&amp;', '&amp;'), ('&shy;', '\u00ad')]:
+                s = s.replace(a, b)
 
     # Знаки препинания за слова не считаются
-    s = re.sub(r'[\-\/]+', '', s)
-    s = re.sub(r'[.,?!@:;_—…–$%*&<>"«»()]+', ' ', s)
+    if strip_punctuation:
+        s = re.sub(r'[\-\/]+', '', s)
+        s = re.sub(r'[.,?!@:;_—…–$%*&<>"«»()]+', ' ', s)
+        s = s.replace('\u00ad', '')  # мягкий перенос
 
     words = s.split()
-    return len(words)
+    return words
+
+
+def words_count(s, html=True):
+    '''По-умному считает число слов в строке.'''
+    return len(words_split(s, html=html, strip_punctuation=True, strip_entities=True))
+
+
+def normalize_text_for_search_index(s, html=True):
+    return ' '.join(words_split(s, html=html, strip_entities=False))
+
+
+def normalize_text_for_search_query(s):
+    s = s.replace('\u00ad', '')
+    return s
 
 
 def htmlcrop(text, length, end='...', spaces=' \t\r\n\xa0', max_overflow=300):

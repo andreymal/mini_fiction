@@ -122,7 +122,7 @@ zip_dump_params = {
         'exclude': (
             'comment_spoiler_threshold', 'comments_maxdepth', 'detail_view', 'excluded_categories',
             'last_viewed_notification_id', 'nsfw', 'premoderation_mode', 'last_password_change',
-            'silent_email', 'silent_tracker', 'comments_per_page', 'extra',
+            'silent_email', 'silent_tracker', 'comments_per_page', 'header_mode', 'extra',
         ),
         'override': {'email': '', 'password': ''},
         'with_collections': False,

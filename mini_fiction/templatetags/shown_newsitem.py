@@ -13,6 +13,6 @@ def shown_newsitem():
     if not n:
         return
     last_id = request.cookies.get('last_newsitem')
-    if last_id and last_id.isdigit() and int(last_id) >= n.id:
+    if last_id and last_id.isdigit() and int(last_id) == n.id:
         return
     return n

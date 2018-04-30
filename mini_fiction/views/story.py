@@ -417,7 +417,10 @@ def edit(pk):
 
     action = request.form.get('act') if request.method == 'POST' else None
 
-    form = StoryForm(data=story_data)
+    if action == 'save_story':
+        form = StoryForm(data=story_data)  # formdata по умолчанию request.form
+    else:
+        form = StoryForm(formdata=None, data=story_data)  # отключаем formdata, чтобы не конфликтовать с другими формами
 
     data['form'] = form
     data['contr_error'] = None

@@ -228,37 +228,53 @@ def publish(pk):
 
 
 
-@bp.route('/<int:pk>/favorite/', methods=('POST',))
+@bp.route('/<int:pk>/favorite/<action>/', methods=('POST',))
 @db_session
 @login_required
-def favorite(pk):
+def favorite(pk, action):
+    if action not in ('add', 'delete'):
+        abort(404)
+
     user = current_user._get_current_object()
-    f = Favorites.select(lambda x: x.author == user and x.story.id == pk).first()
-    if f:
+    f = Favorites.select(lambda x: x.author == user and x.story.id == pk).for_update().first()
+    if f and action == 'delete':
         f.delete()  # без проверки доступа
         f = None
-    else:
+    elif action == 'add':
         story = get_story(pk)  # проверка доступа
         f = Favorites(author=user, story=story)
     if g.is_ajax:
-        return jsonify({'success': True, 'story_id': pk, 'favorited': f is not None})
+        return jsonify({
+            'success': True,
+            'story_id': pk,
+            'favorited': f is not None,
+            'change_url': url_for('story.favorite', pk=pk, action='delete' if f else 'add'),
+        })
     return redirect(url_for('story.view', pk=pk))
 
 
-@bp.route('/<int:pk>/bookmark/', methods=('POST',))
+@bp.route('/<int:pk>/bookmark/<action>/', methods=('POST',))
 @db_session
 @login_required
-def bookmark(pk):
+def bookmark(pk, action):
+    if action not in ('add', 'delete'):
+        abort(404)
+
     user = current_user._get_current_object()
-    b = Bookmark.select(lambda x: x.author == user and x.story.id == pk).first()
-    if b:
+    b = Bookmark.select(lambda x: x.author == user and x.story.id == pk).for_update().first()
+    if b and action == 'delete':
         b.delete()  # без проверки доступа
         b = None
-    else:
+    elif action == 'add':
         story = get_story(pk)  # проверка доступа
         b = Bookmark(author=user, story=story)
     if g.is_ajax:
-        return jsonify({'success': True, 'story_id': pk, 'bookmarked': b is not None})
+        return jsonify({
+            'success': True,
+            'story_id': pk,
+            'bookmarked': b is not None,
+            'change_url': url_for('story.bookmark', pk=pk, action='delete' if b else 'add'),
+        })
     return redirect(url_for('story.view', pk=pk))
 
 

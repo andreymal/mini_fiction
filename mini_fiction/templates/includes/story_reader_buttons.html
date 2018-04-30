@@ -2,7 +2,7 @@
 {% if current_user.is_authenticated -%}
     {%- set favorited = (story.id in favorited_ids) if favorited_ids is defined else story.favorited(current_user.id) -%}
     {%- set bookmarked = (story.id in bookmarked_ids) if bookmarked_ids is defined else story.bookmarked(current_user.id) %}
-    <a title="В избранное" href="{{ url_for('story.favorite', pk=story.id) }}" class="story_favorite scon favorite{% if favorited %} favorited{% endif %}"></a><a title="Прочитать позже" href="{{ url_for('story.bookmark', pk=story.id) }}" class="story_bookmark scon bookmark{% if bookmarked %} bookmarked{% endif %}"></a>
+    <a title="В избранное" href="{{ url_for('story.favorite', pk=story.id, action='delete' if favorited else 'add') }}" class="story_favorite scon favorite{% if favorited %} favorited{% endif %}"></a><a title="Прочитать позже" href="{{ url_for('story.bookmark', pk=story.id, action='delete' if bookmarked else 'add') }}" class="story_bookmark scon bookmark{% if bookmarked %} bookmarked{% endif %}"></a>
 {%- endif -%}
 <a title="Подписаться на новые главы по RSS" href="{{ url_for('feeds.story', story_id=story.id) }}" class="scon feed" data-noajax="1"></a>
 {%- for d in story.list_downloads() -%}

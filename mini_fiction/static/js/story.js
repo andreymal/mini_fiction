@@ -194,7 +194,7 @@ var story = {
                     if (core.handleResponse(response, url)) {
                         return;
                     }
-                    story.setFavorited(response.story_id, response.favorited);
+                    story.setFavorited(response.story_id, response.favorited, response.change_url);
                 }).catch(core.handleError);
         });
 
@@ -211,7 +211,7 @@ var story = {
                     if (core.handleResponse(response, url)) {
                         return;
                     }
-                    story.setBookmarked(response.story_id, response.bookmarked);
+                    story.setBookmarked(response.story_id, response.bookmarked, response.change_url);
                 }).catch(core.handleError);
         });
 
@@ -304,7 +304,7 @@ var story = {
         }
     },
 
-    setFavorited: function(storyId, favorited) {
+    setFavorited: function(storyId, favorited, changeUrl) {
         var story = document.getElementById('story_' + parseInt(storyId));
         if (!story) {
             return false;
@@ -319,6 +319,9 @@ var story = {
                 panelBtn.classList.remove('favorited');
             }
             panelOk = true;
+            if (changeUrl) {
+                panelBtn.href = changeUrl;
+            }
         }
         var btn = story.querySelector('.story_favorite');
         if (btn) {
@@ -328,6 +331,9 @@ var story = {
                 btn.classList.remove('favorited');
             }
             storyOk = true;
+            if (changeUrl) {
+                btn.href = changeUrl;
+            }
         }
 
         if (!panelOk && !storyOk) {
@@ -338,7 +344,7 @@ var story = {
         return true;
     },
 
-    setBookmarked: function(storyId, bookmarked) {
+    setBookmarked: function(storyId, bookmarked, changeUrl) {
         var story = document.getElementById('story_' + parseInt(storyId));
         if (!story) {
             return false;
@@ -353,6 +359,9 @@ var story = {
                 panelBtn.classList.remove('bookmarked');
             }
             panelOk = true;
+            if (changeUrl) {
+                panelBtn.href = changeUrl;
+            }
         }
         var btn = story.querySelector('.story_bookmark');
         if (btn) {
@@ -362,6 +371,9 @@ var story = {
                 btn.classList.remove('bookmarked');
             }
             storyOk = true;
+            if (changeUrl) {
+                btn.href = changeUrl;
+            }
         }
 
         if (!panelOk && !storyOk) {

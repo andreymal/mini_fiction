@@ -2,8 +2,10 @@
     <span class="js-required btn btn-mini btn-mini-formatting js-formatting-btn" title="Настройки форматирования главы"></span>
 
     {% if current_user.is_authenticated %}
-        <a title="В избранное" href="{{ url_for('story.favorite', pk=story.id) }}" class="js-required story_favorite scon favorite{% if story.favorited(current_user.id) %} favorited{% endif %}"></a>
-        <a title="Прочитать позже" href="{{ url_for('story.bookmark', pk=story.id) }}" class="js-required story_bookmark scon bookmark{% if story.bookmarked(current_user.id) %} bookmarked{% endif %}"></a>
+        {%- set favorited = story.favorited(current_user.id) -%}
+        {%- set bookmarked = story.bookmarked(current_user.id) %}
+        <a title="В избранное" href="{{ url_for('story.favorite', pk=story.id, action='delete' if favorited else 'add') }}" class="js-required story_favorite scon favorite{% if favorited %} favorited{% endif %}"></a>
+        <a title="Прочитать позже" href="{{ url_for('story.bookmark', pk=story.id, action='delete' if bookmarked else 'add') }}" class="js-required story_bookmark scon bookmark{% if bookmarked %} bookmarked{% endif %}"></a>
     {% endif %}
     {% if story.status_string != 'finished' %}
         <a title="Подписаться на новые главы по RSS" href="{{ url_for('feeds.story', story_id=story.id) }}" class="scon feed" data-noajax="1"></a>

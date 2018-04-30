@@ -327,29 +327,6 @@ def favorites(pk):
         page_title='«{}» в избранном'.format(story.title),
     )
 
-    user = Author.get(id=user_id)
-    if not user:
-        abort(404)
-
-    objects = select(x.story for x in Favorites if x.author == user)
-    if not current_user.is_authenticated or (not current_user.is_staff and current_user.id != user.id):
-        objects = objects.filter(lambda story: not story.draft and story.approved)
-    objects = objects.without_distinct().order_by('-x.id')
-
-    if current_user.is_authenticated and user.id == current_user.id:
-        page_title = 'Мое избранное'
-    else:
-        page_title = 'Избранное автора %s' % user.username
-
-    return paginate_view(
-        'favorites.html',
-        objects,
-        count=objects.count(),
-        page_title=page_title,
-        author=user,
-        objlistname='stories',
-    )
-
 
 @bp.route('/add/', methods=('GET', 'POST'))
 @db_session

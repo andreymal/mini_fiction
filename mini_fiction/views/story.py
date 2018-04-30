@@ -19,8 +19,11 @@ from mini_fiction.views.editlog import load_users_for_editlog
 bp = Blueprint('story', __name__)
 
 
-def get_story(pk):
-    story = Story.get(id=pk)
+def get_story(pk, for_update=False):
+    if for_update:
+        story = Story.get_for_update(id=pk)
+    else:
+        story = Story.get(id=pk)
     if not story:
         abort(404)
     if not story.bl.has_access(current_user._get_current_object()):
@@ -282,7 +285,7 @@ def bookmark(pk, action):
 @db_session
 @login_required
 def vote(pk):
-    story = get_story(pk)
+    story = get_story(pk, for_update=True)
     user = current_user._get_current_object()
 
     try:
@@ -378,7 +381,10 @@ def add():
 @login_required
 def edit(pk):
     user = current_user._get_current_object()
-    story = Story.get(id=pk)
+    if request.method == 'POST':
+        story = Story.get_for_update(id=pk)
+    else:
+        story = Story.get(id=pk)
     if not story:
         abort(404)
     if not story.bl.editable_by(user):

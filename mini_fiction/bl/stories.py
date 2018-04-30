@@ -491,7 +491,7 @@ class StoryBL(BaseBL, Commentable):
 
         ip = ipaddress.ip_address(ip).exploded
 
-        vote = Vote.select(lambda x: x.author == user and x.story == story).first()
+        vote = Vote.select(lambda x: x.author == user and x.story == story).for_update().first()
         if not vote:
             vote = Vote(
                 author=user,

@@ -87,7 +87,10 @@ def _gen_preview(form, only_selected=False):
 @db_session
 @login_required
 def add(story_id):
-    story = Story.get(id=story_id)
+    if request.method == 'POST':
+        story = Story.get_for_update(id=pk)
+    else:
+        story = Story.get(id=pk)
     if not story:
         abort(404)
     user = current_user._get_current_object()
@@ -163,9 +166,13 @@ def add(story_id):
 @db_session
 @login_required
 def edit(pk):
-    chapter = Chapter.get(id=pk)
+    if request.method == 'POST':
+        chapter = Chapter.get_for_update(id=pk)
+    else:
+        chapter = Chapter.get(id=pk)
     if not chapter:
         abort(404)
+
     user = current_user._get_current_object()
     if not chapter.story.bl.editable_by(user):
         abort(403)

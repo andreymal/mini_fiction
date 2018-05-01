@@ -88,9 +88,9 @@ def _gen_preview(form, only_selected=False):
 @login_required
 def add(story_id):
     if request.method == 'POST':
-        story = Story.get_for_update(id=pk)
+        story = Story.get_for_update(id=story_id)
     else:
-        story = Story.get(id=pk)
+        story = Story.get(id=story_id)
     if not story:
         abort(404)
     user = current_user._get_current_object()

@@ -3,8 +3,9 @@
 
 import json
 import time
-import random
 from urllib.request import Request, urlopen, quote
+
+from mini_fiction.utils import random as utils_random
 
 
 class BaseCaptcha:
@@ -89,7 +90,7 @@ class PyCaptcha(BaseCaptcha):
         self.case_sens = app.config['PYCAPTCHA_CASE_SENSITIVE']
         self.length = app.config['PYCAPTCHA_LENGTH']
 
-        rnd = random.randrange(10**11, 10**12)
+        rnd = utils_random.randrange(10**11, 10**12)
         k = self.prefix + '_cache_test_{}'.format(rnd)
         self.app.cache.set(k, rnd, timeout=10)
         if self.app.cache.get(k) != rnd:
@@ -109,7 +110,7 @@ class PyCaptcha(BaseCaptcha):
     def _draw_and_save_image(self, captcha_id):
         from io import BytesIO
 
-        solution = ''.join([random.choice(self.chars) for _ in range(self.length)])
+        solution = utils_random.random_string(self.length, self.chars)
 
         with self.generator.generate_image(solution) as im:  # class PIL.Image
             data = BytesIO()
@@ -144,7 +145,7 @@ class PyCaptcha(BaseCaptcha):
         return response
 
     def generate(self, lazy=True):
-        captcha_id = random.randrange(10**11, 10**12)
+        captcha_id = utils_random.randrange(10**11, 10**12)
         k = 'pycaptcha_{}'.format(captcha_id)
 
         self.app.cache.set(k, [0, b'', ''], timeout=7200)

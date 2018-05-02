@@ -6,8 +6,6 @@
 import os
 import json
 import time
-import random
-import string
 from io import BytesIO
 from datetime import datetime, timedelta
 
@@ -15,6 +13,7 @@ from flask import current_app, url_for, render_template
 from flask_babel import lazy_gettext
 
 from mini_fiction import hashers
+from mini_fiction.utils import random as utils_random
 from mini_fiction.utils.misc import call_after_request as later
 from mini_fiction.bl.utils import BaseBL
 from mini_fiction.validation import ValidationError, Validator
@@ -74,7 +73,7 @@ class AuthorBL(BaseBL):
             is_superuser=bool(data.get('is_superuser', False)),
             date_joined=data.get('date_joined', datetime.utcnow()),
             activated_at=data.get('activated_at', None),
-            session_token=''.join(random.choice(string.ascii_letters + string.digits) for _ in range(32)),
+            session_token=utils_random.random_string(32),
         )
         user.flush()  # for user.id
         if data.get('password'):
@@ -302,7 +301,7 @@ class AuthorBL(BaseBL):
 
         data = {
             'date': datetime.utcnow(),
-            'activation_key': ''.join(random.choice(string.ascii_letters + string.digits) for _ in range(40)),
+            'activation_key': utils_random.random_string(40),
             'user': user,
             'email': email,
         }
@@ -479,7 +478,7 @@ class AuthorBL(BaseBL):
         del old_rp
 
         rp = RegistrationProfile(
-            activation_key=''.join(random.choice(string.ascii_letters + string.digits) for _ in range(40)),
+            activation_key=utils_random.random_string(40),
             email=data['email'],
             password=self.generate_password_hash(data['password']),
             username=data['username'],
@@ -515,7 +514,7 @@ class AuthorBL(BaseBL):
 
         prp = PasswordResetProfile(
             user=user,
-            activation_key=''.join(random.choice(string.ascii_letters + string.digits) for _ in range(40)),
+            activation_key=utils_random.random_string(40),
             activated=False,
         )
         prp.flush()
@@ -698,7 +697,7 @@ class AuthorBL(BaseBL):
         return True
 
     def reset_session_token(self):
-        token = ''.join(random.choice(string.ascii_letters + string.digits) for _ in range(32))
+        token = utils_random.random_string(32)
         self.model.session_token = token
         return token
 

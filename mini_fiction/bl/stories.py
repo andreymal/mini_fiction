@@ -78,6 +78,7 @@ class StoryBL(BaseBL, Commentable):
                 user=author,
                 is_editor=True,
                 is_author=True,
+                visible=True,
             ).flush()
 
         story.bl.subscribe_to_comments(authors[0], email=True, tracker=True)
@@ -146,7 +147,7 @@ class StoryBL(BaseBL, Commentable):
 
         # TODO: refactor
         if 'categories' in data:
-            old_value = [x.id for x in story.categories]
+            old_value = sorted(x.id for x in story.categories)
             new_value = list(data['categories'])
             if set(old_value) != set(new_value):
                 edited_data['categories'] = [old_value, new_value]
@@ -155,7 +156,7 @@ class StoryBL(BaseBL, Commentable):
                 changed_sphinx_fields.add('category')
 
         if 'characters' in data:
-            old_value = [x.id for x in story.characters]
+            old_value = sorted(x.id for x in story.characters)
             new_value = list(data['characters'])
             if set(old_value) != set(new_value):
                 edited_data['characters'] = [old_value, new_value]
@@ -164,7 +165,7 @@ class StoryBL(BaseBL, Commentable):
                 changed_sphinx_fields.add('character')
 
         if 'classifications' in data:
-            old_value = [x.id for x in story.classifications]
+            old_value = sorted(x.id for x in story.classifications)
             new_value = list(data['classifications'])
             if set(old_value) != set(new_value):
                 edited_data['classifications'] = [old_value, new_value]

@@ -31,7 +31,7 @@ def feed_stories():
             author=author.username,
             url=url_for('story.view', pk=story.id, _external=True),
             updated=story.updated,
-            published=story.date
+            published=story.first_published_at or story.date
         )
     return feed.get_response()
 
@@ -59,7 +59,7 @@ def feed_accounts(user_id):
             author=author.username,
             url=url_for('story.view', pk=story.id, _external=True),
             updated=story.updated,
-            published=story.date
+            published=story.first_published_at or story.date
         )
     return feed.get_response()
 

@@ -118,6 +118,12 @@
         {% if comment.deleted -%}
         <div class="comment-text comment-text-deleted">
             Комментарий был отправлен на Луну
+            {%- if current_user.is_staff and comment.last_deleted_at %}
+                {{ comment.last_deleted_at|datetimeformat('d MMMM Y, HH:mm') -}}
+            {%- endif -%}
+            {%- if current_user.is_staff and comment.last_deleted_by %}
+                пользователем {{ comment.last_deleted_by.username -}}
+            {%- endif -%}
         </div>
         {%- endif %}
 

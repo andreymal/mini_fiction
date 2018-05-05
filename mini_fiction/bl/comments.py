@@ -249,14 +249,15 @@ class BaseCommentBL(BaseBL):
             return False
         return c.date + timedelta(minutes=current_app.config['COMMENT_EDIT_TIME']) > datetime.utcnow()
 
-    def delete(self, author):
+    def delete(self, author=None):
         if not self.can_delete_by(author):
             raise ValueError('Permission denied')
         self.model.deleted = True
         self.model.last_deleted_at = datetime.utcnow()
+        self.model.last_deleted_by = author if author and author.is_authenticated else None
         current_app.cache.delete('index_comments_html')
 
-    def restore(self, author):
+    def restore(self, author=None):
         if not self.can_restore_by(author):
             raise ValueError('Permission denied')
         self.model.deleted = False

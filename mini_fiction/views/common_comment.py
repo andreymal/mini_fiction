@@ -96,7 +96,7 @@ def add(target_attr, target, template, template_ajax=None, template_ajax_modal=F
 
         # Проверяем, что точно такого же коммента не отправлялось ранее
         comment = target.comments.select(
-            lambda c: c.author == user and c.parent == parent and c.text == data['text']
+            lambda c: c.author == user and c.parent == parent and c.text == data['text'] and not c.deleted
         ).first() if user.is_authenticated else None
 
         created = not comment

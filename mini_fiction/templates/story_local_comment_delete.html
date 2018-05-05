@@ -11,6 +11,7 @@
     <div class="comment-item" id="{{ comment.local_id }}">
     {{ comment_html(comment, with_controls=False, with_vote=False) }}
     </div>
+    {%- include 'includes/comment_delete_warning.html' with context -%}
 
     <form method="POST" enctype="multipart/form-data">
           <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />

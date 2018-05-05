@@ -7,6 +7,7 @@
     <div class="comment-item" id="{{ comment.local_id }}">
         {{ comment_html(comment, with_controls=False, with_vote=False) }}
     </div>
+    {%- include 'includes/comment_delete_warning.html' with context -%}
 </div>
 <div class="modal-footer">
     <form method="POST" action="{{ url_for('story_local_comment.delete', story_id=local.story.id, local_id=comment.local_id) }}" style="margin: 0">

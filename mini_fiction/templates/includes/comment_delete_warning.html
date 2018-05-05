@@ -1,0 +1,5 @@
+{% if current_user.is_authenticated and comment.author and current_user.id == comment.author.id %}
+    <div>
+        Имейте в виду, что подписчики уже получили уведомление о вашем комментарии по почте и прочитали его; удаление комментария не скроет его содержимое от них.
+    </div>
+{%- endif %}

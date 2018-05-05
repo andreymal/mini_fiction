@@ -64,11 +64,9 @@ def comments(page):
     objects = StoryComment.select(lambda x: x.story_published)
     filter_deleted = current_user.is_staff and request.args.get('deleted') == '1'
     if filter_deleted:
-        # TODO: без индекса выборка удалённых комментов жутко медленная
-        objects = objects.filter(lambda x: x.deleted)
+        objects = objects.filter(lambda x: x.deleted).order_by(StoryComment.last_deleted_at.desc())
     else:
-        objects = objects.filter(lambda x: not x.deleted)
-    objects = objects.order_by(StoryComment.id.desc())
+        objects = objects.filter(lambda x: not x.deleted).order_by(StoryComment.id.desc())
 
     page_obj = Paginator(page, objects.count(), per_page=current_app.config['COMMENTS_COUNT']['stream'])
     objects = [('story', x) for x in page_obj.slice_or_404(objects)]
@@ -102,10 +100,9 @@ def storylocalcomments(page):
     objects = StoryLocalComment.select()
     filter_deleted = current_user.is_staff and request.args.get('deleted') == '1'
     if filter_deleted:
-        objects = objects.filter(lambda x: x.deleted)
+        objects = objects.filter(lambda x: x.deleted).order_by(StoryLocalComment.last_deleted_at.desc())
     else:
-        objects = objects.filter(lambda x: not x.deleted)
-    objects = objects.order_by(StoryLocalComment.id.desc())
+        objects = objects.filter(lambda x: not x.deleted).order_by(StoryLocalComment.id.desc())
 
     page_obj = Paginator(page, objects.count(), per_page=current_app.config['COMMENTS_COUNT']['stream'])
     objects = [('local', x) for x in page_obj.slice_or_404(objects)]
@@ -133,10 +130,9 @@ def newscomments(page):
     objects = NewsComment.select()
     filter_deleted = current_user.is_staff and request.args.get('deleted') == '1'
     if filter_deleted:
-        objects = objects.filter(lambda x: x.deleted)
+        objects = objects.filter(lambda x: x.deleted).order_by(NewsComment.last_deleted_at.desc())
     else:
-        objects = objects.filter(lambda x: not x.deleted)
-    objects = objects.order_by(NewsComment.id.desc())
+        objects = objects.filter(lambda x: not x.deleted).order_by(NewsComment.id.desc())
 
     page_obj = Paginator(page, objects.count(), per_page=current_app.config['COMMENTS_COUNT']['stream'])
     objects = [('news', x) for x in page_obj.slice_or_404(objects)]

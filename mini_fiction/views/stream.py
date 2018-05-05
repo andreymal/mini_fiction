@@ -3,7 +3,7 @@
 
 from pony import orm
 from pony.orm import db_session
-from flask import Blueprint, current_app, render_template, abort
+from flask import Blueprint, current_app, render_template, abort, request
 from flask_login import current_user
 
 from mini_fiction.models import Story, Chapter, StoryContributor, StoryComment, StoryLocalComment, NewsComment
@@ -61,7 +61,14 @@ def chapters(page):
 @bp.route('/comments/page/<int:page>/')
 @db_session
 def comments(page):
-    objects = StoryComment.select(lambda x: x.story_published and not x.deleted).order_by(StoryComment.id.desc())
+    objects = StoryComment.select(lambda x: x.story_published)
+    filter_deleted = current_user.is_staff and request.args.get('deleted') == '1'
+    if filter_deleted:
+        # TODO: без индекса выборка удалённых комментов жутко медленная
+        objects = objects.filter(lambda x: x.deleted)
+    else:
+        objects = objects.filter(lambda x: not x.deleted)
+    objects = objects.order_by(StoryComment.id.desc())
 
     page_obj = Paginator(page, objects.count(), per_page=current_app.config['COMMENTS_COUNT']['stream'])
     objects = [('story', x) for x in page_obj.slice_or_404(objects)]
@@ -76,6 +83,7 @@ def comments(page):
         page_title='Лента комментариев',
         tab='story',
         comments=objects,
+        filter_deleted=filter_deleted,
         with_target_link=True,
         comment_votes_cache=comment_votes_cache,
         page_obj=page_obj,
@@ -91,7 +99,13 @@ def storylocalcomments(page):
     if not current_user.is_staff:
         abort(403)
 
-    objects = StoryLocalComment.select(lambda x: not x.deleted).order_by(StoryLocalComment.id.desc())
+    objects = StoryLocalComment.select()
+    filter_deleted = current_user.is_staff and request.args.get('deleted') == '1'
+    if filter_deleted:
+        objects = objects.filter(lambda x: x.deleted)
+    else:
+        objects = objects.filter(lambda x: not x.deleted)
+    objects = objects.order_by(StoryLocalComment.id.desc())
 
     page_obj = Paginator(page, objects.count(), per_page=current_app.config['COMMENTS_COUNT']['stream'])
     objects = [('local', x) for x in page_obj.slice_or_404(objects)]
@@ -103,6 +117,7 @@ def storylocalcomments(page):
         page_title='Лента комментариев',
         tab='local',
         comments=objects,
+        filter_deleted=filter_deleted,
         with_target_link=True,
         comment_votes_cache=comment_votes_cache,
         page_obj=page_obj,
@@ -115,7 +130,13 @@ def storylocalcomments(page):
 @bp.route('/newscomments/page/<int:page>/')
 @db_session
 def newscomments(page):
-    objects = NewsComment.select(lambda x: not x.deleted).order_by(NewsComment.id.desc())
+    objects = NewsComment.select()
+    filter_deleted = current_user.is_staff and request.args.get('deleted') == '1'
+    if filter_deleted:
+        objects = objects.filter(lambda x: x.deleted)
+    else:
+        objects = objects.filter(lambda x: not x.deleted)
+    objects = objects.order_by(NewsComment.id.desc())
 
     page_obj = Paginator(page, objects.count(), per_page=current_app.config['COMMENTS_COUNT']['stream'])
     objects = [('news', x) for x in page_obj.slice_or_404(objects)]
@@ -127,6 +148,7 @@ def newscomments(page):
         page_title='Лента комментариев',
         tab='news',
         comments=objects,
+        filter_deleted=filter_deleted,
         with_target_link=True,
         comment_votes_cache=comment_votes_cache,
         page_obj=page_obj,

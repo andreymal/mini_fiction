@@ -23,6 +23,16 @@
         </div>
         <br/>
 
+        {%- if current_user.is_staff %}<div>
+            {% if filter_deleted %}<a href="{{ modified_url(view_args=view_args, deleted=None) }}">{% endif -%}
+                Неудалённые
+            {%- if filter_deleted %}</a>{% endif %}
+            &nbsp; &nbsp;
+            {% if not filter_deleted %}<a href="{{ modified_url(view_args=view_args, deleted='1') }}">{% endif -%}
+                Удалённые
+            {%- if not filter_deleted %}</a>{% endif %}
+        </div><br/>{% endif -%}
+
         <div id="comments-list">
             {% include "includes/comments_list.html" %}
         </div>

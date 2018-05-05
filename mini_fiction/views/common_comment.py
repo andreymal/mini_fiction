@@ -233,7 +233,7 @@ def delete(target_attr, comment, template, template_ajax=None, template_ajax_mod
     user = current_user._get_current_object()
     target = getattr(comment, target_attr)
 
-    if not comment.bl.can_delete_or_restore_by(user):
+    if not comment.bl.can_delete_by(user):
         abort(403)
 
     extra_ajax = g.is_ajax and request.form.get('extra_ajax') == '1'
@@ -261,7 +261,7 @@ def restore(target_attr, comment, template, template_ajax=None, template_ajax_mo
     user = current_user._get_current_object()
     target = getattr(comment, target_attr)
 
-    if not comment.bl.can_delete_or_restore_by(user):
+    if not comment.bl.can_restore_by(user):
         abort(403)
 
     extra_ajax = g.is_ajax and request.form.get('extra_ajax') == '1'

@@ -109,7 +109,10 @@ class BaseCommentBL(BaseBL):
             return None
         return type(c).bl.access_for_commenting_by(target, author)
 
-    def can_delete_or_restore_by(self, author=None):
+    def can_delete_by(self, author=None):
+        return author and author.is_staff
+
+    def can_restore_by(self, author=None):
         return author and author.is_staff
 
     def can_vote_by(self, author=None, _value_cache=None):
@@ -247,14 +250,14 @@ class BaseCommentBL(BaseBL):
         return c.date + timedelta(minutes=current_app.config['COMMENT_EDIT_TIME']) > datetime.utcnow()
 
     def delete(self, author):
-        if not self.can_delete_or_restore_by(author):
+        if not self.can_delete_by(author):
             raise ValueError('Permission denied')
         self.model.deleted = True
         self.model.last_deleted_at = datetime.utcnow()
         current_app.cache.delete('index_comments_html')
 
     def restore(self, author):
-        if not self.can_delete_or_restore_by(author):
+        if not self.can_restore_by(author):
             raise ValueError('Permission denied')
         self.model.deleted = False
         current_app.cache.delete('index_comments_html')

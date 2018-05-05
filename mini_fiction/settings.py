@@ -146,7 +146,8 @@ class Config(object):
     CHAPTERS_COUNT = {'page': 10, 'main': 10, 'stream': 20}
     COMMENTS_ORPHANS = 5
     COMMENT_MIN_LENGTH = 1
-    COMMENT_EDIT_TIME = 15
+    COMMENT_EDIT_TIME = 15  # minutes
+    COMMENT_DELETE_TIME = 2  # minutes
     BRIEF_COMMENT_LENGTH = 175
     STORY_COMMENTS_BY_GUEST = False
     NEWS_COMMENTS_BY_GUEST = False

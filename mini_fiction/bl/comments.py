@@ -110,7 +110,18 @@ class BaseCommentBL(BaseBL):
         return type(c).bl.access_for_commenting_by(target, author)
 
     def can_delete_by(self, author=None):
-        return author and author.is_staff
+        c = self.model
+        if c.deleted or not author or not author.is_authenticated:
+            return False
+        if author.is_staff:
+            return True
+        if not self.access_for_commenting_by(getattr(c, self.target_attr), author):
+            return False
+        if c.author is None or c.author.id != author.id:
+            return False
+        if c.answers_count > 0:
+            return False
+        return c.date + timedelta(minutes=current_app.config['COMMENT_DELETE_TIME']) > datetime.utcnow()
 
     def can_restore_by(self, author=None):
         return author and author.is_staff

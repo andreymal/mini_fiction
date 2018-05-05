@@ -137,6 +137,17 @@
             </time>
 
             {% if not short %}
+                {% if comment.edits_count > 0 -%}
+                    <i class="comment-edited-icon" title="
+                        {%- if comment.edits_count == 1 -%}
+                            {{- gettext('This comment was edited once') -}}
+                        {%- elif comment.edits_count == 2 -%}
+                            {{- gettext('This comment was edited twice') -}}
+                        {%- else -%}
+                            {{- ngettext('This comment was edited %(num)d time', 'This comment was edited %(num)d times', comment.edits_count) -}}
+                        {%- endif -%}"></i>
+                {% endif -%}
+
                 <a class="comment-link" href="{{ comment.bl.get_permalink() }}" rel="nofollow" title="Постоянная ссылка на комментарий">#{{ comment.local_id }}</a>
 
                 {%- if comment.parent -%}

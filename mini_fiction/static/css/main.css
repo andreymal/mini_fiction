@@ -1871,6 +1871,17 @@ a.btn {
     display: inline-block;
 }
 
+.comment-edited-icon {
+    display: inline-block;
+    width: 8px;
+    height: 8px;
+    vertical-align: baseline;
+    background-image: url('../i/edit.png');
+    background-size: 8px 8px;
+    background-repeat: no-repeat;
+    background-position: center center;
+}
+
 .comment-form-content {
     background-color: white;
     width: 70%;

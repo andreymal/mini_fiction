@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version:  0.0.3\n"
 "Report-Msgid-Bugs-To: andriyano-31@mail.ru\n"
-"POT-Creation-Date: 2018-04-26 20:12+0300\n"
+"POT-Creation-Date: 2018-05-05 20:28+0300\n"
 "Last-Translator: andreymal <andriyano-31@mail.ru>\n"
 "Language: ru\n"
 "Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && "
@@ -18,7 +18,7 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 2.5.3\n"
 
-#: mini_fiction/models.py:517 mini_fiction/models.py:780
+#: mini_fiction/models.py:523 mini_fiction/models.py:790
 msgid "Chapter {}"
 msgstr "Глава {}"
 
@@ -26,72 +26,72 @@ msgstr "Глава {}"
 msgid "Add new"
 msgstr "Добавить новый"
 
-#: mini_fiction/bl/authors.py:50
+#: mini_fiction/bl/authors.py:49
 msgid "User already exists"
 msgstr "Пользователь уже существует"
 
-#: mini_fiction/bl/authors.py:52 mini_fiction/bl/authors.py:301
+#: mini_fiction/bl/authors.py:51 mini_fiction/bl/authors.py:300
 msgid "Email address is already in use"
 msgstr "Электропочта уже используется"
 
-#: mini_fiction/bl/authors.py:57
+#: mini_fiction/bl/authors.py:56
 msgid "Please set username and password"
 msgstr "Укажите имя пользователя и пароль"
 
-#: mini_fiction/bl/authors.py:60
+#: mini_fiction/bl/authors.py:59
 msgid "Please set only password or password hash"
 msgstr "Укажите только пароль или хэш пароля"
 
-#: mini_fiction/bl/authors.py:64 mini_fiction/views/auth.py:142
+#: mini_fiction/bl/authors.py:63 mini_fiction/views/auth.py:142
 #: mini_fiction/views/author.py:122
 msgid "Password is too bad, please change it"
 msgstr "Пароль слишком плохой, поменяйте его"
 
-#: mini_fiction/bl/authors.py:159
+#: mini_fiction/bl/authors.py:158
 msgid "Invalid contact type"
 msgstr "Неправильный тип контакта"
 
-#: mini_fiction/bl/authors.py:202
+#: mini_fiction/bl/authors.py:201
 msgid "Too big avatar; must be {value} KiB or smaller"
 msgstr "Слишком большой аватар; надо {value} КиБ или меньше"
 
-#: mini_fiction/bl/authors.py:209
+#: mini_fiction/bl/authors.py:208
 msgid "Cannot read avatar"
 msgstr "Не получилось прочитать аватар"
 
-#: mini_fiction/bl/authors.py:394
+#: mini_fiction/bl/authors.py:393
 msgid "Too small avatar; must be {w}x{h} or bigger"
 msgstr "Слишком маленький аватар; надо {w}x{h} или больше"
 
-#: mini_fiction/bl/authors.py:396
+#: mini_fiction/bl/authors.py:395
 msgid "Too big avatar; must be {w}x{h} or smaller"
 msgstr "Слишком большой аватар; надо {w}x{h} или меньше"
 
-#: mini_fiction/bl/authors.py:650
+#: mini_fiction/bl/authors.py:649
 msgid "Please enter a correct username and password."
 msgstr "Пожалуйста, введите правильные имя пользователя и пароль."
 
-#: mini_fiction/bl/authors.py:652
+#: mini_fiction/bl/authors.py:651
 msgid "Account is disabled"
 msgstr "Аккаунт отключен"
 
-#: mini_fiction/bl/comments.py:148
+#: mini_fiction/bl/comments.py:162
 msgid "Parent comment not found"
 msgstr "Родительский комментарий не найден"
 
-#: mini_fiction/bl/comments.py:253
+#: mini_fiction/bl/comments.py:279
 msgid "Please log in to vote"
 msgstr "Авторизуйтесь, чтобы голосовать"
 
-#: mini_fiction/bl/comments.py:260
+#: mini_fiction/bl/comments.py:286
 msgid "You already voted"
 msgstr "Вы уже голосовали"
 
-#: mini_fiction/bl/comments.py:263
+#: mini_fiction/bl/comments.py:289
 msgid "You can't vote"
 msgstr "Вам нельзя голосовать"
 
-#: mini_fiction/bl/comments.py:266
+#: mini_fiction/bl/comments.py:292
 msgid "Invalid value"
 msgstr "Недопустимое значение"
 
@@ -523,6 +523,22 @@ msgstr "Лог изменений"
 #: mini_fiction/templates/macro.html:75
 msgid "Send"
 msgstr "Отправить"
+
+#: mini_fiction/templates/macro.html:149
+msgid "This comment was edited once"
+msgstr "Комментарий был отредактирован один раз"
+
+#: mini_fiction/templates/macro.html:151
+msgid "This comment was edited twice"
+msgstr "Комментарий был отредактирован два раза"
+
+#: mini_fiction/templates/macro.html:153
+#, python-format
+msgid "This comment was edited %(num)d time"
+msgid_plural "This comment was edited %(num)d times"
+msgstr[0] "Комментарий был отредактирован %(num)d раз"
+msgstr[1] "Комментарий был отредактирован %(num)d раза"
+msgstr[2] "Комментарий был отредактирован %(num)d раз"
 
 #: mini_fiction/templates/notifications.html:13
 #: mini_fiction/templates/notifications_popup.html:4
@@ -1033,6 +1049,21 @@ msgstr "Удалён:"
 msgid "(preview)"
 msgstr "(предпросмотр)"
 
+#: mini_fiction/templates/includes/comment_controls.html:3
+msgctxt "comment_controls"
+msgid "Edit"
+msgstr "Изменить"
+
+#: mini_fiction/templates/includes/comment_controls.html:6
+msgctxt "comment_controls"
+msgid "Restore"
+msgstr "Восстановить"
+
+#: mini_fiction/templates/includes/comment_controls.html:9
+msgctxt "comment_controls"
+msgid "Delete"
+msgstr "Удалить"
+
 #: mini_fiction/templates/includes/edit_log_item.html:46
 msgctxt "story_edit_log"
 msgid "of story"
@@ -1396,7 +1427,7 @@ msgstr "Поиск рассказов"
 msgid "Search results"
 msgstr "Результаты поиска"
 
-#: mini_fiction/views/story.py:376
+#: mini_fiction/views/story.py:372
 msgid "New story"
 msgstr "Новый рассказ"
 

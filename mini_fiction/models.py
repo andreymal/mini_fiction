@@ -102,15 +102,18 @@ class Author(db.Entity, UserMixin):
     views = orm.Set('StoryView')
     activity = orm.Set('Activity')
     votes = orm.Set('Vote')
-    story_comments = orm.Set('StoryComment')
+    story_comments = orm.Set('StoryComment', reverse='author')
     story_comment_votes = orm.Set('StoryCommentVote')
     story_comment_edits = orm.Set('StoryCommentEdit')
-    story_local_comments = orm.Set('StoryLocalComment')
+    story_last_edited_comments = orm.Set('StoryComment', reverse='last_edited_by')
+    story_local_comments = orm.Set('StoryLocalComment', reverse='author')
     story_local_comment_edits = orm.Set('StoryLocalCommentEdit')
+    story_local_last_edited_comments = orm.Set('StoryLocalComment', reverse='last_edited_by')
     news = orm.Set('NewsItem')
-    news_comments = orm.Set('NewsComment')
+    news_comments = orm.Set('NewsComment', reverse='author')
     news_comment_votes = orm.Set('NewsCommentVote')
     news_comment_edits = orm.Set('NewsCommentEdit')
+    news_last_edited_comments = orm.Set('NewsComment', reverse='last_edited_by')
     notifications = orm.Set('Notification', reverse='user')
     created_notifications = orm.Set('Notification', reverse='caused_by_user')
     subscriptions = orm.Set('Subscription')
@@ -585,6 +588,7 @@ class StoryComment(db.Entity):
     root_id = orm.Required(int)  # for pagination
     story_published = orm.Required(bool)
     last_edited_at = orm.Optional(datetime, 6)  # only for text updates
+    last_edited_by = orm.Optional(Author)  # only for text updates
 
     extra = orm.Required(orm.LongStr, lazy=False, default='{}')
 
@@ -666,6 +670,7 @@ class StoryLocalComment(db.Entity):
     edits_count = orm.Required(int, size=16, unsigned=True, default=0)
     root_id = orm.Required(int)  # for pagination
     last_edited_at = orm.Optional(datetime, 6)  # only for text updates
+    last_edited_by = orm.Optional(Author)  # only for text updates
 
     extra = orm.Required(orm.LongStr, lazy=False, default='{}')
 
@@ -833,6 +838,7 @@ class NewsComment(db.Entity):
     edits_count = orm.Required(int, size=16, unsigned=True, default=0)
     root_id = orm.Required(int)  # for pagination
     last_edited_at = orm.Optional(datetime, 6)  # only for text updates
+    last_edited_by = orm.Optional(Author)  # only for text updates
 
     extra = orm.Required(orm.LongStr, lazy=False, default='{}')
 

@@ -151,6 +151,8 @@ class BaseCommentBL(BaseBL):
         else:
             parent = None
 
+        tm = datetime.utcnow()
+
         data = {
             self.target_attr: target,
             'author': author if author and author.is_authenticated else None,
@@ -159,6 +161,10 @@ class BaseCommentBL(BaseBL):
             'parent': parent,
             'tree_depth': parent.tree_depth + 1 if parent else 0,
             'text': data['text'],
+            'date': tm,
+            'edits_count': 0,
+            'last_edited_at': tm,
+            'last_edited_by': author if author and author.is_authenticated else None,
         }
         if parent:
             assert parent.root_id
@@ -203,9 +209,14 @@ class BaseCommentBL(BaseBL):
         comment = self.model
         old_text = comment.text
         new_text = data['text']
+
+        if old_text == new_text:
+            return None
+
         comment.text = new_text
         comment.edits_count += 1
         comment.last_edited_at = datetime.utcnow()
+        comment.last_edited_by = author
         comment.flush()
 
         editlog = comment.edits.create(

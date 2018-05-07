@@ -18,19 +18,6 @@
 {%- endfor -%}
 {% endblock -%}
 
-{%- block head_js %}
-    <!-- compatibility scripts and polyfills -->
-    <!--[if lt IE 9]> <script src="{{ url_for('static', filename='js/lib/html5shiv-printshiv.min.js') }}"></script> <![endif]-->
-    <script src="{{ url_for('static', filename='js/lib/es6-promise.min.js') }}"></script>
-    <script src="{{ url_for('static', filename='js/lib/fetch.min.js') }}"></script>
-
-    <script src="{{ url_for('static', filename='js/lib/jquery-2.2.4.min.js') }}"></script>
-    <script src="{{ url_for('static', filename='js/lib/jquery-ui-custom.min.js') }}"></script>
-    <script src="{{ url_for('static', filename='js/lib/jquery.markitup.js') }}"></script>
-    <script src="{{ url_for('static', filename='js/lib/jquery.slides.3.0.4.min.js') }}"></script>
-    <script src="{{ url_for('static', filename='js/lib/bootstrap.min.js') }}"></script>
-{% endblock -%}
-
 {%- block meta_robots_tag %}{% if robots_noindex or robots_nofollow %}
     <meta name="robots" content="
         {%- if robots_noindex -%}noindex{%- else -%}index{%- endif -%}

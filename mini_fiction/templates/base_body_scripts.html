@@ -1,8 +1,20 @@
+    <!-- compatibility scripts and polyfills -->
+    <!--[if lt IE 9]> <script src="{{ url_for('static', filename='js/lib/html5shiv-printshiv.min.js') }}"></script> <![endif]-->
+    <script src="{{ url_for('static', filename='js/lib/es6-promise.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/lib/fetch.min.js') }}"></script>
+
+    <!-- Third-party libraries -->
+    <script src="{{ url_for('static', filename='js/lib/jquery-2.2.4.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/lib/jquery-ui-custom.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/lib/jquery.markitup.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/lib/jquery.slides.3.0.4.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/lib/bootstrap.min.js') }}"></script>
     <script src="{{ url_for('static', filename='js/lib/amajaxify.js') }}"></script>
     <script src="{{ url_for('static', filename='js/lib/hypher.js') }}"></script>
     <script src="{{ url_for('static', filename='js/lib/hypher.ru.js') }}"></script>
     <script src="{{ url_for('static', filename='js/lib/htmlsanitizer.js') }}"></script>
 
+    <!-- mini_fiction stuff -->
     <script src="{{ url_for('static', filename='js/markitup.set.js') }}"></script>
     <script src="{{ url_for('static', filename='js/core.js') }}"></script>
     <script src="{{ url_for('static', filename='js/common.js') }}"></script>

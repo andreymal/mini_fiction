@@ -148,7 +148,7 @@ class StoryBL(BaseBL, Commentable):
         # TODO: refactor
         if 'categories' in data:
             old_value = sorted(x.id for x in story.categories)
-            new_value = list(data['categories'])
+            new_value = sorted(data['categories'])
             if set(old_value) != set(new_value):
                 edited_data['categories'] = [old_value, new_value]
                 story.categories.clear()
@@ -157,7 +157,7 @@ class StoryBL(BaseBL, Commentable):
 
         if 'characters' in data:
             old_value = sorted(x.id for x in story.characters)
-            new_value = list(data['characters'])
+            new_value = sorted(data['characters'])
             if set(old_value) != set(new_value):
                 edited_data['characters'] = [old_value, new_value]
                 story.characters.clear()
@@ -166,7 +166,7 @@ class StoryBL(BaseBL, Commentable):
 
         if 'classifications' in data:
             old_value = sorted(x.id for x in story.classifications)
-            new_value = list(data['classifications'])
+            new_value = sorted(data['classifications'])
             if set(old_value) != set(new_value):
                 edited_data['classifications'] = [old_value, new_value]
                 story.classifications.clear()

@@ -12,5 +12,5 @@
     <script src="{{ url_for('static', filename='js/comments.js') }}"></script>
     <script src="{{ url_for('static', filename='js/editlog.js') }}"></script>
 {%- for js_link in extra_js %}
-    <link rel="stylesheet" href="{{ js_link }}" />
+    <script src="{{ js_link }}"></script>
 {%- endfor -%}

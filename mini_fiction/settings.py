@@ -48,8 +48,6 @@ class Config(object):
     JSON_AS_ASCII = False
     MAX_CONTENT_LENGTH = 4 * 1024 * 1024
     PROXIES_COUNT = 0
-    LOGGER_LEVEL = logging.INFO
-    LOGGER_STDERR = True
 
     TEMPLATES_AUTO_RELOAD = False
 

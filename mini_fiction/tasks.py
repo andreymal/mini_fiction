@@ -6,12 +6,12 @@ from functools import wraps
 import os
 import json
 import time
-from flask import current_app
+from flask import current_app, url_for
 from pony.orm import db_session
 
 from mini_fiction import models
 from mini_fiction.models import Story, Chapter
-from mini_fiction.utils.misc import render_nonrequest_template
+from mini_fiction.utils.misc import render_nonrequest_template, ping_sitemap
 
 
 tasks = {}
@@ -500,3 +500,20 @@ def zip_dump():
     if os.path.isfile(path):
         os.remove(path)
     os.rename(tmp_path, path)
+
+
+@task()
+def sitemap_ping_story(story_id):
+    if not current_app.config.get('SITEMAP_PING_URLS'):
+        return
+
+    per_page = current_app.config.get('SITEMAP_STORIES_PER_FILE')
+    story_offset = (story_id // per_page) * per_page
+
+    # Уничтожаем кэш Sitemap, чтобы поисковый робот пинганул гарантированно новые файлы
+    current_app.cache.delete('sitemap_general')
+    current_app.cache.delete('sitemap_stories_{offset}'.format(offset=story_offset))
+
+    # Отправляем пинг
+    ping_sitemap(url_for('sitemap.general', _external=True))
+    ping_sitemap(url_for('sitemap.stories', offset=story_offset, _external=True))

@@ -346,6 +346,9 @@ class StoryBL(BaseBL, Commentable):
 
         later(current_app.tasks['notify_author_story'].delay, story.id, caused_by_user.id if caused_by_user else None)
 
+        # Уведомляем поисковых роботов о новом рассказе с помощью Sitemap
+        later(current_app.tasks['sitemap_ping_story'].delay, story.id)
+
     def publish_all_chapters(self, user=None):
         story = self.model
         published_chapter_ids = []

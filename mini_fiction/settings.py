@@ -329,6 +329,7 @@ class Config(object):
 
     # Sitemap
     SITEMAP_STORIES_PER_FILE = 1000
+    SITEMAP_PING_URLS = []  # ['http://google.com/ping?sitemap={url}', ...]
 
     # Testing
     TESTING = False

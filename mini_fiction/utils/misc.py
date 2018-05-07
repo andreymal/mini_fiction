@@ -6,6 +6,7 @@ import sys
 import json
 import math
 import time
+from urllib.request import Request, urlopen, quote
 
 from flask import current_app, g, escape, render_template, abort, url_for, request
 from flask_babel import pgettext, ngettext
@@ -537,3 +538,17 @@ def htmlcrop(text, length, end='...', spaces=' \t\r\n\xa0', max_overflow=300, st
     if final_length >= len(text):
         return text
     return text[:final_length] + end
+
+
+def ping_sitemap(url):
+    for ping_url_tmpl in current_app.config.get('SITEMAP_PING_URLS') or []:
+        ping_url = ping_url_tmpl.format(url=quote(url))
+
+        req = Request(ping_url)
+        req.add_header('Connection', 'close')
+        req.add_header('User-Agent', current_app.user_agent)
+
+        try:
+            urlopen(req, timeout=20).read()
+        except Exception as exc:
+            current_app.logger.warning('Cannot ping {!r}: {}'.format(ping_url, exc))

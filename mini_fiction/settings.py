@@ -327,6 +327,9 @@ class Config(object):
     DEFAULT_USERPIC = {'endpoint': 'static', 'filename': 'i/userpic.png'}
     LOADING_ICON = {'endpoint': 'static', 'filename': 'i/ajax-loader.gif'}
 
+    # Sitemap
+    SITEMAP_STORIES_PER_FILE = 1000
+
     # Testing
     TESTING = False
     SELENIUM_HEADLESS = True

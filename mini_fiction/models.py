@@ -903,7 +903,13 @@ class StaticPage(db.Entity):
     bl = Resource('bl.staticpage')
 
     def __str__(self):
-        return '/page/{}/ - {}'.format(self.name, self.title)
+        if self.name == 'robots.txt':
+            label = '/robots.txt'
+        else:
+            label = '/page/{}/'.format(self.name)
+        if self.title:
+            label += ' - {}'.format(self.title)
+        return label
 
     def before_update(self):
         self.updated = datetime.utcnow()

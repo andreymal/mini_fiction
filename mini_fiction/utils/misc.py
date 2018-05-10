@@ -6,6 +6,7 @@ import sys
 import json
 import math
 import time
+from datetime import timedelta
 from urllib.request import Request, urlopen, quote
 
 from flask import current_app, g, escape, render_template, abort, url_for, request
@@ -552,3 +553,24 @@ def ping_sitemap(url):
             urlopen(req, timeout=20).read()
         except Exception as exc:
             current_app.logger.warning('Cannot ping {!r}: {}'.format(ping_url, exc))
+
+
+def timedelta_format(tm):
+    if isinstance(tm, timedelta):
+        tm = tm.total_seconds()
+
+    tm = int(tm)
+    minus = False
+    if tm < 0:
+        minus = True
+        tm = -tm
+
+    s = '{:02d}s'.format(tm % 60)
+    if tm >= 60:
+        s = '{:02d}m'.format((tm // 60) % 60) + s
+    if tm >= 3600:
+        s = '{}h'.format(tm // 3600) + s
+
+    if minus:
+        s = '-' + s
+    return s

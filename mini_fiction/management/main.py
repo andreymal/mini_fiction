@@ -10,6 +10,7 @@ from pony.orm import db_session
 
 from flask_script import Manager
 from mini_fiction import application
+from mini_fiction.utils.misc import timedelta_format
 
 manager = Manager(application.create_app())
 
@@ -119,12 +120,14 @@ def checkstoryvoting():
 def dumpdb(dirpath, entities_list, gzip_compression=0, silent=False):
     from mini_fiction.dumpload import dumpdb_console as cmd
     orm.sql_debug(False)
+    tm = time.time()
     cmd(
         dirpath,
         entities_list if entities_list and 'all' not in entities_list else [],
         gzip_compression,
         progress=not silent,
     )
+    print('Done in {}.'.format(timedelta_format(time.time() - tm)))
 
 
 @manager.option('-s', '--silent', dest='silent', help='Don\'t print progress bar to console', action='store_true')
@@ -133,7 +136,9 @@ def dumpdb(dirpath, entities_list, gzip_compression=0, silent=False):
 def loaddb(pathlist, silent=False, only_create=False):
     from mini_fiction.dumpload import loaddb_console as cmd
     orm.sql_debug(False)
+    tm = time.time()
     cmd(pathlist, progress=not silent, only_create=only_create)
+    print('Done in {}.'.format(timedelta_format(time.time() - tm)))
 
 
 @manager.option('-k', '--keep-broken', dest='keep_broken', help='Don\'t delete ZIP file if something goes wrong (useful for debugging)', action='store_true')

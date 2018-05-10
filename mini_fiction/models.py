@@ -57,8 +57,8 @@ class Author(db.Entity, UserMixin):
     last_visit = orm.Optional(datetime, 6, optimistic=False)
     is_superuser = orm.Required(bool, default=False, optimistic=False)
     username = orm.Required(str, 32, unique=True, autostrip=False)
-    first_name = orm.Optional(str, 30)
-    last_name = orm.Optional(str, 30)
+    first_name = orm.Optional(str, 30, autostrip=False)
+    last_name = orm.Optional(str, 30, autostrip=False)
     email = orm.Optional(str, 254, index=True)
     is_staff = orm.Required(bool, default=False, optimistic=False)
     is_active = orm.Required(bool, default=True, optimistic=False)
@@ -68,7 +68,7 @@ class Author(db.Entity, UserMixin):
 
     premoderation_mode = orm.Optional(str, 8, py_check=lambda x: x in {'', 'off', 'on'})
 
-    bio = orm.Optional(orm.LongStr)
+    bio = orm.Optional(orm.LongStr, autostrip=False)
     excluded_categories = orm.Optional(str, 200)  # TODO: use it on index page
     detail_view = orm.Required(bool, default=False)
     nsfw = orm.Required(bool, default=False)
@@ -163,7 +163,7 @@ class RegistrationProfile(db.Entity):
     activation_key = orm.Required(str, 40, unique=True)
     email = orm.Required(str, 254)
     password = orm.Optional(str, 255)
-    username = orm.Required(str, 32, index=True)
+    username = orm.Required(str, 32, index=True, autostrip=False)
     created_at = orm.Required(datetime, 6, default=datetime.utcnow)
 
     def __str__(self):
@@ -298,7 +298,7 @@ class Series(db.Entity):
     mark = orm.Required(int, size=16, default=0)
     notes = orm.Optional(orm.LongStr)
     original = orm.Required(bool, default=True)
-    summary = orm.Optional(orm.LongStr, lazy=False)
+    summary = orm.Optional(orm.LongStr, lazy=False, autostrip=False)
     title = orm.Required(str, 512)
     updated = orm.Required(datetime, 6, default=datetime.utcnow)
     views = orm.Required(int, default=0)
@@ -320,7 +320,7 @@ class Series(db.Entity):
 class Story(db.Entity):
     """ Модель рассказа """
 
-    title = orm.Required(str, 512)
+    title = orm.Required(str, 512, autostrip=False)
     contributors = orm.Set('StoryContributor')
     characters = orm.Set(Character)
     categories = orm.Set(Category)
@@ -339,7 +339,7 @@ class Story(db.Entity):
     notes = orm.Optional(orm.LongStr)
     original = orm.Required(bool, default=True)
     rating = orm.Required(Rating)
-    summary = orm.Required(orm.LongStr, lazy=False)
+    summary = orm.Optional(orm.LongStr, lazy=False, autostrip=False)
     updated = orm.Required(datetime, 6, default=datetime.utcnow, optimistic=False)
     words = orm.Required(int, default=0, optimistic=False)
     views = orm.Required(int, default=0, optimistic=False)
@@ -447,9 +447,9 @@ class Chapter(db.Entity):
     date = orm.Required(datetime, 6, default=datetime.utcnow)
     story = orm.Required(Story)
     mark = orm.Required(int, size=16, unsigned=True, default=0)
-    notes = orm.Optional(orm.LongStr)
+    notes = orm.Optional(orm.LongStr, autostrip=False)
     order = orm.Required(int, size=16, unsigned=True, default=1)
-    title = orm.Optional(str, 512)
+    title = orm.Optional(str, 512, autostrip=False)
     text = orm.Optional(orm.LongStr, autostrip=False)
     text_md5 = orm.Required(str, 32, default='d41d8cd98f00b204e9800998ecf8427e')
     updated = orm.Required(datetime, 6, default=datetime.utcnow)
@@ -1046,7 +1046,7 @@ class AdminLog(db.Entity):
     user = orm.Optional(Author)
     type = orm.Required(AdminLogType)
     object_id = orm.Required(str, 255)  # str for non-integer pk
-    object_repr = orm.Optional(str, 255)
+    object_repr = orm.Optional(str, 255, autostrip=False)
     action_flag = orm.Required(int, size=8)
     change_message = orm.Optional(orm.LongStr)
 

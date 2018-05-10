@@ -9,6 +9,7 @@ from mini_fiction.forms.comment import CommentForm
 from mini_fiction.captcha import CaptchaError
 from mini_fiction.validation import ValidationError
 from mini_fiction.utils.misc import calc_maxdepth
+from mini_fiction.validation.utils import safe_string_multiline_coerce
 
 
 def build_comment_tree_response(comment, target_attr, target):
@@ -95,9 +96,13 @@ def add(target_attr, target, template, template_ajax=None, template_ajax_modal=F
             data['parent'] = parent.local_id
 
         # Проверяем, что точно такого же коммента не отправлялось ранее
-        comment = target.comments.select(
-            lambda c: c.author == user and c.parent == parent and c.text == data['text'] and not c.deleted
-        ).first() if user.is_authenticated else None
+        # (тащим coerce из валидатора, так как данные могут меняться после валидации)
+        comment = None
+        if user.is_authenticated:
+            coerced_text = safe_string_multiline_coerce(data['text'].strip())
+            comment = target.comments.select(
+                lambda c: c.author == user and c.parent == parent and c.text == coerced_text and not c.deleted
+            ).first()
 
         created = not comment
 

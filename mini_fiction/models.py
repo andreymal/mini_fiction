@@ -81,7 +81,7 @@ class Author(db.Entity, UserMixin):
     # новые типы подписок
     silent_email = orm.Optional(orm.LongStr, lazy=False)
     silent_tracker = orm.Optional(orm.LongStr, lazy=False)
-    last_viewed_notification_id = orm.Required(int, default=0)
+    last_viewed_notification_id = orm.Required(int, default=0, optimistic=False)
 
     avatar_small = orm.Optional(str, 255)
     avatar_medium = orm.Optional(str, 255)

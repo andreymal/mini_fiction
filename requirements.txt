@@ -2,7 +2,7 @@ Flask-WTF
 Flask-Login>=0.4.1
 Flask-Script
 Flask-Babel
-Flask
+Flask>=0.12,<1.0
 Cerberus>=1.0.1,<1.2
 unidecode
 python3-memcached

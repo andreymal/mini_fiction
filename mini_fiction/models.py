@@ -336,7 +336,7 @@ class Story(db.Entity):
     freezed = orm.Required(bool, default=False)
     favorites = orm.Set('Favorites')
     bookmarks = orm.Set('Bookmark')
-    notes = orm.Optional(orm.LongStr)
+    notes = orm.Optional(orm.LongStr, autostrip=False)
     original = orm.Required(bool, default=True)
     rating = orm.Required(Rating)
     summary = orm.Optional(orm.LongStr, lazy=False, autostrip=False)

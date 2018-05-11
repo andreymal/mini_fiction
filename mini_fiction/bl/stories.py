@@ -247,7 +247,8 @@ class StoryBL(BaseBL, Commentable):
         # TODO: с approve() очень много общего, можно вынести общее в отдельную функцию
         story = self.model
         tm = datetime.utcnow()
-        old_published = story.published
+        old_published = story.published  # not draft and approved
+        old_draft = story.draft
 
         old_draft = story.draft
         if (not published) == story.draft:
@@ -273,16 +274,18 @@ class StoryBL(BaseBL, Commentable):
 
             if notify_pubrequest:
                 story.last_staff_notification_at = datetime.utcnow()
-                story.last_author_notification_at = None
+                if not user or not user.is_staff:
+                    story.last_author_notification_at = None
                 later(current_app.tasks['notify_story_pubrequest'].delay, story.id, user.id)
 
             # Уведомление автора о скрытии рассказа модератором, если:
-            # 1) Если это и правда модератор
+            # 1) Это и правда модератор
             notify_draft = user and user.is_staff
-            # 2) Рассказ был опубликован
-            notify_draft = notify_draft and (old_published and story.draft)
-            # 3) С момента предыдущего уведомления прошло достаточно времени
-            notify_draft = notify_draft and (
+            # 2) Рассказ отправлялся на публикацию или был опубликован
+            # (FIXME: удаление одобрение отправляет такое же уведомление, получается дубликат)
+            notify_draft = notify_draft and (not old_draft and story.draft)
+            # 3) Про почту: с момента предыдущего уведомления прошло достаточно времени
+            fast = not (
                 not story.last_author_notification_at or
                 story.last_author_notification_at + timedelta(seconds=current_app.config['STORY_NOTIFICATIONS_INTERVAL']) < datetime.utcnow()
             )
@@ -290,7 +293,7 @@ class StoryBL(BaseBL, Commentable):
             if notify_draft:
                 story.last_author_notification_at = datetime.utcnow()
                 story.last_staff_notification_at = None
-                later(current_app.tasks['notify_story_publish_draft'].delay, story.id, user.id, not story.published)
+                later(current_app.tasks['notify_story_publish_draft'].delay, story.id, user.id, not story.published, fast=fast)
 
             # Уведомление модераторов о публикации рассказа, если:
             # 1) Его опубликовал обычный пользователь

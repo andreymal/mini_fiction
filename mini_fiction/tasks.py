@@ -219,7 +219,7 @@ def notify_story_delete(story_id, story_title, user_id=None, approved_by_id=None
 
 @task()
 @db_session
-def notify_story_publish_draft(story_id, staff_id, draft):
+def notify_story_publish_draft(story_id, staff_id, draft, fast=False):
     story = models.Story.get(id=story_id)
     if not story:
         return
@@ -234,7 +234,7 @@ def notify_story_publish_draft(story_id, staff_id, draft):
     if typ not in author.silent_tracker_list:
         _notify(author, typ, story, by=staff)
 
-    if author.email and typ not in author.silent_email_list:
+    if not fast and author.email and typ not in author.silent_email_list:
         _sendmail_notify([author.email], typ, {'story': story, 'author': author, 'staff': staff})
 
 

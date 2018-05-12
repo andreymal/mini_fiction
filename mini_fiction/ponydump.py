@@ -177,6 +177,10 @@ class PonyDump(object):
           которые происанны для указанного первичного ключа модели name
         '''
 
+        if pk is not None:
+            if not isinstance(pk, tuple):
+                raise TypeError('pk must be tuple')
+
         result = {}
 
         for k in self._depcache:
@@ -190,6 +194,7 @@ class PonyDump(object):
 
             if attr and attr != cur_attr:
                 continue
+            assert cur_attr not in result
 
             if k[0][0] == name:
                 for v in self._depcache[k]:
@@ -518,7 +523,7 @@ class PonyDump(object):
             depname = self.get_entity_name(getattr(entity, depattr).py_type)
             objs = []
 
-            # TODO: как-нибудь одним select'ом?
+            # TODO: как-нибудь одним select'ом? (вообще это всё довольно тормознуто)
 
             for _pk, dep_pk in depdata:
                 assert _pk == pk
@@ -610,6 +615,8 @@ class PonyDump(object):
                 continue
 
             # Обрабатываем каждый ключ (для Optional он всего один, для Set неограниченно)
+            if not is_set:
+                assert len(dep_pks) == 1
             for dep_pk in dep_pks:
                 if not isinstance(dep_pk, (tuple, list)):
                     dep_pk = (dep_pk,)
@@ -737,6 +744,7 @@ class PonyDump(object):
         updated = created
         if not obj:
             obj = entity(**dump)
+            # FIXME: связи с самим собой никак не разруливаются
         else:
             assert obj.get_pk() == (pk[0] if len(pk) == 1 else pk)
 

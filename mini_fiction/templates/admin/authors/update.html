@@ -9,7 +9,17 @@
             [url_for('admin_index.index'), _('Administration')],
             [url_for('admin_authors.index'), _('Authors')]
         ]) }}
-        <h1>{{ page_title }}</h1>
+
+        <h1 id="author-name">
+            <img src="{{ author.bl.get_avatar_url() }}" width="42" title="{{ author.username }}" alt="{{ author.username }}" class="userpic"/>
+            <a class="invisible-link" href="{{ url_for('author.info', user_id=author.id) }}">
+                {{- author.username -}}
+            </a>
+            {% if not author.is_active %}
+                <sup id="banned">Read-only</sup>
+            {% endif -%}
+        </h1>
+
         {% if author.id == current_user.id %}<h3>{{ _("(it's you)") }}</h3>{% endif %}
 
         {% if saved %}<div class="alert-mini green">{{ _('Saved!') }}</div>{% endif %}

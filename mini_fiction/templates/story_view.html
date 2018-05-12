@@ -22,7 +22,7 @@
         <div class="story-info" itemscope itemtype="http://schema.org/Book">
         {% include 'includes/story_control_buttons.html' %}
         <h1 id="story_title">
-            <span itemprop="name"><a itemprop="url" class="story-title-link" href="{{ url_for('story.view', pk=story.id, _external=True) }}">{{ story.title }}</a></span>
+            <span itemprop="name"><a itemprop="url" class="invisible-link" href="{{ url_for('story.view', pk=story.id, _external=True) }}">{{ story.title }}</a></span>
             <span class="vote-area-1 js-vote-area-1-{{ story.id }}">
                 {{- story.bl.vote_area_1_html(user=current_user, user_vote=vote)|safe -}}
             </span>{#

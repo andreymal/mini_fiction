@@ -1527,13 +1527,13 @@ blockquote > p {
     margin: 0;
 }
 
-.story-title-link,
-.story-title-link:visited {
+a.invisible-link,
+a.invisible-link:visited {
     color: inherit;
     text-decoration: none;
 }
 
-.story-title-link:hover {
+a.invisible-link:hover {
     text-decoration: underline;
 }
 

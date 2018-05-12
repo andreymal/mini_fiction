@@ -155,6 +155,16 @@ class MiniFictionDump(ponydump.PonyDump):
             default_chunk_size=default_chunk_size,
         )
 
+        # В PonyDump._build_depmap() сортировка моделей по опциональным
+        # зависимостям не определена, но вот эти небольшие перестановки
+        # сильно улучшают производительность за счёт меньшего использования
+        # depcache
+        self.put_depmap_entity_after('series', after_entity='story')
+        self.put_depmap_entity_after('coauthorsseries', after_entity='series')
+        self.put_depmap_entity_after('inseriespermissions', after_entity='coauthorsseries')
+        self.put_depmap_entity_after('activity', after_entity=None)  # После всех
+        self.put_depmap_entity_after('storyview', after_entity=None)
+
 
 def dumpdb_console(dirpath, entities_list=None, gzip_compression=0, verbosity=2):
     from mini_fiction.utils.misc import progress_drawer

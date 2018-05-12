@@ -151,6 +151,54 @@ class PonyDump(object):
 
         return deps
 
+    def put_depmap_entity_after(self, entity, after_entity=None):
+        '''В методе _build_depmap() сортировка моделей по опциональным
+        зависимостям не определена, однако некоторые перестановки могут сильно
+        улучшить производительность. Этот метод позволяет поставить
+        одну модель после другой модели в списке зависимостей, что в некоторых
+        случаях сильно снижает нагрузку на кэш зависимостей. Метод выполняет
+        проверку обязательных зависимостей и накосячить не даст.
+        '''
+
+        entity_pos = [x[0] for x in self.depmap].index(entity)
+
+        if after_entity:
+            after_pos = [x[0] for x in self.depmap].index(after_entity)
+            if entity_pos >= after_pos:
+                return
+
+            # Перемещаем
+            new_depmap = self.depmap[:]
+            new_depmap.insert(after_pos + 1, new_depmap[entity_pos])
+            a = new_depmap.pop(entity_pos)
+
+            # Внутренние проверки
+            assert a[0] == entity
+            assert a is new_depmap[after_pos]
+
+        else:
+            # При after_entity=None просто пихаем в конец
+            if self.depmap[-1][0] == entity:
+                return
+            new_depmap = self.depmap[:]
+            a = new_depmap.pop(entity_pos)
+            assert a[0] == entity
+            new_depmap.append(a)
+            after_pos = len(new_depmap) - 1
+
+        # Проверяем обязательные зависимости: проходимся ко каждой модели
+        # перед перемещённой и смотрим, что всё в порядке
+        deps = [x[0] for x in new_depmap[:after_pos]]
+        for i in range(after_pos):  # i - порядковый номер модели в depmap
+            # Проходимся по обязательным зависимостям i-й модели
+            for dep_name in new_depmap[i][1][0].values():
+                # Если среди (0..i-1) моделей нужной нет, то всё плохо
+                if dep_name not in deps[:i]:
+                    raise ValueError('Required dependencies does not allow this moving')
+
+        # После всех проверок применяем изменения
+        self.depmap = new_depmap
+
     def get_entity_name(self, entity):
         name = None
         for k, v in self.entities.items():

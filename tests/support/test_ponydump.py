@@ -798,3 +798,74 @@ def test_get_entities_from_list(use_testdb):
         'pdtest2': PDTest2,
         'many1': Many1,
     }
+
+
+@pytest.mark.nodbcleaner
+@orm.db_session
+def test_depmap_ok(use_testdb):
+    pd = PonyDump(testdb)
+
+    # Строго говоря, порядок не абсолютно определён, и некоторые не-required
+    # зависимости позволяют менять модели местами, но у обязательных
+    # зависимостей строгий порядок: нельзя зависеть от моделей ниже по списку
+    assert pd.depmap == [
+        # (entity_name, ({required}, {optional}, {set}))
+        ('many1', ({}, {}, {'many2': 'many2'})),
+        ('many2', ({}, {}, {'many1': 'many1'})),
+        ('pdtest1', ({}, {'test2': 'pdtest2', 'test4': 'pdtest4'}, {'test3': 'pdtest3'})),
+        ('pdtest3', ({}, {'test1': 'pdtest1'}, {})),
+        ('pdtest4', ({}, {'test1': 'pdtest1'}, {})),
+        ('pdtest2', ({'test1': 'pdtest1'}, {}, {})),
+    ]
+
+
+@pytest.mark.nodbcleaner
+@orm.db_session
+def test_put_depmap_entity_after_ok(use_testdb):
+    pd = PonyDump(testdb)
+
+    pd.put_depmap_entity_after('many1', 'pdtest3')
+    assert pd.depmap == [
+        ('many2', ({}, {}, {'many1': 'many1'})),
+        ('pdtest1', ({}, {'test2': 'pdtest2', 'test4': 'pdtest4'}, {'test3': 'pdtest3'})),
+        ('pdtest3', ({}, {'test1': 'pdtest1'}, {})),
+        ('many1', ({}, {}, {'many2': 'many2'})),
+        ('pdtest4', ({}, {'test1': 'pdtest1'}, {})),
+        ('pdtest2', ({'test1': 'pdtest1'}, {}, {})),
+    ]
+
+
+@pytest.mark.nodbcleaner
+@orm.db_session
+def test_put_depmap_entity_after_all_ok(use_testdb):
+    pd = PonyDump(testdb)
+
+    pd.put_depmap_entity_after('many1', after_entity=None)
+    assert pd.depmap == [
+        ('many2', ({}, {}, {'many1': 'many1'})),
+        ('pdtest1', ({}, {'test2': 'pdtest2', 'test4': 'pdtest4'}, {'test3': 'pdtest3'})),
+        ('pdtest3', ({}, {'test1': 'pdtest1'}, {})),
+        ('pdtest4', ({}, {'test1': 'pdtest1'}, {})),
+        ('pdtest2', ({'test1': 'pdtest1'}, {}, {})),
+        ('many1', ({}, {}, {'many2': 'many2'})),
+    ]
+
+
+@pytest.mark.nodbcleaner
+@orm.db_session
+def test_put_depmap_entity_after_required_fail(use_testdb):
+    pd = PonyDump(testdb)
+
+    with pytest.raises(ValueError) as excinfo:
+        pd.put_depmap_entity_after('pdtest1', after_entity='pdtest2')
+
+    assert str(excinfo.value) == 'Required dependencies does not allow this moving'
+
+    assert pd.depmap == [
+        ('many1', ({}, {}, {'many2': 'many2'})),
+        ('many2', ({}, {}, {'many1': 'many1'})),
+        ('pdtest1', ({}, {'test2': 'pdtest2', 'test4': 'pdtest4'}, {'test3': 'pdtest3'})),
+        ('pdtest3', ({}, {'test1': 'pdtest1'}, {})),
+        ('pdtest4', ({}, {'test1': 'pdtest1'}, {})),
+        ('pdtest2', ({'test1': 'pdtest1'}, {}, {})),
+    ]

@@ -81,7 +81,7 @@ def database_cleaner(request):
 
     assert flask_app.config['DATABASE_CLEANER']['provider'] in ('sqlite3',)
     try:
-        with db_session:
+        with db_session:  # FIXME: документация Pony ORM не советует так делать
             yield
     finally:
         database.db.rollback()

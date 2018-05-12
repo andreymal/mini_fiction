@@ -67,8 +67,7 @@ def use_testdb():
         testdb_started = True
 
     try:
-        with orm.db_session:
-            yield
+        yield
     finally:
         testdb.rollback()
 
@@ -80,6 +79,7 @@ def use_testdb():
             for x in conn.execute("SELECT name FROM sqlite_master WHERE type='table'").fetchall():
                 conn.execute('DELETE FROM {}'.format(x[0]))
             conn.execute('COMMIT')
+            testdb.disconnect()
 
 
 @pytest.yield_fixture(scope="function")
@@ -169,6 +169,7 @@ def _check_dump_content(dumpdir, name, data):
 
 @pytest.mark.nodbcleaner
 @pytest.mark.parametrize('gzip_compression', [0, 1])
+@orm.db_session
 def test_dump_to_directory_full(use_testdb, dumpdir, gzip_compression):
     pd = PonyDump(testdb)
     _fill_testdb()
@@ -269,6 +270,7 @@ def test_dump_to_directory_full(use_testdb, dumpdir, gzip_compression):
 
 
 @pytest.mark.nodbcleaner
+@orm.db_session
 def test_dump_to_directory_one_entity(use_testdb, dumpdir):
     pd = PonyDump(testdb)
     _fill_testdb()
@@ -302,6 +304,7 @@ def test_dump_to_directory_one_entity(use_testdb, dumpdir):
 
 
 @pytest.mark.nodbcleaner
+@orm.db_session
 def test_dump_to_directory_exclude_attrs(use_testdb, dumpdir):
     pd = PonyDump(testdb, dict_params={
         'many1': {'exclude': 'many2'},
@@ -317,7 +320,11 @@ def test_dump_to_directory_exclude_attrs(use_testdb, dumpdir):
     ])
 
 
+# loaddb tests
+
+
 @pytest.mark.nodbcleaner
+@orm.db_session
 def test_load_from_files_full(use_testdb, dumpdir):
     os.makedirs(dumpdir)
 
@@ -436,6 +443,7 @@ def test_load_from_files_full(use_testdb, dumpdir):
 
 
 @pytest.mark.nodbcleaner
+@orm.db_session
 def test_load_from_files_partial(use_testdb, dumpdir):
     os.makedirs(dumpdir)
 
@@ -491,6 +499,7 @@ def test_load_from_files_partial(use_testdb, dumpdir):
 
 
 @pytest.mark.nodbcleaner
+@orm.db_session
 def test_load_from_files_notfull(use_testdb, dumpdir):
     os.makedirs(dumpdir)
 
@@ -535,6 +544,7 @@ def test_load_from_files_notfull(use_testdb, dumpdir):
         '{"_entity": "many2", "id": 20, "many1": [10]}',
     ],
 ])
+@orm.db_session
 def test_load_from_files_relations_all_orders(use_testdb, dumpdir, lines):
     os.makedirs(dumpdir)
 
@@ -556,6 +566,8 @@ def test_load_from_files_relations_all_orders(use_testdb, dumpdir, lines):
     assert many2.many1.select()[:] == [many1]
 
 
+@pytest.mark.nodbcleaner
+@orm.db_session
 def test_json2obj_ok_entity_case_insensitive(use_testdb):
     pd = PonyDump(testdb)
 
@@ -564,7 +576,9 @@ def test_json2obj_ok_entity_case_insensitive(use_testdb):
     assert result['obj'].id == 7
 
 
-def test_json2obj_ok_datetime_int(use_testdb):
+@pytest.mark.nodbcleaner
+@orm.db_session
+def test_json2obj_ok_datetime_unix(use_testdb):
     pd = PonyDump(testdb)
 
     result = pd.json2obj({
@@ -584,6 +598,8 @@ def test_json2obj_ok_datetime_int(use_testdb):
     assert result['obj'].foo_datetime == datetime(1970, 1, 1, 1, 0, 1, 999987)
 
 
+@pytest.mark.nodbcleaner
+@orm.db_session
 def test_json2obj_ok_datetime_obj(use_testdb):
     pd = PonyDump(testdb)
 
@@ -604,6 +620,8 @@ def test_json2obj_ok_datetime_obj(use_testdb):
     assert result['obj'].foo_datetime == datetime(1970, 1, 1, 2, 0, 3, 999987)
 
 
+@pytest.mark.nodbcleaner
+@orm.db_session
 def test_json2obj_ok_uuid_obj(use_testdb):
     pd = PonyDump(testdb)
 
@@ -626,6 +644,8 @@ def test_json2obj_ok_uuid_obj(use_testdb):
     assert result['obj'].foo_uuid == u
 
 
+@pytest.mark.nodbcleaner
+@orm.db_session
 def test_json2obj_fail_invalid_entity(use_testdb):
     pd = PonyDump(testdb)
 
@@ -635,6 +655,8 @@ def test_json2obj_fail_invalid_entity(use_testdb):
     assert str(excinfo.value) == 'Unknown entity "wtfisthat"'
 
 
+@pytest.mark.nodbcleaner
+@orm.db_session
 def test_json2obj_fail_inconsistent_set(use_testdb):
     pd = PonyDump(testdb)
 
@@ -647,6 +669,8 @@ def test_json2obj_fail_inconsistent_set(use_testdb):
     assert str(excinfo.value) == 'Inconsistent dump: attribute "many1" of "many2(2,)" conflicts with reverse data'
 
 
+@pytest.mark.nodbcleaner
+@orm.db_session
 def test_json2obj_fail_inconsistent_optional_count(use_testdb):
     pd = PonyDump(testdb)
 
@@ -660,6 +684,8 @@ def test_json2obj_fail_inconsistent_optional_count(use_testdb):
     assert str(excinfo.value) == 'Inconsistent dump: attribute "test4" of "pdtest1(1, 2, 3)" has multiple values in reverse data'
 
 
+@pytest.mark.nodbcleaner
+@orm.db_session
 def test_json2obj_fail_inconsistent_optional_count_2(use_testdb):
     pd = PonyDump(testdb)
 
@@ -673,6 +699,8 @@ def test_json2obj_fail_inconsistent_optional_count_2(use_testdb):
     assert str(excinfo.value) == 'Inconsistent dump: attribute "test4" of "pdtest1(1, 2, 3)" has multiple values in reverse data'
 
 
+@pytest.mark.nodbcleaner
+@orm.db_session
 def test_json2obj_fail_inconsistent_optional_value(use_testdb):
     pd = PonyDump(testdb)
 
@@ -685,6 +713,8 @@ def test_json2obj_fail_inconsistent_optional_value(use_testdb):
     assert str(excinfo.value) == 'Inconsistent dump: attribute "test4" of "pdtest1(1, 2, 3)" conflicts with reverse data'
 
 
+@pytest.mark.nodbcleaner
+@orm.db_session
 def test_json2obj_fail_unknown_attr(use_testdb):
     pd = PonyDump(testdb)
 
@@ -696,6 +726,8 @@ def test_json2obj_fail_unknown_attr(use_testdb):
     assert str(excinfo.value) in (x + 'wtfisthat, andthat', x + 'andthat, wtfisthat')
 
 
+@pytest.mark.nodbcleaner
+@orm.db_session
 def test_load_entities_fail_invalid_json_syntax(use_testdb):
     pd = PonyDump(testdb)
 
@@ -706,6 +738,8 @@ def test_load_entities_fail_invalid_json_syntax(use_testdb):
     assert str(excinfo.value).startswith('Invalid JSON on line 1: ')
 
 
+@pytest.mark.nodbcleaner
+@orm.db_session
 def test_load_entities_fail_invalid_json_no_entity(use_testdb):
     pd = PonyDump(testdb)
 
@@ -716,6 +750,8 @@ def test_load_entities_fail_invalid_json_no_entity(use_testdb):
     assert str(excinfo.value) =='Invalid dump format on line 1'
 
 
+@pytest.mark.nodbcleaner
+@orm.db_session
 def test_load_entities_fail_invalid_json_nonstr_entity(use_testdb):
     pd = PonyDump(testdb)
 
@@ -726,7 +762,8 @@ def test_load_entities_fail_invalid_json_nonstr_entity(use_testdb):
     assert str(excinfo.value) =='Invalid dump format on line 1'
 
 
-
+@pytest.mark.nodbcleaner
+@orm.db_session
 def test_load_entities_fail_invalid_json_unknown_entity(use_testdb):
     pd = PonyDump(testdb)
 
@@ -737,6 +774,8 @@ def test_load_entities_fail_invalid_json_unknown_entity(use_testdb):
     assert str(excinfo.value) =='Unknown entity "wat" on line 1'
 
 
+@pytest.mark.nodbcleaner
+@orm.db_session
 def test_get_entities_dict_from_db(use_testdb):
     result = ponydump.get_entities_dict(testdb)
 
@@ -750,6 +789,8 @@ def test_get_entities_dict_from_db(use_testdb):
     }
 
 
+@pytest.mark.nodbcleaner
+@orm.db_session
 def test_get_entities_from_list(use_testdb):
     result = ponydump.get_entities_dict([PDTest2, Many1])
 

@@ -24,7 +24,7 @@ def app():
 
     with db_session:
         # Init testing database
-        fixtures.seed(progress=False)
+        fixtures.seed(verbosity=0)
 
     yield flask_app
 

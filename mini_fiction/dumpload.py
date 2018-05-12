@@ -156,7 +156,7 @@ class MiniFictionDump(ponydump.PonyDump):
         )
 
 
-def dumpdb_console(dirpath, entities_list=None, gzip_compression=0, progress=True):
+def dumpdb_console(dirpath, entities_list=None, gzip_compression=0, verbosity=2):
     from mini_fiction.utils.misc import progress_drawer
 
     mfd = MiniFictionDump()
@@ -168,16 +168,17 @@ def dumpdb_console(dirpath, entities_list=None, gzip_compression=0, progress=Tru
     for status in mfd.dump_to_directory(dirpath, entities_list, gzip_compression=gzip_compression):
         if not status['entity']:
             # Закончилось всё
-            print()
+            if verbosity:
+                print()
             continue
 
         if current != status['entity']:
             current = status['entity']
-            if not progress:
+            if verbosity:
                 print(current, end='... ')
                 sys.stdout.flush()
 
-        if progress and not drawer:
+        if verbosity >= 2 and not drawer:
             print(current.ljust(ljust_cnt), end='')
             drawer = progress_drawer(status['count'], show_count=True)
             drawer.send(None)
@@ -185,22 +186,23 @@ def dumpdb_console(dirpath, entities_list=None, gzip_compression=0, progress=Tru
 
         if not status['pk']:
             # Закончилась одна модель
-            if progress:
+            if verbosity >= 2:
                 try:
                     drawer.send(None)
                 except StopIteration:
                     pass
                 drawer = None
-                print()
-            else:
+                if verbosity:
+                    print()
+            elif verbosity:
                 print('ok. {}'.format(status['count']))
             continue
 
-        if progress:
+        if verbosity >= 2:
             drawer.send(status['current'])
 
 
-def loaddb_console(paths, progress=True, only_create=False):
+def loaddb_console(paths, verbosity=2, only_create=False):
     from mini_fiction.utils.misc import progress_drawer
 
     mfd = MiniFictionDump()
@@ -230,16 +232,17 @@ def loaddb_console(paths, progress=True, only_create=False):
         status = statuses[-1]
         if not status['path']:
             # Закончилось всё
-            print()
+            if verbosity:
+                print()
             continue
 
         if current != status['path']:
             current = status['path']
-            if not progress:
+            if verbosity == 1:
                 print(os.path.split(status['path'])[-1], end='... ')
                 sys.stdout.flush()
 
-        if progress and not drawer:
+        if verbosity >= 2 and not drawer:
             print(os.path.split(status['path'])[-1].ljust(ljust_cnt), end='')
             drawer = progress_drawer(status['count'] or 0, show_count=bool(status['count']))
             drawer.send(None)
@@ -247,28 +250,31 @@ def loaddb_console(paths, progress=True, only_create=False):
 
         if not status['entity']:
             # Закончился текущий файл
-            if progress:
+            if verbosity >= 2:
                 try:
                     drawer.send(None)
                 except StopIteration:
                     pass
                 drawer = None
                 print()
-            else:
+            elif verbosity:
                 if status['count'] is not None:
                     print('ok. {}'.format(status['count'] or 0))
                 else:
                     print('ok.')
             continue
 
-        if progress:
+        if verbosity >= 2:
             drawer.send(status['current'])
 
     if only_create:
         assert not updated
-        print('Finished. {} objects created'.format(created))
-    else:
-        print('Finished. {} objects created, {} updated, {} not changed'.format(created, updated, not_changed))
+
+    if verbosity:
+        if only_create:
+            print('Finished. {} objects created'.format(created))
+        else:
+            print('Finished. {} objects created, {} updated, {} not changed'.format(created, updated, not_changed))
 
     depcache = mfd.get_depcache_dict()
     if depcache:

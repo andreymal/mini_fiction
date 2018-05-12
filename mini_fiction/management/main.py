@@ -38,7 +38,7 @@ def shell():
 def seed(silent=False):
     from mini_fiction import fixtures
     orm.sql_debug(False)
-    fixtures.seed(progress=not silent, only_create=True)
+    fixtures.seed(verbosity=1 if silent else 2, only_create=True)
 
 
 @manager.command
@@ -125,7 +125,7 @@ def dumpdb(dirpath, entities_list, gzip_compression=0, silent=False):
         dirpath,
         entities_list if entities_list and 'all' not in entities_list else [],
         gzip_compression,
-        progress=not silent,
+        verbosity=1 if silent else 2,
     )
     print('Done in {}.'.format(timedelta_format(time.time() - tm)))
 
@@ -137,7 +137,7 @@ def loaddb(pathlist, silent=False, only_create=False):
     from mini_fiction.dumpload import loaddb_console as cmd
     orm.sql_debug(False)
     tm = time.time()
-    cmd(pathlist, progress=not silent, only_create=only_create)
+    cmd(pathlist, verbosity=1 if silent else 2, only_create=only_create)
     print('Done in {}.'.format(timedelta_format(time.time() - tm)))
 
 

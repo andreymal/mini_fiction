@@ -401,7 +401,9 @@ def test_load_from_files_full(use_testdb, dumpdir):
             load_statuses.remove(status)
             if status['entity'] == 'many1':
                 # Проверяем, что отсутствующая зависимость Many2 положена в depcache
-                assert ((status['pk'],), (2,)) in pd.get_depcache_dict()[(('many1', 'many2'), ('many2', 'many1'))]
+                deps = pd.get_depcache_dict()[(('many1', 'many2'), ('many2', 'many1'))]
+                assert (2,) in deps[0].get((status['pk'],))
+                assert (status['pk'],) in deps[1].get((2,))
 
     assert not load_statuses
     assert not pd.get_depcache_dict()
@@ -526,11 +528,26 @@ def test_load_from_files_notfull(use_testdb, dumpdir):
 
     key = (('pdtest1', 'test2'), ('pdtest2', 'test1'))
     assert key in depcache
-    assert depcache[key] == {((1, 2, 3), (12,))}
+    assert depcache[key] == [
+        {
+            (1, 2, 3): {(12,)},
+        },
+        {
+            (12,): {(1, 2, 3)},
+        },
+    ]
 
     key = (('pdtest1', 'test3'), ('pdtest3', 'test1'))
     assert key in depcache
-    assert depcache[key] == {((1, 2, 3), (19,)), ((1, 2, 3), (17,))}
+    assert depcache[key] == [
+        {
+            (1, 2, 3): {(19,), (17,)}
+        },
+        {
+            (19,): {(1, 2, 3)},
+            (17,): {(1, 2, 3)},
+        }
+    ]
 
 
 @pytest.mark.nodbcleaner

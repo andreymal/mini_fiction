@@ -56,6 +56,15 @@ class PonyDump(object):
             for name, e in self.entities.items()
         }
 
+        # Это кэш опциональных зависимостей. Когда у загруженного объекта
+        # ещё не загружены зависимости в БД, сюда кладутся ожидаемые
+        # первичные ключи, чтобы проставить зависимости позже, когда
+        # объекты появятся.
+        # Формат:
+        # - ключи: (('модель1', 'атрибут1'), ('модель2', 'атрибут2'))
+        # - значения — два зеркальных словаря, дублирующих друг друга ради
+        #   производительности: [{ключмодели1: {ключмодели2, ключмодели3}},
+        #   {ключмодели2: {ключмодели1}, ключмодели3: {ключмодели1}}]
         self._depcache = {}
 
     def _build_depmap(self):
@@ -231,34 +240,40 @@ class PonyDump(object):
 
         result = {}
 
-        for k in self._depcache:
-            if k[0][0] != name and k[1][0] != name:
+        d = self._depcache
+
+        for key in d:
+            # Отбираем только нашу модель из кэша
+            if key[0][0] != name and key[1][0] != name:
                 continue
 
-            if k[0][0] == name:
-                cur_attr = k[0][1]
+            # Выясняем, о каком Optional/Set атрибуте речь в данном случае
+            if key[0][0] == name:
+                cur_attr = key[0][1]
             else:
-                cur_attr = k[1][1]
+                cur_attr = key[1][1]
 
+            # Если с нас спрашивают конкретный атрибут и сейчас не он,
+            # то едем дальше
             if attr and attr != cur_attr:
                 continue
             assert cur_attr not in result
 
-            if k[0][0] == name:
-                for v in self._depcache[k]:
-                    if pk and v[0] != pk:
-                        continue
-                    if cur_attr not in result:
-                        result[cur_attr] = set()
-                    result[cur_attr].add((v[0], v[1]))
-
+            # deps — словарик первичных ключей с зависимостями вида
+            # {объект1: {зависимость1, зависимость2, ...}, ...}
+            if key[0][0] == name:
+                deps = d[key][0]  # если в depcache лежит прямой порядок
             else:
-                for v in self._depcache[k]:
-                    if pk and v[1] != pk:
-                        continue
-                    if cur_attr not in result:
-                        result[cur_attr] = set()
-                    result[cur_attr].add((v[1], v[0]))
+                deps = d[key][1]  # если в depcache лежит обратный порядок
+
+            # Собираем нужные нам значения из словарика
+            if pk:
+                if pk in deps:
+                    result[cur_attr] = set((pk, x) for x in deps[pk])
+            else:
+                result[cur_attr] = set()
+                for xpk in deps:
+                    result[cur_attr] |= set((xpk, x) for x in deps[xpk])
 
         return result
 
@@ -293,10 +308,21 @@ class PonyDump(object):
             value = (dep_pk, pk)
 
         if key not in d:
-            d[key] = set()
+            # Дублирование ради производительности:
+            # В первом словаре связь модель1→модель2,
+            # во втором модель2→модель1
+            d[key] = [{}, {}]
 
-        if value not in d[key]:
-            d[key].add(value)
+        # У Set атрибутов есть несколько зависимых объектов,
+        # поэтому set и здесь
+        if value[0] not in d[key][0]:
+            d[key][0][value[0]] = set()
+        d[key][0][value[0]].add(value[1])
+
+        # Зеркальное дублирование для производительности
+        if value[1] not in d[key][1]:
+            d[key][1][value[1]] = set()
+        d[key][1][value[1]].add(value[0])
 
     def dc_delete(self, name, attr, pk, dep_pk):
         '''Удаляет из кэша ожидаемую опциональную (Optional или Set)
@@ -328,9 +354,22 @@ class PonyDump(object):
         else:
             value = (dep_pk, pk)
 
-        if key in d and value in d[key]:
-            d[key].remove(value)
-            if not d[key]:
+        if key in d:
+            if value[0] in d[key][0]:
+                deps_for_pk = d[key][0][value[0]]
+                if value[1] in deps_for_pk:
+                    deps_for_pk.remove(value[1])
+                if not deps_for_pk:
+                    d[key][0].pop(value[0])
+
+            if value[1] in d[key][1]:
+                deps_for_pk = d[key][1][value[1]]
+                if value[0] in deps_for_pk:
+                    deps_for_pk.remove(value[0])
+                if not deps_for_pk:
+                    d[key][1].pop(value[1])
+
+            if not d[key][0] and not d[key][1]:
                 del d[key]
 
     # Методы для дампа базы данных

@@ -175,6 +175,9 @@ class StoryBL(BaseBL, Commentable):
 
         if edited_data:
             story.updated = datetime.utcnow()
+            current_app.cache.delete('index_updated_chapters')
+            current_app.cache.delete('index_comments_html')
+
         if editor and edited_data:
             self.edit_log(editor, edited_data)
 

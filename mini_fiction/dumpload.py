@@ -184,7 +184,7 @@ def dumpdb_console(dirpath, entities_list=None, gzip_compression=0, verbosity=2)
 
         if current != status['entity']:
             current = status['entity']
-            if verbosity:
+            if verbosity == 1:
                 print(current, end='... ')
                 sys.stdout.flush()
 

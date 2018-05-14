@@ -496,6 +496,8 @@ class StoryBL(BaseBL, Commentable):
             raise ValueError('Оценивание рассказов недоступно')
         if self.is_author(user):
             raise ValueError('Нельзя голосовать за свой рассказ')
+        if not self.can_vote(user):
+            raise ValueError('Вы не можете голосовать за этот рассказ')
         if not current_app.story_voting.validate_value(value):
             raise ValueError('Неверное значение')
 
@@ -714,6 +716,14 @@ class StoryBL(BaseBL, Commentable):
         if self.is_contributor(user):
             return True
         return False
+
+    def can_vote(self, user):
+        story = self.model
+        if user and user.is_staff:
+            return True
+        if not user or not user.is_authenticated or not story.published or self.is_author(user):
+            return False
+        return self.has_access(user)
 
     # search
 

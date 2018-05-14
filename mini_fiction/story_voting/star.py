@@ -116,7 +116,7 @@ class StarVoting(BaseVoting):
         return ''
 
     def vote_area_2_html(self, story, user=None, user_vote=None):
-        if not user or not user.is_authenticated or story.bl.is_author(user):
+        if not story.bl.can_vote(user):
             return ''
 
         ctx = {

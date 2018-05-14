@@ -710,13 +710,6 @@ class StoryBL(BaseBL, Commentable):
             return True
         return False
 
-    def has_beta_access(self, user):
-        if user and user.is_staff:
-            return True
-        if self.is_contributor(user):
-            return True
-        return False
-
     def can_vote(self, user):
         story = self.model
         if user and user.is_staff:

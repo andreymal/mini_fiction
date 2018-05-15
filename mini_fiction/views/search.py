@@ -39,7 +39,7 @@ def search_action(postform):
 
     try:
         page_current = int(request.args.get('page') or 1)
-    except:
+    except Exception:
         page_current = 1
 
     query = postform.data['q']

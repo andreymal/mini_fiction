@@ -202,9 +202,7 @@ class AuthorBL(BaseBL):
 
             try:
                 image = Image.open(BytesIO(image_data))
-            except (KeyboardInterrupt, SystemExit):
-                raise
-            except:
+            except Exception:
                 raise ValidationError({'avatar': [lazy_gettext('Cannot read avatar')]})
             else:
                 with image:

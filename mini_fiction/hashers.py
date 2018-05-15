@@ -30,9 +30,7 @@ def pbkdf2_check(data, password):
     try:
         algorithm, iterations, salt, _ = data.split('$', 3)
         iterations = int(iterations)
-    except (KeyboardInterrupt, SystemExit):
-        raise
-    except:
+    except Exception:
         raise ValueError('Invalid hash format')
     if algorithm != 'pbkdf2_sha256':
         raise ValueError('Unknown pbkdf2 algorithm variant')
@@ -55,9 +53,7 @@ def bcrypt_check(data, password):
     try:
         encoded = data.encode('utf-8')
         encoded2 = bcrypt.hashpw(password.encode('utf-8'), encoded)
-    except (KeyboardInterrupt, SystemExit):
-        raise
-    except:
+    except Exception:
         raise ValueError('Invalid hash format')
     return safe_str_cmp(encoded, encoded2)
 
@@ -89,8 +85,6 @@ def scrypt_check(data, password):
         r = int(r, 10)
         p = int(p, 10)
         keylen = int(keylen, 10)
-    except (KeyboardInterrupt, SystemExit):
-        raise
-    except:
+    except Exception:
         raise ValueError('Invalid hash format')
     return safe_str_cmp(h, _scrypt_password_hash(password, salt, Nexp, r, p, keylen))

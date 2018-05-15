@@ -43,7 +43,9 @@ def cached_xml_response(cache_key, timeout):
 @cached_xml_response('sitemap_index', timeout=600)
 @db_session
 def index():
-    max_story_id = select(x.id for x in Story if not x.draft and x.approved).order_by('-x.id').first()
+    max_story_id = select(
+        x.id for x in Story if not x.draft and x.approved and not x.robots_noindex
+    ).order_by('-x.id').first() or 0
 
     sitemaps = [
         {'url': url_for('sitemap.general', _external=True)},
@@ -80,7 +82,9 @@ def stories(offset):
     if offset % per_file != 0:
         abort(404)
 
-    max_story_id = select(x.id for x in Story if not x.draft and x.approved).order_by('-x.id').first()
+    max_story_id = select(
+        x.id for x in Story if not x.draft and x.approved and not x.robots_noindex
+    ).order_by('-x.id').first() or 0
     if offset > max_story_id:
         abort(404)
 
@@ -95,7 +99,7 @@ def stories(offset):
     # Собираем ссылки на рассказы
     stories = select(
         (x.id, x.first_published_at, x.updated) for x in Story
-        if x.id >= min_id and x.id < max_id and not x.draft and x.approved
+        if x.id >= min_id and x.id < max_id and not x.draft and x.approved and not x.robots_noindex
     )[:]
     story_ids = [x[0] for x in stories]
     stories.sort(key=lambda x: x[1], reverse=True)

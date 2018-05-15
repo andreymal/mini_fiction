@@ -91,13 +91,9 @@ var comments = {
     },
 
     loadPagination: function() {
-        var next_btn = document.getElementById('ajax_next_comment');
-        if (next_btn) {
-            next_btn.addEventListener('click', this._commentBtnEvent);
-        }
-        var prev_btn = document.getElementById('ajax_prev_comment');
-        if (prev_btn) {
-            prev_btn.addEventListener('click', this._commentBtnEvent);
+        var paginationButtons = document.querySelectorAll('.js-comment-pagination-btn');
+        for (var i = 0; i < paginationButtons.length; i++) {
+            paginationButtons[i].addEventListener('click', this._commentPaginationBtnEvent);
         }
     },
 
@@ -274,7 +270,7 @@ var comments = {
         return false;
     },
 
-    _commentBtnEvent: function(event) {
+    _commentPaginationBtnEvent: function(event) {
         event.stopImmediatePropagation();
         event.preventDefault();
 

@@ -176,8 +176,6 @@ def ajax_author_dashboard(page):
 
     data = {
         'comments': comments,
-        'num_pages': paged.num_pages,
-        'page_current': page,
         'page_obj': paged,
         'comments_short': True,
     }
@@ -214,8 +212,6 @@ def ajax_author_overview(user_id, page):
     data = {
         'author': author,
         'comments': comments,
-        'num_pages': paged.num_pages,
-        'page_current': page,
         'page_obj': paged,
         'comments_short': True,
     }

@@ -64,11 +64,11 @@ def info(user_id=None, comments_page=1):
         number=comments_page,
         total=comments_count,
         per_page=current_app.config['COMMENTS_COUNT']['author_page'],
+        page_arg_name='comments_page',
     )  # TODO: restore orphans?
     comments = paged.slice(comments_list)
     if not comments and comments_page != 1:
         abort(404)
-    num_pages = paged.num_pages
 
     data.update({
         'author': author,
@@ -78,8 +78,6 @@ def info(user_id=None, comments_page=1):
         'contributing_stories': contributing_stories,
         'series': series,
         'comments': comments,
-        'page_current': comments_page,
-        'num_pages': num_pages,
         'comments_count': comments_count,
         'comments_short': True,
         'page_obj': paged,

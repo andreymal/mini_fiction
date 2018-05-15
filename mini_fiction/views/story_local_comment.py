@@ -49,8 +49,6 @@ def view(story_id, comments_page):
         'comments_tree_list': comments_tree_list,
         'comments_count': comments_count,
         'last_viewed_comment': last_viewed_comment,
-        'num_pages': paged.num_pages,
-        'page_current': comments_page,
         'page_title': 'Обсуждение «{}»'.format(story.title),
         'comment_form': CommentForm(),
         'page_obj': paged,

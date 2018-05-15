@@ -1,21 +1,10 @@
-{% if num_pages != 1 %}
-    <a
-        href="{% if page_obj.has_previous() %}{{ url_for('story.view', pk=story.id, comments_page=page_obj.number - 1) }}{% else %}#{% endif %}"
-        data-ajax-href="{{ url_for('story_comment.ajax', story_id=story.id, page=page_obj.number - 1) }}"
-        id="ajax_prev_comment"
-        class="btn{% if not page_obj.has_previous() %} hidden{% endif %}">
-        ← Старые
-    </a>
-
-    <span id="ajax_pages_comment" class="btn btn-primary">{{ page_obj.number }} / {{ page_obj.num_pages }}</span>
-
-    <a
-        href="{% if page_obj.has_next() %}{{ url_for('story.view', pk=story.id, comments_page=page_obj.number + 1) }}{% else %}#{% endif %}"
-        data-ajax-href="{{ url_for('story_comment.ajax', story_id=story.id, page=page_obj.number + 1) }}"
-        id="ajax_next_comment"
-        class="btn{% if not page_obj.has_next() %} hidden{% endif %}">
-        Новые →
-    </a>
-
-    <input type="hidden" id="num_pages" value="{{ page_obj.num_pages }}" />
-{% endif %}
+{% if page_obj.num_pages != 1 -%}
+    {% for page_id in page_obj.iter_pages() %}
+        <a
+            href="{{ url_for('story.view', pk=story.id, comments_page=page_id) }}"
+            data-ajax-href="{{ url_for('story_comment.ajax', story_id=story.id, page=page_id) }}"
+            class="js-comment-pagination-btn btn{% if page_id == page_obj.number %} btn-primary{% endif %}">
+            {{- page_id -}}
+        </a>
+    {% endfor %}
+{%- endif %}

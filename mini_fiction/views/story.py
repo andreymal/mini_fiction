@@ -87,8 +87,6 @@ def view(pk, comments_page):
         'local_comments_count': local_comments_count,
         'new_local_comments_count': new_local_comments_count,
         'chapters': chapters,
-        'num_pages': paged.num_pages,
-        'page_current': comments_page,
         'page_title': story.title,
         'comment_form': CommentForm(),
         'page_obj': paged,
@@ -96,6 +94,7 @@ def view(pk, comments_page):
         'sub_comments': story.bl.get_comments_subscription(user),
         'robots_noindex': not story.published or story.robots_noindex,
         'favorites_count': story.favorites.select().count(),
+        'show_meta_description': comments_page == -1,
     }
 
     return render_template('story_view.html', **data)

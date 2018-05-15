@@ -69,7 +69,9 @@
             <div id="comments-list">
             {% include "includes/story_comments_list.html" %}
             </div>
-            {% include "includes/comments_pagination_author_overview.html" %}
+            <div id="comments-pagination" class="pagination center">
+                {%- include "includes/comments_pagination_author_overview.html" -%}
+            </div>
         {% endif %}
     </div>
 

@@ -333,8 +333,6 @@ def ajax(target_attr, target, link, page, per_page, template_pagination, last_vi
         target_attr: target,
         'comments_tree_list': comments_tree_list,
         'last_viewed_comment': last_viewed_comment,
-        'num_pages': paged.num_pages,
-        'page_current': page,
         'page_obj': paged,
         'comment_votes_cache': comment_votes_cache,
     })

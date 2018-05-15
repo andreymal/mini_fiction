@@ -9,7 +9,7 @@
     {% if page_obj.has_next() -%}
         <link rel="next" href="{{ url_for('story.view', pk=story.id, comments_page=page_obj.number + 1, _external=True) }}" />
     {%- endif %}
-    {% if page_current == -1 -%}
+    {% if show_meta_description -%}
         <meta name="description" content="{{ story.summary|striptags }}" />
     {%- endif -%}
 {% endblock %}

@@ -15,6 +15,8 @@ var comments = {
     __previewBtnEvent: null,
 
     load: function() {
+        this.loadCommentsContent();
+
         this.addlink = document.getElementById('comment-add-link');
         this.form = document.getElementById('comment-form');
         if (this.addlink && this.form) {
@@ -22,7 +24,6 @@ var comments = {
                 this.addlink.addEventListener('click', this._answerEvent);
                 this.form.addEventListener('submit', this.submitForm.bind(this));
             }
-            this.loadCommentsContent();
 
             this._captchaField = this.form.getElementsByClassName('js-captcha-field')[0];
             this._captchaWrap = this.form.getElementsByClassName('js-captcha-wrap')[0];

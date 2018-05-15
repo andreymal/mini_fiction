@@ -9,7 +9,7 @@ import time
 from datetime import timedelta
 from urllib.request import Request, urlopen, quote
 
-from flask import current_app, g, escape, render_template, abort, url_for, request
+from flask import current_app, g, escape, render_template, abort, url_for, request, has_request_context
 from flask_babel import pgettext, ngettext
 
 from mini_fiction.utils import diff as utils_diff
@@ -20,8 +20,6 @@ class Paginator(object):
         self.number = number
         self.total = total
         self.per_page = per_page
-        self.endpoint = endpoint
-        self.view_args = view_args
         self.page_arg_name = page_arg_name
 
         self.num_pages = max(1, math.ceil(total / self.per_page))
@@ -29,19 +27,38 @@ class Paginator(object):
             self.number = self.num_pages
         self.offset = (self.number - 1) * per_page
 
+        if endpoint:
+            self.endpoint = endpoint
+        elif has_request_context():
+            self.endpoint = request.endpoint
+        else:
+            self.endpoint = None
+
+        if view_args is not None:
+            self.view_args = dict(view_args)
+        elif has_request_context():
+            self.view_args = dict(request.view_args or {})
+        else:
+            self.view_args = None
+
     def slice(self, objlist):
         if self.offset < 0:
             return []
         return objlist[self.offset:self.offset + self.per_page]
 
+    def can_generate_url(self):
+        return self.endpoint is not None and self.view_args is not None
+
     def url_for_page(self, number=None):
+        if not self.can_generate_url():
+            raise ValueError('URLs are unavailable for this paginator')
+
         if number is None:
             number = self.number
 
-        endpoint = self.endpoint or request.endpoint
-        view_args = dict(self.view_args) if self.view_args is not None else dict(request.view_args or {})
+        view_args = dict(self.view_args)
         view_args[self.page_arg_name] = number
-        return url_for(endpoint, **view_args)
+        return url_for(self.endpoint, **view_args)
 
     def slice_or_404(self, objlist):
         result = self.slice(objlist)

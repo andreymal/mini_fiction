@@ -120,6 +120,11 @@ class Commentable(object):
             per_page=per_page,
         )  # TODO: restore orphans?
 
+        # paginate_comments вызывается откуда попало, и endpoint запроса
+        # неприменим или вообще не существует
+        paged.endpoint = None
+        paged.view_args = None
+
         comments_tree_list = target.bl.get_comments_tree_list(
             maxdepth=maxdepth,
             root_offset=per_page * (paged.number - 1),

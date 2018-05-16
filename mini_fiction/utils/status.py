@@ -97,6 +97,9 @@ class ProjectStatus(Status):
         'classifications': 'Classifications count',
         'ratings': 'Ratings count',
         'nsfw_ratings': 'NSFW ratings count',
+        'premoderation': 'Premoderation',
+        'story_comments_mode': 'Story comments mode',
+        'story_direct_access': 'Story direct access',
         'staticpages': 'Static pages count',
     }
 
@@ -320,6 +323,31 @@ class ProjectStatus(Status):
         cnt = models.Rating.select(lambda x: x.nsfw).count()
         return self._ok('nsfw_ratings', str(cnt))
 
+    def premoderation(self):
+        return self._ok('premoderation', 'Yes' if self.app.config['PREMODERATION'] else 'No')
+
+    def story_comments_mode(self):
+        m = self.app.config['STORY_COMMENTS_MODE']
+        if m == 'on':
+            return self._ok('story_comments_mode', 'Enabled by default')
+        elif m == 'off':
+            return self._ok('story_comments_mode', 'Disabled by default')
+        elif m == 'pub':
+            return self._ok('story_comments_mode', 'Enabled by default for published stories')
+        elif m == 'nodraft':
+            return self._ok('story_comments_mode', 'Enabled by default for non-draft stories')
+        return self._fail('story_comments_mode', 'Invalid value {!r}'.format(m))
+
+    def story_direct_access(self):
+        m = self.app.config['STORY_DIRECT_ACCESS']
+        if m == 'all':
+            return self._ok('story_direct_access', 'Always by default')
+        elif m == 'none':
+            return self._ok('story_direct_access', 'Never by default')
+        elif m in ('nodraft', 'anodraft'):
+            return self._ok('story_direct_access', 'Enabled by default for non-draft stories')
+        return self._fail('story_direct_access', 'Invalid value {!r}'.format(m))
+
     def staticpages(self):
         notfound = set()
         for system_page in ('help', 'terms', 'robots.txt'):
@@ -355,6 +383,9 @@ class ProjectStatus(Status):
         yield self.classifications()
         yield self.ratings()
         yield self.nsfw_ratings()
+        yield self.premoderation()
+        yield self.story_comments_mode()
+        yield self.story_direct_access()
         yield self.staticpages()
 
 

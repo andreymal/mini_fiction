@@ -441,6 +441,8 @@ def edit(pk):
                 form.set_errors(exc.errors)
             else:
                 data['saved'] = True
+                # Заголовок могли изменить, обновляем
+                data['page_title'] = 'Редактирование «{}»'.format(story.title)
 
     elif action == 'save_access':
         if not story.bl.can_edit_contributors(user):

@@ -232,6 +232,8 @@ class Config(object):
     VOTES_MID = 4.1
 
     STORY_COMMENTS_MODE = 'pub'  # or 'on' or 'off' or 'nodraft'
+    STORY_DIRECT_ACCESS = 'none'  # or 'all' or 'nodraft' or 'anodraft'
+    STORY_DIRECT_ACCESS_FOR_GUEST = False  # always True for 'anodraft'
 
     STORY_DOWNLOAD_FORMATS = tuple(reversed((
         'mini_fiction.downloads.fb2.FB2Download',

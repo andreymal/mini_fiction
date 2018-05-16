@@ -354,6 +354,7 @@ class Story(db.Entity):
     pinned = orm.Required(bool, default=False)
     robots_noindex = orm.Required(bool, default=False)
     comments_mode = orm.Optional(str, 8, py_check=lambda x: x in {'', 'on', 'off', 'pub', 'nodraft'})
+    direct_access = orm.Optional(str, 8, py_check=lambda x: x in {'', 'all', 'none', 'nodraft', 'anodraft'})
     approved_by = orm.Optional(Author)
     published_by_author = orm.Optional(Author)  # Ему будет отправлено уведомление о публикации
     last_author_notification_at = orm.Optional(datetime, 6)  # Во избежание слишком частых уведомлений

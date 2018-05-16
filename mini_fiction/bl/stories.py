@@ -704,11 +704,46 @@ class StoryBL(BaseBL, Commentable):
 
     def has_access(self, user):
         story = self.model
+
+        # Модераторы имеют доступ всегда
         if user and user.is_staff:
             return True
+
+        # Авторы, очевидно, тоже должны иметь доступ всегда
+        # Опубликованный рассказ тоже всегда доступен всем
         if story.published or self.is_contributor(user):
             return True
-        return False
+
+        # Остальное означает доступ по прямой ссылке (рассказ скрыт со всех
+        # публичных выборок) и зависит от настроек
+        direct_access = story.direct_access or current_app.config['STORY_DIRECT_ACCESS']
+
+        if direct_access == 'all':
+            # Доступ всегда, даже черновику
+            allowed = True
+        elif direct_access == 'none':
+            # Доступ никогда, если не опубликован
+            allowed = False
+        elif direct_access in ('nodraft', 'anodraft'):
+            # Доступ только если не в черновиках (в том числе
+            # для неопубликованного на модерации; полезно для песочниц)
+            allowed = not story.draft
+        else:
+            # Админ глупенький
+            raise ValueError('Incorrect settings: STORY_DIRECT_ACCESS can be all, none, nodraft or anodraft (got {!r})'.format(direct_access))
+
+        if not allowed:
+            return False
+
+        # anodraft означает доступ по прямой ссылке в том числе гостям
+        if direct_access == 'anodraft':
+            return True
+
+        # Если не anodraft, то доступ гостей проверяется по настройкам
+        if (not user or not user.is_authenticated) and not current_app.config['STORY_DIRECT_ACCESS_FOR_GUEST']:
+            return False
+
+        return True
 
     def can_vote(self, user):
         story = self.model

@@ -50,6 +50,34 @@
               </div>
         </div>
 
+        <div class="control-group">
+            <label class="control-label">Доступ по ссылке</label>
+            <div class="controls">
+                <label>
+                    <input type="radio" name="direct_access" value=""{% if story.direct_access == '' %} checked{% endif %} />
+                    По умолчанию
+                </label>
+                <label>
+                    <input type="radio" name="direct_access" value="all"{% if story.direct_access == 'all' %} checked{% endif %} />
+                    Всегда (даже в черновиках)
+                </label>
+                <label>
+                    <input type="radio" name="direct_access" value="none"{% if story.direct_access == 'none' %} checked{% endif %} />
+                    Никогда
+                </label>
+                <label>
+                    <input type="radio" name="direct_access" value="nodraft"{% if story.direct_access == 'nodraft' %} checked{% endif %} />
+                    Только если не в черновиках
+                </label>
+                <label>
+                    <input type="radio" name="direct_access" value="anodraft"{% if story.direct_access == 'anodraft' %} checked{% endif %} />
+                    Только если не в черновиках, в том числе для гостей
+                </label>
+
+                <span class="help-inline">Опубликованный рассказ в любом случае доступен всегда и всем. Гости никогда не имеют доступа к неопубликованному рассказу, если не выбран соответствующий пункт.</span>
+              </div>
+        </div>
+
         <div class="form-actions">
             <button type="submit" class="btn btn-primary" name="act" value="save_staff">Сохранить</button>
         </div>

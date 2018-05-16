@@ -52,7 +52,6 @@ def safe_string_multiline_coerce(s):
 
 
 def strip_string_coerce(s):
-    print('wtf', repr(s))
     if not isinstance(s, str):
         return s
     return s.strip()

@@ -9,7 +9,11 @@
     {% if next_chapter -%}
         <link rel="next" href="{{ url_for('chapter.view', story_id=story.id, chapter_order=next_chapter.order, _external=True) }}" />
     {%- endif %}
-    <meta name="description" content="{% if allchapters %}{{ chapters[0].text_preview }}{% else %}{{ chapter.text_preview }}{% endif %}" />
+    <meta name="description" content="{% if allchapters %}
+        {%- if chapters -%}{{- chapters[0].text_preview -}}{%- endif -%}
+    {% else %}
+        {{- chapter.text_preview -}}
+    {% endif %}" />
 {% endblock %}
 
 {% block content %}

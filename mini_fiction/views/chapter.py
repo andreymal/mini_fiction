@@ -48,7 +48,7 @@ def view(story_id, chapter_order=None):
             'robots_noindex': not story.published or story.robots_noindex,
         }
     else:
-        chapters = story.bl.select_accessible_chapters(user).order_by(Chapter.order, Chapter.id)[:]
+        chapters = list(story.bl.select_accessible_chapters(user).order_by(Chapter.order, Chapter.id))
         page_title = story.title + ' – все главы'
         if user.is_authenticated:
             for c in chapters:

@@ -1089,11 +1089,12 @@ class ChapterBL(BaseBL):
         new_order = orm.select(orm.max(x.order) for x in Chapter if x.story == story).first()
 
         text = safe_string_multiline_coerce(data['text']).strip()
+        assert '\r' not in text
 
         chapter = self.model(
             story=story,
-            title=safe_string_coerce(data['title']),
-            notes=safe_string_multiline_coerce(data['notes']),
+            title=safe_string_coerce(data['title']).strip(),
+            notes=safe_string_multiline_coerce(data['notes']).strip(),
             text=text,
             text_md5=md5(text.encode('utf-8')).hexdigest(),
             draft=True,
@@ -1140,11 +1141,12 @@ class ChapterBL(BaseBL):
         # TODO: move validation to Cerberus
         data = dict(data)
         if 'title' in data:
-            data['title'] = safe_string_coerce(data['title'])
+            data['title'] = safe_string_coerce(data['title']).strip()
         if 'notes' in data:
-            data['notes'] = safe_string_multiline_coerce(data['notes'])
+            data['notes'] = safe_string_multiline_coerce(data['notes']).strip()
         if 'text' in data:
-            data['text'] = safe_string_multiline_coerce(data['text'])
+            data['text'] = safe_string_multiline_coerce(data['text']).strip()
+            assert '\r' not in data['text']
 
         chapter = self.model
         edited_data = {}
@@ -1158,9 +1160,8 @@ class ChapterBL(BaseBL):
             edited_data['notes'] = [chapter.notes, data['notes']]
             chapter.notes = data['notes']
 
-        text = data['text'].replace('\r', '').strip() if 'text' in data else None
-
-        if 'text' in data and text != chapter.text:
+        text = data.get('text')
+        if text is not None and text != chapter.text:
             if len(chapter.text) <= current_app.config['MAX_SIZE_FOR_DIFF'] and len(text) <= current_app.config['MAX_SIZE_FOR_DIFF']:
                 # Для небольших текстов используем дифф на питоне, который красивый, но не быстрый
                 chapter_text_diff = utils_diff.get_diff_default(chapter.text, text)

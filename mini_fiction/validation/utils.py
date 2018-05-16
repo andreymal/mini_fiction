@@ -49,3 +49,10 @@ def safe_string_multiline_coerce(s):
     if not isinstance(s, str):
         return s
     return clean_string(s, unsafe_chars)
+
+
+def strip_string_coerce(s):
+    print('wtf', repr(s))
+    if not isinstance(s, str):
+        return s
+    return s.strip()

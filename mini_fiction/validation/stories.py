@@ -4,13 +4,13 @@
 from pony import orm
 
 from mini_fiction import models
-from mini_fiction.validation.utils import bool_coerce, safe_string_coerce, safe_string_multiline_coerce
+from mini_fiction.validation.utils import bool_coerce, safe_string_coerce, safe_string_multiline_coerce, strip_string_coerce
 
 
 STORY = {
     'title': {
         'type': 'string',
-        'coerce': safe_string_coerce,
+        'coerce': (safe_string_coerce, strip_string_coerce),
         'required': True,
         'minlength': 1,
         'maxlength': 512,
@@ -44,7 +44,7 @@ STORY = {
     },
     'summary': {
         'type': 'string',
-        'coerce': safe_string_multiline_coerce,
+        'coerce': (safe_string_multiline_coerce, strip_string_coerce),
         'required': True,
         'minlength': 1,
         'maxlength': 4096,
@@ -55,13 +55,13 @@ STORY = {
     },
     'notes': {
         'type': 'string',
-        'coerce': safe_string_multiline_coerce,
+        'coerce': (safe_string_multiline_coerce, strip_string_coerce),
         'default': '',
         'maxlength': 4096,
     },
     'source_link': {
         'type': 'string',
-        'coerce': safe_string_coerce,
+        'coerce': (safe_string_coerce, strip_string_coerce),
         'required': False,
         'default': '',
         'minlength': 0,
@@ -73,7 +73,7 @@ STORY = {
     },
     'source_title': {
         'type': 'string',
-        'coerce': safe_string_coerce,
+        'coerce': (safe_string_coerce, strip_string_coerce),
         'required': False,
         'default': '',
         'minlength': 0,

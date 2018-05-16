@@ -104,9 +104,9 @@ class BaseCommentBL(BaseBL):
         '''
 
         c = self.model
-        target = getattr(c, self.target_attr)
         if c.deleted:
             return None
+        target = getattr(c, self.target_attr)
         return type(c).bl.access_for_commenting_by(target, author)
 
     def can_delete_by(self, author=None):
@@ -327,10 +327,38 @@ class StoryCommentBL(BaseCommentBL):
 
     def access_for_commenting_by(self, target, author=None):
         reqs = super().access_for_commenting_by(target, author)
+
+        # Модераторы могут комментировать всегда
         if author and author.is_staff:
             return reqs
-        if not target.published:
+
+        # Всем остальным выбирается режим согласно настройкам
+        if not self.has_comments_access(target, author):
             return None
+
+        comments_mode = target.comments_mode or current_app.config['STORY_COMMENTS_MODE']
+
+        if comments_mode == 'on':
+            # Комменты включены всегда, даже черновику
+            allowed = True
+        elif comments_mode == 'off':
+            # Комменты отключены всегда, даже опубликованному
+            allowed = False
+        elif comments_mode == 'pub':
+            # Комменты включены только опубликованному
+            allowed = target.published
+        elif comments_mode == 'nodraft':
+            # Комменты включены только если не в черновиках (в том числе
+            # для неопубликованного на модерации; полезно для песочниц)
+            allowed = not target.draft
+        else:
+            # Админ глупенький
+            raise ValueError('Incorrect settings: STORY_COMMENTS_MODE can be on, off, pub or nodraft (got {!r})'.format(comments_mode))
+
+        if not allowed:
+            return None
+
+        # Комментирование анонимусов настраивается отдельно
         if (not author or not author.is_authenticated) and not current_app.config['STORY_COMMENTS_BY_GUEST']:
             return None
         return reqs

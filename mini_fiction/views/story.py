@@ -504,6 +504,8 @@ def edit(pk):
     elif action == 'save_staff' and user.is_staff:
         # TODO: bl
         story.robots_noindex = request.form.get('robots_noindex') == '1'
+        if request.form.get('comments_mode') in {'', 'on', 'off', 'pub', 'nodraft'}:
+            story.comments_mode = request.form.get('comments_mode')
         data['staff_saved'] = True
 
     return render_template('story_work.html', **data)

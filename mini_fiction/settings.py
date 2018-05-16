@@ -231,6 +231,8 @@ class Config(object):
     MINIMUM_VOTES_FOR_VIEW = 5
     VOTES_MID = 4.1
 
+    STORY_COMMENTS_MODE = 'pub'  # or 'on' or 'off' or 'nodraft'
+
     STORY_DOWNLOAD_FORMATS = tuple(reversed((
         'mini_fiction.downloads.fb2.FB2Download',
         # 'mini_fiction.downloads.fb2.FB2ZipDownload',

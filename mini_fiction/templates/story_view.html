@@ -192,6 +192,8 @@
             {% from 'macro.html' import comment_form_content with context %}
             {{ comment_form_content(comment_form, 'story', story.id, preview_html=preview_html, reqs=comment_reqs) }}
             </form>
+        {% elif story.comments_mode == 'off' %}
+        <h3 id="banned">Комментарии в этом рассказе отключены</h3>
         {% elif not story.published %}
         <h3 id="banned">В неопубликованном рассказе нельзя добавлять комментарии</h3>
         {% elif current_user.is_authenticated %}

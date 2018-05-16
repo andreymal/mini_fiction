@@ -24,6 +24,32 @@
               </div>
         </div>
 
+        <div class="control-group">
+            <label class="control-label">Комментарии</label>
+            <div class="controls">
+                <label>
+                    <input type="radio" name="comments_mode" value=""{% if story.comments_mode == '' %} checked{% endif %} />
+                    По умолчанию
+                </label>
+                <label>
+                    <input type="radio" name="comments_mode" value="on"{% if story.comments_mode == 'on' %} checked{% endif %} />
+                    Включены всегда (даже в черновиках)
+                </label>
+                <label>
+                    <input type="radio" name="comments_mode" value="off"{% if story.comments_mode == 'off' %} checked{% endif %} />
+                    Отключены всегда (даже после публикации)
+                </label>
+                <label>
+                    <input type="radio" name="comments_mode" value="pub"{% if story.comments_mode == 'pub' %} checked{% endif %} />
+                    Только если опубликован
+                </label>
+                <label>
+                    <input type="radio" name="comments_mode" value="nodraft"{% if story.comments_mode == 'nodraft' %} checked{% endif %} />
+                    Только если не в черновиках (в том числе на модерации)
+                </label>
+              </div>
+        </div>
+
         <div class="form-actions">
             <button type="submit" class="btn btn-primary" name="act" value="save_staff">Сохранить</button>
         </div>

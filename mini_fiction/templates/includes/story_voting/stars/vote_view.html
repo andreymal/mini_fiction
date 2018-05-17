@@ -5,6 +5,7 @@
     </span>
 {% endif %}
 
+{% if story.published or vote_total > 0 -%}
 {% if current_user.is_staff -%}<a href="{{ url_for('admin_votes.index') }}?story_id={{ story.id }}">{% endif -%}
 <span class="starblock" title="
 {%- if can_show_stars -%}
@@ -15,3 +16,4 @@
     {% for star in star_ids %}<span class="starvote star-{{ star }}"></span>{% endfor %}
 </span>
 {%- if current_user.is_staff -%}</a>{% endif -%}
+{%- endif %}

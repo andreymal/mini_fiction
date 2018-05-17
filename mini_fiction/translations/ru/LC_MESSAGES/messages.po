@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version:  0.0.3\n"
 "Report-Msgid-Bugs-To: andriyano-31@mail.ru\n"
-"POT-Creation-Date: 2018-05-05 20:28+0300\n"
+"POT-Creation-Date: 2018-05-17 19:51+0300\n"
 "Last-Translator: andreymal <andriyano-31@mail.ru>\n"
 "Language: ru\n"
 "Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && "
@@ -18,7 +18,7 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 2.5.3\n"
 
-#: mini_fiction/models.py:523 mini_fiction/models.py:790
+#: mini_fiction/models.py:525 mini_fiction/models.py:792
 msgid "Chapter {}"
 msgstr "Глава {}"
 
@@ -30,7 +30,7 @@ msgstr "Добавить новый"
 msgid "User already exists"
 msgstr "Пользователь уже существует"
 
-#: mini_fiction/bl/authors.py:51 mini_fiction/bl/authors.py:300
+#: mini_fiction/bl/authors.py:51 mini_fiction/bl/authors.py:298
 msgid "Email address is already in use"
 msgstr "Электропочта уже используется"
 
@@ -43,7 +43,7 @@ msgid "Please set only password or password hash"
 msgstr "Укажите только пароль или хэш пароля"
 
 #: mini_fiction/bl/authors.py:63 mini_fiction/views/auth.py:142
-#: mini_fiction/views/author.py:122
+#: mini_fiction/views/author.py:120
 msgid "Password is too bad, please change it"
 msgstr "Пароль слишком плохой, поменяйте его"
 
@@ -55,23 +55,23 @@ msgstr "Неправильный тип контакта"
 msgid "Too big avatar; must be {value} KiB or smaller"
 msgstr "Слишком большой аватар; надо {value} КиБ или меньше"
 
-#: mini_fiction/bl/authors.py:208
+#: mini_fiction/bl/authors.py:206
 msgid "Cannot read avatar"
 msgstr "Не получилось прочитать аватар"
 
-#: mini_fiction/bl/authors.py:393
+#: mini_fiction/bl/authors.py:391
 msgid "Too small avatar; must be {w}x{h} or bigger"
 msgstr "Слишком маленький аватар; надо {w}x{h} или больше"
 
-#: mini_fiction/bl/authors.py:395
+#: mini_fiction/bl/authors.py:393
 msgid "Too big avatar; must be {w}x{h} or smaller"
 msgstr "Слишком большой аватар; надо {w}x{h} или меньше"
 
-#: mini_fiction/bl/authors.py:649
+#: mini_fiction/bl/authors.py:647
 msgid "Please enter a correct username and password."
 msgstr "Пожалуйста, введите правильные имя пользователя и пароль."
 
-#: mini_fiction/bl/authors.py:651
+#: mini_fiction/bl/authors.py:649
 msgid "Account is disabled"
 msgstr "Аккаунт отключен"
 
@@ -569,7 +569,7 @@ msgstr[0] "его просмотрел %(num)d пользователь"
 msgstr[1] "его просмотрели %(num)d пользователя"
 msgstr[2] "его просмотрели %(num)d пользователей"
 
-#: mini_fiction/templates/includes/story_voting/stars/vote_view.html:11
+#: mini_fiction/templates/includes/story_voting/stars/vote_view.html:12
 #: mini_fiction/templates/story_confirm_delete.html:22
 #, python-format
 msgid "%(num)d vote"
@@ -595,7 +595,7 @@ msgstr[2] "В избранном у %(num)d пользователей"
 #: mini_fiction/templates/includes/stories.html:21
 #: mini_fiction/templates/includes/stories.html:51
 #: mini_fiction/templates/story_view.html:85
-#: mini_fiction/templates/story_view.html:136
+#: mini_fiction/templates/story_view.html:146
 #, python-format
 msgid "%(num)d word"
 msgid_plural "%(num)d words"
@@ -608,7 +608,7 @@ msgstr[2] "%(num)d слов"
 #: mini_fiction/templates/includes/stories.html:25
 #: mini_fiction/templates/includes/stories.html:51
 #: mini_fiction/templates/story_view.html:85
-#: mini_fiction/templates/story_view.html:136
+#: mini_fiction/templates/story_view.html:146
 #, python-format
 msgid "%(num)d view"
 msgid_plural "%(num)d views"
@@ -639,7 +639,7 @@ msgstr[1] "%(num)d оценки за последние 24 часа"
 msgstr[2] "%(num)d оценок за последние 24 часа"
 
 #: mini_fiction/templates/admin/authors/update.html:10
-#: mini_fiction/templates/admin/authors/update.html:108
+#: mini_fiction/templates/admin/authors/update.html:118
 #: mini_fiction/templates/admin/index.html:32
 #: mini_fiction/views/admin/authors.py:77
 msgid "Authors"
@@ -749,7 +749,7 @@ msgstr "(ничего)"
 #: mini_fiction/templates/admin/authors/index.html:6
 #: mini_fiction/templates/admin/authors/index.html:112
 #: mini_fiction/templates/admin/authors/update.html:9
-#: mini_fiction/templates/admin/authors/update.html:107
+#: mini_fiction/templates/admin/authors/update.html:117
 #: mini_fiction/templates/admin/categories/delete.html:7
 #: mini_fiction/templates/admin/categories/delete.html:24
 #: mini_fiction/templates/admin/categories/index.html:7
@@ -829,7 +829,7 @@ msgid "Search"
 msgstr "Поиск"
 
 #: mini_fiction/templates/admin/abuse_reports/show.html:24
-#: mini_fiction/templates/admin/authors/update.html:15
+#: mini_fiction/templates/admin/authors/update.html:25
 #: mini_fiction/templates/admin/categories/work.html:18
 #: mini_fiction/templates/admin/charactergroups/work.html:22
 #: mini_fiction/templates/admin/characters/work.html:18
@@ -842,17 +842,17 @@ msgid "Saved!"
 msgstr "Сохранено!"
 
 #: mini_fiction/templates/admin/authors/index.html:15
-#: mini_fiction/templates/admin/authors/update.html:19
+#: mini_fiction/templates/admin/authors/update.html:29
 msgid "Registered at"
 msgstr "Зарегистрирован"
 
 #: mini_fiction/templates/admin/authors/index.html:16
-#: mini_fiction/templates/admin/authors/update.html:28
+#: mini_fiction/templates/admin/authors/update.html:38
 msgid "Last visit"
 msgstr "Последний визит"
 
 #: mini_fiction/templates/admin/authors/index.html:28
-#: mini_fiction/templates/admin/authors/update.html:13
+#: mini_fiction/templates/admin/authors/update.html:23
 msgid "(it's you)"
 msgstr "(это вы)"
 
@@ -873,7 +873,7 @@ msgstr "Да"
 msgid "No"
 msgstr "Нет"
 
-#: mini_fiction/templates/admin/authors/update.html:38
+#: mini_fiction/templates/admin/authors/update.html:48
 #: mini_fiction/templates/admin/categories/work.html:23
 #: mini_fiction/templates/admin/charactergroups/work.html:27
 #: mini_fiction/templates/admin/characters/work.html:23
@@ -885,31 +885,31 @@ msgstr "Нет"
 msgid "Save"
 msgstr "Сохранить"
 
-#: mini_fiction/templates/admin/authors/update.html:42
+#: mini_fiction/templates/admin/authors/update.html:52
 msgid "This is system user account, you cannot edit it."
 msgstr "Это системная учётная запись, вы не можете редактировать её."
 
-#: mini_fiction/templates/admin/authors/update.html:51
+#: mini_fiction/templates/admin/authors/update.html:61
 msgid "Log in as this user"
 msgstr "Войти как этот пользователь"
 
-#: mini_fiction/templates/admin/authors/update.html:59
+#: mini_fiction/templates/admin/authors/update.html:69
 msgid "Password hash"
 msgstr "Хэш пароля"
 
-#: mini_fiction/templates/admin/authors/update.html:72
+#: mini_fiction/templates/admin/authors/update.html:82
 msgid "Last password change"
 msgstr "Последнее изменение пароля"
 
-#: mini_fiction/templates/admin/authors/update.html:82
+#: mini_fiction/templates/admin/authors/update.html:92
 msgid "Password reset link"
 msgstr "Ссылка для сброса пароля"
 
-#: mini_fiction/templates/admin/authors/update.html:94
+#: mini_fiction/templates/admin/authors/update.html:104
 msgid "Change password"
 msgstr "Изменить пароль"
 
-#: mini_fiction/templates/admin/authors/update.html:101
+#: mini_fiction/templates/admin/authors/update.html:111
 msgid "Generate a password reset link"
 msgstr "Создать ссылку для сброса пароля"
 
@@ -1180,57 +1180,57 @@ msgstr "Pony ORM"
 msgid "Pony ORM queries"
 msgstr "Запросы Pony ORM"
 
-#: mini_fiction/utils/misc.py:154
+#: mini_fiction/utils/misc.py:173
 msgctxt "story_edit_log"
 msgid "edited story"
 msgstr "отредактировал рассказ"
 
-#: mini_fiction/utils/misc.py:159
+#: mini_fiction/utils/misc.py:178
 msgctxt "story_edit_log"
 msgid "published story"
 msgstr "опубликовал рассказ"
 
-#: mini_fiction/utils/misc.py:161
+#: mini_fiction/utils/misc.py:180
 msgctxt "story_edit_log"
 msgid "sent to drafts story"
 msgstr "отправил в черновики рассказ"
 
-#: mini_fiction/utils/misc.py:163
+#: mini_fiction/utils/misc.py:182
 msgctxt "story_edit_log"
 msgid "approved story"
 msgstr "одобрил рассказ"
 
-#: mini_fiction/utils/misc.py:165
+#: mini_fiction/utils/misc.py:184
 msgctxt "story_edit_log"
 msgid "unapproved story"
 msgstr "отозвал рассказ"
 
-#: mini_fiction/utils/misc.py:176
+#: mini_fiction/utils/misc.py:195
 msgctxt "story_edit_log"
 msgid "edited chapter"
 msgstr "отредактировал главу"
 
-#: mini_fiction/utils/misc.py:183
+#: mini_fiction/utils/misc.py:202
 msgctxt "story_edit_log"
 msgid "added chapter"
 msgstr "добавил главу"
 
-#: mini_fiction/utils/misc.py:185
+#: mini_fiction/utils/misc.py:204
 msgctxt "story_edit_log"
 msgid "deleted chapter"
 msgstr "удалил главу"
 
-#: mini_fiction/utils/misc.py:188
+#: mini_fiction/utils/misc.py:207
 msgctxt "story_edit_log"
 msgid "sent to drafts chapter"
 msgstr "отправил в черновики главу"
 
-#: mini_fiction/utils/misc.py:190
+#: mini_fiction/utils/misc.py:209
 msgctxt "story_edit_log"
 msgid "published chapter"
 msgstr "опубликовал главу"
 
-#: mini_fiction/utils/misc.py:240
+#: mini_fiction/utils/misc.py:259
 #, python-format
 msgid "Show %(num)s unchanged symbol"
 msgid_plural "Show %(num)s unchanged symbols"
@@ -1385,15 +1385,15 @@ msgstr "Мой кабинет"
 msgid "Author: {author}"
 msgstr "Автор: {author}"
 
-#: mini_fiction/views/author.py:101
+#: mini_fiction/views/author.py:99
 msgid "Profile settings"
 msgstr "Настройки профиля"
 
-#: mini_fiction/views/author.py:120
+#: mini_fiction/views/author.py:118
 msgid "Old password is incorrect"
 msgstr "Старый пароль неверный"
 
-#: mini_fiction/views/author.py:148
+#: mini_fiction/views/author.py:146
 msgid "Password is incorrect"
 msgstr "Неверный пароль"
 
@@ -1401,19 +1401,19 @@ msgstr "Неверный пароль"
 msgid "Chapter"
 msgstr "Глава"
 
-#: mini_fiction/views/common_comment.py:149
+#: mini_fiction/views/common_comment.py:154
 msgid "Add new comment"
 msgstr "Добавить новый комментарий"
 
-#: mini_fiction/views/common_comment.py:216
+#: mini_fiction/views/common_comment.py:221
 msgid "Edit comment"
 msgstr "Редактировать комментарий"
 
-#: mini_fiction/views/common_comment.py:247
+#: mini_fiction/views/common_comment.py:252
 msgid "Confirm delete comment"
 msgstr "Подтверждение удаления комментария"
 
-#: mini_fiction/views/common_comment.py:276
+#: mini_fiction/views/common_comment.py:281
 msgid "Confirm restore comment"
 msgstr "Подтверждение восстановления комментария"
 
@@ -1427,7 +1427,7 @@ msgstr "Поиск рассказов"
 msgid "Search results"
 msgstr "Результаты поиска"
 
-#: mini_fiction/views/story.py:372
+#: mini_fiction/views/story.py:371
 msgid "New story"
 msgstr "Новый рассказ"
 

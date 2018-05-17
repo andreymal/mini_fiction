@@ -1,7 +1,8 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
 import re
+from datetime import datetime
 
 from flask import Markup, current_app
 
@@ -18,8 +19,8 @@ def filter_html(text, tags=None, attributes=None):
         tags = current_app.config['ALLOWED_TAGS']
     if attributes is None:
         attributes = current_app.config['ALLOWED_ATTRIBUTES']
-    doc = typo(text)
-    doc = normalize_html(doc, convert_linebreaks=True)
+    text = typo(text)
+    doc = normalize_html(text, convert_linebreaks=True)
     doc = _filter_html(
         doc,
         tags=tags,
@@ -35,7 +36,7 @@ def filtered_html_property(name, filter_):
         except Exception:
             import sys
             import traceback
-            print("filter_html", type(self).__name__, self.get_pk(), name, filter_, file=sys.stderr)
+            print(datetime.now().strftime('[%Y-%m-%d %H:%M:%S]'), "filter_html failed", type(self).__name__, self.get_pk(), name, filter_, file=sys.stderr)
             traceback.print_exc()
             return "#ERROR#"
     return property(fn)

@@ -310,7 +310,7 @@ class BaseCommentBL(BaseBL):
         except Exception:
             import sys
             import traceback
-            print("filter_html_comment_text", file=sys.stderr)
+            print(datetime.now().strftime('[%Y-%m-%d %H:%M:%S]'), "filter_html_comment_text failed", file=sys.stderr)
             traceback.print_exc()
             return "#ERROR#"
 

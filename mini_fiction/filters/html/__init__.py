@@ -1,3 +1,8 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+
+import re
+
 from lxml import etree
 import lxml.html.defs
 from ..base import xslt_transform_loader, html_doc_transform
@@ -48,6 +53,10 @@ def iter_splitted_elements(element, separators, block_elements):
         return
 
     tag = element.tag
+    # Костыль: кривые теги (например, '...') заменяем на 'span'
+    if not re.match(r'^[A-Za-z0-9-]+$', tag):
+        tag = 'span'
+
     if tag in block_elements:
         children = element[:]
         element[:] = []

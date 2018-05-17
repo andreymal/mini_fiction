@@ -1237,7 +1237,7 @@ class ChapterBL(BaseBL):
         except Exception:
             import sys
             import traceback
-            print("filter_html_notes", file=sys.stderr)
+            print(datetime.now().strftime('[%Y-%m-%d %H:%M:%S]'), "filter_html_notes failed", file=sys.stderr)
             traceback.print_exc()
             return "#ERROR#"
 
@@ -1359,8 +1359,8 @@ class ChapterBL(BaseBL):
             import traceback
             if current_app.config['DEBUG']:
                 return traceback.format_exc()
-            else:
-                traceback.print_exc()
+            print(datetime.now().strftime('[%Y-%m-%d %H:%M:%S]'), "story text2html failed", file=sys.stderr)
+            traceback.print_exc()
             return "#ERROR#"
 
     def get_version(self, text_md5=None, log_item=None):

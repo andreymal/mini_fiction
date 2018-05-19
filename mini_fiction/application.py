@@ -473,6 +473,7 @@ def configure_development(app):
 
 
 def init_plugins(app):
+    app.plugins = []
     app.hooks = {}
     with app.app_context():
         for plugin_module in app.config['PLUGINS']:
@@ -481,6 +482,7 @@ def init_plugins(app):
             else:
                 func_name = 'configure_app'
             plugin = importlib.import_module(plugin_module)
+            app.plugins.append(plugin)
             getattr(plugin, func_name)(register_hook)
 
 

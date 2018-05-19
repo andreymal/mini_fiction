@@ -4,6 +4,7 @@
 from pony import orm
 from flask import current_app
 
+from mini_fiction.management.manager import manager
 from mini_fiction.models import Story, Chapter
 
 
@@ -49,7 +50,10 @@ def story_check_words_count(story, verbose=True):
         print()
 
 
+@manager.option('story_ids', metavar='story_ids', nargs='*', default=(), help='Story IDs')
 def checkwordscount(story_ids=None):
+    orm.sql_debug(False)
+
     if story_ids:
         for story_id in story_ids:
             with orm.db_session:

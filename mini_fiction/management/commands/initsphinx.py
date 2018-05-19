@@ -4,12 +4,22 @@
 import sys
 
 from flask import current_app
+from pony import orm
 from pony.orm import db_session
 
 from mini_fiction.models import Story, Chapter
 
 
+from mini_fiction.management.manager import manager
+
+
+@manager.command
 def initsphinx():
+    if current_app.config.get('SPHINX_DISABLED'):
+        print('Please set SPHINX_DISABLED = False before initsphinx.', file=sys.stderr)
+        sys.exit(1)
+
+    orm.sql_debug(False)
     sys.stderr.write(' Cleaning...')
     sys.stderr.flush()
     with current_app.sphinx as sphinx:

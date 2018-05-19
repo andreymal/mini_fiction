@@ -3,6 +3,7 @@
 
 from pony import orm
 
+from mini_fiction.management.manager import manager
 from mini_fiction.models import Story, StoryLocalThread, NewsItem
 
 
@@ -93,7 +94,10 @@ def check_comments_for(target, comments_list):
     check_comments_tree(tree)
 
 
+@manager.command
 def checkstorycomments():
+    orm.sql_debug(False)
+
     with orm.db_session:
         first_story = orm.select(orm.min(x.id) for x in Story).first()
         last_story = orm.select(orm.max(x.id) for x in Story).first()
@@ -122,7 +126,10 @@ def checkstorycomments():
             story_id = story.id + 1
 
 
+@manager.command
 def checkstorylocalcomments():
+    orm.sql_debug(False)
+
     with orm.db_session:
         first_local = orm.select(orm.min(x.id) for x in StoryLocalThread).first()
         last_local = orm.select(orm.max(x.id) for x in StoryLocalThread).first()
@@ -143,7 +150,10 @@ def checkstorylocalcomments():
             local_id = local.id + 1
 
 
+@manager.command
 def checknewscomments():
+    orm.sql_debug(False)
+
     with orm.db_session:
         first_newsitem = orm.select(orm.min(x.id) for x in NewsItem).first()
         last_newsitem = orm.select(orm.max(x.id) for x in NewsItem).first()

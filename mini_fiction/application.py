@@ -366,11 +366,16 @@ def configure_templates(app):
     app.jinja_env.filters['tojson_raw'] = flask_json.dumps  # not escapes &, < and >
 
     if app.config['LOCALTEMPLATES']:
-        my_loader = jinja2.ChoiceLoader([
-            jinja2.FileSystemLoader(os.path.abspath(app.config['LOCALTEMPLATES'])),
-            app.jinja_loader,
-        ])
-        app.jinja_loader = my_loader
+        paths = app.config['LOCALTEMPLATES']
+        if isinstance(paths, str):
+            paths = [paths]
+
+        loaders = []
+        for x in paths:
+            loaders.append(jinja2.FileSystemLoader(os.path.abspath(x)))
+        loaders.append(app.jinja_loader)
+
+        app.jinja_loader = jinja2.ChoiceLoader(loaders)
 
     from mini_fiction.templatefilters import timesince
     from mini_fiction.templatefilters import registry as filters_registry

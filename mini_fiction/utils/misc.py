@@ -285,6 +285,9 @@ def diff2html(s, diff, show_newlines=False):
 def render_nonrequest_template(*args, **kwargs):
     '''Обёртка над flask.request_template, просто добавляет некоторые нужные
     переменные в ``flask.g``.
+
+    Если запускается в контексте текущего запроса, то патчит url_adapter,
+    чтобы отцепиться от запроса.
     '''
     if not hasattr(g, 'locale'):
         g.locale = current_app.extensions['babel'].default_locale

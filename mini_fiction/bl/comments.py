@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 
 import ipaddress
+import traceback
 from datetime import datetime, timedelta
 
 from pony import orm
@@ -308,10 +309,7 @@ class BaseCommentBL(BaseBL):
             doc = filter_html(text)
             return Markup(html_doc_to_string(doc))
         except Exception:
-            import sys
-            import traceback
-            print(datetime.now().strftime('[%Y-%m-%d %H:%M:%S]'), "filter_html_comment_text failed", file=sys.stderr)
-            traceback.print_exc()
+            current_app.logger.warning("filter_html_comment_text failed:\n\n%s", traceback.format_exc())
             return "#ERROR#"
 
 

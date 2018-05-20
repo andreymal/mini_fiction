@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 import re
-from datetime import datetime
+import traceback
 
 from flask import Markup, current_app
 
@@ -34,10 +34,7 @@ def filtered_html_property(name, filter_):
         try:
             return Markup(html_doc_to_string(filter_(getattr(self, name) or '')))
         except Exception:
-            import sys
-            import traceback
-            print(datetime.now().strftime('[%Y-%m-%d %H:%M:%S]'), "filter_html failed", type(self).__name__, self.get_pk(), name, filter_, file=sys.stderr)
-            traceback.print_exc()
+            current_app.logger.warning("filter_html failed: %s %s %s %s\n%s", type(self).__name__, self.get_pk(), name, filter_, traceback.format_exc())
             return "#ERROR#"
     return property(fn)
 

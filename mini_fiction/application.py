@@ -20,6 +20,7 @@ from flask import Flask, current_app, request, g, jsonify
 from flask import json as flask_json
 import flask_babel
 from flask_login import LoginManager
+from flask.logging import default_handler
 from flask_wtf.csrf import CSRFProtect, CSRFError
 
 from mini_fiction import models  # pylint: disable=unused-import
@@ -36,10 +37,12 @@ def create_app():
     else:
         os.environ.setdefault('MINIFICTION_SETTINGS', 'mini_fiction.settings.Development')
 
-    logging.basicConfig(level=logging.INFO, format='%(message)s')
-
     app = Flask(__name__)
     app.config.from_object(os.environ.get('MINIFICTION_SETTINGS'))
+
+    default_handler.setLevel(app.config['LOGLEVEL'])
+    logging.basicConfig(level=app.config['LOGLEVEL'], format=app.config['LOGFORMAT'])
+
     app.static_folder = app.config['STATIC_ROOT']
     app.extra_css = []
     app.extra_js = []
@@ -213,14 +216,27 @@ def templates_context():
 
 
 def configure_error_handlers(app):
+    class RequestErrorFormatter(logging.Formatter):
+        def format(self, record):
+            from pony.orm import db_session
+            from flask_login import current_user
+
+            record.remote_addr = request.remote_addr
+            with db_session:
+                record.user_id = current_user.id if current_user.is_authenticated else None
+                record.username = current_user.username if current_user.is_authenticated else None
+
+            return super().format(record)
+
     if app.config['ADMINS'] and app.config['ERROR_EMAIL_HANDLER_PARAMS']:
         params = dict(app.config['ERROR_EMAIL_HANDLER_PARAMS'])
         params['toaddrs'] = app.config['ADMINS']
         params['fromaddr'] = app.config['ERROR_EMAIL_FROM']
         params['subject'] = app.config['ERROR_EMAIL_SUBJECT']
-        handler = SMTPHandler(**params)
-        handler.setLevel(logging.ERROR)
-        app.logger.addHandler(handler)
+        smtp_handler = SMTPHandler(**params)
+        smtp_handler.setLevel(logging.ERROR)
+        smtp_handler.setFormatter(RequestErrorFormatter(app.config['ERROR_LOGFORMAT']))
+        app.logger.addHandler(smtp_handler)
 
 
 def configure_views(app):

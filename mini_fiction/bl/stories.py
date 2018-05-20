@@ -6,6 +6,7 @@
 import json
 import random
 import ipaddress
+import traceback
 from hashlib import md5
 from datetime import datetime, timedelta
 
@@ -1235,10 +1236,7 @@ class ChapterBL(BaseBL):
             doc = filter_html(notes)
             return Markup(html_doc_to_string(doc))
         except Exception:
-            import sys
-            import traceback
-            print(datetime.now().strftime('[%Y-%m-%d %H:%M:%S]'), "filter_html_notes failed", file=sys.stderr)
-            traceback.print_exc()
+            current_app.logger.warning("filter_html_notes failed:\n\n%s", traceback.format_exc())
             return "#ERROR#"
 
     def filter_text(self, text):

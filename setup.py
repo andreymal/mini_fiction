@@ -72,4 +72,7 @@ setup(
     ],
     test_suite="tests",
     tests_require=test_requirements,
+    project_urls=OrderedDict((
+        ('Bug Reports', 'https://github.com/andreymal/mini_fiction/issues'),
+    )),
 )

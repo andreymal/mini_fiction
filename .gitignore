@@ -10,9 +10,6 @@ __pycache__/
 # virtualenv
 /env/
 
-# IDE
-.idea/
-
 # Tests
 /.tox/
 /.cache/

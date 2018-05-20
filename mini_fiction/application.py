@@ -345,6 +345,8 @@ def configure_errorpages(app):
         return _error_common('csrf.html', 'csrf_modal.html', 400, e)
 
     def _pageall(e):
+        if e.code and e.code < 400:
+            return e
         return _error_common('error.html', 'error_modal.html', e.code or 500, e)
 
     app.errorhandler(403)(db_session(_page403))

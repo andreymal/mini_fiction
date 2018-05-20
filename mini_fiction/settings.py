@@ -12,7 +12,7 @@ class Config(object):
         # unfinished: 'en': 'English',
         'ru': 'Русский',
     }
-    DEBUG = False
+    ENV = 'production'
     SECRET_KEY = 'mnwpNkTYhFeu57Fc9WjVbw7DidbkZoVe'
     SYSTEM_USER_ID = -1
 
@@ -89,6 +89,7 @@ class Config(object):
     SITE_DESCRIPTION = {'default': ''}
     SITE_FEEDBACK = '/'
     FAVICON_URL = None
+    SESSION_COOKIE_DOMAIN = False
 
     MEDIA_ROOT = os.path.join(os.getcwd(), 'media')
 
@@ -341,7 +342,7 @@ class Config(object):
 
 
 class Development(Config):
-    DEBUG = True
+    ENV = 'development'
     SQL_DEBUG = True
     CHECK_PASSWORDS_SECURITY = False
     SPHINX_DISABLED = True
@@ -353,6 +354,8 @@ class Development(Config):
 
 
 class Test(Config):
+    ENV = 'development'
+    TESTING = True
     LOCALES = {'ru': 'Русский'}
     DATABASE_ENGINE = 'sqlite'
     DATABASE = {
@@ -360,7 +363,6 @@ class Test(Config):
         'create_db': True,
     }
     DATABASE_CLEANER = {'provider': 'sqlite3'}  # TODO: MySQL and PostgreSQL
-    TESTING = True
     TESTING_DIRECTORY = os.path.join(os.getcwd(), 'testmedia')
     MEDIA_ROOT = os.path.join(os.getcwd(), 'testmedia', 'media')
     SQL_DEBUG = False

@@ -15,6 +15,7 @@ from celery import Celery
 from werkzeug.urls import iri_to_uri
 from werkzeug.contrib import cache
 from werkzeug.contrib.fixers import ProxyFix
+from werkzeug.exceptions import HTTPException
 from flask import Flask, current_app, request, g, jsonify
 from flask import json as flask_json
 import flask_babel
@@ -350,9 +351,7 @@ def configure_errorpages(app):
     app.errorhandler(404)(db_session(_page404))
     app.errorhandler(500)(db_session(_page500))
     app.errorhandler(CSRFError)(db_session(_pagecsrf))
-
-    # Здесь должно было быть HTTPException, но https://github.com/mitsuhiko/flask/issues/941
-    app.errorhandler(405)(db_session(_pageall))
+    app.errorhandler(HTTPException)(db_session(_pageall))
 
 
 def configure_templates(app):

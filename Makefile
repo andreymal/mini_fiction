@@ -98,7 +98,7 @@ babel-extract:
 		-o messages.pot \
 		--project mini_fiction \
 		--copyright-holder andreymal \
-		--version 0.0.3 \
+		--version 0.0.4 \
 		--msgid-bugs-address andriyano-31@mail.ru \
 		mini_fiction
 

@@ -1,36 +1,26 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-import sys
+from collections import OrderedDict
+
 from setuptools import setup, find_packages
 
-if sys.version_info < (3, 4):
-    print("mini_fiction requires Python 3.4 or later.")
-    sys.exit(1)
 
-
-def read_requirements(f, links):
+def read_requirements(f):
     with open(f, 'r', encoding='utf-8-sig') as fp:
         reqs = fp.read().splitlines()
     result = []
     for line in reqs:
+        line = line.strip()
         if not line or line.startswith('#'):
             continue
-        if line.startswith('git+'):
-            # Should be installed by pip
-            result.append(line.rsplit('#egg=', 1)[-1])
-        elif line.startswith('http://') or line.startswith('https://'):
-            links.append(line)
-            result.append(line.rsplit('#egg=', 1)[-1])
-        else:
-            result.append(line)
+        result.append(line)
     return result
 
 
-deplinks = []
-requirements = read_requirements('requirements.txt', deplinks)
-optional_requirements = read_requirements('optional-requirements.txt', deplinks)
-test_requirements = read_requirements('test-requirements.txt', deplinks)
+requirements = read_requirements('requirements.txt')
+optional_requirements = read_requirements('optional-requirements.txt')
+test_requirements = read_requirements('test-requirements.txt')
 
 
 with open('README.rst', 'r', encoding='utf-8-sig') as rfp:
@@ -45,14 +35,15 @@ setup(
     version=mini_fiction.__version__,
     description='CMS for fanfics',
     long_description=desc,
+    long_description_content_type='text/x-rst',
     author='andreymal',
     author_email='andriyano-31@mail.ru',
     license='GPLv3',
     url='https://github.com/andreymal/mini_fiction',
     platforms='any',
+    python_requires='>=3.4',
     packages=find_packages(),
     install_requires=requirements,
-    dependency_links=deplinks,
     include_package_data=True,
     zip_safe=False,
     entry_points={

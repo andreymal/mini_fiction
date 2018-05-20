@@ -1,4 +1,4 @@
-.PHONY: help clean clean-build clean-pyc clean-translations lint test test-all coverage release release-sign dist install develop babel-extract babel-update babel-compile
+.PHONY: help clean clean-build clean-pyc clean-translations lint test test-all coverage release release-test release-sign release-sign-test dist install develop babel-extract babel-update babel-compile
 
 PYTHON?=python3
 PIP?=pip3
@@ -15,8 +15,10 @@ help:
 	@echo "test - run tests quickly with the default Python with pytest"
 	@echo "test-all - run tests on every Python version with tox"
 	@echo "coverage - check code coverage quickly with the default Python and pytest"
-	@echo "release - package and upload a release"
-	@echo "release-sign - package and upload a release with PGP sign"
+	@echo "release - package and upload a release to PyPI using twine"
+	@echo "release-test - package and upload a release to TestPyPI using twine"
+	@echo "release-sign - package, sign and upload a release to PyPI using twine"
+	@echo "release-sign-test - package, sign and upload a release to TestPyPI using twine"
 	@echo "dist - package"
 	@echo "install - install the package to the active Python's site-packages"
 	@echo "develop - install the package for development as editable"
@@ -61,15 +63,17 @@ coverage:
 	py.test --cov=mini_fiction --cov-report=html --cov-branch tests
 	ls -lh htmlcov/index.html
 
-release: clean
-	$(PYTHON) setup.py sdist upload
-	pybabel compile -d mini_fiction/translations
-	$(PYTHON) setup.py bdist_wheel upload
+release: dist
+	twine upload dist/*
 
-release-sign: clean
-	$(PYTHON) setup.py sdist upload --sign
-	pybabel compile -d mini_fiction/translations
-	$(PYTHON) setup.py bdist_wheel upload --sign
+release-test: dist
+	twine upload --repository-url https://test.pypi.org/legacy/ dist/*
+
+release-sign: dist
+	twine upload --sign --sign-with gpg dist/*
+
+release-sign-test: dist
+	twine upload --sign --sign-with gpg --repository-url https://test.pypi.org/legacy/ dist/*
 
 dist: clean
 	$(PYTHON) setup.py sdist

@@ -6,7 +6,7 @@
 #
 msgid ""
 msgstr ""
-"Project-Id-Version:  0.0.3\n"
+"Project-Id-Version:  0.0.4\n"
 "Report-Msgid-Bugs-To: andriyano-31@mail.ru\n"
 "POT-Creation-Date: 2018-05-20 23:50+0300\n"
 "Last-Translator: andreymal <andriyano-31@mail.ru>\n"

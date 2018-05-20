@@ -26,6 +26,7 @@ class Config(object):
     LOGLEVEL = logging.INFO
     LOGFORMAT = '[%(asctime)s] [%(levelname)s] %(message)s'
     ERROR_LOGFORMAT = 'IP: %(remote_addr)s\nUser: %(username)s (%(user_id)s)\n\n%(message)s'
+    AUTH_LOG = True
 
     # database
     DATABASE_ENGINE = 'sqlite'

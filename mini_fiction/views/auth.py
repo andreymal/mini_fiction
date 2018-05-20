@@ -5,7 +5,7 @@ from datetime import datetime
 
 from flask import Blueprint, current_app, request, render_template, redirect, url_for, flash
 from flask_babel import gettext
-from flask_login import login_user, logout_user
+from flask_login import login_user, logout_user, current_user
 from pony.orm import db_session
 
 from mini_fiction.models import Author
@@ -32,6 +32,8 @@ def login():
         except ValidationError as exc:
             form.set_errors(exc.errors)
         else:
+            if current_app.config['AUTH_LOG']:
+                current_app.logger.info('%s logged in (ID: %s, IP: %s)', user.username, user.id, request.remote_addr)
             user.last_login = datetime.utcnow()
             user.last_visit = user.last_login
             next_url = request.args.get('next')
@@ -170,6 +172,8 @@ def new_email_activate(activation_key):
 @bp.route('/logout/', methods=('GET',))
 @db_session
 def logout():
+    if current_app.config['AUTH_LOG'] and current_user.is_authenticated:
+        current_app.logger.info('%s logged out (ID: %s, IP: %s)', current_user.username, current_user.id, request.remote_addr)
     logout_user()
     next_url = request.args.get('next')
     if not next_url or len(next_url) < 2 or next_url[0] != '/' or next_url.startswith('//'):

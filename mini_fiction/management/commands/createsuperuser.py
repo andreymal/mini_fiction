@@ -3,7 +3,7 @@
 
 from getpass import getpass
 
-from pony.orm import db_session
+from pony.orm import db_session, sql_debug
 
 from mini_fiction.models import Author
 from mini_fiction.management.manager import cli
@@ -11,6 +11,8 @@ from mini_fiction.management.manager import cli
 
 @cli.command()
 def createsuperuser():
+    sql_debug(False)
+
     username = input('Username: ')
     email = input('Email address: ')
     while True:

@@ -10,7 +10,7 @@ from flask_babel import lazy_gettext
 
 from mini_fiction.bl.utils import BaseBL
 from mini_fiction.validation import Validator, ValidationError
-from mini_fiction.validation.sorting import CATEGORY, CHARACTER, CHARACTER_GROUP, CLASSIFIER
+from mini_fiction.validation.sorting import CATEGORY, CHARACTER, CHARACTER_FOR_UPDATE, CHARACTER_GROUP, CLASSIFIER
 
 
 class CategoryBL(BaseBL):
@@ -96,7 +96,7 @@ class CharacterBL(BaseBL):
     def update(self, author, data):
         from mini_fiction.models import AdminLog
 
-        data = Validator(CHARACTER).validated(data, update=True)
+        data = Validator(CHARACTER_FOR_UPDATE).validated(data, update=True)
         character = self.model
 
         errors = {}
@@ -121,7 +121,7 @@ class CharacterBL(BaseBL):
 
         changed_fields = set()
 
-        if data.get('picture'):  # FIXME: Cerberus считает picture обязательным
+        if data.get('picture'):
             picture = self.validate_and_get_picture_data(data['picture'])
         else:
             picture = None

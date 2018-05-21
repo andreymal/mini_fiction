@@ -2,13 +2,13 @@
 # -*- coding: utf-8 -*-
 
 from mini_fiction.validation import common
-from mini_fiction.validation.utils import required
+from mini_fiction.validation.utils import uniondict
 
 
 REGISTRATION = {
-    'username': required(common.USERNAME),
-    'password': required(common.PASSWORD),
-    'email': required(common.EMAIL),
+    'username': uniondict(common.USERNAME, {'required': True}),
+    'password': uniondict(common.PASSWORD, {'required': True}),
+    'email': uniondict(common.EMAIL, {'required': True}),
 }
 
 

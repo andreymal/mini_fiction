@@ -24,7 +24,11 @@
                                 {% endfor %}
                                 </span>
                             {% else %}
-                                <span class="help-inline small">{{ field.description }}</span>
+                                {%- if field.description -%}
+                                    <span class="help-inline small">{{ field.description }}</span>
+                                {%- elif field.name == 'username' and username_help -%}
+                                    <span class="help-inline small">{{ username_help }}</span>
+                                {%- endif -%}
                             {% endif %}
                         </div>
                     </div>

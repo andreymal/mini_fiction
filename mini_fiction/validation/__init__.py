@@ -1,13 +1,22 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
+import re
 import copy
+from collections import Iterable
 
 import cerberus
 from werkzeug.datastructures import FileStorage
 from flask_babel import gettext, lazy_gettext
 
 # when https://github.com/nicolaiarocci/cerberus/issues/174 will be solved, it can be rewritten
+
+# TODO: перепроверить ID на какие-нибудь коллизии в будущем
+MIN_LENGTH_NOSTRIP = cerberus.errors.ErrorDefinition(0x4027, 'minlengthnostrip')
+MAX_LENGTH_NOSTRIP = cerberus.errors.ErrorDefinition(0x4028, 'maxlengthnostrip')
+DYNREGEX_MISMATCH = cerberus.errors.ErrorDefinition(0x4041, 'dynregex')
+
+file_type = cerberus.TypeDefinition('file', (FileStorage,), ())
 
 
 class ValidationError(ValueError):
@@ -51,8 +60,8 @@ class CustomErrorHandler(cerberus.errors.BasicErrorHandler):
         0x46: lazy_gettext("Unallowed value {value}"),
         0x47: lazy_gettext("Unallowed values {0}"),
 
-        0x61: lazy_gettext("Field '{field}' cannot be coerced"),
-        0x62: lazy_gettext("Field '{field}' cannot be renamed"),
+        0x61: lazy_gettext("Field '{field}' cannot be coerced: {0}"),
+        0x62: lazy_gettext("Field '{field}' cannot be renamed: {0}"),
         0x63: lazy_gettext("Field is read-only"),
         0x64: lazy_gettext("Default value for '{field}' cannot be set: {0}"),
 
@@ -66,24 +75,54 @@ class CustomErrorHandler(cerberus.errors.BasicErrorHandler):
         0x92: lazy_gettext("None or more than one rule validate"),
         0x93: lazy_gettext("No definitions validate"),
         0x94: lazy_gettext("One or more definitions don't validate"),
+
+        0x4027: lazy_gettext("Min length is {constraint}"),
+        0x4028: lazy_gettext("Max length is {constraint}"),
+        0x4041: lazy_gettext("Value does not match regex '{0}'"),
     })
 
     def __init__(self, tree=None, custom_messages=None):
         super().__init__(tree)
         self.custom_messages = custom_messages or {}
 
-    def format_message(self, field, error):
+    def _format_message(self, field, error):
+        # Собираем аргументы для форматирования сообщения об ошибке
+        fmt_args = error.info
+        fmt_kwargs = {'constraint': error.constraint, 'field': field, 'value': error.value}
+
+        custom_msg = None
+
+        # Пробегаемся по кастомным сообщениям согласно пути к правилу в schema_path
+        # (для кастомных правил schema_path пуст, если не использовать
+        # ErrorDefinition, поэтому он тут используется, хоть и плохо
+        # документирован в Cerberus)
         tmp = self.custom_messages
         for i, x in enumerate(error.schema_path):
             try:
+                # Шажок
                 tmp = tmp[x]
             except KeyError:
+                # Шажок не удался, упёрлись
+                # Если мы достигли места назначения (правила, выдавшего ошибку),
+                # то берём его универсальное сообщение об ошибке
                 if i == len(error.schema_path) - 1 and 'any' in tmp:
-                    return tmp['any']
-                return super().format_message(field, error)
-        if isinstance(tmp, dict):
-            return super().format_message(field, error)
-        return tmp
+                    custom_msg = tmp['any']
+                break
+
+        # Если в цикле выше не упёрлись, то в tmp будет или сообщение об ошибке,
+        # или, если не дошагали, словарь-кусок схемы
+        if custom_msg is None:
+            if isinstance(tmp, dict):
+                # Если сообщения нет, возвращаем родное сообщение
+                return super()._format_message(field, error)
+            custom_msg = tmp
+
+        # Сообщение может быть функцией, чтобы генерировать его динамически
+        if callable(custom_msg):
+            custom_msg = custom_msg()
+
+        # Форматируем. Обёрнуто в str() ради всяких lazy_gettext
+        return str(custom_msg).format(*fmt_args, **fmt_kwargs)
 
 
 class Validator(cerberus.Validator):
@@ -92,7 +131,11 @@ class Validator(cerberus.Validator):
     v = Validator(schema)
     v.validate({"q": "0"})  # => False
     v.errors  # => {'q': ['Custom too few']}
+    v.validated({"q": "0"})  # => ValidationError
     """
+
+    types_mapping = cerberus.Validator.types_mapping.copy()
+    types_mapping['file'] = file_type
 
     def __init__(self, *args, **kwargs):
         if args:
@@ -127,9 +170,9 @@ class Validator(cerberus.Validator):
                     msgs[k] = {}
                     queue.append((v, msgs[k]))
 
-    def validated(self, document, *args, **kwargs):
+    def validated(self, *args, **kwargs):
         throw_exception = kwargs.pop('throw_exception', True)
-        result = super().validated(document, *args, **kwargs)
+        result = super().validated(*args, **kwargs)
         if result is None and throw_exception:
             raise ValidationError(self.errors)
         return result
@@ -142,16 +185,13 @@ class Validator(cerberus.Validator):
         if value not in choices:
             self._error(field, gettext("Unallowed value {value}").format(value=value))
 
-    def _validate_type_file(self, value):
-        return isinstance(value, FileStorage)
-
     def _validate_maxlength(self, max_length, field, value):
         """ {'type': 'integer'} """
         # Pony ORM автоматически strip'ает строки (если не указано иное),
         # так что автоматически strip'аем их и здесь для удобства
         if isinstance(value, str):
             if len(value.strip()) > max_length:
-                self._error(field, lazy_gettext("Max length is {constraint}").format(constraint=max_length))
+                self._error(field, cerberus.errors.MAX_LENGTH, len(value.strip()))
         else:
             super()._validate_maxlength(max_length, field, value)
 
@@ -159,15 +199,33 @@ class Validator(cerberus.Validator):
         """ {'type': 'integer'} """
         if isinstance(value, str):
             if len(value.strip()) < min_length:
-                self._error(field, lazy_gettext("Min length is {constraint}").format(constraint=min_length))
+                self._error(field, cerberus.errors.MIN_LENGTH, len(value.strip()))
         else:
             super()._validate_minlength(min_length, field, value)
 
     def _validate_maxlengthnostrip(self, max_length, field, value):
         """ {'type': 'integer'} """
         # Оставляем родной валидатор доступным
-        super()._validate_maxlength(max_length, field, value)
+        if isinstance(value, Iterable) and len(value) > max_length:
+            self._error(field, MAX_LENGTH_NOSTRIP, len(value))
 
     def _validate_minlengthnostrip(self, min_length, field, value):
         """ {'type': 'integer'} """
-        super()._validate_minlength(min_length, field, value)
+        if isinstance(value, Iterable) and len(value) < min_length:
+            self._error(field, MIN_LENGTH_NOSTRIP, len(value))
+
+    def _validate_dynregex(self, pattern_func, field, value):
+        """ {'nullable': False} """
+        if not isinstance(value, str):
+            return
+        pattern = pattern_func()
+        if not pattern.endswith('$'):
+            pattern += '$'
+        re_obj = re.compile(pattern)
+        if not re_obj.match(value):
+            self._error(field, DYNREGEX_MISMATCH, pattern)
+
+    def _normalize_coerce_strip(self, value):
+        if isinstance(value, str):
+            return value.strip()
+        return value

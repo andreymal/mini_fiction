@@ -77,6 +77,7 @@ def registration():
         captcha=captcha,
         captcha_error=captcha_error,
         page_title=page_title,
+        username_help=current_app.config['USERNAME_HELP'],
     )
 
 

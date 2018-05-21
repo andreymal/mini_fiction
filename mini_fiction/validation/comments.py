@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-from mini_fiction.validation.utils import safe_string_multiline_coerce, strip_string_coerce
+from mini_fiction.validation.utils import safe_string_multiline_coerce
 
 
 STORY_COMMENT = {
@@ -13,7 +13,7 @@ STORY_COMMENT = {
 
     'text': {
         'type': 'string',
-        'coerce': (safe_string_multiline_coerce, strip_string_coerce),
+        'coerce': (safe_string_multiline_coerce, 'strip'),
         'required': True,
         'minlength': 1,
         'maxlength': 8192,
@@ -30,7 +30,7 @@ NEWS_COMMENT = {
 
     'text': {
         'type': 'string',
-        'coerce': (safe_string_multiline_coerce, strip_string_coerce),
+        'coerce': (safe_string_multiline_coerce, 'strip'),
         'required': True,
         'minlength': 1,
         'maxlength': 8192,

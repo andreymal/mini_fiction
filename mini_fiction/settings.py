@@ -82,6 +82,12 @@ class Config(object):
     ]
     PONYORM_RECORD_QUERIES = False
 
+    USERNAME_REGEX = r'^[0-9a-zA-Zа-яА-ЯёЁ_@+-\. ]+$'
+    USERNAME_HELP = 'Только русские/латинские буквы, цифры, пробел, точка и символы _ @ + -'
+    USERNAME_ERROR_MESSAGE = (
+        'Пожалуйста, исправьте ошибку в логине - он может содержать только '
+        'русские/латинские буквы, цифры, пробел, точку и символы _ @ + -'
+    )
     PASSWORD_HASHER = 'pbkdf2'  # or 'bcrypt' or 'scrypt'
     PBKDF2_ITERATIONS = 100000
 

@@ -60,6 +60,14 @@ CHARACTER = {
     },
 }
 
+CHARACTER_FOR_UPDATE = dict(CHARACTER)
+CHARACTER_FOR_UPDATE['picture'] = {
+    'type': 'file',
+    'nullable': True,
+    'default': None,
+}
+
+
 
 CHARACTER_GROUP = {
     'name': {

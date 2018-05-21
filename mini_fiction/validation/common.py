@@ -1,15 +1,19 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
+from flask import current_app
+
+from mini_fiction.validation.utils import safe_string_coerce
+
+
 USERNAME = {
     'type': 'string',
     'minlength': 2,
     'maxlength': 32,
-    'regex': r'^[0-9a-zA-Z\u0430-\u044f\u0410-\u042f\u0451\u0401_@+-.. ]+$',
+    'coerce': [safe_string_coerce, 'strip'],
+    'dynregex': lambda: current_app.config['USERNAME_REGEX'],
     'error_messages': {
-        'any': 'Пожалуйста, исправьте ошибку в логине - '
-            'он может содержать только русские/латинские буквы, цифры, пробел, '
-            'точку и символы _ @ + -',
+        'dynregex': lambda: current_app.config['USERNAME_ERROR_MESSAGE'],
     },
 }
 
@@ -25,6 +29,7 @@ EMAIL = {
     'type': 'string',
     'minlength': 6,
     'maxlength': 75,
+    'coerce': [safe_string_coerce, 'strip'],
     'regex': r'^.+@([^.@][^@]+)$',
     'error_messages': {
         'regex': 'Пожалуйста, исправьте ошибку в адресе e-mail: похоже, он неправильный',

@@ -14,7 +14,6 @@ class AuthorRegistrationForm(Form):
     username = TextField(
         'Логин',
         render_kw=dict(attrs_dict, maxlength=32),
-        description='Только русские/латинские буквы, цифры, пробел, точка и символы _ @ + -'
     )
     email = TextField(
         'Электропочта',

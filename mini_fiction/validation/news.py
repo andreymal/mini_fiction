@@ -17,7 +17,7 @@ NEWS_ITEM = {
         'type': 'string',
         'coerce': safe_string_coerce,
         'required': False,
-        'minlength': 0,
+        'minlength': 1,
         'maxlength': 192,
         'default': '',
     },

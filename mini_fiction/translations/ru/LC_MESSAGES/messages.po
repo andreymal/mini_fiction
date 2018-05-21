@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version:  0.0.4\n"
 "Report-Msgid-Bugs-To: andriyano-31@mail.ru\n"
-"POT-Creation-Date: 2018-05-20 23:50+0300\n"
+"POT-Creation-Date: 2018-05-21 22:07+0300\n"
 "Last-Translator: andreymal <andriyano-31@mail.ru>\n"
 "Language: ru\n"
 "Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && "
@@ -42,7 +42,7 @@ msgstr "Укажите имя пользователя и пароль"
 msgid "Please set only password or password hash"
 msgstr "Укажите только пароль или хэш пароля"
 
-#: mini_fiction/bl/authors.py:63 mini_fiction/views/auth.py:142
+#: mini_fiction/bl/authors.py:63 mini_fiction/views/auth.py:145
 #: mini_fiction/views/author.py:120
 msgid "Password is too bad, please change it"
 msgstr "Пароль слишком плохой, поменяйте его"
@@ -75,23 +75,23 @@ msgstr "Пожалуйста, введите правильные имя пол�
 msgid "Account is disabled"
 msgstr "Аккаунт отключен"
 
-#: mini_fiction/bl/comments.py:162
+#: mini_fiction/bl/comments.py:163
 msgid "Parent comment not found"
 msgstr "Родительский комментарий не найден"
 
-#: mini_fiction/bl/comments.py:279
+#: mini_fiction/bl/comments.py:280
 msgid "Please log in to vote"
 msgstr "Авторизуйтесь, чтобы голосовать"
 
-#: mini_fiction/bl/comments.py:286
+#: mini_fiction/bl/comments.py:287
 msgid "You already voted"
 msgstr "Вы уже голосовали"
 
-#: mini_fiction/bl/comments.py:289
+#: mini_fiction/bl/comments.py:290
 msgid "You can't vote"
 msgstr "Вам нельзя голосовать"
 
-#: mini_fiction/bl/comments.py:292
+#: mini_fiction/bl/comments.py:293
 msgid "Invalid value"
 msgstr "Недопустимое значение"
 
@@ -197,7 +197,7 @@ msgid "Delete avatar"
 msgstr "Удалить аватар"
 
 #: mini_fiction/forms/admin/authors.py:55 mini_fiction/forms/author.py:180
-#: mini_fiction/forms/register.py:26 mini_fiction/forms/register.py:57
+#: mini_fiction/forms/register.py:25 mini_fiction/forms/register.py:56
 msgid "Passwords do not match"
 msgstr "Пароли не совпадают"
 
@@ -1238,124 +1238,128 @@ msgstr[0] "Показать %(num)s неизменённый символ"
 msgstr[1] "Показать %(num)s неизменённых символа"
 msgstr[2] "Показать %(num)s неизменённых символов"
 
-#: mini_fiction/validation/__init__.py:32
+#: mini_fiction/validation/__init__.py:41
 msgid "Required field"
 msgstr "Обязательное поле"
 
-#: mini_fiction/validation/__init__.py:33
+#: mini_fiction/validation/__init__.py:42
 msgid "Unknown field"
 msgstr "Неизвестное поле"
 
-#: mini_fiction/validation/__init__.py:34
+#: mini_fiction/validation/__init__.py:43
 msgid "Field '{0}' is required"
 msgstr "Обязательное поле {0}"
 
-#: mini_fiction/validation/__init__.py:35
+#: mini_fiction/validation/__init__.py:44
 msgid "Depends on these values: {constraint}"
 msgstr "Зависит от следующих значений: {constraint}"
 
-#: mini_fiction/validation/__init__.py:36
+#: mini_fiction/validation/__init__.py:45
 msgid "{0} must not be present with '{field}'"
 msgstr "'{0}' не должно быть вместе с '{field}'"
 
-#: mini_fiction/validation/__init__.py:38
+#: mini_fiction/validation/__init__.py:47
 msgid "'{0}' is not a document, must be a dict"
 msgstr "'{0}' не документ, должен быть словарь"
 
-#: mini_fiction/validation/__init__.py:39
-#: mini_fiction/validation/__init__.py:40
+#: mini_fiction/validation/__init__.py:48
+#: mini_fiction/validation/__init__.py:49
 msgid "Field should not be empty"
 msgstr "Поле не может быть пустым"
 
-#: mini_fiction/validation/__init__.py:41
+#: mini_fiction/validation/__init__.py:50
 msgid "Must be of {constraint} type"
 msgstr "Должно иметь тип {constraint}"
 
-#: mini_fiction/validation/__init__.py:42
+#: mini_fiction/validation/__init__.py:51
 msgid "Length of list should be {constraint}, it is {0}"
 msgstr "Длина списка должна быть {constraint}, а не {0}"
 
-#: mini_fiction/validation/__init__.py:43
-#: mini_fiction/validation/__init__.py:162
+#: mini_fiction/validation/__init__.py:52
+#: mini_fiction/validation/__init__.py:79
 msgid "Min length is {constraint}"
 msgstr "Минимальная длина {constraint}"
 
-#: mini_fiction/validation/__init__.py:44
-#: mini_fiction/validation/__init__.py:154
+#: mini_fiction/validation/__init__.py:53
+#: mini_fiction/validation/__init__.py:80
 msgid "Max length is {constraint}"
 msgstr "Максимальная длина {constraint}"
 
-#: mini_fiction/validation/__init__.py:46
+#: mini_fiction/validation/__init__.py:55
 msgid "Value does not match regex '{constraint}'"
 msgstr "Значение не соответствует регулярному выражению {constraint}"
 
-#: mini_fiction/validation/__init__.py:47
+#: mini_fiction/validation/__init__.py:56
 msgid "Min value is {constraint}"
 msgstr "Минимальное значение {constraint}"
 
-#: mini_fiction/validation/__init__.py:48
+#: mini_fiction/validation/__init__.py:57
 msgid "Max value is {constraint}"
 msgstr "Максимальное значение {constraint}"
 
-#: mini_fiction/validation/__init__.py:49
-#: mini_fiction/validation/__init__.py:51
-#: mini_fiction/validation/__init__.py:143
+#: mini_fiction/validation/__init__.py:58
+#: mini_fiction/validation/__init__.py:60
+#: mini_fiction/validation/__init__.py:186
 msgid "Unallowed value {value}"
 msgstr "Недопустимое значение {value}"
 
-#: mini_fiction/validation/__init__.py:50
-#: mini_fiction/validation/__init__.py:52
+#: mini_fiction/validation/__init__.py:59
+#: mini_fiction/validation/__init__.py:61
 msgid "Unallowed values {0}"
 msgstr "Недопустимые значения {0}"
 
-#: mini_fiction/validation/__init__.py:54
-msgid "Field '{field}' cannot be coerced"
-msgstr "Поле {field} не может быть преобразовано"
+#: mini_fiction/validation/__init__.py:63
+msgid "Field '{field}' cannot be coerced: {0}"
+msgstr "Поле {field} не может быть преобразовано: {0}"
 
-#: mini_fiction/validation/__init__.py:55
-msgid "Field '{field}' cannot be renamed"
-msgstr "Поле {field} не может быть переименовано"
+#: mini_fiction/validation/__init__.py:64
+msgid "Field '{field}' cannot be renamed: {0}"
+msgstr "Поле {field} не может быть переименовано: {0}"
 
-#: mini_fiction/validation/__init__.py:56
+#: mini_fiction/validation/__init__.py:65
 msgid "Field is read-only"
 msgstr "Поле доступно только для чтения"
 
-#: mini_fiction/validation/__init__.py:57
+#: mini_fiction/validation/__init__.py:66
 msgid "Default value for '{field}' cannot be set: {0}"
 msgstr "Не получилось установить значение по умолчанию для поля {field}: {0}"
 
-#: mini_fiction/validation/__init__.py:59
+#: mini_fiction/validation/__init__.py:68
 msgid "Mapping doesn't validate subschema: {0}"
 msgstr ""
 
-#: mini_fiction/validation/__init__.py:60
-#: mini_fiction/validation/__init__.py:63
+#: mini_fiction/validation/__init__.py:69
+#: mini_fiction/validation/__init__.py:72
 msgid "One or more sequence-items don't validate: {0}"
 msgstr ""
 
-#: mini_fiction/validation/__init__.py:61
+#: mini_fiction/validation/__init__.py:70
 msgid "One or more properties of a mapping  don't validate: {0}"
 msgstr ""
 
-#: mini_fiction/validation/__init__.py:62
+#: mini_fiction/validation/__init__.py:71
 msgid "One or more values in a mapping don't validate: {0}"
 msgstr ""
 
-#: mini_fiction/validation/__init__.py:65
+#: mini_fiction/validation/__init__.py:74
 msgid "One or more definitions validate"
 msgstr ""
 
-#: mini_fiction/validation/__init__.py:66
+#: mini_fiction/validation/__init__.py:75
 msgid "None or more than one rule validate"
 msgstr ""
 
-#: mini_fiction/validation/__init__.py:67
+#: mini_fiction/validation/__init__.py:76
 msgid "No definitions validate"
 msgstr ""
 
-#: mini_fiction/validation/__init__.py:68
+#: mini_fiction/validation/__init__.py:77
 msgid "One or more definitions don't validate"
 msgstr ""
+
+#: mini_fiction/validation/__init__.py:81
+msgid "Value does not match regex '{0}'"
+msgstr "Значение не соответствует регулярному выражению {0}"
 
 #: mini_fiction/validation/sorting.py:30
 msgid "Color format must be \"#HHH\" or \"#HHHHHH\""
@@ -1369,11 +1373,11 @@ msgstr "Авторизация"
 msgid "Cannot login"
 msgstr "Не получилось войти"
 
-#: mini_fiction/views/auth.py:49
+#: mini_fiction/views/auth.py:51
 msgid "Registration is closed"
 msgstr "Регистрация закрыта"
 
-#: mini_fiction/views/auth.py:51
+#: mini_fiction/views/auth.py:53
 msgid "Registration in library"
 msgstr "Регистрация в библиотеке"
 

@@ -1,10 +1,11 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
+import click
 from pony import orm
 from flask import current_app
 
-from mini_fiction.management.manager import manager
+from mini_fiction.management.manager import cli
 from mini_fiction.models import Story, Chapter
 
 
@@ -50,8 +51,9 @@ def story_check_words_count(story, verbose=True):
         print()
 
 
-@manager.option('story_ids', metavar='story_ids', nargs='*', default=(), help='Story IDs')
-def checkwordscount(story_ids=None):
+@cli.command()
+@click.argument('story_ids', nargs=-1, type=int)
+def checkwordscount(story_ids):
     orm.sql_debug(False)
 
     if story_ids:

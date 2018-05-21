@@ -3,7 +3,7 @@
 
 import logging
 
-from mini_fiction.settings import Development
+from mini_fiction.settings import Development, Test as BaseTest
 
 
 class Local(Development):
@@ -20,7 +20,7 @@ class Local(Development):
     # SERVER_NAME = 'example.org'
     # PREFERRED_URL_SCHEME = 'http'
 
-    # LOGGER_LEVEL = logging.DEBUG
+    # LOGLEVEL = logging.DEBUG
 
     # ADMINS = ['admin@example.org']
     # ERROR_EMAIL_HANDLER_PARAMS = {'mailhost': ('127.0.0.1', 1025)}
@@ -57,3 +57,11 @@ class Local(Development):
     # SPHINX_ROOT = '/path/to/directory/sphinx'
     # SPHINX_SEARCHD = dict(Development.SPHINX_SEARCHD)
     # SPHINX_SEARCHD['listen'] = '0.0.0.0:9306:mysql41'
+
+    # Example that allows only english usernames
+    # USERNAME_REGEX = r'^[A-Za-z0-9_-]+$'
+
+
+class Test(BaseTest):
+    # This config will be used with `python setup.py test` command
+    pass

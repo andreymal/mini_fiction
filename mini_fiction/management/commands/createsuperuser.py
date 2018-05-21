@@ -6,10 +6,10 @@ from getpass import getpass
 from pony.orm import db_session
 
 from mini_fiction.models import Author
-from mini_fiction.management.manager import manager
+from mini_fiction.management.manager import cli
 
 
-@manager.command
+@cli.command()
 def createsuperuser():
     username = input('Username: ')
     email = input('Email address: ')

@@ -32,10 +32,7 @@ __all__ = ['create_app']
 
 
 def create_app():
-    if os.path.isfile(os.path.join(os.getcwd(), 'local_settings.py')):
-        os.environ.setdefault('MINIFICTION_SETTINGS', 'local_settings.Local')
-    else:
-        os.environ.setdefault('MINIFICTION_SETTINGS', 'mini_fiction.settings.Development')
+    select_default_settings()
 
     app = Flask(__name__)
     app.config.from_object(os.environ.get('MINIFICTION_SETTINGS'))
@@ -80,6 +77,26 @@ def create_app():
     database.configure_for_app(app)
 
     return app
+
+
+def select_default_settings():
+    if os.environ.get('MINIFICTION_SETTINGS'):
+        return
+
+    if os.path.isfile(os.path.join(os.getcwd(), 'local_settings.py')):
+        os.environ.setdefault(
+            'MINIFICTION_SETTINGS',
+            'local_settings.Test' if os.environ.get('FLASK_ENV') == 'test' else 'local_settings.Local'
+        )
+
+    elif os.environ.get('FLASK_ENV') == 'test':  # see tests/conftest.py
+        os.environ.setdefault('MINIFICTION_SETTINGS', 'mini_fiction.settings.Test')
+
+    elif os.environ.get('FLASK_ENV') == 'development':  # uses .env file if started by mini_fiction command
+        os.environ.setdefault('MINIFICTION_SETTINGS', 'mini_fiction.settings.Development')
+
+    else:
+        os.environ.setdefault('MINIFICTION_SETTINGS', 'mini_fiction.settings.Config')
 
 
 def configure_user_agent(app):

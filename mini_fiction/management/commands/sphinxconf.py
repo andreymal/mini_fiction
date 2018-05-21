@@ -5,10 +5,10 @@ import os
 
 from flask import current_app
 
-from mini_fiction.management.manager import manager
+from mini_fiction.management.manager import cli
 
 
-@manager.command
+@cli.command()
 def sphinxconf():
     ctx = {
         'sphinxroot': os.path.abspath(current_app.config['SPHINX_ROOT']),

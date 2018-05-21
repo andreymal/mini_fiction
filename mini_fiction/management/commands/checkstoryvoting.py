@@ -6,11 +6,11 @@ import json
 from pony import orm
 from flask import current_app
 
-from mini_fiction.management.manager import manager
+from mini_fiction.management.manager import cli
 from mini_fiction.models import Story
 
 
-@manager.command
+@cli.command()
 def checkstoryvoting():
     orm.sql_debug(False)
 

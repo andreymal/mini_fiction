@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
+import os
 import time
 import shutil
 
@@ -18,6 +19,7 @@ flask_app = None
 @pytest.yield_fixture(scope="session", autouse=True)
 def app():
     global flask_app
+    os.environ.setdefault('FLASK_ENV', 'test')
     flask_app = create_app()
     if not flask_app.config['TESTING']:
         raise RuntimeError('This is not testing configuration')

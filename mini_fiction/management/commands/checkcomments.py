@@ -3,7 +3,7 @@
 
 from pony import orm
 
-from mini_fiction.management.manager import manager
+from mini_fiction.management.manager import cli
 from mini_fiction.models import Story, StoryLocalThread, NewsItem
 
 
@@ -94,7 +94,7 @@ def check_comments_for(target, comments_list):
     check_comments_tree(tree)
 
 
-@manager.command
+@cli.command()
 def checkstorycomments():
     orm.sql_debug(False)
 
@@ -126,7 +126,7 @@ def checkstorycomments():
             story_id = story.id + 1
 
 
-@manager.command
+@cli.command()
 def checkstorylocalcomments():
     orm.sql_debug(False)
 
@@ -150,7 +150,7 @@ def checkstorylocalcomments():
             local_id = local.id + 1
 
 
-@manager.command
+@cli.command()
 def checknewscomments():
     orm.sql_debug(False)
 

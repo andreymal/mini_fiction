@@ -10,7 +10,7 @@
 * `mkdir media`
 * `mini_fiction seed`
 * `mini_fiction createsuperuser`
-* `mini_fiction runserver`
+* `mini_fiction run`
 
 
 ## Быстрый старт (развёртывание минимального окружения для разработки)
@@ -68,7 +68,7 @@ mini_fiction createsuperuser
 * Запускаем сервер для разработки:
 
 ```
-mini_fiction runserver
+mini_fiction run
 ```
 
 * Сайт создаст базу данных SQLite3 в текущем каталоге и станет доступен
@@ -94,8 +94,8 @@ class Local(Development):
     ...  # здесь и далее все ваши настройки
 ```
 
-* Запускаем `mini_fiction runserver` (или gunicorn или любой другой
-  wsgi-сервер) в том же каталоге, в котором находится `local_settings.py`:
+* Запускаем `mini_fiction run` (или gunicorn или любой другой wsgi-сервер)
+  в том же каталоге, в котором находится `local_settings.py`:
   сайт его найдёт и автоматически подхватит. Если же не подхватит, попробуйте
   переменную окружения `PYTHONPATH=.` (не забудьте про `export PYTHONPATH` в
   юниксовых шеллах).

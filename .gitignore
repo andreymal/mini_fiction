@@ -29,6 +29,8 @@ dist/
 *.mo
 
 # mini_fiction stuff
+/.env
+/.flaskenv
 /local_settings.py
 /local/
 /media/

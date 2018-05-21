@@ -12,7 +12,6 @@ class Config(object):
         # unfinished: 'en': 'English',
         'ru': 'Русский',
     }
-    ENV = 'production'
     SECRET_KEY = 'mnwpNkTYhFeu57Fc9WjVbw7DidbkZoVe'
     SYSTEM_USER_ID = -1
 
@@ -355,7 +354,6 @@ class Config(object):
 
 
 class Development(Config):
-    ENV = 'development'
     SQL_DEBUG = True
     CHECK_PASSWORDS_SECURITY = False
     SPHINX_DISABLED = True
@@ -367,7 +365,6 @@ class Development(Config):
 
 
 class Test(Config):
-    ENV = 'development'
     TESTING = True
     LOCALES = {'ru': 'Русский'}
     DATABASE_ENGINE = 'sqlite'

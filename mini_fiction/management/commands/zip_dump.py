@@ -4,14 +4,16 @@
 import os
 import time
 
+import click
 from pony import orm
 
-from mini_fiction.management.manager import manager
+from mini_fiction.management.manager import cli
 
 
-@manager.option('-k', '--keep-broken', dest='keep_broken', help='Don\'t delete ZIP file if something goes wrong (useful for debugging)', action='store_true')
-@manager.option('path', metavar='path/to/file.zip', help='ZIP file where dump will be saved')
-def zip_dump(path, keep_broken=False):
+@cli.command()
+@click.option('-k', '--keep-broken', 'keep_broken', help='Don\'t delete ZIP file if something goes wrong (useful for debugging)', is_flag=True)
+@click.argument('path', 'path/to/destination.zip')
+def zip_dump(path, keep_broken):
     from mini_fiction.dumpload import zip_dump as cmd
     orm.sql_debug(False)
     path = os.path.abspath(path)

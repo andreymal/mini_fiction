@@ -3,16 +3,18 @@
 
 import time
 
+import click
 from pony import orm
 
-from mini_fiction.management.manager import manager
+from mini_fiction.management.manager import cli
 from mini_fiction.utils.misc import timedelta_format
 
 
-@manager.option('-s', '--silent', dest='silent', help='Don\'t print progress bar to console', action='store_true')
-@manager.option('-C', '--only-create', dest='only_create', help='Only create non-existent objects', action='store_true')
-@manager.option('pathlist', metavar='input_directory', nargs='+', help='Directories or files with dump data')
-def loaddb(pathlist, silent=False, only_create=False):
+@cli.command()
+@click.option('-s', '--silent', 'silent', help='Don\'t print progress bar to console', is_flag=True)
+@click.option('-C', '--only-create', 'only_create', help='Only create non-existent objects', is_flag=True)
+@click.argument('pathlist', nargs=-1, required=True)
+def loaddb(pathlist, silent, only_create):
     from mini_fiction.dumpload import loaddb_console as cmd
     orm.sql_debug(False)
     tm = time.time()

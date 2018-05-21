@@ -1,0 +1,2 @@
+MINIFICTION_SETTINGS=mini_fiction.settings.Config
+FLASK_ENV=production

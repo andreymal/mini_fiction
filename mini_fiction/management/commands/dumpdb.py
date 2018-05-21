@@ -3,17 +3,19 @@
 
 import time
 
+import click
 from pony import orm
 
-from mini_fiction.management.manager import manager
+from mini_fiction.management.manager import cli
 from mini_fiction.utils.misc import timedelta_format
 
 
-@manager.option('-s', '--silent', dest='silent', help='Don\'t print progress bar to console', action='store_true')
-@manager.option('-c', '--compression', dest='gzip_compression', type=int, default=0, choices=list(range(10)), help='Use gzip compression for files')
-@manager.option('entities_list', metavar='entity_name', nargs='*', default=(), help='Names of entities that will be dumped (lowercase, all by default)')
-@manager.option('dirpath', metavar='output_directory', help='Directory where dump will be saved')
-def dumpdb(dirpath, entities_list, gzip_compression=0, silent=False):
+@cli.command()
+@click.option('-s', '--silent', 'silent', help='Don\'t print progress bar to console', is_flag=True)
+@click.option('-c', '--compression', 'gzip_compression', type=click.IntRange(0, 9), default=0, help='Use gzip compression for files')
+@click.argument('dirpath')
+@click.argument('entities_list', nargs=-1)
+def dumpdb(dirpath, entities_list, gzip_compression, silent):
     from mini_fiction.dumpload import dumpdb_console as cmd
     orm.sql_debug(False)
     tm = time.time()

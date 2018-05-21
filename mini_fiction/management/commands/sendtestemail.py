@@ -1,19 +1,21 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
+import click
 from pony.orm import db_session
 from flask import current_app
 
 from mini_fiction.utils.mail import sendmail
 from mini_fiction.utils.misc import render_nonrequest_template
 
-from mini_fiction.management.manager import manager
+from mini_fiction.management.manager import cli
 
 
-@manager.option('-e', '--eager', dest='eager', help='Don\'t use Celery for delayed sending', action='store_true')
-@manager.option('recipients', metavar='recipients', nargs='+', default=(), help='Recipient addresses')
+@cli.command()
+@click.option('-e', '--eager', 'eager', help='Don\'t use Celery for delayed sending', is_flag=True)
+@click.argument('recipients', nargs=-1, required=True)
 @db_session
-def sendtestemail(recipients, eager=False):
+def sendtestemail(recipients, eager):
     kwargs = {
         'to': recipients,
         'subject': render_nonrequest_template('email/test_subject.txt'),

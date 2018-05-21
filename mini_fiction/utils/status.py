@@ -39,7 +39,8 @@ class SystemStatus(Status):
     title = 'System information'
     labels = {
         'python': 'Python',
-        'env': 'Environment',
+        'env': 'Flask environment',
+        'config': 'Configuration',
         'db': 'DB Provider',
         'sysencoding': 'Default encoding',
         'stdoutencoding': 'stdout encoding',
@@ -49,7 +50,10 @@ class SystemStatus(Status):
         return self._ok('python', sys.version.replace('\n', ' '))
 
     def env(self):
-        return self._ok('env', os.environ.get('MINIFICTION_SETTINGS', 'mini_fiction.settings.Development'))
+        return self._ok('env', self.app.config['ENV'])
+
+    def config(self):
+        return self._ok('config', os.environ.get('MINIFICTION_SETTINGS'))
 
     def db(self):
         from mini_fiction.database import db
@@ -70,6 +74,7 @@ class SystemStatus(Status):
     def generate(self):
         yield self.python()
         yield self.env()
+        yield self.config()
         yield self.db()
         yield self.sysencoding()
         yield self.stdoutencoding()

@@ -29,17 +29,35 @@ Quick start
     mkdir media
     mini_fiction seed
     mini_fiction createsuperuser
-    mini_fiction runserver
+    mini_fiction run
 
 Website will be available at ``http://localhost:5000/``, administration page is
 ``http://localhost:5000/admin/``.
+
+Flask uses production environment by default. If you want to use
+a development server, create ``.env`` file in your working directory and put
+some settings here:
+
+.. code::
+
+    FLASK_ENV=development
+    MINIFICTION_SETTINGS=mini_fiction.settings.Development
+
+You can override this file using native environment variables:
+
+.. code::
+
+    FLASK_ENV=production mini_fiction run
 
 
 Configuration file
 ------------------
 
 Just copy ``local_settings.example.py`` to ``local_settings.py`` and edit it.
-Then run ``mini_fiction runserver`` in the same directory with this file.
+Then run ``mini_fiction run`` in the same directory with this file.
+Ensure that ``MINIFICTION_SETTINGS`` is not used in ``.env`` file.
+Alternatively you can put ``MINIFICTION_SETTINGS=local_settings.Local`` to
+``.env`` file if you think that explicit is better than implicit.
 
 If mini_fiction can't import module ``local_settings``, try to set environment
 variable ``PYTHONPATH=.`` (don't forget ``export PYTHONPATH`` for unix

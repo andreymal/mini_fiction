@@ -6,9 +6,10 @@ import shutil
 from hashlib import sha256
 from datetime import datetime
 
+import click
 from flask import current_app
 
-from mini_fiction.management.manager import manager
+from mini_fiction.management.manager import cli
 
 
 def collect_files(src):
@@ -84,10 +85,10 @@ def copyfile(src, dst, global_hash, verbose=True):
         print(' (not changed)', flush=True)
     return False
 
-
-@manager.option('-V', '--no-verbose', dest='verbose', help='Disable verbose output', action='store_false', default=True)
-@manager.option('destination', metavar='path/to/static', nargs='?', help='Target directory (default: STATIC_ROOT option)')
-def collectstatic(verbose=True, destination=None):
+@cli.command()
+@click.option('-v/-V', '--verbose/--no-verbose', default=True)
+@click.argument('destination', nargs=1, required=False)
+def collectstatic(verbose, destination):
     modulestatic = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname((__file__)))), 'static')
     assert os.path.isdir(modulestatic)
     if verbose:

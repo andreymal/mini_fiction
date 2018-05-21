@@ -10,10 +10,10 @@ from pony.orm import db_session
 from mini_fiction.models import Story, Chapter
 
 
-from mini_fiction.management.manager import manager
+from mini_fiction.management.manager import cli
 
 
-@manager.command
+@cli.command()
 def initsphinx():
     if current_app.config.get('SPHINX_DISABLED'):
         print('Please set SPHINX_DISABLED = False before initsphinx.', file=sys.stderr)

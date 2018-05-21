@@ -748,11 +748,13 @@ class StoryBL(BaseBL, Commentable):
 
     def can_vote(self, user):
         story = self.model
-        if user and user.is_staff:
-            return True
-        if not user or not user.is_authenticated or not story.published or self.is_author(user):
+        if not user or not user.is_authenticated:
             return False
-        return self.has_access(user)
+        if self.is_author(user):
+            return False
+        if user.is_staff:
+            return True
+        return story.published and self.has_access(user)
 
     # search
 

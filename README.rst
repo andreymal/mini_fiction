@@ -41,7 +41,6 @@ some settings here:
 .. code::
 
     FLASK_ENV=development
-    MINIFICTION_SETTINGS=mini_fiction.settings.Development
 
 You can override this file using native environment variables:
 
@@ -54,10 +53,11 @@ Configuration file
 ------------------
 
 Just copy ``local_settings.example.py`` to ``local_settings.py`` and edit it.
-Then run ``mini_fiction run`` in the same directory with this file.
-Ensure that ``MINIFICTION_SETTINGS`` is not used in ``.env`` file.
-Alternatively you can put ``MINIFICTION_SETTINGS=local_settings.Local`` to
-``.env`` file if you think that explicit is better than implicit.
+Then run ``mini_fiction run`` in the same directory with this file: settings
+will be loaded automatically. Ensure that ``MINIFICTION_SETTINGS`` is not used
+in ``.env`` file. Alternatively you can put
+``MINIFICTION_SETTINGS=local_settings.Local`` to ``.env`` file if you think
+that explicit is better than implicit.
 
 If mini_fiction can't import module ``local_settings``, try to set environment
 variable ``PYTHONPATH=.`` (don't forget ``export PYTHONPATH`` for unix
@@ -67,6 +67,9 @@ If you want to change domain (e.g. ``127.0.0.1:5000`` or ``example.com``
 instead of default ``localhost:5000``), change ``SERVER_NAME`` option.
 
 You can run ``mini_fiction status`` to check some configuration variables.
+
+Don't forget to change the ``SECRET_KEY`` option before using mini_fiction
+on production!
 
 Search, avatars and captcha are disabled by default.
 

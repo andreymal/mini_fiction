@@ -69,6 +69,8 @@ def registration():
         except ValidationError as exc:
             form.set_errors(exc.errors)
         else:
+            if current_app.config['AUTH_LOG']:
+                current_app.logger.info('%s requested registration (ID: N/A, IP: %s)', data.get('username'), request.remote_addr)
             return redirect(url_for('auth.registration_complete'))
 
     return render_template(
@@ -84,7 +86,7 @@ def registration():
 @bp.route('/register/complete/', methods=('GET',))
 @db_session
 def registration_complete():
-    return render_template('registration/registration_complete.html')
+    return render_template('registration/registration_complete.html', robots_noindex=True)
 
 
 @bp.route('/activate/<activation_key>/', methods=('GET',))
@@ -92,6 +94,8 @@ def registration_complete():
 def registration_activate(activation_key):
     user = Author.bl.activate(activation_key)
     if user:
+        if current_app.config['AUTH_LOG']:
+            current_app.logger.info('%s registered and activated (ID: %s, IP: %s)', user.username, user.id, request.remote_addr)
         if current_app.config['REGISTRATION_AUTO_LOGIN']:
             login_user(user, remember=True)
         return render_template('registration/activation_complete.html', robots_noindex=True)
@@ -128,7 +132,7 @@ def password_reset():
 @db_session
 def password_reset_done():
     page_title = 'Восстановление пароля: письмо отправлено'
-    return render_template('registration/password_reset_done.html', page_title=page_title)
+    return render_template('registration/password_reset_done.html', page_title=page_title, robots_noindex=True)
 
 
 @bp.route('/password/reset/<activation_key>/', methods=('GET', 'POST'))
@@ -155,7 +159,7 @@ def password_reset_confirm(activation_key):
 @db_session
 def password_reset_complete():
     page_title = 'Восстановление пароля: пароль восстановлен'
-    return render_template('registration/password_reset_complete.html', page_title=page_title)
+    return render_template('registration/password_reset_complete.html', page_title=page_title, robots_noindex=True)
 
 
 @bp.route('/changemail/<activation_key>/', methods=('GET',))

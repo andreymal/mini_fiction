@@ -374,17 +374,20 @@ class PonyDump(object):
 
     # Методы для дампа базы данных
 
-    def obj2json(self, obj, name=None):
+    def obj2json(self, obj, name=None, encode=False):
         '''Дампит указанный объект базы данных в формат, совместимый с JSON.
 
         :param Entity obj: объект из базы данных
         :param str name: название модели объекта в lowercase, рекомендуется
           указать для большей производительности
-        :rtype: dict
+        :param bool encode: если True, сразу же кодирует в JSON-строку вместо
+          возвращения словаря
         '''
 
         if not name:
             name = self.get_entity_name(obj)
+        else:
+            assert name in self.entities
 
         dict_params = {'with_lazy': True, 'with_collections': True}
         if name in self.dict_params:
@@ -392,7 +395,21 @@ class PonyDump(object):
         result = obj.to_dict(**dict_params)
         assert '_entity' not in result
         result['_entity'] = name
+        if encode:
+            return self.je.encode(result)
         return result
+
+    def obj2jsonfp(self, fp, obj, name=None):
+        '''Дампит указанный объект базы данных в формат, совместимый с JSON,
+        и сразу же записывает в указанный файл. Обёртка над obj2json
+
+        :param fp: файл или файлоподобный объект (с методом write и текстовым
+          режимом)
+        :param Entity obj: объект из базы данных
+        :param str name: название модели объекта в lowercase, рекомендуется
+          указать для большей производительности
+        '''
+        fp.write(self.obj2json(obj, name, encode=True) + '\n')
 
     def dump_entity(self, entity, fp, chunk_size=250, binary_mode=False, sanitizer=None):
         '''Дампит указанную модель в указанный вывод в формате JSON Lines.

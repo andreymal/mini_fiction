@@ -2,6 +2,13 @@
     <div class="story-item">
         <h3><a href="{{ url_for('story.view', pk=random_story.id) }}">{{ random_story.title }}</a></h3>
         <p class="meta">
+                {%- if current_user.is_authenticated -%}
+                <span class="chapter-controls">
+                    {%- set bookmarked = random_story.bookmarked(current_user.id) -%}
+                    <a title="Прочитать позже" href="{{ url_for('story.bookmark', pk=random_story.id, action='delete' if bookmarked else 'add') }}" class="story_bookmark js-story-bookmark-{{ random_story.id }} scon bookmark{% if bookmarked %} bookmarked{% endif %}"></a>
+                </span>
+                {%- endif -%}
+
                 <span class="category-list">
                     {%- for category in random_story.categories|sort(attribute='id') -%}
                         <a class="gen" style="background-color: {{ category.color }}" href="{{ url_for('search.simple', search_type='category', search_id=category.id) }}">{{ category.name }}</a>

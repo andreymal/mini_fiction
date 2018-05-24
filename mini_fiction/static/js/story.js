@@ -182,7 +182,7 @@ var story = {
         });
 
         // Добавление в избранное
-        core.bind('#content .story_favorite', 'click', function(event) {
+        core.bind('.story_favorite', 'click', function(event) {
             event.stopImmediatePropagation();
             event.preventDefault();
             var url = this.href;
@@ -199,7 +199,7 @@ var story = {
         });
 
         // Добавление в закладки
-        core.bind('#content .story_bookmark', 'click', function(event) {
+        core.bind('.story_bookmark', 'click', function(event) {
             event.stopImmediatePropagation();
             event.preventDefault();
             var url = this.href;
@@ -305,39 +305,22 @@ var story = {
     },
 
     setFavorited: function(storyId, favorited, changeUrl) {
-        var story = document.getElementById('story_' + parseInt(storyId));
-        if (!story) {
+        storyId = parseInt(storyId, 10);
+        if (isNaN(storyId)) {
             return false;
         }
-        var panelOk = false;
-        var storyOk = false;
-        var panelBtn = document.querySelector('#story_panel .story_favorite');
-        if (panelBtn) {
-            if (favorited) {
-                panelBtn.classList.add('favorited');
-            } else {
-                panelBtn.classList.remove('favorited');
-            }
-            panelOk = true;
-            if (changeUrl) {
-                panelBtn.href = changeUrl;
-            }
-        }
-        var btn = story.querySelector('.story_favorite');
-        if (btn) {
+
+        var btns = document.querySelectorAll('.js-story-favorite-' + storyId);
+        for (var i = 0; i < btns.length; i++) {
+            var btn = btns[i];
             if (favorited) {
                 btn.classList.add('favorited');
             } else {
                 btn.classList.remove('favorited');
             }
-            storyOk = true;
             if (changeUrl) {
                 btn.href = changeUrl;
             }
-        }
-
-        if (!panelOk && !storyOk) {
-            return false;
         }
 
         core.notify(favorited ? 'Рассказ добавлен в избранное' : 'Рассказ удален из избранного');
@@ -345,39 +328,22 @@ var story = {
     },
 
     setBookmarked: function(storyId, bookmarked, changeUrl) {
-        var story = document.getElementById('story_' + parseInt(storyId));
-        if (!story) {
+        storyId = parseInt(storyId, 10);
+        if (isNaN(storyId)) {
             return false;
         }
-        var panelOk = false;
-        var storyOk = false;
-        var panelBtn = document.querySelector('#story_panel .story_bookmark');
-        if (panelBtn) {
-            if (bookmarked) {
-                panelBtn.classList.add('bookmarked');
-            } else {
-                panelBtn.classList.remove('bookmarked');
-            }
-            panelOk = true;
-            if (changeUrl) {
-                panelBtn.href = changeUrl;
-            }
-        }
-        var btn = story.querySelector('.story_bookmark');
-        if (btn) {
+
+        var btns = document.querySelectorAll('.js-story-bookmark-' + storyId);
+        for (var i = 0; i < btns.length; i++) {
+            var btn = btns[i];
             if (bookmarked) {
                 btn.classList.add('bookmarked');
             } else {
                 btn.classList.remove('bookmarked');
             }
-            storyOk = true;
             if (changeUrl) {
                 btn.href = changeUrl;
             }
-        }
-
-        if (!panelOk && !storyOk) {
-            return false;
         }
 
         core.notify(bookmarked ? 'Рассказ добавлен в список' : 'Рассказ удален из списка');

@@ -30,4 +30,4 @@ def createsuperuser():
             'is_staff': True,
             'is_superuser': True,
         })
-        print('Superuser created successfully.')
+    print('Superuser created successfully.')

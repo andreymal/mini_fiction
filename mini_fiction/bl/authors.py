@@ -52,11 +52,11 @@ class AuthorBL(BaseBL):
         return errors
 
     def create(self, data):
-        if 'username' not in data or (not data.get('password') and not data.get('password_hash')):
-            raise ValidationError({'username': lazy_gettext('Please set username and password')})
+        if 'username' not in data:
+            raise ValidationError({'username': [lazy_gettext('Please set username')]})
 
         if data.get('password') and data.get('password_hash'):
-            raise ValidationError({'password': lazy_gettext('Please set only password or password hash')})
+            raise ValidationError({'password': [lazy_gettext('Please set only password or password hash')]})
 
         errors = {}
         if data.get('password') and current_app.config['CHECK_PASSWORDS_SECURITY'] and not self.is_password_good(data['password'], extra=(data['username'],)):
@@ -74,12 +74,11 @@ class AuthorBL(BaseBL):
             date_joined=data.get('date_joined', datetime.utcnow()),
             activated_at=data.get('activated_at', None),
             session_token=utils_random.random_string(32),
+            password=data.get('password_hash') or '',
         )
         user.flush()  # for user.id
         if data.get('password'):
             user.bl.set_password(data['password'])
-        else:
-            user.password = data['password_hash']
         return user
 
     def update(self, data, modified_by_user=None, fill_admin_log=False):

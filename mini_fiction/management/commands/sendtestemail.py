@@ -11,8 +11,8 @@ from mini_fiction.utils.misc import render_nonrequest_template
 from mini_fiction.management.manager import cli
 
 
-@cli.command()
-@click.option('-e', '--eager', 'eager', help='Don\'t use Celery for delayed sending', is_flag=True)
+@cli.command(short_help='Sends a testing email.', help='Sends a test email to the email addresses specified as arguments.')
+@click.option('-e', '--eager', 'eager', help='Don\'t use Celery for delayed sending.', is_flag=True)
 @click.argument('recipients', nargs=-1, required=True)
 @db_session
 def sendtestemail(recipients, eager):

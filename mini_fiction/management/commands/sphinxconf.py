@@ -8,7 +8,7 @@ from flask import current_app
 from mini_fiction.management.manager import cli
 
 
-@cli.command()
+@cli.command(help='Prints config for Sphinx searchd.')
 def sphinxconf():
     ctx = {
         'sphinxroot': os.path.abspath(current_app.config['SPHINX_ROOT']),

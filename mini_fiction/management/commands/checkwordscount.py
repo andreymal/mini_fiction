@@ -51,7 +51,7 @@ def story_check_words_count(story, verbose=True):
         print()
 
 
-@cli.command()
+@cli.command(short_help='Recalculates words count.', help='Relalculates words count cache of stories and chapters.')
 @click.argument('story_ids', nargs=-1, type=int)
 def checkwordscount(story_ids):
     orm.sql_debug(False)

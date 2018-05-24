@@ -7,7 +7,7 @@ from pony.orm import db_session
 from mini_fiction.management.manager import cli
 
 
-@cli.command()
+@cli.command(help='Runs a Python interactive interpreter.')
 def shell():
     import code
     import mini_fiction

@@ -85,7 +85,7 @@ def copyfile(src, dst, global_hash, verbose=True):
         print(' (not changed)', flush=True)
     return False
 
-@cli.command()
+@cli.command(short_help='Copies static files.', help='Copies static files to DESTINATION directory (STATIC_ROOT by default).')
 @click.option('-v/-V', '--verbose/--no-verbose', default=True)
 @click.argument('destination', nargs=1, required=False)
 def collectstatic(verbose, destination):

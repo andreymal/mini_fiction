@@ -3,6 +3,7 @@
 
 import json
 
+import click
 from pony import orm
 from flask import current_app
 
@@ -10,24 +11,36 @@ from mini_fiction.management.manager import cli
 from mini_fiction.models import Story
 
 
-@cli.command()
-def checkstoryvoting():
+@cli.command(help='Checks votes of stories.')
+@click.argument('story_ids', nargs=-1, type=int)
+def checkstoryvoting(story_ids):
     orm.sql_debug(False)
 
     if not current_app.story_voting:
         print('Story voting is disabled.')
         return
 
-    with orm.db_session:
-        first_story = orm.select(orm.min(x.id) for x in Story).first()
-        last_story = orm.select(orm.max(x.id) for x in Story).first()
+    if not story_ids:
+        with orm.db_session:
+            first_story = orm.select(orm.min(x.id) for x in Story).first()
+            last_story = orm.select(orm.max(x.id) for x in Story).first()
+        story_id = first_story
+    else:
+        story_ids_queue = story_ids[::-1]  # reversed
 
-    story_id = first_story
     while True:
         with orm.db_session:
-            stories = Story.select(lambda x: x.id >= story_id and x.id <= last_story).order_by(Story.id)[:50]
-            if not stories:
-                break
+            if not story_ids:
+                stories = Story.select(lambda x: x.id >= story_id and x.id <= last_story).order_by(Story.id)[:50]
+                if not stories:
+                    break
+            else:
+                if not story_ids_queue:
+                    break
+                stories = list(Story.select(lambda x: x.id in story_ids_queue[-50:]).order_by(Story.id))
+                story_ids_queue = story_ids_queue[:-50]
+                if not stories:
+                    continue
 
             changed_stories = []
 
@@ -57,4 +70,5 @@ def checkstoryvoting():
             orm.commit()
             print('Done.', flush=True)
 
-            story_id = stories[-1].id + 1
+            if not story_ids:
+                story_id = stories[-1].id + 1

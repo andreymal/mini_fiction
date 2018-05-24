@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
+import click
 from pony import orm
 
 from mini_fiction.management.manager import cli
@@ -94,20 +95,33 @@ def check_comments_for(target, comments_list):
     check_comments_tree(tree)
 
 
-@cli.command()
-def checkstorycomments():
+@cli.command(short_help='Checks story comments.', help='Checks tree, answers, votes, ids etc. of story comments.')
+@click.argument('story_ids', nargs=-1, type=int)
+def checkstorycomments(story_ids):
     orm.sql_debug(False)
 
-    with orm.db_session:
-        first_story = orm.select(orm.min(x.id) for x in Story).first()
-        last_story = orm.select(orm.max(x.id) for x in Story).first()
+    if not story_ids:
+        with orm.db_session:
+            first_story = orm.select(orm.min(x.id) for x in Story).first()
+            last_story = orm.select(orm.max(x.id) for x in Story).first()
+        story_id = first_story
+    else:
+        i = 0
 
-    story_id = first_story
     while True:
         with orm.db_session:
-            story = Story.select(lambda x: x.id >= story_id and x.id <= last_story).first()
-            if not story:
-                break
+            if not story_ids:
+                story = Story.select(lambda x: x.id >= story_id and x.id <= last_story).first()
+                if not story:
+                    break
+            else:
+                if i >= len(story_ids):
+                    break
+                story = Story.get(id=story_ids[i])
+                i += 1
+                if not story:
+                    print('Story {} not found'.format(story_ids[i - 1]))
+                    continue
 
             print('Story {}'.format(story.id))
             comments_list = story.bl.select_comments().order_by('c.date, c.id')
@@ -126,20 +140,37 @@ def checkstorycomments():
             story_id = story.id + 1
 
 
-@cli.command()
-def checkstorylocalcomments():
+@cli.command(short_help='Checks local comments of stories.', help='Checks tree, answers, votes, ids etc. of local comments of stories.')
+@click.argument('story_ids', nargs=-1, type=int)
+def checkstorylocalcomments(story_ids):
     orm.sql_debug(False)
 
-    with orm.db_session:
-        first_local = orm.select(orm.min(x.id) for x in StoryLocalThread).first()
-        last_local = orm.select(orm.max(x.id) for x in StoryLocalThread).first()
+    if not story_ids:
+        with orm.db_session:
+            first_local = orm.select(orm.min(x.id) for x in StoryLocalThread).first()
+            last_local = orm.select(orm.max(x.id) for x in StoryLocalThread).first()
+        local_id = first_local
+    else:
+        i = 0
 
-    local_id = first_local
     while True:
         with orm.db_session:
-            local = StoryLocalThread.select(lambda x: x.id >= local_id and x.id <= last_local).first()
-            if not local:
-                break
+            if not story_ids:
+                local = StoryLocalThread.select(lambda x: x.id >= local_id and x.id <= last_local).first()
+                if not local:
+                    break
+            else:
+                if i >= len(story_ids):
+                    break
+                story = Story.get(id=story_ids[i])
+                i += 1
+                if not story:
+                    print('Story {} not found'.format(story_ids[i - 1]))
+                    continue
+                if not story.local:
+                    print('Story {} has no StoryLocalThread'.format(story_ids[i - 1]))
+                    continue
+                local = story.local
 
             print('Story {} / StoryLocalThread {}'.format(local.story.id, local.id))
             comments_list = local.bl.select_comments().order_by('c.date, c.id')
@@ -150,20 +181,36 @@ def checkstorylocalcomments():
             local_id = local.id + 1
 
 
-@cli.command()
-def checknewscomments():
+@cli.command(short_help='Checks news comments.', help='Checks tree, answers, votes, ids etc. of news comments.')
+@click.argument('news', nargs=-1)
+def checknewscomments(news):
     orm.sql_debug(False)
 
-    with orm.db_session:
-        first_newsitem = orm.select(orm.min(x.id) for x in NewsItem).first()
-        last_newsitem = orm.select(orm.max(x.id) for x in NewsItem).first()
+    if not news:
+        with orm.db_session:
+            first_newsitem = orm.select(orm.min(x.id) for x in NewsItem).first()
+            last_newsitem = orm.select(orm.max(x.id) for x in NewsItem).first()
+        newsitem_id = first_newsitem
+    else:
+        i = 0
 
-    newsitem_id = first_newsitem
     while True:
         with orm.db_session:
-            newsitem = NewsItem.select(lambda x: x.id >= newsitem_id and x.id <= last_newsitem).first()
-            if not newsitem:
-                break
+            if not news:
+                newsitem = NewsItem.select(lambda x: x.id >= newsitem_id and x.id <= last_newsitem).first()
+                if not newsitem:
+                    break
+            else:
+                if i >= len(news):
+                    break
+                if news[i].isdigit():
+                    newsitem = NewsItem.get(id=int(news[i]))
+                else:
+                    newsitem = NewsItem.get(name=news[i])
+                i += 1
+                if not newsitem:
+                    print('News item {} not found'.format(news[i - 1]))
+                    continue
 
             print('News item {} ({})'.format(newsitem.id, newsitem.name))
             comments_list = newsitem.bl.select_comments().order_by('c.date, c.id')

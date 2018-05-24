@@ -10,11 +10,11 @@ from mini_fiction.management.manager import cli
 from mini_fiction.utils.misc import timedelta_format
 
 
-@cli.command()
-@click.option('-s', '--silent', 'silent', help='Don\'t print progress bar to console', is_flag=True)
-@click.option('-c', '--compression', 'gzip_compression', type=click.IntRange(0, 9), default=0, help='Use gzip compression for files')
-@click.argument('dirpath')
-@click.argument('entities_list', nargs=-1)
+@cli.command(short_help='Makes a database dump.', help='Creates a jsonl dump of ENTITIES content (all by default) and saves it into DIRECTORY.')
+@click.option('-s', '--silent', 'silent', help='Don\'t print progress bar to console.', is_flag=True)
+@click.option('-c', '--compression', 'gzip_compression', type=click.IntRange(0, 9), default=0, help='Use gzip compression for files.')
+@click.argument('dirpath', metavar='DIRECTORY')
+@click.argument('entities_list', metavar='ENTITIES', nargs=-1)
 def dumpdb(dirpath, entities_list, gzip_compression, silent):
     from mini_fiction.dumpload import dumpdb_console as cmd
     orm.sql_debug(False)

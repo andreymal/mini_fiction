@@ -8,6 +8,4 @@
 {%- for d in story.list_downloads() -%}
     <a title="Скачать в {{ d.format.name }}" href="{{ d.url }}" class="get {{ d.cls }}" data-noajax="1"></a>
 {%- endfor -%}
-<span class="story_bookmark_msg"></span>
-<span class="story_favorite_msg"></span>
 </span>

@@ -8,7 +8,7 @@ __pycache__/
 *.pyo
 
 # virtualenv
-/env/
+/env
 
 # Tests
 /.tox/
@@ -16,7 +16,7 @@ __pycache__/
 /htmlcov/
 /.coverage
 /ghostdriver.log
-/testmedia/
+/testmedia
 
 # Distribution / packaging
 build/
@@ -33,14 +33,14 @@ dist/
 /.flaskenv
 /local_settings.py
 /local/
-/media/
+/media
 /cache/
-/sphinx/
-/static/
-/localstatic/
-/templates/
-/localtemplates/
-/dump/
+/sphinx
+/static
+/localstatic
+/templates
+/localtemplates
+/dump
 /sphinxroot.txt
 /local_sphinx.conf
 *.sqlite3

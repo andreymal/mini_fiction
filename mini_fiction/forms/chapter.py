@@ -31,7 +31,7 @@ class ChapterForm(Form):
     text = TextAreaField(
         'Текст главы',
         [
-            validators.Length(max=300000)
+            validators.Length(max=1000000)
         ],
         render_kw=dict(textarea_dict, data_formsaving='chapter_text', data_formgroup='chapter', placeholder='Текст новой главы', cols=40, rows=10, id='id_text'),
     )

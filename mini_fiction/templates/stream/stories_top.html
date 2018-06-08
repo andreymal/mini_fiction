@@ -4,19 +4,19 @@
 
 {% block before_list %}
 <div>
-    {% if period != 7 %}<a href="{{ modified_url(period='7') }}">{% endif -%}
+    {% if period != 7 %}<a href="{{ modified_url(period='7', page=1) }}">{% endif -%}
         За неделю
     {%- if period != 7 %}</a>{% endif %}
     &nbsp; &nbsp;
-    {% if period != 30 %}<a href="{{ modified_url(period='30') }}">{% endif -%}
+    {% if period != 30 %}<a href="{{ modified_url(period='30', page=1) }}">{% endif -%}
         За месяц
     {%- if period != 30 %}</a>{% endif %}
     &nbsp; &nbsp;
-    {% if period != 365 %}<a href="{{ modified_url(period='365') }}">{% endif -%}
+    {% if period != 365 %}<a href="{{ modified_url(period='365', page=1) }}">{% endif -%}
         За год
     {%- if period != 365 %}</a>{% endif %}
     &nbsp; &nbsp;
-    {% if period != 0 %}<a href="{{ modified_url(period=None) }}">{% endif -%}
+    {% if period != 0 %}<a href="{{ modified_url(period=None, page=1) }}">{% endif -%}
         За всё время
     {%- if period != 0 %}</a>{% endif %}
 </div>

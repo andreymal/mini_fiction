@@ -614,7 +614,7 @@ class AuthorBL(BaseBL):
         ChangeEmailProfile.select(lambda x: x.email.lower() == user.email.lower()).delete(bulk=True)
         return user
 
-    def authenticate(self, password):
+    def check_password(self, password):
         if not password:
             return False
 
@@ -642,7 +642,7 @@ class AuthorBL(BaseBL):
         user = None
         if data['username']:
             user = self._model().select(lambda x: x.username.lower() == data['username'].lower()).first()
-        if not user or not user.bl.authenticate(data['password']):
+        if not user or not user.bl.check_password(data['password']):
             raise ValidationError({'username': [lazy_gettext('Please enter a correct username and password.')]})
         if not user.is_active:
             raise ValidationError({'username': [lazy_gettext('Account is disabled')]})
@@ -654,7 +654,7 @@ class AuthorBL(BaseBL):
         if not password and not user.password:
             return
 
-        changed = not self.authenticate(password)
+        changed = not self.check_password(password)
         user.password = self.generate_password_hash(password)
         if changed:
             user.last_password_change = datetime.utcnow()

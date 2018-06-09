@@ -114,7 +114,7 @@ def edit():
         if 'save_password' in request.form:
             password_form = AuthorEditPasswordForm()
             if password_form.validate_on_submit():
-                if not author.bl.authenticate(password_form.old_password.data):
+                if not author.bl.check_password(password_form.old_password.data):
                     password_form_errors.append(gettext('Old password is incorrect'))
                 elif not author.bl.is_password_good(password_form.new_password_1.data):
                     password_form_errors.append(gettext('Password is too bad, please change it'))
@@ -142,7 +142,7 @@ def edit():
         if 'save_email' in request.form:
             email_form = AuthorEditEmailForm()
             if email_form.validate_on_submit():
-                if not author.bl.authenticate(email_form.password.data):
+                if not author.bl.check_password(email_form.password.data):
                     email_form_errors.append(gettext('Password is incorrect'))
                 else:
                     try:

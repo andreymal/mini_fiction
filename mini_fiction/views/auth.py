@@ -25,15 +25,15 @@ def login():
 
     form = LoginForm()
     if form.validate_on_submit():
+        data = dict(form.data)
+
         try:
-            user = Author.bl.authenticate_by_username(form.data)
+            user = Author.bl.authenticate_by_username(data, request.remote_addr)
             if not login_user(user, remember=True):
                 raise ValidationError({'username': [gettext('Cannot login')]})
         except ValidationError as exc:
             form.set_errors(exc.errors)
         else:
-            if current_app.config['AUTH_LOG']:
-                current_app.logger.info('%s logged in (ID: %s, IP: %s)', user.username, user.id, request.remote_addr)
             user.last_login = datetime.utcnow()
             user.last_visit = user.last_login
             next_url = request.args.get('next')
@@ -41,7 +41,11 @@ def login():
                 next_url = url_for('index.index')
             return redirect(next_url)
 
-    return render_template('registration/login.html', form=form, page_title=page_title)
+    return render_template(
+        'registration/login.html',
+        form=form,
+        page_title=page_title,
+    )
 
 
 @bp.route('/register/', methods=('GET', 'POST'))

@@ -637,15 +637,40 @@ class AuthorBL(BaseBL):
         else:
             raise NotImplementedError('Unknown algorithm')
 
-    def authenticate_by_username(self, data):
+    def get_by_username(self, username):
+        if not username:
+            return None
+        # strip() не ставить: для некоторых юзеров-олдфагов пробелы это фича
+        return self.model.select(
+            lambda x: x.username.lower() == username.lower()
+        ).first()
+
+    def authenticate_by_username(self, data, remote_addr=None):
         data = Validator(LOGIN).validated(data)
         user = None
-        if data['username']:
-            user = self._model().select(lambda x: x.username.lower() == data['username'].lower()).first()
+
+        # Сначала достаём пользователя из базы
+        # (без чувствительности к регистру)
+        user = self.get_by_username(data.get('username'))
+
+        # Проверяем пароль
         if not user or not user.bl.check_password(data['password']):
+            if remote_addr and current_app.config['AUTH_LOG']:
+                if not user:
+                    current_app.logger.info('%s tried to log in, but account not found (ID: N/A, IP: %s)', data.get('username', '?'), remote_addr)
+                else:
+                    current_app.logger.info('%s tried to log in with incorrect password (ID: %s, IP: %s)', user.username, user.id, remote_addr)
             raise ValidationError({'username': [lazy_gettext('Please enter a correct username and password.')]})
+
+        # Проверяем бан
         if not user.is_active:
+            if remote_addr and current_app.config['AUTH_LOG']:
+                current_app.logger.info('%s tried to log in, but account is disabled (ID: %s, IP: %s)', user.username, user.id, remote_addr)
             raise ValidationError({'username': [lazy_gettext('Account is disabled')]})
+
+        # Если дошли сюда, значит всё хорошо
+        if remote_addr and current_app.config['AUTH_LOG']:
+            current_app.logger.info('%s logged in (ID: %s, IP: %s)', user.username, user.id, remote_addr)
         return user
 
     def set_password(self, password):

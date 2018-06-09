@@ -26,6 +26,8 @@ class Config(object):
     LOGFORMAT = '[%(asctime)s] [%(levelname)s] %(message)s'
     ERROR_LOGFORMAT = 'IP: %(remote_addr)s\nUser: %(username)s (%(user_id)s)\n\n%(message)s'
     AUTH_LOG = True
+    AUTH_CAPTCHA_MIN_TRIES = 5
+    AUTH_CAPTCHA_TIMEOUT = 600
 
     # database
     DATABASE_ENGINE = 'sqlite'

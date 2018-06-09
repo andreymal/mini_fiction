@@ -7,6 +7,7 @@ import os
 import json
 import time
 from io import BytesIO
+from hashlib import md5
 from datetime import datetime, timedelta
 
 from flask import current_app, url_for, render_template
@@ -614,6 +615,47 @@ class AuthorBL(BaseBL):
         ChangeEmailProfile.select(lambda x: x.email.lower() == user.email.lower()).delete(bulk=True)
         return user
 
+    def track_auth(self, ip, user_id):
+        tm = int(time.time())
+
+        ip_key = 'auth_ip_{}'.format(md5(ip.encode('utf-8')).hexdigest())
+        user_key = 'auth_user_{}'.format(user_id) if user_id is not None else None
+
+        # Пишем статистику входов для IP, чтоб не брутфорсили всех юзеров с одного IP
+        ip_stat = current_app.cache.get(ip_key)
+        ip_stat = (tm, 1 if not ip_stat else (ip_stat[1] + 1))
+        current_app.cache.set(ip_key, ip_stat, current_app.config['AUTH_CAPTCHA_TIMEOUT'])
+
+        # Пишем статистику входов для конкретного пользователя, чтоб защитить его от перебора пароля
+        if user_key is not None:
+            user_stat = current_app.cache.get(user_key)
+            user_stat = (tm, 1 if not user_stat else (user_stat[1] + 1))
+            current_app.cache.set(user_key, user_stat, current_app.config['AUTH_CAPTCHA_TIMEOUT'])
+
+    def need_captcha_for_auth(self, ip, user_id=None):
+        tm = int(time.time())
+        tries = current_app.config['AUTH_CAPTCHA_MIN_TRIES']
+        if tries < 0:
+            return False
+        if tries == 0:
+            return True
+
+        ip_key = 'auth_ip_{}'.format(md5(ip.encode('utf-8')).hexdigest())
+        user_key = 'auth_user_{}'.format(user_id) if user_id is not None else None
+
+        # Если с данного IP брутфорсят, то ставим капчу
+        ip_stat = current_app.cache.get(ip_key)
+        if ip_stat and ip_stat[1] >= tries and tm - ip_stat[0] < current_app.config['AUTH_CAPTCHA_TIMEOUT']:
+            return True
+
+        # Если пароль данного юзера брутфорсят, то тоже ставим капчу
+        if user_key is not None:
+            user_stat = current_app.cache.get(user_key)
+            if user_stat and user_stat[1] >= tries and tm - user_stat[0] < current_app.config['AUTH_CAPTCHA_TIMEOUT']:
+                return True
+
+        return False
+
     def check_password(self, password):
         if not password:
             return False
@@ -646,12 +688,19 @@ class AuthorBL(BaseBL):
         ).first()
 
     def authenticate_by_username(self, data, remote_addr=None):
+        raw_data = data
         data = Validator(LOGIN).validated(data)
         user = None
 
         # Сначала достаём пользователя из базы
         # (без чувствительности к регистру)
         user = self.get_by_username(data.get('username'))
+
+        # Пресекаем перебор пароля капчей (по IP и по юзеру)
+        if remote_addr:
+            if current_app.captcha and self.need_captcha_for_auth(remote_addr, user.id if user else None):
+                current_app.captcha.check_or_raise(raw_data)
+            self.track_auth(remote_addr, user.id if user else None)
 
         # Проверяем пароль
         if not user or not user.bl.check_password(data['password']):

@@ -23,9 +23,14 @@ bp = Blueprint('auth', __name__)
 def login():
     page_title = gettext('Authorization')
 
+    captcha = None
+    captcha_error = None
+
     form = LoginForm()
     if form.validate_on_submit():
         data = dict(form.data)
+        if current_app.captcha:
+            data = current_app.captcha.copy_fields(data, request.form)
 
         try:
             user = Author.bl.authenticate_by_username(data, request.remote_addr)
@@ -33,6 +38,10 @@ def login():
                 raise ValidationError({'username': [gettext('Cannot login')]})
         except ValidationError as exc:
             form.set_errors(exc.errors)
+        except CaptchaError:
+            captcha_error = 'Вы не доказали, что вы не робот'
+            if not captcha:
+                captcha = current_app.captcha.generate()
         else:
             user.last_login = datetime.utcnow()
             user.last_visit = user.last_login
@@ -41,10 +50,15 @@ def login():
                 next_url = url_for('index.index')
             return redirect(next_url)
 
+    if not captcha and current_app.captcha and Author.bl.need_captcha_for_auth(request.remote_addr):
+        captcha = current_app.captcha.generate()
+
     return render_template(
         'registration/login.html',
         form=form,
         page_title=page_title,
+        captcha=captcha,
+        captcha_error=captcha_error,
     )
 
 

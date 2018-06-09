@@ -88,7 +88,7 @@ class Config(object):
         'русские/латинские буквы, цифры, пробел, точку и символы _ @ + -'
     )
     PASSWORD_HASHER = 'pbkdf2'  # or 'bcrypt' or 'scrypt'
-    PBKDF2_ITERATIONS = 100000
+    PBKDF2_ITERATIONS = 200000
 
     SERVER_NAME = 'localhost:5000'
     PREFERRED_URL_SCHEME = 'http'

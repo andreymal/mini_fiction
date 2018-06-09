@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version:  0.0.4\n"
 "Report-Msgid-Bugs-To: andriyano-31@mail.ru\n"
-"POT-Creation-Date: 2018-05-21 22:07+0300\n"
+"POT-Creation-Date: 2018-06-09 23:37+0300\n"
 "Last-Translator: andreymal <andriyano-31@mail.ru>\n"
 "Language: ru\n"
 "Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && "
@@ -16,7 +16,7 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Generated-By: Babel 2.5.3\n"
+"Generated-By: Babel 2.6.0\n"
 
 #: mini_fiction/models.py:525 mini_fiction/models.py:792
 msgid "Chapter {}"
@@ -26,23 +26,23 @@ msgstr "Глава {}"
 msgid "Add new"
 msgstr "Добавить новый"
 
-#: mini_fiction/bl/authors.py:49
+#: mini_fiction/bl/authors.py:50
 msgid "User already exists"
 msgstr "Пользователь уже существует"
 
-#: mini_fiction/bl/authors.py:51 mini_fiction/bl/authors.py:298
+#: mini_fiction/bl/authors.py:52 mini_fiction/bl/authors.py:298
 msgid "Email address is already in use"
 msgstr "Электропочта уже используется"
 
-#: mini_fiction/bl/authors.py:56
-msgid "Please set username and password"
-msgstr "Укажите имя пользователя и пароль"
+#: mini_fiction/bl/authors.py:57
+msgid "Please set username"
+msgstr "Укажите имя пользователя"
 
-#: mini_fiction/bl/authors.py:59
+#: mini_fiction/bl/authors.py:60
 msgid "Please set only password or password hash"
 msgstr "Укажите только пароль или хэш пароля"
 
-#: mini_fiction/bl/authors.py:63 mini_fiction/views/auth.py:145
+#: mini_fiction/bl/authors.py:64 mini_fiction/views/auth.py:167
 #: mini_fiction/views/author.py:120
 msgid "Password is too bad, please change it"
 msgstr "Пароль слишком плохой, поменяйте его"
@@ -67,11 +67,11 @@ msgstr "Слишком маленький аватар; надо {w}x{h} или 
 msgid "Too big avatar; must be {w}x{h} or smaller"
 msgstr "Слишком большой аватар; надо {w}x{h} или меньше"
 
-#: mini_fiction/bl/authors.py:647
+#: mini_fiction/bl/authors.py:712
 msgid "Please enter a correct username and password."
 msgstr "Пожалуйста, введите правильные имя пользователя и пароль."
 
-#: mini_fiction/bl/authors.py:649
+#: mini_fiction/bl/authors.py:718
 msgid "Account is disabled"
 msgstr "Аккаунт отключен"
 
@@ -1369,15 +1369,15 @@ msgstr "Цвет должен быть в формате «#HHH» или «#HHHH
 msgid "Authorization"
 msgstr "Авторизация"
 
-#: mini_fiction/views/auth.py:31
+#: mini_fiction/views/auth.py:38
 msgid "Cannot login"
 msgstr "Не получилось войти"
 
-#: mini_fiction/views/auth.py:51
+#: mini_fiction/views/auth.py:69
 msgid "Registration is closed"
 msgstr "Регистрация закрыта"
 
-#: mini_fiction/views/auth.py:53
+#: mini_fiction/views/auth.py:71
 msgid "Registration in library"
 msgstr "Регистрация в библиотеке"
 

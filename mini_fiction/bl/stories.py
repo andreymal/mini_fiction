@@ -3,6 +3,7 @@
 
 # pylint: disable=unexpected-keyword-arg,no-value-for-parameter
 
+import os
 import json
 import random
 import ipaddress
@@ -916,6 +917,224 @@ class StoryBL(BaseBL, Commentable):
         result = [result[i] for i in ids if i in result]
 
         return raw_result, result
+
+    def dump_to_file_full(self, path, gzip_compression=0, dump_collections=False):
+        path = os.path.abspath(path)
+
+        if gzip_compression:
+            import gzip
+            fp = gzip.open(path, 'wt', encoding='utf-8')
+        else:
+            fp = open(path, 'w', encoding='utf-8')
+
+        from mini_fiction.ponydump import JSONEncoder
+        je = JSONEncoder(ensure_ascii=False, sort_keys=True)
+        with fp:
+            for x in self.dump_full(dump_collections=dump_collections):
+                fp.write(je.encode(x) + '\n')
+
+    def dump_full(self, dump_collections=False):
+        from mini_fiction import dumpload
+        from mini_fiction.models import StoryCommentEdit, StoryCommentVote
+        from mini_fiction.models import StoryLocalComment, StoryLocalCommentEdit
+        from mini_fiction.models import Notification, Subscription
+
+        story = self.model
+        mdf = dumpload.MiniFictionDump()
+
+        yield mdf.obj2json(story, 'story')
+
+        # Сначала всё, что не зависит от глав
+        for x in sorted(story.contributors, key=lambda c: c.id):
+            yield mdf.obj2json(x, 'storycontributor')
+        if dump_collections:
+            for x in sorted(story.characters, key=lambda c: c.id):
+                yield mdf.obj2json(x, 'character')
+            for x in sorted(story.categories, key=lambda c: c.id):
+                yield mdf.obj2json(x, 'category')
+            for x in sorted(story.classifications, key=lambda c: c.id):
+                yield mdf.obj2json(x, 'classifier')
+        for x in sorted(story.favorites, key=lambda c: c.id):
+            yield mdf.obj2json(x, 'favorites')
+        for x in sorted(story.bookmarks, key=lambda c: c.id):
+            yield mdf.obj2json(x, 'bookmark')
+        for x in sorted(story.votes, key=lambda c: c.id):
+            yield mdf.obj2json(x, 'vote')
+
+        # Потом главы
+        for chapter in sorted(story.chapters, key=lambda x: x.order):
+            yield mdf.obj2json(chapter, 'chapter')
+
+        # Потом всё, что прямо или косвенно зависит от глав
+        for x in story.story_views_set:
+            yield mdf.obj2json(x, 'storyview')
+        for x in story.activity:
+            yield mdf.obj2json(x, 'activity')
+        for x in story.edit_log:
+            yield mdf.obj2json(x, 'storylog')
+
+        # Комменты к рассказу
+        comment_ids = set()
+        for x in sorted(story.comments, key=lambda c: c.id):
+            comment_ids.add(x.id)
+            yield mdf.obj2json(x, 'storycomment')
+        for x in StoryCommentEdit.select(lambda x: x.comment.id in comment_ids):
+            yield mdf.obj2json(x, 'storycommentedit')
+        for x in StoryCommentVote.select(lambda x: x.comment.id in comment_ids):
+            yield mdf.obj2json(x, 'storycommentvote')
+
+        # Комменты в редакторской
+        # (плюс сбор id для выгрузки уведомлений)
+        local_comment_ids = set()
+        if story.local:
+            yield mdf.obj2json(story.local, 'storylocalthread')
+            for x in StoryLocalComment.select(lambda x: x.local == story.local):
+                local_comment_ids.add(x.id)
+                yield mdf.obj2json(x, 'storylocalcomment')
+            for x in StoryLocalCommentEdit.select(lambda x: x.comment.id in local_comment_ids):
+                yield mdf.obj2json(x, 'storylocalcommentedit')
+
+        # Уведомления о состоянии рассказа
+        for x in Notification.select(
+            lambda x: x.type in ('story_publish', 'story_draft', 'author_story') and x.target_id == story.id
+        ):
+            yield mdf.obj2json(x, 'notification')
+
+        # Уведомления о новых главах
+        chapter_ids = set(x.id for x in story.chapters)
+        for x in Notification.select(
+            lambda x: x.type in ('story_chapter',) and x.target_id in chapter_ids
+        ):
+            yield mdf.obj2json(x, 'notification')
+
+        # Уведомления о новых комментах
+        for x in Notification.select(
+            lambda x: x.type in ('story_reply', 'story_comment') and x.target_id in comment_ids
+        ):
+            yield mdf.obj2json(x, 'notification')
+
+        # Уведомления о комментах в редакторской
+        if story.local:
+            for x in Notification.select(
+                lambda x: x.type in ('story_lreply', 'story_lcomment') and x.target_id in local_comment_ids
+            ):
+                yield mdf.obj2json(x, 'notification')
+
+        # Подписки на рассказ
+        for x in Subscription.select(
+            lambda x: x.type in ('story_chapter', 'story_comment', 'story_lcomment') and x.target_id == story.id
+        ):
+            yield mdf.obj2json(x, 'subscription')
+
+    def dump_to_file_only_public(self, path, gzip_compression=0, with_chapters=True, with_favorites=False, with_comments=False):
+        path = os.path.abspath(path)
+
+        if gzip_compression:
+            import gzip
+            fp = gzip.open(path, 'wt', encoding='utf-8')
+        else:
+            fp = open(path, 'w', encoding='utf-8')
+
+        from mini_fiction.ponydump import JSONEncoder
+        je = JSONEncoder(ensure_ascii=False, sort_keys=True)
+        with fp:
+            for x in self.dump_only_public(
+                with_chapters=with_chapters,
+                with_favorites=with_favorites,
+                with_comments=with_comments
+            ):
+                fp.write(je.encode(x) + '\n')
+
+    def dump_only_public(self, with_chapters=True, with_favorites=False, with_comments=False):
+        from mini_fiction import dumpload
+
+        story = self.model
+
+        mdf = dumpload.MiniFictionDump()
+
+        # В зависимости от состояния рассказа определяем поля, считающиеся
+        # публичными
+        only = [
+            'id', 'title', 'characters', 'categories', 'classifications',
+            'date', 'first_published_at', 'draft', 'approved', 'finished',
+            'freezed', 'notes', 'original', 'rating', 'summary', 'updated',
+            'words', 'vote_total', 'vote_value', 'vote_extra', 'source_link',
+            'source_title', 'pinned', 'views',
+        ]
+        override = {}
+
+        if with_comments:
+            only.append('comments_count')
+
+        if story.first_published_at:
+            override['date'] = story.first_published_at
+            if story.updated < story.first_published_at:
+                override['updated'] = story.first_published_at
+
+        if not current_app.story_voting.can_show(story):
+            override['vote_total'] = 0
+            override['vote_value'] = current_app.story_voting.get_default_vote_value()
+            override['vote_extra'] = current_app.story_voting.get_default_vote_extra()
+
+        yield mdf.obj2json(story, 'story', params={'exclude': None, 'only': only}, override=override)
+
+        # Дампим только публично видимых авторов
+        # (override прячет авторов, с которыми поругались)
+        for x in sorted(story.contributors, key=lambda c: c.id):
+            if not x.visible:
+                continue
+            yield mdf.obj2json(x, 'storycontributor', params={'exclude': None, 'only': [
+                'id', 'story', 'user', 'visible', 'is_author',
+            ]}, override={'is_editor': True if x.is_author else x.is_editor})
+
+        # Из избранного не палим дату
+        if with_favorites:
+            for x in sorted(story.favorites, key=lambda c: c.id):
+                yield mdf.obj2json(x, 'favorites', params={'exclude': None, 'only': ['id', 'author', 'story']})
+
+        # В главах ничего особенного, но лишние даты и черновики тоже не палим
+        if with_chapters:
+            for chapter in sorted(story.chapters, key=lambda x: x.order):
+                if chapter.draft:
+                    continue
+                chapter_only = [
+                    'id', 'date', 'story', 'notes', 'order', 'title',
+                    'text', 'text_md5', 'updated', 'words', 'draft',
+                    'story_published', 'first_published_at', 'views',
+                ]
+                chapter_override = {}
+
+                if chapter.first_published_at:
+                    chapter_override['date'] = chapter.first_published_at
+                    if chapter.updated < chapter.first_published_at:
+                        chapter_override['updated'] = chapter.first_published_at
+
+                yield mdf.obj2json(chapter, 'chapter', params={'exclude': None, 'only': chapter_only}, override=chapter_override)
+
+        # Удалённые комментарии тоже дампим, но со стиранием из них всей информации
+        if with_comments:
+            for x in sorted(story.comments, key=lambda c: c.id):
+                comment_override = {'ip': '127.0.0.1'}
+                if x.deleted:
+                    comment_override['updated'] = x.date
+                    comment_override['author'] = None
+                    comment_override['author_username'] = ''
+                    comment_override['text'] = ''
+                    comment_override['edits_count'] = 0
+                    comment_override['vote_count'] = 0
+                    comment_override['vote_total'] = 0
+
+                yield mdf.obj2json(
+                    x, 'storycomment',
+                    params={'exclude': None, 'only': [
+                        'id', 'local_id', 'parent', 'story', 'author',
+                        'author_username', 'date', 'updated', 'deleted',
+                        'text', 'vote_count', 'vote_total', 'tree_depth',
+                        'answers_count', 'edits_count', 'root_id',
+                        'story_published',
+                    ]},
+                    override=comment_override,
+                )
 
     # comments
 

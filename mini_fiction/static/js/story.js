@@ -10,6 +10,7 @@ var story = {
     _contributorsChangeEventBinded: null,
     _hashChangeEventBinded: null,
 
+    _lsFormattingKey: 'formatting',
     _preview: {
         btn: null,
         btnEvent: null,
@@ -1030,8 +1031,9 @@ var story = {
             return;
         }
 
+        var newStyle;
         try {
-            var newStyle = JSON.parse(window.localStorage.formatting || '{}');
+            newStyle = JSON.parse(window.localStorage[this._lsFormattingKey] || '{}');
         } catch (e) {
             console.warn('Cannot load formatting from local storage: ' + e);
             return;
@@ -1081,7 +1083,7 @@ var story = {
             this._formatting.current[name] = value;
             this.applyFormatting();
             if (window.localStorage) {
-                window.localStorage.formatting = JSON.stringify(this._formatting.current);
+                window.localStorage[this._lsFormattingKey] = JSON.stringify(this._formatting.current);
             }
         }
     },
@@ -1103,7 +1105,7 @@ var story = {
             paragraph: null
         });
         if (window.localStorage) {
-            window.localStorage.formatting = JSON.stringify(this._formatting.current);
+            window.localStorage[this._lsFormattingKey] = JSON.stringify(this._formatting.current);
         }
     },
 

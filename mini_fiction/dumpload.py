@@ -293,13 +293,14 @@ def loaddb_console(paths, verbosity=2, only_create=False):
     if depcache:
         print()
         print('WARNING: some optional relations are broken!')
-        for k, v in depcache.items():
+        for k, rel_dicts in depcache.items():
             print('{}.{} > {}:'.format(k[0][0], k[0][1], k[1][0]))
-            for vv in v:
-                print('  - {} > {}'.format(
-                    vv[0][0] if len(vv[0]) == 1 else vv[0],
-                    vv[1][0] if len(vv[1]) == 1 else vv[1],
-                ))
+            for obj_pk, deps in rel_dicts[0].items():
+                for dep_pk in deps:
+                    print('  - {} > {}'.format(
+                        obj_pk[0] if len(obj_pk) == 1 else obj_pk,
+                        dep_pk[0] if len(dep_pk) == 1 else dep_pk,
+                    ))
 
 
 def zip_dump(path, params=None, keep_broken=False):

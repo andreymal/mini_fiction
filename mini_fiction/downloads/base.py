@@ -57,7 +57,7 @@ class ZipFileDownloadFormat(BaseDownloadFormat):
         dirname = slugify(story.title or str(story.id))
         ext = self.chapter_extension
 
-        chapters = story.chapters.select().order_by(Chapter.order, Chapter.id)[:]
+        chapters = story.chapters.select(lambda x: not x.draft).order_by(Chapter.order, Chapter.id)[:]
         num_width = len(str(len(chapters)))
         for i, chapter in enumerate(chapters):
             data = render_template(

@@ -12,7 +12,7 @@ class FB2BaseDownload:
         from ..filters import fb2
         from mini_fiction.models import Chapter
 
-        chapters = story.chapters.select().order_by(Chapter.order, Chapter.id)
+        chapters = story.chapters.select(lambda x: not x.draft).order_by(Chapter.order, Chapter.id)
         chapters = [fb2.html_to_fb2(c.get_fb2_chapter_text(), title=c.autotitle) for c in chapters]
         subdocs = [self._get_annotation_doc(story)] + chapters
 

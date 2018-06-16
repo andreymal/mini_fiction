@@ -12,7 +12,9 @@ from flask import current_app
 from mini_fiction.management.manager import cli
 
 
-def collect_files(src):
+def collect_files(src, only=None, ignore=None):
+    only = frozenset(only or ())
+    ignore = frozenset(ignore or ())
     result = []
 
     queue = os.listdir(src)
@@ -22,14 +24,18 @@ def collect_files(src):
         abspath = os.path.join(src, path)
 
         if os.path.islink(abspath) or os.path.isfile(abspath):
-            result.append(path)
+            if only and path not in only:
+                continue
+            if path not in ignore:
+                result.append(path)
             continue
 
         assert os.path.isdir(abspath)
 
-        q = [os.path.join(path, x) for x in os.listdir(abspath)]
-        q.sort(reverse=True)
-        queue.extend(q)
+        if path not in ignore and os.path.join(path, '') not in ignore:
+            q = [os.path.join(path, x) for x in os.listdir(abspath)]
+            q.sort(reverse=True)
+            queue.extend(q)
 
     return result
 
@@ -106,7 +112,7 @@ def collectstatic(verbose, destination):
     copy_static_directory(modulestatic, projectstatic, verbose=verbose, static_version_file=current_app.config.get('STATIC_VERSION_FILE'))
 
 
-def copy_static_directory(src, dst, verbose=True, static_version_file=None):
+def copy_static_directory(src, dst, verbose=True, static_version_file=None, only=None, ignore=None):
     modulestatic = src
     projectstatic = dst
 
@@ -116,7 +122,7 @@ def copy_static_directory(src, dst, verbose=True, static_version_file=None):
 
     if verbose:
         print('Collect files list...', end=' ', flush=True)
-    srcfiles = collect_files(modulestatic)
+    srcfiles = collect_files(modulestatic, only=only, ignore=ignore)
     if verbose:
         print('found {} files.'.format(len(srcfiles)), flush=True)
 

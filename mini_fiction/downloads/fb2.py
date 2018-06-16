@@ -1,7 +1,9 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-from .base import BaseDownloadFormat, ZipFileDownloadFormat
+import zipfile
+
+from .base import BaseDownloadFormat, ZipFileDownloadFormat, slugify
 
 
 class FB2BaseDownload:
@@ -49,10 +51,17 @@ class FB2ZipDownload(FB2BaseDownload, ZipFileDownloadFormat):
     name = 'FB2+zip'
     debug_content_type = 'text/xml'
 
-
-    def render_zip_contents(self, zipfile, story, filename, **kw):
+    def render_zip_contents(self, zipobj, story, **kw):
         data = self.render_fb2(story=story, **kw)
-        zipfile.writestr(filename + '.fb2', data)
+
+        zipinfo = zipfile.ZipInfo(
+            kw.pop('filename', slugify(story.title or str(story.id))),
+            date_time=story.updated.timetuple()[:6],
+        )
+        zipinfo.compress_type = zipfile.ZIP_DEFLATED
+        zipinfo.external_attr = 0o644 << 16  # Python 3.4 ставит файлам права 000, фиксим
+
+        zipobj.writestr(zipinfo + '.fb2', data)
 
     def render(self, **kw):
         if kw.get('debug'):

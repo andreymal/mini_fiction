@@ -570,8 +570,6 @@ def download(story_id, filename):
 
         data = fmt.render(
             story=story,
-            filename=filename,
-            extension=extension,
             debug=debug,
         )
 

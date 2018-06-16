@@ -17,8 +17,8 @@
 {% endblock %}
 
 {% block content %}
-<div class="row" id="story_{{ story.id }}">
-    <div class="span12">
+<div class="row">
+    <div class="span12 story-chapter-page{% if story.nsfw %} story-nsfw{% endif %}" id="story_{{ story.id }}">
     {{- breadcrumbs(
         [[url_for('story.view', pk=story.id), story.title]],
         current='Все главы' if allchapters else chapter.autotitle

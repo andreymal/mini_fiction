@@ -16,7 +16,7 @@
 
 {% block content %}
 <div class="row">
-    <div class="span12 story-page" id="story_{{ story.id }}">
+    <div class="span12 story-page{% if story.nsfw %} story-nsfw{% endif %}" id="story_{{ story.id }}">
         {{- breadcrumbs() }}
 
         <div class="story-info" itemscope itemtype="http://schema.org/Book">

@@ -15,7 +15,7 @@ dumpdb_params = {
     'story': {'exclude': (
         'edit_log', 'story_views_set', 'votes', 'favorites', 'bookmarks',
         'comments', 'activity', 'local', 'in_series_permissions',
-        'contributors',
+        'contributors', 'chapters',
     )},
     'author': {'exclude': (
         'activity', 'edit_log',

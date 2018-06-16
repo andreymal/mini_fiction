@@ -20,6 +20,7 @@ class FB2BaseDownload:
             subdocs,
             title=story.title,
             author_name=story.authors[0].username,  # TODO: multiple authors
+            date=(story.first_published_at or story.date).strftime('%Y-%m-%dT%H:%M:%SZ'),
         )
         return etree.tostring(doc, encoding='UTF-8', xml_declaration=True)
 

@@ -372,14 +372,29 @@ class PonyDump(object):
             if not d[key][0] and not d[key][1]:
                 del d[key]
 
+    def get_entity_params(self, obj=None, name=None):
+        if not name:
+            name = self.get_entity_name(obj)
+        else:
+            assert name in self.entities
+
+        dict_params = {'with_lazy': True, 'with_collections': True}
+        if name in self.dict_params:
+            dict_params.update(self.dict_params[name])
+
+        return dict_params
+
     # Методы для дампа базы данных
 
-    def obj2json(self, obj, name=None, encode=False):
+    def obj2json(self, obj, name=None, params=None, override=None, encode=False):
         '''Дампит указанный объект базы данных в формат, совместимый с JSON.
 
         :param Entity obj: объект из базы данных
         :param str name: название модели объекта в lowercase, рекомендуется
           указать для большей производительности
+        :param dict params: дополнение стандартных аргументов,
+          передаваемых в Pony ORM to_dict
+        :param dict override: замена значений некоторых полей
         :param bool encode: если True, сразу же кодирует в JSON-строку вместо
           возвращения словаря
         '''
@@ -389,17 +404,24 @@ class PonyDump(object):
         else:
             assert name in self.entities
 
-        dict_params = {'with_lazy': True, 'with_collections': True}
-        if name in self.dict_params:
-            dict_params.update(self.dict_params[name])
+        dict_params = self.get_entity_params(name=name)
+        if params:
+            dict_params.update(params)
         result = obj.to_dict(**dict_params)
+
+        if override:
+            if '_entity' in override:
+                raise ValueError
+            result.update(override)
+
         assert '_entity' not in result
         result['_entity'] = name
+
         if encode:
             return self.je.encode(result)
         return result
 
-    def obj2jsonfp(self, fp, obj, name=None):
+    def obj2jsonfp(self, fp, obj, name=None, params=None, override=None):
         '''Дампит указанный объект базы данных в формат, совместимый с JSON,
         и сразу же записывает в указанный файл. Обёртка над obj2json
 
@@ -408,8 +430,11 @@ class PonyDump(object):
         :param Entity obj: объект из базы данных
         :param str name: название модели объекта в lowercase, рекомендуется
           указать для большей производительности
+        :param dict params: дополнение стандартных аргументов,
+          передаваемых в Pony ORM to_dict
+        :param dict override: замена значений некоторых полей
         '''
-        fp.write(self.obj2json(obj, name, encode=True) + '\n')
+        fp.write(self.obj2json(obj, name, params=params, override=override, encode=True) + '\n')
 
     def dump_entity(self, entity, fp, chunk_size=250, binary_mode=False, sanitizer=None):
         '''Дампит указанную модель в указанный вывод в формате JSON Lines.

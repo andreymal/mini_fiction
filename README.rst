@@ -42,11 +42,12 @@ some settings here:
 
     FLASK_ENV=development
 
-You can override this file using native environment variables:
+You can override this file using native environment variables (example for bash):
 
 .. code::
 
-    FLASK_ENV=production mini_fiction run
+    $ export FLASK_ENV=production
+    $ mini_fiction run
 
 
 Configuration file

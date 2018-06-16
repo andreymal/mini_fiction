@@ -1,4 +1,5 @@
 factory-boy
+pytest-runner
 pytest-selenium
 pytest-flask
 pytest-cov>=2.5.1

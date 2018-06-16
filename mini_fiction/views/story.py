@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 
 import os
+from io import StringIO
 from datetime import datetime
 
 from flask import Blueprint, Response, current_app, request, render_template, abort, redirect, url_for, send_file, jsonify, g
@@ -589,4 +590,49 @@ def download(story_id, filename):
         return send_file(storage_path)
 
     response = Response(data, mimetype=fmt.debug_content_type)
+    return response
+
+
+@bp.route('/<int:story_id>_dump.jsonl', methods=('GET',))
+@db_session
+def download_json(story_id):
+    from mini_fiction.ponydump import JSONEncoder
+
+    story = get_story(story_id)
+
+    je = JSONEncoder(ensure_ascii=False, sort_keys=True)
+    result = StringIO()
+
+    for x in story.bl.dump_only_public(
+        with_chapters=True,
+        with_favorites=False,
+        with_comments=False
+    ):
+        result.write(je.encode(x) + '\n')
+
+    # TODO: определиться с mimetype
+    response = Response(result.getvalue(), mimetype='text/plain')
+    response.headers['X-Robots-Tag'] = 'noindex'
+    return response
+
+
+@bp.route('/<int:story_id>_full_dump.jsonl', methods=('GET',))
+@db_session
+def download_json_full(story_id):
+    from mini_fiction.ponydump import JSONEncoder
+
+    if not current_user.is_superuser:
+        abort(403)
+
+    story = get_story(story_id)
+
+    je = JSONEncoder(ensure_ascii=False, sort_keys=True)
+    result = StringIO()
+
+    for x in story.bl.dump_full(dump_collections=False):
+        result.write(je.encode(x) + '\n')
+
+    # TODO: определиться с mimetype
+    response = Response(result.getvalue(), mimetype='text/plain')
+    response.headers['X-Robots-Tag'] = 'noindex'
     return response

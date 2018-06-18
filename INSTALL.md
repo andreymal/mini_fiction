@@ -3,15 +3,17 @@
 
 ## tl;dr (для тех, кто в теме)
 
-* `cd mini_fiction`
-* `virtualenv env`
-* `. env/bin/activate`
-* `make develop`
-* `mkdir media`
-* `mini_fiction seed`
-* `mini_fiction createsuperuser`
-* `mini_fiction run`
-
+```bash
+cd mini_fiction
+virtualenv --python=python3 env
+. env/bin/activate
+make develop
+mkdir media
+cp local_settings.example.py local_settings.py
+mini_fiction seed
+mini_fiction createsuperuser
+mini_fiction run
+```
 
 ## Быстрый старт (развёртывание минимального окружения для разработки)
 

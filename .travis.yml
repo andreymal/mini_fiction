@@ -16,6 +16,7 @@ before_install:
   - unzip /tmp/chromedriver/chromedriver.zip -d /tmp/chromedriver
   - chmod 700 /tmp/chromedriver/chromedriver
 install:
+  - pip install git+https://github.com/ponyorm/pony.git#egg=pony
   - pip install -r requirements.txt
   - pip install -r optional-requirements.txt
   - pip install -r test-requirements.txt

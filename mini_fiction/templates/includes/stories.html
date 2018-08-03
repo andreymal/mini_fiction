@@ -31,7 +31,7 @@
                     {% endif %}
                 {% endif %}
         </p>
-        <p>{{ story.summary_as_html|striptags }}</p>
+        <p>{{ story.summary|striptags }}</p>
         {% if (stories_detail_view or current_user.detail_view) and story_chapters_count > 1 %}
             <button class="btn btn-collapse btn-small" data-toggle="collapse" data-target="#story-{{ story.id }}">{{ ngettext("Show %(num)d chapter", "Show %(num)d chapters", story_chapters_count) }}</button>
             <div id="story-{{ story.id }}" class="collapse">

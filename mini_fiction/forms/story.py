@@ -40,7 +40,7 @@ class StoryForm(Form):
 
     categories = LazySelectMultipleField(
         'Жанры',
-        choices=lambda: orm.select((x.id, x.name) for x in Category)[:],
+        choices=lambda: list(orm.select((x.id, x.name) for x in Category)),
         widget=StoriesCategorySelect(multiple=True),
         description='',
         coerce=int,
@@ -50,7 +50,7 @@ class StoryForm(Form):
     characters = GroupedModelChoiceField(
         'Персонажи',
         [],
-        choices=lambda: Character.select().prefetch(Character.group).order_by(Character.group, Character.id)[:],
+        choices=lambda: list(Character.select().prefetch(Character.group).order_by(Character.group, Character.id)),
         choices_attrs=('id', 'name'),
         coerce=int,
         group_by_field='group',
@@ -83,7 +83,7 @@ class StoryForm(Form):
 
     rating = LazySelectField(
         'Рейтинг',
-        choices=lambda: orm.select((x.id, x.name) for x in Rating).order_by(-1)[:],
+        choices=lambda: list(orm.select((x.id, x.name) for x in Rating).order_by(-1)),
         coerce=int,
         widget=StoriesButtons(),
         render_kw=radio_attrs,
@@ -108,7 +108,7 @@ class StoryForm(Form):
 
     classifications = LazySelectMultipleField(
         'События',
-        choices=lambda: orm.select((x.id, x.name) for x in Classifier)[:],
+        choices=lambda: list(orm.select((x.id, x.name) for x in Classifier)),
         widget=StoriesCheckboxSelect(multiple=True),
         description='Ключевые события рассказа',
         coerce=int,

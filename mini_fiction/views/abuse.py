@@ -30,9 +30,9 @@ def abuse_common(target_type, target):
     }
 
     # Если пользователь уже отправлял жалобу, то он не может отправить её ещё раз
-    abuse = AbuseReport.select(
+    abuse = list(AbuseReport.select(
         lambda x: x.target_type == target_type and x.target_id == target.id and x.user.id == user.id and not x.ignored
-    )[:]
+    ))
     abuse.sort(key=lambda x: -x.id)
     abuse = abuse[0] if abuse else None
     if abuse:

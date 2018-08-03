@@ -55,8 +55,8 @@ def cached_lists(story_ids):
         })
     else:
         data.update({
-            'favorited_ids': orm.select(x.story.id for x in models.Favorites if x.author.id == current_user.id and x.story.id in story_ids)[:],
-            'bookmarked_ids': orm.select(x.story.id for x in models.Bookmark if x.author.id == current_user.id and x.story.id in story_ids)[:],
+            'favorited_ids': list(orm.select(x.story.id for x in models.Favorites if x.author.id == current_user.id and x.story.id in story_ids)),
+            'bookmarked_ids': list(orm.select(x.story.id for x in models.Bookmark if x.author.id == current_user.id and x.story.id in story_ids)),
             'activities': {x.story.id: x for x in current_user.activity.select(lambda x: x.story.id in story_ids)},
         })
     return data

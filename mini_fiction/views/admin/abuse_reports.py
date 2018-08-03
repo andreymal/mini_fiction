@@ -42,7 +42,7 @@ def index(page):
 
     if request.args.get('username'):
         args['username'] = request.args['username']
-        user_ids = select(x.id for x in models.Author if args['username'].lower() in x.username.lower())[:]
+        user_ids = list(select(x.id for x in models.Author if args['username'].lower() in x.username.lower()))
         objects = objects.filter(lambda x: x.user.id in user_ids)
 
     if request.args.get('status') == 'none':
@@ -104,7 +104,7 @@ def manyupdate():
         return_path = url_for('admin_abuse_reports.index')
 
     abuse_ids = [int(x) for x in request.form.getlist('abuse') if x and x.isdigit()]
-    all_abuses = models.AbuseReport.select(lambda x: x.id in abuse_ids)[:]
+    all_abuses = list(models.AbuseReport.select(lambda x: x.id in abuse_ids))
 
     _update_abuses(all_abuses, user=current_user._get_current_object(), status=request.form.get('status'))
 
@@ -120,9 +120,9 @@ def show(abuse_id):
         abort(404)
 
     if not abuse.ignored:
-        all_abuses = models.AbuseReport.select(
+        all_abuses = list(models.AbuseReport.select(
             lambda x: x.target_type == abuse.target_type and x.target_id == abuse.target_id and not x.ignored
-        )[:]
+        ))
         all_abuses.sort(key=lambda x: -x.id)
         assert abuse in all_abuses
         all_abuses.remove(abuse)

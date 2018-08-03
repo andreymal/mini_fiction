@@ -38,7 +38,7 @@ def index(page):
 
     if request.args.get('username'):
         args['username'] = request.args['username']
-        user_ids = select(x.id for x in Author if args['username'].lower() in x.username.lower())[:]
+        user_ids = list(select(x.id for x in Author if args['username'].lower() in x.username.lower()))
         objects = objects.filter(lambda x: x.author.id in user_ids)
 
     if request.args.get('ip'):
@@ -79,7 +79,7 @@ def manyupdate():
         return_path = url_for('admin_votes.index')
 
     vote_ids = [int(x) for x in request.form.getlist('vote') if x and x.isdigit()]
-    all_votes = Vote.select(lambda x: x.id in vote_ids)[:]
+    all_votes = list(Vote.select(lambda x: x.id in vote_ids))
 
     act = request.form.get('act')
 

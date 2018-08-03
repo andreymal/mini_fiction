@@ -81,7 +81,7 @@ class SearchForm(Form):
     genre = LazySelectMultipleField(
         '',
         [],
-        choices=lambda: orm.select((x.id, x.name) for x in Category)[:],
+        choices=lambda: list(orm.select((x.id, x.name) for x in Category)),
         widget=StoriesCategorySelect(multiple=True),
         description='',
         coerce=int,
@@ -94,7 +94,7 @@ class SearchForm(Form):
     char = GroupedModelChoiceField(
         '',
         [],
-        choices=lambda: Character.select().prefetch(Character.group).order_by(Character.group, Character.id)[:],
+        choices=lambda: list(Character.select().prefetch(Character.group).order_by(Character.group, Character.id)),
         choices_attrs=('id', 'name'),
         coerce=int,
         group_by_field='group',
@@ -136,7 +136,7 @@ class SearchForm(Form):
     rating = LazySelectMultipleField(
         '',
         [],
-        choices=lambda: orm.select((x.id, x.name) for x in Rating).order_by(-1)[:],
+        choices=lambda: list(orm.select((x.id, x.name) for x in Rating).order_by(-1)),
         coerce=int,
         widget=StoriesButtons(multiple=True),
         render_kw=checkbox_attrs,
@@ -146,7 +146,7 @@ class SearchForm(Form):
     cls = LazySelectMultipleField(
         '',
         [],
-        choices=lambda: orm.select((x.id, x.name) for x in Classifier)[:],
+        choices=lambda: list(orm.select((x.id, x.name) for x in Classifier)),
         widget=StoriesCheckboxSelect(multiple=True),
         coerce=int,
         render_kw={'label_attrs': ['checkbox', 'inline']}

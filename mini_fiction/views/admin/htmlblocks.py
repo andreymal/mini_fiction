@@ -21,7 +21,7 @@ def index():
     return render_template(
         'admin/htmlblocks/index.html',
         page_title=gettext('HTML Blocks'),
-        htmlblocks=HtmlBlock.select().order_by(HtmlBlock.name)[:],
+        htmlblocks=list(HtmlBlock.select().order_by(HtmlBlock.name)),
     )
 
 

@@ -58,7 +58,7 @@ def view(pk, comments_page):
             if act else 0
         )
 
-    chapters = story.chapters.select().order_by(Chapter.order, Chapter.id)[:]
+    chapters = list(story.chapters.select().order_by(Chapter.order, Chapter.id))
     if not user.is_staff and not story.bl.is_contributor(user):
         chapters = [x for x in chapters if not x.draft]
 
@@ -336,7 +336,7 @@ def favorites(pk):
     story = get_story(pk)
 
     favorites_list = Favorites.select(lambda x: x.story == story).prefetch(Favorites.author)
-    favorites_list = favorites_list.order_by(Favorites.date)[:]
+    favorites_list = list(favorites_list.order_by(Favorites.date))
 
     return render_template(
         'story_favorites.html',
@@ -392,7 +392,7 @@ def edit(pk):
 
     data = {
         'story_edit': True,
-        'chapters': story.chapters.select().order_by(Chapter.order, Chapter.id)[:],
+        'chapters': list(story.chapters.select().order_by(Chapter.order, Chapter.id)),
         'saved': False,
         'story': story
     }

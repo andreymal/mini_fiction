@@ -59,7 +59,7 @@ def info(user_id=None, comments_page=1):
         template = 'author_overview.html'
 
     comments_count = comments_list.count()
-    series = author.series[:]
+    series = list(author.series)
     paged = Paginator(
         number=comments_page,
         total=comments_count,
@@ -190,7 +190,7 @@ def edit():
                 data['subs_ok'] = True
 
     if not profile_form:
-        contacts = Contact.select(lambda x: x.author == author).order_by(Contact.id)[:]
+        contacts = list(Contact.select(lambda x: x.author == author).order_by(Contact.id))
         profile_form = AuthorEditProfileForm(formdata=None, data={
             'bio': author.bio,
             'contacts': [

@@ -77,7 +77,7 @@ class AuthorEditPrefsForm(Form):
     excluded_categories = LazySelectMultipleField(
         '',
         [],
-        choices=lambda: orm.select((x.id, x.name) for x in Category).order_by(1)[:],
+        choices=lambda: list(orm.select((x.id, x.name) for x in Category).order_by(1)),
         coerce=int,
         widget=StoriesButtons(multiple=True),
         render_kw=checkbox_attrs,

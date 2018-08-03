@@ -884,7 +884,7 @@ class PonyDump(object):
                 if isinstance(getattr(entity, k), orm.core.Set):
                     # Для many зависимостей проверяем совпадение множеств первичных ключей
                     # FIXME: этот запрос наверняка кушает оперативку при большом кол-ве объектов
-                    pks1 = set(x.get_pk() for x in getattr(obj, k).select()[:])
+                    pks1 = set(x.get_pk() for x in list(getattr(obj, k).select()))
                     pks2 = set(x.get_pk() for x in v)
                     if pks1 != pks2:
                         changed_dump = v

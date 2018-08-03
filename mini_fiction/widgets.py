@@ -48,7 +48,7 @@ class StoriesCheckboxSelect(Select):
 
 class StoriesCategorySelect(StoriesCheckboxSelect):
     def render_custom_option(self, field, value, label, selected, label_class):
-        categories = dict(orm.select((c.id, c.color) for c in Category)[:])  # NOTE: Pony ORM caches this
+        categories = dict(orm.select((c.id, c.color) for c in Category))  # NOTE: Pony ORM caches this
         label_attrs = ' style="background-color: %s;"' % categories[value]
         cb = Input('checkbox' if self.multiple else 'radio')  # NOTE: CheckboxInput() is always checked if field.data is present
         rendered_cb = cb(field, checked=selected, value=value, id='{}_{}'.format(field.id, value))
@@ -100,7 +100,7 @@ class StoriesImgSelect(Select):
 
 class StoriesCharacterSelect(StoriesImgSelect):
     def get_img_url(self, field, value):
-        characters = {x.id: x for x in orm.select(c for c in Character)[:]}  # NOTE: Pony ORM caches this
+        characters = {x.id: x for x in orm.select(c for c in Character)}  # NOTE: Pony ORM caches this
         return characters[value].thumb
 
 

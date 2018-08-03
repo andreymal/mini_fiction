@@ -54,7 +54,7 @@ def check_comments_tree(tree, depth=0, root_id=None, parent_id=None):
                 comment.vote_count = vote_count
 
             # Проверка vote_total
-            vote_total = sum(x.vote_value for x in comment.votes.select()[:])
+            vote_total = sum(x.vote_value for x in comment.votes.select())
             if comment.vote_total != vote_total:
                 print(' -{}: vote_total {} -> {}'.format(comment.id, comment.vote_total, vote_total))
                 comment.vote_total = vote_total

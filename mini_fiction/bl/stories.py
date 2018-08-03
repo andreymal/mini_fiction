@@ -71,9 +71,9 @@ class StoryBL(BaseBL, Commentable):
             vote_extra=current_app.story_voting.get_default_vote_extra() if current_app.story_voting else '{}',
         )
         story.flush()
-        story.categories.add(Category.select(lambda x: x.id in data['categories'])[:])
-        story.characters.add(Character.select(lambda x: x.id in data['characters'])[:])
-        story.classifications.add(Classifier.select(lambda x: x.id in data['classifications'])[:])
+        story.categories.add(list(Category.select(lambda x: x.id in data['categories'])))
+        story.characters.add(list(Character.select(lambda x: x.id in data['characters'])))
+        story.classifications.add(list(Classifier.select(lambda x: x.id in data['classifications'])))
         for author in authors:
             StoryContributor(
                 story=story,
@@ -154,7 +154,7 @@ class StoryBL(BaseBL, Commentable):
             if set(old_value) != set(new_value):
                 edited_data['categories'] = [old_value, new_value]
                 story.categories.clear()
-                story.categories.add(Category.select(lambda x: x.id in data['categories'])[:])
+                story.categories.add(list(Category.select(lambda x: x.id in data['categories'])))
                 changed_sphinx_fields.add('category')
 
         if 'characters' in data:
@@ -163,7 +163,7 @@ class StoryBL(BaseBL, Commentable):
             if set(old_value) != set(new_value):
                 edited_data['characters'] = [old_value, new_value]
                 story.characters.clear()
-                story.characters.add(Character.select(lambda x: x.id in data['characters'])[:])
+                story.characters.add(list(Character.select(lambda x: x.id in data['characters'])))
                 changed_sphinx_fields.add('character')
 
         if 'classifications' in data:
@@ -172,7 +172,7 @@ class StoryBL(BaseBL, Commentable):
             if set(old_value) != set(new_value):
                 edited_data['classifications'] = [old_value, new_value]
                 story.classifications.clear()
-                story.classifications.add(Classifier.select(lambda x: x.id in data['classifications'])[:])
+                story.classifications.add(list(Classifier.select(lambda x: x.id in data['classifications'])))
                 changed_sphinx_fields.add('classifier')
 
         if edited_data:
@@ -432,7 +432,7 @@ class StoryBL(BaseBL, Commentable):
         story.comments.select().order_by(StoryComment.id.desc()).delete(bulk=False)  # поня не может bulk
 
         if local_thread_id is not None:
-            local_comment_ids = orm.select(x.id for x in StoryLocalComment if x.local.id == local_thread_id)[:]
+            local_comment_ids = list(orm.select(x.id for x in StoryLocalComment if x.local.id == local_thread_id))
             Notification.select(
                 lambda x: x.type in ('story_lreply', 'story_lcomment') and x.target_id in local_comment_ids
             ).delete(bulk=True)
@@ -473,7 +473,7 @@ class StoryBL(BaseBL, Commentable):
             'last_comment_id': last_comment.id if last_comment else 0,
         }
 
-        acts = Activity.select(lambda x: x.story == story and x.author == user)[:]
+        acts = list(Activity.select(lambda x: x.story == story and x.author == user))
         if acts:
             for act in acts[1:]:
                 # Если по каким-то причинам сайт лаганул и насоздавал активитей, то удаляем лишнее
@@ -549,7 +549,7 @@ class StoryBL(BaseBL, Commentable):
         # TODO: optimize it
         from mini_fiction.models import StoryContributor, StoryView
 
-        story_ids = orm.select(x.story.id for x in StoryContributor if x.user == author and x.is_author)
+        story_ids = list(orm.select(x.story.id for x in StoryContributor if x.user == author and x.is_author))
         return StoryView.select(lambda x: x.story.id in story_ids).count()
 
     def select_accessible(self, user):
@@ -1164,10 +1164,10 @@ class StoryBL(BaseBL, Commentable):
 
     def select_comment_votes(self, author, comment_ids):
         from mini_fiction.models import StoryCommentVote
-        votes = orm.select(
+        votes = list(orm.select(
             (v.comment.id, v.vote_value) for v in StoryCommentVote
             if v.author.id == author.id and v.comment.id in comment_ids
-        )[:]
+        ))
         votes = dict(votes)
         return {i: votes.get(i, 0) for i in comment_ids}
 
@@ -1263,7 +1263,7 @@ class StoryBL(BaseBL, Commentable):
             current_app.cache.set('all_story_ids', ids, 300)
         if len(ids) > count:
             ids = random.sample(ids, count)
-        stories = Story.select(lambda x: x.id in ids).prefetch(Story.characters, Story.categories)[:]
+        stories = list(Story.select(lambda x: x.id in ids).prefetch(Story.characters, Story.categories))
         random.shuffle(stories)
         return stories
 
@@ -1605,10 +1605,10 @@ class ChapterBL(BaseBL):
             return chapter.text
 
         # Если не совпало, то собираем диффы с логов для отката с новой версии на старую
-        logs = orm.select(
+        logs = list(orm.select(
             (x.created_at, x.chapter_text_diff) for x in StoryLog
             if x.chapter == chapter and x.created_at >= log_item.created_at
-        ).order_by(-1)[:]
+        ).order_by(-1))
 
         chapter_text = chapter.text
         # Последовательно откатываем более новые изменения у нового текста, получая таким образом старый

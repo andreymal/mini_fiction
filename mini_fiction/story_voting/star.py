@@ -37,8 +37,7 @@ class StarVoting(BaseVoting):
     def update_rating(self, story):
         from mini_fiction.models import Vote
 
-        votes = orm.select(x.vote_value for x in Vote if x.story == story and x.revoked_at is None)
-        votes = votes.without_distinct()[:]
+        votes = orm.select(x.vote_value for x in Vote if x.story == story and x.revoked_at is None).without_distinct()
         votes = [min(x, current_app.config['VOTING_MAX_VALUE']) for x in votes]
         votes = [max(1, x) for x in votes]
         m = mean(votes) if votes else 3.0

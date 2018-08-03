@@ -50,7 +50,7 @@ class Commentable(object):
                 return []
 
             # FIXME: filter не дружит с select_comment_ids, но оптимизировать нужно
-            comment_ids = self.select_comments().filter(lambda x: x.tree_depth == 0).order_by('c.id')[:]
+            comment_ids = self.select_comments().filter(lambda x: x.tree_depth == 0).order_by('c.id')
             comment_ids = [c.id for c in comment_ids]
             if not comment_ids or len(comment_ids) <= root_offset:
                 return []
@@ -67,7 +67,7 @@ class Commentable(object):
             result = result.filter(lambda x: x.root_id == root_id)
 
         result = result.order_by('c.id')
-        return result[:]
+        return list(result)
 
     def get_comments_tree(self, maxdepth=None, root_offset=None, root_count=None, root_id=None, last_viewed_comment=None):
         # Примечание: избегайте использования c.root_id и c.tree_depth в этом методе

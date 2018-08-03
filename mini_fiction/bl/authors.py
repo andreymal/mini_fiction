@@ -168,7 +168,7 @@ class AuthorBL(BaseBL):
 
             from mini_fiction.models import Contact
 
-            old_contacts = Contact.select(lambda x: x.author == user).order_by(Contact.id)[:]
+            old_contacts = list(Contact.select(lambda x: x.author == user).order_by(Contact.id))
             while len(old_contacts) > lenc:
                 old_contacts.pop().delete()
 

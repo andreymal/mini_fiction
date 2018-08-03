@@ -125,9 +125,9 @@ def update(pk):
             author.bl.set_password(password_edit_form.data['new_password_1'])
             saved = True
 
-    prps = PasswordResetProfile.select(
+    prps = list(PasswordResetProfile.select(
         lambda x: x.user == author and not x.activated and x.date > datetime.utcnow() - timedelta(days=current_app.config['ACCOUNT_ACTIVATION_DAYS'])
-    )[:]
+    ))
     prp_links = [url_for('auth.password_reset_confirm', activation_key=prp.activation_key, _external=True) for prp in prps]
 
     return render_template(

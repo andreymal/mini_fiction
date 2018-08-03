@@ -97,10 +97,10 @@ def stories(offset):
     items = []
 
     # Собираем ссылки на рассказы
-    stories = select(
+    stories = list(select(
         (x.id, x.first_published_at, x.updated) for x in Story
         if x.id >= min_id and x.id < max_id and not x.draft and x.approved and not x.robots_noindex
-    )[:]
+    ))
     story_ids = [x[0] for x in stories]
     stories.sort(key=lambda x: x[1], reverse=True)
 
@@ -129,10 +129,10 @@ def stories(offset):
         })
 
     # Собираем ссылки на главы
-    chapters = select(
+    chapters = list(select(
         (x.story.id, x.order, x.first_published_at, x.updated) for x in Chapter
         if x.story.id in story_ids and not x.draft
-    )[:]
+    ))
     chapters.sort(key=lambda x: x[2], reverse=True)
 
     for story_id, chapter_order, first_published_at, updated_at in chapters:

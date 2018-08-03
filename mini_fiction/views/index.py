@@ -17,7 +17,7 @@ bp = Blueprint('index', __name__)
 def index():
     page_title = gettext('Index')
 
-    categories = Category.select()[:]
+    categories = list(Category.select())
 
     pinned_stories = list(
         Story.select_published().filter(lambda x: x.pinned).order_by(Story.first_published_at.desc())
@@ -25,7 +25,8 @@ def index():
 
     stories = Story.select_published().filter(lambda x: not x.pinned).order_by(Story.first_published_at.desc())
     stories = stories.prefetch(Story.characters, Story.categories, Story.contributors, StoryContributor.user)
-    stories = pinned_stories + stories[:max(1, current_app.config['STORIES_COUNT']['main'] - len(pinned_stories))]
+    stories = stories[:max(1, current_app.config['STORIES_COUNT']['main'] - len(pinned_stories))]
+    stories = pinned_stories + list(stories)
 
     # Старая логика, при которой могли выводиться много глав одного рассказа подряд
     # chapters = select(c for c in Chapter if not c.draft and c.story_published and c.order != 1)
@@ -45,11 +46,11 @@ def index():
 
         # Забираем последнюю главу каждого рассказа
         # (TODO: наверняка можно оптимизировать, но не придумалось как)
-        latest_chapters = select(
+        latest_chapters = list(select(
             (c.story.id, c.id, c.first_published_at, c.order)
             for c in Chapter
             if not c.draft and c.story_published and c.story.id in index_updated_story_ids
-        ).order_by(-3, -4)[:]
+        ).order_by(-3, -4))
 
         index_updated_chapter_ids = []
         for story_id in index_updated_story_ids:
@@ -86,7 +87,7 @@ def index():
             })
         current_app.cache.set('index_updated_chapters', chapters, 600)
 
-    news = NewsItem.select().order_by(NewsItem.id.desc())[:3]
+    news = list(NewsItem.select().order_by(NewsItem.id.desc())[:3])
 
     comments_html = current_app.cache.get('index_comments_html')
 

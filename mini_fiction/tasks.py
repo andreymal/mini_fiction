@@ -249,7 +249,7 @@ def notify_author_story(story_id, publisher_user_id=None):
     author_ids = [x.id for x in story.bl.get_authors()]
 
     # Получаем подписчиков, ждущих новые рассказы автора
-    subs = models.Subscription.select(lambda x: x.type == 'author_story' and x.target_id in author_ids)[:]
+    subs = list(models.Subscription.select(lambda x: x.type == 'author_story' and x.target_id in author_ids))
 
     sendto = set()  # Список почт для отправки
 
@@ -280,7 +280,7 @@ def notify_author_story(story_id, publisher_user_id=None):
 @db_session
 def notify_story_chapters(chapter_ids, publisher_user_id=None):
     # Получаем главы и проверяем адекватность
-    chapters = models.Chapter.select(lambda x: x.id in chapter_ids)[:]
+    chapters = list(models.Chapter.select(lambda x: x.id in chapter_ids))
     if not chapters:
         return
     story = chapters[0].story
@@ -290,7 +290,7 @@ def notify_story_chapters(chapter_ids, publisher_user_id=None):
     chapters.sort(key=lambda x: x.order)
 
     # Получаем подписчиков, ждущих главы
-    subs = models.Subscription.select(lambda x: x.type == 'story_chapter' and x.target_id == story.id)[:]
+    subs = list(models.Subscription.select(lambda x: x.type == 'story_chapter' and x.target_id == story.id))
 
     sendto = set()  # Список почт для отправки
 
@@ -344,7 +344,7 @@ def notify_story_comment(comment_id):
                 reply_sent_email = True
 
     # Уведомляем остальных подписчиков о появлении нового комментария
-    subs = models.Subscription.select(lambda x: x.type == 'story_comment' and x.target_id == story.id)[:]
+    subs = list(models.Subscription.select(lambda x: x.type == 'story_comment' and x.target_id == story.id))
 
     sendto = set()
     for sub in subs:
@@ -404,7 +404,7 @@ def notify_story_lcomment(comment_id):
                 reply_sent_email = True
 
     # Уведомляем остальных подписчиков о появлении нового комментария
-    subs = models.Subscription.select(lambda x: x.type == 'story_lcomment' and x.target_id == story.id)[:]
+    subs = list(models.Subscription.select(lambda x: x.type == 'story_lcomment' and x.target_id == story.id))
 
     sendto = set()
     for sub in subs:
@@ -452,7 +452,7 @@ def notify_news_comment(comment_id):
             reply_sent_email = True
 
     # Уведомляем остальных подписчиков о появлении нового комментария
-    subs = models.Subscription.select(lambda x: x.type == 'news_comment' and x.target_id == newsitem.id)[:]
+    subs = list(models.Subscription.select(lambda x: x.type == 'news_comment' and x.target_id == newsitem.id))
 
     sendto = set()
     for sub in subs:

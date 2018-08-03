@@ -52,7 +52,7 @@ class CharacterForm(Form):
 
     group = LazySelectField(
         lazy_gettext('Group'),
-        choices=lambda: orm.select((x.id, x.name) for x in CharacterGroup)[:],
+        choices=lambda: list(orm.select((x.id, x.name) for x in CharacterGroup)),
         coerce=int,
     )
 

@@ -158,10 +158,10 @@ class NewsItemBL(BaseBL, Commentable):
 
     def select_comment_votes(self, author, comment_ids):
         from mini_fiction.models import NewsCommentVote
-        votes = orm.select(
+        votes = list(orm.select(
             (v.comment.id, v.vote_value) for v in NewsCommentVote
             if v.author.id == author.id and v.comment.id in comment_ids
-        )[:]
+        ))
         votes = dict(votes)
         return {i: votes.get(i, 0) for i in comment_ids}
 

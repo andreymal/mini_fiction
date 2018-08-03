@@ -61,7 +61,7 @@ class BaseCommentBL(BaseBL):
 
         # FIXME: filter не дружит с select_comment_ids, но оптимизировать нужно
         comment_ids = getattr(c, self.target_attr).bl.select_comments()
-        comment_ids = comment_ids.filter(lambda x: x.tree_depth == 0).order_by('c.id')[:]
+        comment_ids = comment_ids.filter(lambda x: x.tree_depth == 0).order_by('c.id')
         comment_ids = [c.id for c in comment_ids]
 
         try:

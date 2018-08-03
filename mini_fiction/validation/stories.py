@@ -26,7 +26,7 @@ STORY = {
         'schema': {
             'type': 'integer',
             'coerce': int,
-            'allowed_func': lambda: orm.select(x.id for x in models.Category)[:],
+            'allowed_func': lambda: list(orm.select(x.id for x in models.Category)),
         },
         'error_messages': {
             'required': 'Жанры - обязательное поле',
@@ -39,7 +39,7 @@ STORY = {
         'schema': {
             'type': 'integer',
             'coerce': int,
-            'allowed_func': lambda: orm.select(x.id for x in models.Character)[:],
+            'allowed_func': lambda: list(orm.select(x.id for x in models.Character)),
         },
     },
     'summary': {
@@ -83,7 +83,7 @@ STORY = {
         'type': 'integer',
         'required': True,
         'coerce': int,
-        'allowed_func': lambda: orm.select(x.id for x in models.Rating)[:],
+        'allowed_func': lambda: list(orm.select(x.id for x in models.Rating)),
         'error_messages': {
             'required': 'Нужно обязательно указать рейтинг рассказа!',
         },
@@ -110,7 +110,7 @@ STORY = {
         'schema': {
             'type': 'integer',
             'coerce': int,
-            'allowed_func': lambda: orm.select(x.id for x in models.Classifier)[:],
+            'allowed_func': lambda: list(orm.select(x.id for x in models.Classifier)),
         },
     },
 }

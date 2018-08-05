@@ -157,6 +157,15 @@
                         {% endif %}
                       </div>
                 </div>
+
+                <!-- Symlink'ed by now -->
+                <script async src="{{ url_for('static', filename='js/story.bundle.js') }}"></script>
+                <!-- Tags -->
+                <div class="control-group">
+                    <label class="control-label">Теги</label>
+                    <div class="controls" data-bazooka="storyTags"></div>
+                </div>
+
                 <!-- Не завершен/завершен/заморожен -->
                 <div class="control-group{% if form.status.errors %} error{% endif %}">
                     {{ form.status.label(class_='control-label', for=False) }}

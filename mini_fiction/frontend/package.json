@@ -1,0 +1,43 @@
+{
+  "name": "mini_fiction",
+  "version": "1.0.0",
+  "description": "Frontend components",
+  "main": "index.js",
+  "scripts": {
+    "webpack": "webpack --progress",
+    "webpack:watch": "webpack --progress --watch",
+    "build": "NODE_ENV=production webpack --progress -p --display-modules --display-chunks",
+    "lint": "eslint src test"
+  },
+  "author": {
+    "name": "Andriy Kushnir (Orhideous)",
+    "email": "me@orhideous.name",
+    "url": "https://orhideous.name/"
+  },
+  "license": "ISC",
+  "dependencies": {
+    "autobind-decorator": "^2.1.0",
+    "bazooka": "^0.9.0",
+    "classnames": "^2.2.6",
+    "preact": "^8.2.9",
+    "preact-compat": "^3.18.2",
+    "react-autosuggest": "^9.3.4",
+    "react-tagsinput": "^3.19.0"
+  },
+  "devDependencies": {
+    "babel-eslint": "^8.2.6",
+    "babel-loader": "^7.1.5",
+    "babel-plugin-transform-decorators-legacy": "^1.3.5",
+    "babel-plugin-transform-object-rest-spread": "^6.26.0",
+    "babel-plugin-transform-react-jsx": "^6.24.1",
+    "babel-preset-env": "^1.7.0",
+    "babel-register": "^6.26.0",
+    "eslint": "^4.19.1",
+    "eslint-config-airbnb": "^17.0.0",
+    "eslint-plugin-import": "^2.13.0",
+    "eslint-plugin-react": "^7.10.0",
+    "source-map-loader": "^0.2.3",
+    "webpack": "^4.16.4",
+    "webpack-cli": "^3.1.0"
+  }
+}

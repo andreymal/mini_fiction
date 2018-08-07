@@ -38,18 +38,27 @@ background = #fff
   cursor pointer
   font-weight bold
 
-.dropdown-container
+.react-autosuggest__suggestions-container
   margin 0.15em
   border 1px solid
   position absolute
   z-index 1000
   background background
+  visibility hidden
 
-.dropdown-list
+.react-autosuggest__suggestions-container--open
+  visibility visible
+
+.react-autosuggest__suggestions-list
   padding 0.3em
   display flex
   flex-direction column
+  list-style none
+  margin 0
 
-.dropdown-item
+.react-autosuggest__suggestion
   border 1px solid blue
   margin 0.15em 0
+
+.react-autosuggest__suggestion--highlighted
+  background gold

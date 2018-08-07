@@ -15,7 +15,7 @@ dumpdb_params = {
     'story': {'exclude': (
         'edit_log', 'story_views_set', 'votes', 'favorites', 'bookmarks',
         'comments', 'activity', 'local', 'in_series_permissions',
-        'contributors', 'chapters',
+        'contributors', 'chapters', 'tags', 'tags_log',
     )},
     'author': {'exclude': (
         'activity', 'edit_log',
@@ -30,7 +30,8 @@ dumpdb_params = {
         'contacts', 'subscriptions', 'notifications',
         'created_notifications', 'published_stories', 'approvals',
         'change_email_profiles', 'password_reset_profiles',
-        'abuse_reports', 'admin_log',
+        'abuse_reports', 'admin_log', 'tags_created', 'tags_aliases',
+        'tags_blacklist', 'tags_log',
     )},
     'chapter': {'exclude': (
         'edit_log', 'chapter_views_set',
@@ -50,14 +51,20 @@ dumpdb_params = {
     'newscomment': {'exclude': (
         'answers', 'edits', 'votes',
     )},
-    'category': {'exclude': (
-        'stories',
-    )},
+    #'category': {'exclude': (
+    #    'stories',
+    #)},
     'character': {'exclude': (
         'stories',
     )},
-    'classifier': {'exclude': (
-        'stories',
+    #'classifier': {'exclude': (
+    #    'stories',
+    #)},
+    'tagcategory': {'exclude': (
+        'tags',
+    )},
+    'tag': {'exclude': (
+        'aliases', 'stories', 'log',
     )},
     'rating': {'exclude': (
         'stories',
@@ -91,13 +98,33 @@ zip_dump_params = {
         'exclude': ('stories',),
         'media': ('picture',),
     },
-    'category': {
-        'include': ('id', 'name', 'description', 'color'),
-        'exclude': ('stories',),
+    #'category': {
+    #    'include': ('id', 'name', 'description', 'color'),
+    #    'exclude': ('stories',),
+    #},
+    #'classifier': {
+    #    'include': ('id', 'name', 'description'),
+    #    'exclude': ('stories',),
+    #},
+    'tagcategory': {
+        'include': ('id', 'name', 'color', 'description', 'created_at', 'updated_at'),
+        'exclude': ('tags',),
     },
-    'classifier': {
-        'include': ('id', 'name', 'description'),
-        'exclude': ('stories',),
+    'tag': {
+        'include': (
+            'id', 'name', 'iname', 'category', 'color', 'description',
+            'is_main_tag', 'created_at', 'updated_at',
+        ),
+        'exclude': (
+            'created_by', 'stories_count', 'published_stories_count',
+            'aliases', 'stories', 'log',
+        ),
+    },
+    'tagalias': {
+        'include': (
+            'id', 'name', 'iname', 'tag', 'created_at',
+        ),
+        'exclude': ('created_by',),
     },
     'rating': {
         'include': ('id', 'name', 'description', 'nsfw'),

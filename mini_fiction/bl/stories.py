@@ -1248,7 +1248,7 @@ class StoryBL(BaseBL, Commentable):
 
     # misc
 
-    def get_random(self, count=10):
+    def get_random(self, count=10, prefetch=()):
         # это быстрее, чем RAND() в MySQL
         from mini_fiction.models import Story
 
@@ -1260,7 +1260,10 @@ class StoryBL(BaseBL, Commentable):
             current_app.cache.set('all_story_ids', ids, 300)
         if len(ids) > count:
             ids = random.sample(ids, count)
-        stories = list(Story.select(lambda x: x.id in ids).prefetch(Story.characters, Story.categories))
+        q = Story.select(lambda x: x.id in ids)
+        if prefetch:
+            q = q.prefetch(*prefetch)
+        stories = list(q)
         random.shuffle(stories)
         return stories
 

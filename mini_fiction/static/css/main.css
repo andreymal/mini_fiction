@@ -764,6 +764,7 @@ h1 .alert {
     display: inline-block;
     line-height: 16px;
     margin: 0 4px 4px 0;
+    background-color: #35B450;
 }
 
 .error .gen {
@@ -777,7 +778,7 @@ p.meta .gen {
 
 a.gen:hover {
     color: #fff;
-    background-color: #999;
+    background-color: #999 !important;
 }
 
 label.gen {

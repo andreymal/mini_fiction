@@ -9,7 +9,7 @@
 
 <div class="row">
     <div class="span8">
-        <h2>{{ page_title }}</h2>
+        {% block list_title %}<h2>{{ page_title }}</h2>{% endblock %}
         {% block before_list %}{% endblock %}
         <div id="stories-list">
             {% include "includes/stories.html" %}

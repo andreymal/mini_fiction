@@ -70,7 +70,7 @@ class StoryBL(BaseBL, Commentable):
             vote_value=current_app.story_voting.get_default_vote_value() if current_app.story_voting else 0,
             vote_extra=current_app.story_voting.get_default_vote_extra() if current_app.story_voting else '{}',
         )
-        story.flush()
+        story.flush()  # получаем id у базы данных
         story.categories.add(list(Category.select(lambda x: x.id in data['categories'])))
         story.characters.add(list(Character.select(lambda x: x.id in data['characters'])))
         story.classifications.add(list(Classifier.select(lambda x: x.id in data['classifications'])))
@@ -340,6 +340,7 @@ class StoryBL(BaseBL, Commentable):
 
     def first_publish(self, tm=None, caused_by_user=None):
         # Метод для действий при первой публикации рассказа
+        # (главы обрабатываются отдельно)
 
         story = self.model
         assert story.first_published_at is None

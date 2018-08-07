@@ -184,12 +184,42 @@ class StoryBL(BaseBL, Commentable):
             self.edit_log(editor, edited_data)
 
         if old_published != story.published:
-            for c in story.chapters:
-                c.story_published = story.published
+            self._publish_changed_event(caused_by_user=editor)
 
         if changed_sphinx_fields:
             later(current_app.tasks['sphinx_update_story'].delay, story.id, tuple(changed_sphinx_fields))
         return story
+
+    def _publish_changed_event(self, caused_by_user=None, tm=None):
+        # Этот метод вызывается, когда story.published изменился
+
+        if tm is None:
+            tm = datetime.utcnow()
+
+        story = self.model
+        published = story.published
+
+        # Если это самая первая публикация, то обновляем даты
+        if published and not story.first_published_at:
+            story.bl.first_publish(tm=tm, caused_by_user=caused_by_user)
+
+        # Обновляем статус публикации рассказа в главах
+        # (собираем id для уведомления о публикации глав)
+        published_chapter_ids = []
+        for c in sorted(story.chapters, key=lambda c: c.order):
+            c.story_published = published
+            if published and not c.draft and not c.first_published_at:  # Если глава публикуется впервые
+                c.bl.first_publish(tm=tm, notify=False, caused_by_user=caused_by_user)  # Уведомления разошлём сами чуть ниже
+                published_chapter_ids.append(c.id)
+
+        if published_chapter_ids:
+            later(current_app.tasks['notify_story_chapters'].delay, published_chapter_ids, caused_by_user.id if caused_by_user else None)
+
+        for c in story.comments:  # TODO: update StoryComment where story = story.id
+            c.story_published = published
+
+        current_app.cache.delete('index_updated_chapters')
+        current_app.cache.delete('index_comments_html')
 
     def approve(self, user, approved):
         # TODO: с publish() очень много общего, можно вынести общее в отдельную функцию
@@ -226,24 +256,8 @@ class StoryBL(BaseBL, Commentable):
 
         if old_published != story.published:
             if story.published and not story.first_published_at:
-                story.bl.first_publish(tm=tm, caused_by_user=user)
                 changed_sphinx_fields.add('first_published_at')
-
-            published_chapter_ids = []
-            for c in sorted(story.chapters, key=lambda c: c.order):
-                c.story_published = story.published
-                if story.published and not c.draft and not c.first_published_at:
-                    c.bl.first_publish(tm=tm, notify=False, caused_by_user=user)  # Уведомления разошлём сами чуть ниже
-                    published_chapter_ids.append(c.id)
-
-            if published_chapter_ids:
-                later(current_app.tasks['notify_story_chapters'].delay, published_chapter_ids, user.id if user else None)
-
-            for c in story.comments:  # TODO: update StoryComment where story = story.id
-                c.story_published = story.published
-
-            current_app.cache.delete('index_updated_chapters')
-            current_app.cache.delete('index_comments_html')
+            self._publish_changed_event(caused_by_user=user, tm=tm)
 
         if changed_sphinx_fields:
             later(current_app.tasks['sphinx_update_story'].delay, story.id, tuple(changed_sphinx_fields))
@@ -315,25 +329,8 @@ class StoryBL(BaseBL, Commentable):
             changed_sphinx_fields = {'draft',}
             if old_published != story.published:
                 if story.published and not story.first_published_at:
-                    story.bl.first_publish(tm=tm, caused_by_user=user)
                     changed_sphinx_fields.add('first_published_at')
-
-                published_chapter_ids = []
-                for c in sorted(story.chapters, key=lambda c: c.order):
-                    c.story_published = story.published
-                    if story.published and not c.draft and not c.first_published_at:
-                        c.bl.first_publish(tm=tm, notify=False, caused_by_user=user)  # Уведомления разошлём сами чуть ниже
-                        published_chapter_ids.append(c.id)
-                    later(current_app.tasks['sphinx_update_chapter'].delay, c.id)
-
-                if published_chapter_ids:
-                    later(current_app.tasks['notify_story_chapters'].delay, published_chapter_ids, user.id if user else None)
-
-                for c in story.comments:
-                    c.story_published = story.published
-
-                current_app.cache.delete('index_updated_chapters')
-                current_app.cache.delete('index_comments_html')
+                self._publish_changed_event(caused_by_user=user, tm=tm)
 
             later(current_app.tasks['sphinx_update_story'].delay, story.id, tuple(changed_sphinx_fields))
 

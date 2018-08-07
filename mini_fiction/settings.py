@@ -92,6 +92,18 @@ class Config(object):
     PASSWORD_HASHER = 'pbkdf2'  # or 'bcrypt' or 'scrypt'
     PBKDF2_ITERATIONS = 200000
 
+    NORMALIZED_TAGS_WHITELIST = (
+        '_-()×°'
+        '0123456789'
+        'abcdefghijklmnopqrstuvwxyz'
+        'àáâãäåæçèéêëìíîïðñòóôõöøùúûüýþÿß'
+        'абвгдеёжзийклмнопрстуфхцчшщъыьэюя'
+        'ґєії'
+    )
+    NORMALIZED_TAGS_DELIMETERS = (
+        ' \u00a0/\\—–[]<>:;?!%&@*+=«»|'
+    )
+
     SERVER_NAME = 'localhost:5000'
     PREFERRED_URL_SCHEME = 'http'
     SITE_NAME = {

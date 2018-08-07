@@ -594,3 +594,19 @@ def timedelta_format(tm):
     if minus:
         s = '-' + s
     return s
+
+
+def normalize_tag(s, whitelist=None, delimeters=None):
+    from mini_fiction.validation.utils import safe_string_coerce
+
+    if whitelist is None:
+        whitelist = current_app.config['NORMALIZED_TAGS_WHITELIST']
+    if delimeters is None:
+        delimeters = current_app.config['NORMALIZED_TAGS_DELIMETERS']
+    s = ''.join((
+        x if x in whitelist else ('_' if x in delimeters else '')
+        for x in safe_string_coerce(s.lower()).strip()
+    ))
+    while '__' in s:
+        s = s.replace('__', '_')
+    return s.strip('_') or None

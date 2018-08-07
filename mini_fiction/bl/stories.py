@@ -193,11 +193,20 @@ class StoryBL(BaseBL, Commentable):
     def _publish_changed_event(self, caused_by_user=None, tm=None):
         # Этот метод вызывается, когда story.published изменился
 
+        from mini_fiction.models import StoryTag
+
         if tm is None:
             tm = datetime.utcnow()
 
         story = self.model
         published = story.published
+
+        # Обновляем число рассказов в тегах
+        for story_tag in story.tags.select().prefetch(StoryTag.tag):
+            if published:
+                story_tag.tag.published_stories_count += 1
+            else:
+                story_tag.tag.published_stories_count -= 1
 
         # Если это самая первая публикация, то обновляем даты
         if published and not story.first_published_at:
@@ -378,7 +387,7 @@ class StoryBL(BaseBL, Commentable):
             current_app.cache.delete('index_updated_chapters')
 
     def delete(self, user=None):
-        from mini_fiction.models import Chapter, StoryComment, StoryCommentVote, StoryCommentEdit
+        from mini_fiction.models import StoryTag, Chapter, StoryComment, StoryCommentVote, StoryCommentEdit
         from mini_fiction.models import StoryLocalComment, StoryLocalCommentEdit, Subscription, Notification
 
         story = self.model
@@ -403,6 +412,15 @@ class StoryBL(BaseBL, Commentable):
 
         story_id = story.id  # Вроде бы обход утечки памяти
         local_thread_id = story.local.id if story.local else None
+
+        # Обновляем счётчики рассказов в тегах
+        for story_tag in story.tags.select().prefetch(StoryTag.tag):
+            story_tag.tag.stories_count -= 1
+            if story.published:
+                story_tag.tag.published_stories_count -= 1
+
+        # Удаляем лог изменений тегов
+        story.tags_log.select().delete(bulk=True)
 
         # Неявная связь с подписками
         Subscription.select(
@@ -1133,6 +1151,26 @@ class StoryBL(BaseBL, Commentable):
                     ]},
                     override=comment_override,
                 )
+
+    # tags
+
+    def get_tags_list(self, sort=False):
+        result = list(self.model.tags)  # Не используем select, потому что во вьюхах уже мог быть prefetch
+        if sort:
+            result.sort(key=lambda x: (x.tag.category.id if x.tag.category else 2 ** 31, x.tag.iname))
+        return result
+
+    def select_by_tag(self, tag, user=None):
+        from mini_fiction.models import Tag, StoryTag
+
+        tag = Tag.bl.get_tags_objects([tag], create=False)[0]
+        if not tag:
+            return orm.select(x.story for x in StoryTag if False)  # pylint: disable=W0125
+
+        q = orm.select(x.story for x in StoryTag if x.tag == tag)
+        if not user or not user.is_staff:
+            q = q.filter(lambda s: not s.draft and s.approved)
+        return q
 
     # comments
 

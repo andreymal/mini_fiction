@@ -122,6 +122,10 @@ class Author(db.Entity, UserMixin):
     subscriptions = orm.Set('Subscription')
     abuse_reports = orm.Set('AbuseReport')
     admin_log = orm.Set('AdminLog')
+    tags_created = orm.Set('Tag')
+    tags_aliases = orm.Set('TagAlias')
+    tags_blacklist = orm.Set('TagBlacklist')
+    tags_log = orm.Set('StoryTagLog')
 
     bl = Resource('bl.author')
 
@@ -276,6 +280,110 @@ class Rating(db.Entity):
         return self.name
 
 
+class TagCategory(db.Entity):
+    """ Модель категории тега """
+
+    name = orm.Required(str, 255)
+    color = orm.Optional(str, 7)
+    description = orm.Optional(orm.LongStr)
+    created_at = orm.Required(datetime, 6, default=datetime.utcnow)
+    updated_at = orm.Required(datetime, 6, default=datetime.utcnow)
+
+    tags = orm.Set('Tag')
+
+    def __str__(self):
+        return self.name
+
+
+class Tag(db.Entity):
+    """ Модель тега рассказа """
+
+    name = orm.Required(str, 255)  # fancy human-readable name
+    iname = orm.Required(str, 32, unique=True)  # normalized lowercase name
+    category = orm.Optional(TagCategory)
+    color = orm.Optional(str, 7)
+    description = orm.Optional(orm.LongStr)
+    is_main_tag = orm.Required(bool, default=False)
+    created_at = orm.Required(datetime, 6, default=datetime.utcnow)
+    updated_at = orm.Required(datetime, 6, default=datetime.utcnow)
+    created_by = orm.Optional(Author)
+    stories_count = orm.Required(int, unsigned=True, default=0)
+    published_stories_count = orm.Required(int, unsigned=True, default=0)
+
+    aliases = orm.Set('TagAlias')
+    stories = orm.Set('StoryTag')
+    log = orm.Set('StoryTagLog')
+
+    bl = Resource('bl.tag')
+
+    def __str__(self):
+        return self.name
+
+    def __repr__(self):
+        return '<Tag: {}>'.format(str(self))
+
+    def get_color(self):
+        if self.color:
+            return self.color
+        if self.category and self.category.color:
+            return self.category.color
+        return ''
+
+
+class TagAlias(db.Entity):
+    """ Модель синонимов тега """
+
+    name = orm.Required(str, 255)
+    iname = orm.Required(str, 32, unique=True)
+    tag = orm.Required(Tag)
+    created_at = orm.Required(datetime, 6, default=datetime.utcnow)
+    created_by = orm.Optional(Author)
+
+    def __str__(self):
+        return '{} -> {}'.format(self.iname, self.tag.name)
+
+    def __repr__(self):
+        return '<TagAlias: {}>'.format(str(self))
+
+
+class TagBlacklist(db.Entity):
+    """ Модель для хранения запрещённых тегов """
+
+    iname = orm.Required(str, 32, unique=True)
+    created_at = orm.Required(datetime, 6, default=datetime.utcnow)
+    created_by = orm.Optional(Author)
+
+    def __str__(self):
+        return self.iname
+
+    def __repr__(self):
+        return '<TagBlacklist: {}>'.format(str(self))
+
+
+class StoryTag(db.Entity):
+    """ Модель, хранящая действующие теги рассказа """
+
+    story = orm.Required('Story')
+    tag = orm.Required(Tag)
+    created_at = orm.Required(datetime, 6, default=datetime.utcnow)
+
+    orm.composite_key(story, tag)
+
+
+class StoryTagLog(db.Entity):
+    """ Модель изменения действующих тегов рассказа """
+
+    ADDITION = 1
+    DELETION = 2
+
+    story = orm.Required('Story')
+    tag = orm.Optional(Tag)  # если тег ещё существует
+    tag_name = orm.Optional(str, 255)  # если тег удалён или синонимизирован
+    action_flag = orm.Required(int)
+    modified_by = orm.Optional(Author)
+    date = orm.Required(datetime, 6, default=datetime.utcnow)
+
+
 class InSeriesPermissions(db.Entity):
     """ Промежуточная модель хранения взаимосвязей рассказов, серий и разрешений на добавления рассказов в серии """
 
@@ -325,6 +433,8 @@ class Story(db.Entity):
     characters = orm.Set(Character)
     categories = orm.Set(Category)
     classifications = orm.Set(Classifier)
+    tags = orm.Set(StoryTag)
+    tags_log = orm.Set(StoryTagLog)
     cover = orm.Required(bool, default=False)
     date = orm.Required(datetime, 6, default=datetime.utcnow)
     first_published_at = orm.Optional(datetime, 6, index=True)

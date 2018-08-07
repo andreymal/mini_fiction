@@ -1,0 +1,34 @@
+{% extends base %}
+{% from 'macro.html' import breadcrumbs with context %}
+{% block content %}
+
+<div class="row">
+    <div class="span12">
+        {{- breadcrumbs() }}
+    </div>
+
+    <div class="span12">
+        <h2>{{ page_title }}</h2>
+
+        <ul class="all-categories-list">{% for info in categories %}
+            <li>
+                <h3>{% if info.category %}{{ info.category.name }}{% else %}Прочее{% endif %}</h3>
+                <ul class="all-tags-list">
+                    {%- for tag in info.tags -%}
+                        {%- if True or info.category or tag.published_stories_count -%}{# TODO: убрать True потом -#}
+                        <li>
+                            <h4 class="tag-name"><a href="{{ url_for('tags.tag_index', tag_name=tag.iname) }}">{{ tag.name }}</a></h4>
+                            <em class="tag-stories-count">{{ ngettext("%(num)d story", "%(num)d stories", tag.published_stories_count) }}</em>
+                        </li>
+                    {%- endif -%}
+                    {%- endfor -%}
+                </ul>
+            </li>
+        {% endfor %}</ul>
+    </div>
+
+    <div class="span12">
+        {{- breadcrumbs() }}
+    </div>
+</div>
+{% endblock %}

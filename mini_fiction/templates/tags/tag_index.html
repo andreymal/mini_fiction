@@ -1,0 +1,37 @@
+{% extends base %}
+{% from 'macro.html' import paginator, breadcrumbs with context %}
+
+{% block content %}
+<div class="row">
+    <div class="span12">
+        {{- breadcrumbs([[url_for('tags.index'), 'Теги']]) }}
+    </div>
+</div>
+
+<div class="row"><div class="span8">
+    <div class="tag-page">
+        <h1 class="tag-name">{{ tag.name }}</h1>
+        <span class="tag-stories-count">{{ ngettext("%(num)d story", "%(num)d stories", tag.published_stories_count) }}</span>
+        {% if aliases -%}
+            <br/>
+            <span class="tag-aliases">Синонимы: {% for alias in aliases -%}
+                {{ alias }}{% if not loop.last %}, {% endif -%}
+            {%- endfor -%}
+            </span>
+        {% endif -%}
+        <div class="tag-description">{{ tag.description|safe }}</div>
+    </div>
+
+    <div id="stories-list">
+        {% include "includes/stories.html" %}
+    </div>
+
+    {% if stories %}{{ paginator(page_obj) }}{% endif %}
+</div></div>
+
+<div class="row">
+    <div class="span12">
+        {{- breadcrumbs([[url_for('tags.index'), 'Теги']]) }}
+    </div>
+</div>
+{% endblock %}

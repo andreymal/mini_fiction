@@ -789,6 +789,49 @@ label.gen input {
     margin: 2px 4px 0 0 !important;
 }
 
+/* Tags list page */
+.all-categories-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+.all-categories-list > li {
+    margin: 0 0 24px 0;
+    padding: 0;
+}
+
+.all-tags-list {
+    list-style: none;
+}
+
+.all-tags-list > li {
+    width: 25%;
+    display: inline-block;
+    vertical-align: top;
+    margin: 0 0 16px 0;
+    padding: 0 16px 0 0;
+    box-sizing: border-box;
+}
+
+/* Tag page */
+
+.tag-page {
+    margin-bottom: 8px;
+}
+
+.tag-page .tag-stories-count {
+    font-style: italic;
+}
+
+.tag-page .tag-aliases {
+    font-style: italic;
+}
+
+.tag-page .tag-description {
+    margin-top: 1em;
+}
+
 /* Story page */
 .story-page {
     margin-bottom: 60px;
@@ -2563,6 +2606,9 @@ ul.editlog .editlog-item:nth-child(2n+1) {
     .story-panel {
         margin-right: 0;
     }
+    .all-tags-list > li {
+        width: 50%;
+    }
 }
 
 @media ( min-width : 768px) {
@@ -2669,6 +2715,9 @@ ul.editlog .editlog-item:nth-child(2n+1) {
         margin-right: 8px;
         margin-right: calc(12px - 1%);
     }
+    .all-tags-list > li {
+        width: 50%;
+    }
 }
 
 /* Smartphones */
@@ -2720,6 +2769,9 @@ ul.editlog .editlog-item:nth-child(2n+1) {
     }
     .padded>.bootstrap.radio {
         display: none;
+    }
+    .all-tags-list > li {
+        width: 100%;
     }
 }
 

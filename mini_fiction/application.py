@@ -259,7 +259,7 @@ def configure_error_handlers(app):
 def configure_views(app):
     from mini_fiction.views import index, auth, story, chapter, editlog, search, author, stream, object_lists
     from mini_fiction.views import story_comment, story_local_comment, feeds, staticpages, news, news_comment
-    from mini_fiction.views import notifications, abuse, sitemap
+    from mini_fiction.views import notifications, abuse, sitemap, tags
     from mini_fiction.views import misc
     app.register_blueprint(index.bp)
     app.register_blueprint(auth.bp, url_prefix='/accounts')
@@ -280,6 +280,7 @@ def configure_views(app):
     app.register_blueprint(notifications.bp, url_prefix='/notifications')
     app.register_blueprint(abuse.bp, url_prefix='/abuse')
     app.register_blueprint(sitemap.bp)
+    app.register_blueprint(tags.bp)
 
     app.add_url_rule('/dump/', 'dump', misc.dump)
     app.add_url_rule('/media/<path:filename>', 'media', misc.media)

@@ -33,6 +33,7 @@
             <a href="{{ url_for('stream.stories') }}">Лента добавлений</a>
             | <a href="{{ url_for('object_lists.top') }}">Топ</a>
             | <a href="{{ url_for('feeds.stories') }}" data-noajax="1">RSS</a>
+            | <a href="{{ url_for('tags.index') }}">Теги</a>
             {% if current_user.is_staff %}| <a href="{{ url_for('editlog.index', all='1', staff='1') }}">{{ _('Moderation log') }}</a>
             {% elif current_user.is_authenticated %}| <a href="{{ url_for('editlog.index') }}">{{ _('Edit log') }}</a>
             {% endif %}

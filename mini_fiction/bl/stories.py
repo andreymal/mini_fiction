@@ -18,10 +18,10 @@ from flask import Markup, current_app
 
 from mini_fiction.bl.utils import BaseBL
 from mini_fiction.bl.commentable import Commentable
-from mini_fiction.utils.misc import words_count, call_after_request as later
+from mini_fiction.utils.misc import words_count, normalize_tag, call_after_request as later
 from mini_fiction.utils.misc import normalize_text_for_search_index, normalize_text_for_search_query
 from mini_fiction.utils import diff as utils_diff
-from mini_fiction.validation import Validator
+from mini_fiction.validation import Validator, ValidationError
 from mini_fiction.validation.stories import STORY
 from mini_fiction.filters import filter_html
 from mini_fiction.filters.base import html_doc_to_string
@@ -41,12 +41,16 @@ class StoryBL(BaseBL, Commentable):
     _contributors = None
 
     def create(self, authors, data):
-        from mini_fiction.models import Category, Character, Classifier, StoryContributor
+        from mini_fiction.models import Category, Character, Classifier, StoryContributor, Tag
 
         if not authors:
             raise ValueError('Authors are required')
 
         data = Validator(STORY).validated(data)
+
+        tags_blacklist = Tag.bl.get_blacklisted_tags(data['tags'])
+        if tags_blacklist:
+            raise ValidationError({'tags': ['Эти теги использовать нельзя: {}'.format(', '.join(tags_blacklist))]})
 
         approved = not current_app.config['PREMODERATION']
         if authors[0].premoderation_mode == 'on':
@@ -73,7 +77,8 @@ class StoryBL(BaseBL, Commentable):
         story.flush()  # получаем id у базы данных
         story.categories.add(list(Category.select(lambda x: x.id in data['categories'])))
         story.characters.add(list(Character.select(lambda x: x.id in data['characters'])))
-        story.classifications.add(list(Classifier.select(lambda x: x.id in data['classifications'])))
+        # story.classifications.add(list(Classifier.select(lambda x: x.id in data['classifications'])))
+        story.bl.set_tags(authors[0], data['tags'], update_search=False)
         for author in authors:
             StoryContributor(
                 story=story,
@@ -110,9 +115,13 @@ class StoryBL(BaseBL, Commentable):
         return sl
 
     def update(self, editor, data):
-        from mini_fiction.models import Category, Character, Classifier, Rating
+        from mini_fiction.models import Category, Character, Classifier, Rating, Tag, StoryTag
 
         data = Validator(STORY).validated(data, update=True)
+
+        tags_blacklist = Tag.bl.get_blacklisted_tags(data['tags'])
+        if tags_blacklist:
+            raise ValidationError({'tags': ['Эти теги использовать нельзя: {}'.format(', '.join(tags_blacklist))]})
 
         story = self.model
         old_published = story.published  # for chapters
@@ -148,14 +157,14 @@ class StoryBL(BaseBL, Commentable):
             changed_sphinx_fields.add('rating_id')
 
         # TODO: refactor
-        if 'categories' in data:
-            old_value = sorted(x.id for x in story.categories)
-            new_value = sorted(data['categories'])
-            if set(old_value) != set(new_value):
-                edited_data['categories'] = [old_value, new_value]
-                story.categories.clear()
-                story.categories.add(list(Category.select(lambda x: x.id in data['categories'])))
-                changed_sphinx_fields.add('category')
+        # if 'categories' in data:
+        #     old_value = sorted(x.id for x in story.categories)
+        #     new_value = sorted(data['categories'])
+        #     if set(old_value) != set(new_value):
+        #         edited_data['categories'] = [old_value, new_value]
+        #         story.categories.clear()
+        #         story.categories.add(list(Category.select(lambda x: x.id in data['categories'])))
+        #         changed_sphinx_fields.add('category')
 
         if 'characters' in data:
             old_value = sorted(x.id for x in story.characters)
@@ -166,16 +175,20 @@ class StoryBL(BaseBL, Commentable):
                 story.characters.add(list(Character.select(lambda x: x.id in data['characters'])))
                 changed_sphinx_fields.add('character')
 
-        if 'classifications' in data:
-            old_value = sorted(x.id for x in story.classifications)
-            new_value = sorted(data['classifications'])
-            if set(old_value) != set(new_value):
-                edited_data['classifications'] = [old_value, new_value]
-                story.classifications.clear()
-                story.classifications.add(list(Classifier.select(lambda x: x.id in data['classifications'])))
-                changed_sphinx_fields.add('classifier')
+        # if 'classifications' in data:
+        #     old_value = sorted(x.id for x in story.classifications)
+        #     new_value = sorted(data['classifications'])
+        #     if set(old_value) != set(new_value):
+        #         edited_data['classifications'] = [old_value, new_value]
+        #         story.classifications.clear()
+        #         story.classifications.add(list(Classifier.select(lambda x: x.id in data['classifications'])))
+        #         changed_sphinx_fields.add('classifier')
 
-        if edited_data:
+        add_tags, rm_tags = self.set_tags(editor, data['tags'], update_search=False)  # у тегов отдельный лог изменений, если что
+        if add_tags or rm_tags:
+            changed_sphinx_fields.add('tag')
+
+        if edited_data or add_tags or rm_tags:
             story.updated = datetime.utcnow()
             current_app.cache.delete('index_updated_chapters')
             current_app.cache.delete('index_comments_html')
@@ -866,16 +879,20 @@ class StoryBL(BaseBL, Commentable):
 
         if f is None or 'character' in f:
             common_fields['character'] = [x.id for x in story.characters]  # TODO: check performance
-        if f is None or 'category' in f:
-            common_fields['category'] = [x.id for x in story.categories]
-        if f is None or 'classifier' in f:
-            common_fields['classifier'] = [x.id for x in story.classifications]
+        # if f is None or 'category' in f:
+        #     common_fields['category'] = [x.id for x in story.categories]
+        # if f is None or 'classifier' in f:
+        #     common_fields['classifier'] = [x.id for x in story.classifications]
+        if f is None or 'tag' in f:
+            common_fields['tag'] = [x.tag.id for x in story.tags]
         if f is None or 'author' in f:
             common_fields['author'] = [x.id for x in story.authors]
 
         return common_fields
 
     def search(self, query, limit, sort_by=0, only_published=True, extended_syntax=True, **filters):
+        from mini_fiction.models import Tag
+
         if current_app.config['SPHINX_DISABLED']:
             return {}, []
 
@@ -894,12 +911,24 @@ class StoryBL(BaseBL, Commentable):
         #     if filters.get(ofilter):
         #         sphinx_filters[ofilter + '__in'] = [x.id for x in filters[ofilter]]
 
-        for ifilter in ('original', 'finished', 'freezed', 'character', 'classifier', 'category', 'rating_id'):
+        for ifilter in ('original', 'finished', 'freezed', 'character', 'rating_id'):
             if filters.get(ifilter):
                 sphinx_filters[ifilter + '__in'] = [int(x) for x in filters[ifilter]]
 
-        if filters.get('excluded_categories'):
-            sphinx_filters['category__not_in'] = [int(x) for x in filters['excluded_categories']]
+        tags = filters.get('tags') or None
+        if tags:
+            tags = [x.id for x in Tag.bl.get_tags_objects(tags, create=False) if x is not None]
+        if tags:
+            sphinx_filters['tag__in'] = tags
+
+        exclude_tags = filters.get('exclude_tags') or None
+        if exclude_tags:
+            exclude_tags = [x.id for x in Tag.bl.get_tags_objects(exclude_tags, create=False) if x is not None]
+        if exclude_tags:
+            sphinx_filters['tag__not_in'] = exclude_tags
+
+        # if filters.get('excluded_categories'):
+        #     sphinx_filters['category__not_in'] = [int(x) for x in filters['excluded_categories']]
 
         if filters.get('min_words') is not None:
             sphinx_filters['words__gte'] = int(filters['min_words'])
@@ -1159,6 +1188,123 @@ class StoryBL(BaseBL, Commentable):
         if sort:
             result.sort(key=lambda x: (x.tag.category.id if x.tag.category else 2 ** 31, x.tag.iname))
         return result
+
+    def add_tag(self, user, tag, check_blacklist=True, log=True, update_search=True):
+        from mini_fiction.models import Tag, TagBlacklist, StoryTag, StoryTagLog
+
+        if not user or not user.is_authenticated:
+            raise ValueError('Not authenticated')
+
+        story = self.model
+
+        if not isinstance(tag, Tag):
+            tag = Tag.bl.get_tags_objects([tag], create=True, user=user)[0]
+        assert isinstance(tag, Tag)
+
+        # Даже если тег существует, всё равно проверяем, что он не запрещён
+        # (вдруг легаси-тег какой-нибудь)
+        iname = tag.iname
+        if check_blacklist and TagBlacklist.select(lambda x: x.iname == iname).exists():
+            raise ValueError('Tag {!r} is blacklisted'.format(iname))
+
+        # Создаём тег рассказу, если его ещё не существует
+        story_tag = story.tags.select(lambda x: x.tag == tag).first()
+        story_tag_log = None
+        if not story_tag:
+            story_tag = StoryTag(story=story, tag=tag)
+            story_tag.flush()
+            tag.stories_count += 1
+            if story.published:
+                tag.published_stories_count += 1
+            if log:
+                story_tag_log = StoryTagLog(
+                    story=story,
+                    tag=tag,
+                    action_flag=StoryTagLog.ADDITION,
+                    modified_by=user,
+                )
+                story_tag_log.flush()
+
+        if update_search:
+            later(current_app.tasks['sphinx_update_story'].delay, story.id, ('tag',))
+
+        return story_tag, story_tag_log
+
+    def remove_tag(self, user, tag, log=True, update_search=True):
+        from mini_fiction.models import Tag, StoryTagLog
+
+        if not user or not user.is_authenticated:
+            raise ValueError('Not authenticated')
+
+        story = self.model
+
+        if not isinstance(tag, Tag):
+            iname = normalize_tag(tag)
+            if not iname:
+                return None
+            # Проверяем существование удаляемого тега
+            tag = Tag.get(iname=iname)
+            if not tag:
+                return None
+        assert isinstance(tag, Tag)
+
+        # Удаляем тег, если он существует
+        story_tag = story.tags.select(lambda x: x.tag == tag).first()
+        story_tag_log = None
+        if story_tag:
+            tag.stories_count -= 1
+            assert tag.stories_count >= 0
+            if story.published:
+                tag.published_stories_count += 1
+                assert tag.published_stories_count >= 0
+            story_tag.delete()
+            if log:
+                story_tag_log = StoryTagLog(
+                    story=story,
+                    tag=tag,
+                    action_flag=StoryTagLog.DELETION,
+                    modified_by=user,
+                )
+                story_tag_log.flush()
+
+        if update_search:
+            later(current_app.tasks['sphinx_update_story'].delay, story.id, ('tag',))
+
+        return story_tag_log
+
+    def set_tags(self, user, tags, log=True, update_search=True):
+        from mini_fiction.models import Tag
+
+        add_tags = []
+        rm_tags = []
+
+        old_tags = [x.tag for x in self.get_tags_list()]
+
+        # Переводим все теги-строки в объекты Tag, создавая их в базе по необходимости
+        tags = Tag.bl.get_tags_objects(tags, create=True, user=user)
+        for x in tags:
+            assert isinstance(x, Tag)
+
+        # Собираем список тегов, которые нужно добавить
+        for tag in tags:
+            if tag not in old_tags:
+                add_tags.append(tag)
+
+        # Собираем список тегов, которые нужно удалить
+        for tag in old_tags:
+            if tag not in tags:
+                rm_tags.append(tag)
+
+        # И применяем собранные изменения
+        for tag in rm_tags:
+            self.remove_tag(user, tag, log=log, update_search=False)
+        for tag in add_tags:
+            self.add_tag(user, tag, log=log, update_search=False)
+
+        if update_search:
+            later(current_app.tasks['sphinx_update_story'].delay, self.model.id, ('tag',))
+
+        return add_tags, rm_tags
 
     def select_by_tag(self, tag, user=None):
         from mini_fiction.models import Tag, StoryTag
@@ -1824,6 +1970,8 @@ class ChapterBL(BaseBL):
         self.delete_chapters_from_search((self.model.story.id), (self.model.id,), update_story_words=update_story_words)
 
     def search(self, query, limit, sort_by=0, only_published=True, extended_syntax=True, **filters):
+        from mini_fiction.models import Tag
+
         if current_app.config['SPHINX_DISABLED']:
             return {}, []
 
@@ -1838,12 +1986,24 @@ class ChapterBL(BaseBL):
             sphinx_filters['draft'] = 0
             sphinx_filters['approved'] = 1
 
-        for ifilter in ('original', 'finished', 'freezed', 'character', 'classifier', 'category', 'rating_id'):
+        for ifilter in ('original', 'finished', 'freezed', 'character', 'rating_id'):
             if filters.get(ifilter):
                 sphinx_filters[ifilter + '__in'] = [int(x) for x in filters[ifilter]]
 
-        if filters.get('excluded_categories'):
-            sphinx_filters['category__not_in'] = [int(x) for x in filters['excluded_categories']]
+        tags = filters.get('tags') or None
+        if tags:
+            tags = [x.id for x in Tag.bl.get_tags_objects(tags, create=False) if x is not None]
+        if tags:
+            sphinx_filters['tag__in'] = tags
+
+        exclude_tags = filters.get('exclude_tags') or None
+        if exclude_tags:
+            exclude_tags = [x.id for x in Tag.bl.get_tags_objects(exclude_tags, create=False) if x is not None]
+        if exclude_tags:
+            sphinx_filters['tag__not_in'] = exclude_tags
+
+        # if filters.get('excluded_categories'):
+        #     sphinx_filters['category__not_in'] = [int(x) for x in filters['excluded_categories']]
 
         if filters.get('min_words') is not None:
             sphinx_filters['words__gte'] = int(filters['min_words'])

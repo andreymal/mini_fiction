@@ -7,7 +7,7 @@ from pony import orm
 
 from mini_fiction.models import Category, Character, Rating, Classifier
 from mini_fiction.forms.fields import LazySelectMultipleField, GroupedModelChoiceField
-from mini_fiction.widgets import StoriesCharacterSelect, StoriesCheckboxSelect, StoriesCategorySelect, StoriesButtons, ButtonWidget
+from mini_fiction.widgets import StoriesCharacterSelect, StoriesCheckboxSelect, StoriesCategorySelect, StoriesButtons, ButtonWidget, TagsInput
 
 
 class SearchForm(Form):
@@ -28,6 +28,7 @@ class SearchForm(Form):
         'data_attrs': {'class': 'hidden'},
         'container_attrs': {'class': 'character-item'}
     }
+    attrs_tags_dict = {'class': 'input-xxxlarge', 'autocomplete': 'off'}
 
     # Строка поиска
     q = TextField(
@@ -78,16 +79,28 @@ class SearchForm(Form):
     )
 
     # Жанры
-    genre = LazySelectMultipleField(
-        '',
-        [],
-        choices=lambda: list(orm.select((x.id, x.name) for x in Category)),
-        widget=StoriesCategorySelect(multiple=True),
-        description='',
-        coerce=int,
-        render_kw={
-            'label_attrs': ['checkbox', 'inline', 'gen'],
-        }
+    #genre = LazySelectMultipleField(
+    #    '',
+    #    [],
+    #    choices=lambda: list(orm.select((x.id, x.name) for x in Category)),
+    #    widget=StoriesCategorySelect(multiple=True),
+    #    description='',
+    #    coerce=int,
+    #    render_kw={
+    #        'label_attrs': ['checkbox', 'inline', 'gen'],
+    #    }
+    #)
+
+    tags = TextField(
+        'Теги',
+        render_kw=dict(attrs_tags_dict, maxlength=512, placeholder='Теги разделяются запятой, например: Флафф, Повседневность, Зарисовка'),
+        widget=TagsInput(),
+    )
+
+    exclude_tags = TextField(
+        'Исключить рассказы с этими тегами',
+        render_kw=dict(attrs_tags_dict, maxlength=512, placeholder='Теги разделяются запятой, например: Флафф, Повседневность, Зарисовка'),
+        widget=TagsInput(),
     )
 
     # Персонажи
@@ -143,14 +156,14 @@ class SearchForm(Form):
     )
 
     # События
-    cls = LazySelectMultipleField(
-        '',
-        [],
-        choices=lambda: list(orm.select((x.id, x.name) for x in Classifier)),
-        widget=StoriesCheckboxSelect(multiple=True),
-        coerce=int,
-        render_kw={'label_attrs': ['checkbox', 'inline']}
-    )
+    #cls = LazySelectMultipleField(
+    #    '',
+    #    [],
+    #    choices=lambda: list(orm.select((x.id, x.name) for x in Classifier)),
+    #    widget=StoriesCheckboxSelect(multiple=True),
+    #    coerce=int,
+    #    render_kw={'label_attrs': ['checkbox', 'inline']}
+    #)
 
     # Кнопка "Развернуть тонкие настройки поиска"
     button_advanced = BooleanField(

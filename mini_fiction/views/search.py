@@ -50,10 +50,10 @@ def search_action(postform):
     data = {'page_title': query.strip() or gettext('Search results'), 'search_type': search_type, 'robots_noindex': True}
 
     if search_type == 0:
-        if current_user.is_authenticated:
-            excluded_categories = [x for x in current_user.excluded_categories_list if x not in postform.data['genre']]
-        else:
-            excluded_categories = []
+        # if current_user.is_authenticated:
+        #     excluded_categories = [x for x in current_user.excluded_categories_list if x not in postform.data['genre']]
+        # else:
+        excluded_categories = []
         try:
             raw_result, result = Story.bl.search(
                 query,
@@ -62,8 +62,10 @@ def search_action(postform):
                 only_published=not current_user.is_authenticated or not current_user.is_staff,
                 extended_syntax=postform.data.get('extsyntax'),
                 character=postform.data['char'],
-                classifier=postform.data['cls'],
-                category=postform.data['genre'],
+                # classifier=postform.data['cls'],
+                tags=postform.data.get('tags', '').split(','),
+                exclude_tags=postform.data.get('exclude_tags', '').split(','),
+                # category=postform.data['genre'],
                 rating_id=postform.data['rating'],
                 original=postform.data['original'],
                 finished=postform.data['finished'],
@@ -89,8 +91,10 @@ def search_action(postform):
                 only_published=not current_user.is_authenticated or not current_user.is_staff,
                 extended_syntax=postform.data.get('extsyntax'),
                 character=postform.data['char'],
-                classifier=postform.data['cls'],
-                category=postform.data['genre'],
+                # lassifier=postform.data['cls'],
+                tags=postform.data.get('tags', '').split(','),
+                exclude_tags=postform.data.get('exclude_tags', '').split(','),
+                # category=postform.data['genre'],
                 rating_id=postform.data['rating'],
                 original=postform.data['original'],
                 finished=postform.data['finished'],
@@ -124,10 +128,10 @@ def simple(search_type, search_id):
     bound_data = {'type': '0', 'sort': '1'}
     if search_type == 'character':
         bound_data['char'] = [search_id]
-    elif search_type == 'category':
-        bound_data['genre'] = [search_id]
-    elif search_type == 'classifier':
-        bound_data['cls'] = [search_id]
+    # elif search_type == 'category':
+    #     bound_data['genre'] = [search_id]
+    # elif search_type == 'classifier':
+    #     bound_data['cls'] = [search_id]
     elif search_type == 'rating':
         bound_data['rating'] = [search_id]
     else:

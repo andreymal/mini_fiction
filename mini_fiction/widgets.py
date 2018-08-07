@@ -6,10 +6,10 @@ from itertools import chain
 from pony import orm
 from flask import Markup, escape
 from flask_babel import gettext
-from wtforms.widgets import Select, Input
+from wtforms.widgets import Select, Input, TextInput
 from wtforms.widgets.core import html_params
 
-from mini_fiction.models import Category, Character
+from mini_fiction.models import Category, Character, Tag
 
 
 class ButtonWidget(object):
@@ -162,3 +162,14 @@ class ContactsWidget(object):
         output.append('<a href="#" class="contacts-add">{}</a>'.format(escape(gettext('Add new'))))
         output.append('</div>')
         return Markup('\n'.join(output))
+
+
+class TagsInput(TextInput):
+    def render_popup(self):
+        return '<span class="input-tags-popup js-input-tags-popup popup-hidden"></span>'
+
+    def __call__(self, field, **kwargs):
+        input_html = super().__call__(field, **kwargs)
+        return '<span class="input-tags js-input-tags">{}{}</span>'.format(
+            input_html, self.render_popup()
+        )

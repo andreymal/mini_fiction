@@ -36,8 +36,14 @@
                 <!--Начало спойлера -->
                 <div id="more-filters" class="collapse">
                     <h3>Фильтры поиска</h3>
+                    {#
                     <h4>Жанры</h4>
                     <p class="genres-select">{{ form.genre }}</p>
+                    #}
+                    <h4>Теги</h4>
+                    <p class="genres-select">{{ form.tags }}</p>
+                    <h4>Исключить рассказы с этими тегами</h4>
+                    <p class="genres-select">{{ form.exclude_tags }}</p>
                     {% if form.char.choices %}
                     <h4>Персонажи</h4>
                     <div class="characters-select" >{{ form.char }}</div>
@@ -68,6 +74,7 @@
                         <h4>Размер рассказа</h4>
                         {{ form.min_words }}—{{ form.max_words }}
                     </div>
+                    {#
                     {% if form.cls.choices %}
                     <div class="control-group">
                         <div class="padded medium-input">
@@ -78,6 +85,7 @@
                         </div>
                     </div>
                     {% endif %}
+                    #}
                 </div>
                 <!-- Конец спойлера -->
 

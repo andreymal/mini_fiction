@@ -76,8 +76,14 @@ def view(pk, comments_page):
     else:
         comment_votes_cache = {i: 0 for i in comment_ids}
 
+    tags = story.bl.get_tags_list(sort=True)
+    main_tags = [x for x in tags if x.tag.is_main_tag]
+    more_tags = [x for x in tags if not x.tag.is_main_tag]
+
     data = {
         'story': story,
+        'main_tags': main_tags,
+        'more_tags': more_tags,
         'contributors': story.bl.get_contributors_for_view(),
         'vote': user_vote,
         'author_ids': [x.id for x in story.authors],
@@ -371,6 +377,10 @@ def add():
             formdata['status'] = 'finished'
         elif formdata['status'] == 2:
             formdata['status'] = 'freezed'
+
+        formdata['tags'] = [x.strip() for x in formdata['tags'].split(',')]
+        formdata['tags'] = [x for x in formdata['tags'] if x]
+
         try:
             story = Story.bl.create([user], formdata)
         except ValidationError as exc:
@@ -400,13 +410,15 @@ def edit(pk):
         'story_edit': True,
         'chapters': list(story.chapters.select().order_by(Chapter.order, Chapter.id)),
         'saved': False,
+        'not_saved': False,
         'story': story
     }
 
     story_data = {
-        'categories': [x.id for x in story.categories],  # TODO: optimize
+        # 'categories': [x.id for x in story.categories],  # TODO: optimize
+        'tags': ', '.join(x.tag.name for x in story.bl.get_tags_list()),
         'characters': [x.id for x in story.characters],
-        'classifications': [x.id for x in story.classifications],
+        # 'classifications': [x.id for x in story.classifications],
         'rating': story.rating.id,
         'source_link': story.source_link,
         'source_title': story.source_title,
@@ -442,6 +454,10 @@ def edit(pk):
                 formdata['status'] = 'finished'
             elif formdata['status'] == 2:
                 formdata['status'] = 'freezed'
+
+            formdata['tags'] = [x.strip() for x in formdata['tags'].split(',')]
+            formdata['tags'] = [x for x in formdata['tags'] if x]
+
             try:
                 story = story.bl.update(user, formdata)
             except ValidationError as exc:
@@ -451,6 +467,8 @@ def edit(pk):
                 data['saved'] = True
                 # Заголовок могли изменить, обновляем
                 data['page_title'] = 'Редактирование «{}»'.format(story.title)
+                # Приводим теги к нормализованному виду
+                form.tags.data = ', '.join(x.tag.name for x in story.bl.get_tags_list())
 
     elif action == 'save_access':
         if not story.bl.can_edit_contributors(user):

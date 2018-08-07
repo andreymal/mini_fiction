@@ -35,6 +35,7 @@
                         {% endif %}
                       </div>
                 </div>
+                {#
                 <!-- Жанры -->
                 <div class="control-group{% if form.categories.errors %} error{% endif %}">
                     {{ form.categories.label(class_='control-label', for=False) }}
@@ -48,6 +49,20 @@
                         {% endif %}
                           {{ form.categories }}
                      </div>
+                </div>
+                #}
+                <!-- Теги -->
+                <div class="control-group{% if form.tags.errors %} error{% endif %}">
+                    {{ form.tags.label(class_='control-label') }}
+                    <div class="controls">{{ form.tags }}
+                        {% if form.tags.errors %}
+                            {% for error in form.tags.errors %}
+                        <span class="help-inline">{{ error }}</span>
+                            {% endfor %}
+                        {% else %}
+                            <span class="help-inline small">{{ form.tags.description }}</span>
+                        {% endif %}
+                      </div>
                 </div>
                 <!-- Персонажи -->
                 {% if form.characters.choices %}
@@ -155,6 +170,7 @@
                         {% endif %}
                       </div>
                 </div>
+                {#
                 <!-- События -->
                 {% if form.classifications.choices %}
                 <div class="control-group{% if form.classifications.errors %} error{% endif %}">
@@ -171,6 +187,7 @@
                       </div>
                 </div>
                 {% endif %}
+                #}
                 <!-- Действия -->
                   <div class="form-actions">
                 {% if story_edit %}

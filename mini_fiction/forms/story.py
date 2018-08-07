@@ -6,13 +6,14 @@ from pony import orm
 
 from mini_fiction.models import Category, Character, Rating, Classifier
 from mini_fiction.forms.fields import LazySelectField, LazySelectMultipleField, GroupedModelChoiceField
-from mini_fiction.widgets import StoriesCharacterSelect, StoriesCheckboxSelect, StoriesCategorySelect, StoriesButtons
+from mini_fiction.widgets import StoriesCharacterSelect, StoriesCheckboxSelect, StoriesCategorySelect, StoriesButtons, TagsInput
 from mini_fiction.forms.form import Form
 
 
 class StoryForm(Form):
     attrs_dict = {'class': 'input-xxxlarge'}
     attrs_markitup_dict = {'class': 'input-xxxlarge with-markitup'}
+    attrs_tags_dict = {'class': 'input-xxxlarge', 'autocomplete': 'off'}
     img_attrs = {
            'group_container_class': 'characters-group group-',
            'data_attrs': {'class': 'hidden'},
@@ -38,13 +39,20 @@ class StoryForm(Form):
         render_kw=dict(attrs_dict, maxlength=512, placeholder='Заголовок нового рассказа')
     )
 
-    categories = LazySelectMultipleField(
-        'Жанры',
-        choices=lambda: list(orm.select((x.id, x.name) for x in Category)),
-        widget=StoriesCategorySelect(multiple=True),
-        description='',
-        coerce=int,
-        render_kw={'label_attrs': ['checkbox', 'inline', 'gen']}
+    # categories = LazySelectMultipleField(
+    #     'Жанры',
+    #     choices=lambda: list(orm.select((x.id, x.name) for x in Category)),
+    #     widget=StoriesCategorySelect(multiple=True),
+    #     description='',
+    #     coerce=int,
+    #     render_kw={'label_attrs': ['checkbox', 'inline', 'gen']}
+    # )
+
+    tags = TextField(
+        'Теги',
+        render_kw=dict(attrs_tags_dict, maxlength=512, placeholder='Теги разделяются запятой, например: Флафф, Повседневность, Зарисовка'),
+        description='Перечислите жанры и основные события рассказа',
+        widget=TagsInput(),
     )
 
     characters = GroupedModelChoiceField(
@@ -106,11 +114,11 @@ class StoryForm(Form):
         description='Активность рассказа (пишется ли он сейчас)'
     )
 
-    classifications = LazySelectMultipleField(
-        'События',
-        choices=lambda: list(orm.select((x.id, x.name) for x in Classifier)),
-        widget=StoriesCheckboxSelect(multiple=True),
-        description='Ключевые события рассказа',
-        coerce=int,
-        render_kw={'label_attrs': ['checkbox', 'inline']}
-    )
+    # classifications = LazySelectMultipleField(
+    #     'События',
+    #     choices=lambda: list(orm.select((x.id, x.name) for x in Classifier)),
+    #     widget=StoriesCheckboxSelect(multiple=True),
+    #     description='Ключевые события рассказа',
+    #     coerce=int,
+    #     render_kw={'label_attrs': ['checkbox', 'inline']}
+    # )

@@ -74,14 +74,14 @@ class AuthorEditPrefsForm(Form):
         'data_container_attrs': {'class': 'buttons-data'},
     }
 
-    excluded_categories = LazySelectMultipleField(
-        '',
-        [],
-        choices=lambda: list(orm.select((x.id, x.name) for x in Category).order_by(1)),
-        coerce=int,
-        widget=StoriesButtons(multiple=True),
-        render_kw=checkbox_attrs,
-    )
+    # excluded_categories = LazySelectMultipleField(
+    #     '',
+    #     [],
+    #     choices=lambda: list(orm.select((x.id, x.name) for x in Category).order_by(1)),
+    #     coerce=int,
+    #     widget=StoriesButtons(multiple=True),
+    #     render_kw=checkbox_attrs,
+    # )
 
     detail_view = SelectField(
         '',

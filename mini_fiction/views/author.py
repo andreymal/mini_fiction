@@ -208,7 +208,7 @@ def edit():
         password_form = AuthorEditPasswordForm(formdata=None)
     if not prefs_form:
         prefs_form = AuthorEditPrefsForm(formdata=None, data={
-                'excluded_categories': author.excluded_categories_list,
+                # 'excluded_categories': author.excluded_categories_list,
                 'detail_view': author.detail_view,
                 'nsfw': author.nsfw,
                 'comments_per_page': (

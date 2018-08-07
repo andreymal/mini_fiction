@@ -124,10 +124,12 @@
                             <legend>Настройки отображения</legend>
                             {{ prefs_form.csrf_token(id="prefs_form_" + prefs_form.csrf_token.id) }}
                           {% if prefs_ok %}<div class="alert-mini green">Личные настройки сохранены</div>{% endif %}
+                            {#
                             <div class="padded bootstrap checkbox">
                                 <label>Скрыть жанры из поиска:</label>
                                 {{ prefs_form.excluded_categories }}
                             </div>
+                            #}
                             <div class="padded bootstrap radio">
                                 <label>Показать рассказ в списках:</label>
                                 {{ prefs_form.detail_view }}

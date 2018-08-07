@@ -5,7 +5,7 @@ from flask import Blueprint, current_app, render_template
 from flask_babel import gettext
 from pony.orm import select, db_session
 
-from mini_fiction.models import Story, StoryContributor, Category, Chapter, StoryComment, NewsItem, NewsComment
+from mini_fiction.models import Story, StoryContributor, Category, Chapter, StoryComment, NewsItem, NewsComment, StoryTag, Tag
 from mini_fiction.utils.views import cached_lists
 from mini_fiction.utils.misc import indextitle, sitedescription
 
@@ -17,14 +17,14 @@ bp = Blueprint('index', __name__)
 def index():
     page_title = gettext('Index')
 
-    categories = list(Category.select())
+    categories = []  # list(Category.select())
 
     pinned_stories = list(
         Story.select_published().filter(lambda x: x.pinned).order_by(Story.first_published_at.desc())
     )
 
     stories = Story.select_published().filter(lambda x: not x.pinned).order_by(Story.first_published_at.desc())
-    stories = stories.prefetch(Story.characters, Story.categories, Story.contributors, StoryContributor.user)
+    stories = stories.prefetch(Story.characters, Story.contributors, StoryContributor.user, Story.tags, StoryTag.tag, Tag.category)
     stories = stories[:max(1, current_app.config['STORIES_COUNT']['main'] - len(pinned_stories))]
     stories = pinned_stories + list(stories)
 

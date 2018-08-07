@@ -15,14 +15,17 @@ def test_story_deletion_full(app, factories):
         # Эти фикстуры всегда на месте
         assert models.CharacterGroup.select().count() == 1
         assert models.Character.select().count() == 1
-        assert models.Category.select().count() == 1
-        assert models.Classifier.select().count() == 1
+        # assert models.Category.select().count() == 1
+        # assert models.Classifier.select().count() == 1
+        assert models.Tag.select().count() == 1
         assert models.Rating.select().count() == 4
 
         assert models.Author.select().count() == 4  # moderator, author, reader, system
 
         # А тут уже всё связанное с рассказом, что должно удаляться
         assert models.Story.select().count() == 0
+        assert models.StoryTag.select().count() == 0
+        assert models.StoryTagLog.select().count() == 0
         assert models.StoryContributor.select().count() == 0
         assert models.Chapter.select().count() == 0
         assert models.StoryLog.select().count() == 0
@@ -48,8 +51,9 @@ def test_story_deletion_full(app, factories):
         cg = models.CharacterGroup(name='Main')
         cg.flush()
         models.Character(name='Даша', picture='na.png', group=cg).flush()
-        models.Category(name='Приключения').flush()
-        models.Classifier(name='Особо жестокие сцены').flush()
+        # models.Category(name='Приключения').flush()
+        # models.Classifier(name='Особо жестокие сцены').flush()
+        models.Tag(name='Приключения', iname='приключения').flush()
 
         moderator = factories.AuthorFactory(username='Moderator', is_staff=True)
         author = factories.AuthorFactory(username='Author')
@@ -64,8 +68,9 @@ def test_story_deletion_full(app, factories):
         chapter2 = factories.ChapterFactory(story=story)
 
         story.characters.add(models.Character.select().first())
-        story.categories.add(models.Category.select().first())
-        story.classifications.add(models.Classifier.select().first())
+        # story.categories.add(models.Category.select().first())
+        # story.classifications.add(models.Classifier.select().first())
+        story.bl.set_tags(author, ['Приключения'], log=True, update_search=False)
 
         lt = models.StoryLocalThread(story=story)
         lt.flush()
@@ -177,8 +182,9 @@ def test_story_deletion_full(app, factories):
         with orm.db_session:
             models.Character.select().delete()
             models.CharacterGroup.select().delete()
-            models.Category.select().delete()
-            models.Classifier.select().delete()
+            #models.Category.select().delete()
+            #models.Classifier.select().delete()
+            models.Tag.select().delete()
 
         try:
             # Если тест упал, то и это иногда падает, эх

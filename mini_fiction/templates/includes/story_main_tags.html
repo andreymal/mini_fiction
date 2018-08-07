@@ -1,0 +1,5 @@
+{%- for st in story.bl.get_tags_list(sort=True) %}{% if st.tag.is_main_tag %}
+    <a class="gen"{% if st.tag.get_color() %} style="background-color:
+        {{- st.tag.get_color() -}}
+    "{%- endif %} href="{{ url_for('tags.tag_index', tag_name=st.tag.iname) }}">{{ st.tag.name }}</a>
+{% endif %}{% endfor -%}

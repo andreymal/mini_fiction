@@ -150,9 +150,9 @@ class Author(db.Entity, UserMixin):
     def series(self):
         return orm.select(x.series for x in CoAuthorsSeries if x.author == self).without_distinct()
 
-    @property
-    def excluded_categories_list(self):
-        return [int(x) for x in self.excluded_categories.split(',') if x]
+    # @property
+    # def excluded_categories_list(self):
+    #     return [int(x) for x in self.excluded_categories.split(',') if x]
 
     @property
     def silent_email_list(self):

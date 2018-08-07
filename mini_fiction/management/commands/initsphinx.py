@@ -43,8 +43,9 @@ def initsphinx():
             stories = tuple(Story.select(lambda x: x.id > pk).prefetch(
                 Story.contributors,
                 Story.characters,
-                Story.categories,
-                Story.classifications,
+                # Story.categories,
+                # Story.classifications,
+                Story.tags,
             ).order_by(Story.id)[:100])
             if not stories:
                 break

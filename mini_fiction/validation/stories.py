@@ -19,18 +19,31 @@ STORY = {
             'required': 'Пожалуйста, назовите ваш рассказ',
         },
     },
-    'categories': {
+    #'categories': {
+    #    'type': 'list',
+    #    'required': True,
+    #    'minlength': 1,
+    #    'schema': {
+    #        'type': 'integer',
+    #        'coerce': int,
+    #        'allowed_func': lambda: list(orm.select(x.id for x in models.Category)),
+    #    },
+    #    'error_messages': {
+    #        'required': 'Жанры - обязательное поле',
+    #        'minlength': 'Жанры - обязательное поле',
+    #    },
+    #},
+    'tags': {
         'type': 'list',
         'required': True,
         'minlength': 1,
         'schema': {
-            'type': 'integer',
-            'coerce': int,
-            'allowed_func': lambda: list(orm.select(x.id for x in models.Category)),
+            'type': 'string',
+            'coerce': str,
         },
         'error_messages': {
-            'required': 'Жанры - обязательное поле',
-            'minlength': 'Жанры - обязательное поле',
+            'required': 'Укажите хотя бы один тег',
+            'minlength': 'Укажите хотя бы один тег',
         },
     },
     'characters': {
@@ -104,13 +117,13 @@ STORY = {
             'required': 'Нужно обязательно указать статус рассказа!',
         },
     },
-    'classifications': {
-        'type': 'list',
-        'default': [],
-        'schema': {
-            'type': 'integer',
-            'coerce': int,
-            'allowed_func': lambda: list(orm.select(x.id for x in models.Classifier)),
-        },
-    },
+    #'classifications': {
+    #    'type': 'list',
+    #    'default': [],
+    #    'schema': {
+    #        'type': 'integer',
+    #        'coerce': int,
+    #        'allowed_func': lambda: list(orm.select(x.id for x in models.Classifier)),
+    #    },
+    #},
 }

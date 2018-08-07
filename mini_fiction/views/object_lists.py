@@ -7,7 +7,7 @@ from pony.orm import select, db_session
 from flask import Blueprint, current_app, abort, render_template, request
 from flask_login import current_user, login_required
 
-from mini_fiction.models import Author, Story, StoryContributor, Favorites, Bookmark, StoryView
+from mini_fiction.models import Author, Story, StoryContributor, Favorites, Bookmark, StoryView, StoryTag, Tag
 from mini_fiction.utils.misc import Paginator
 from mini_fiction.utils.views import paginate_view, cached_lists
 
@@ -88,7 +88,7 @@ def viewed(page):
     views = select(
         (x.story, min(x.id)) for x in StoryView if x.author.id == current_user.id and x.story
     )
-    views = views.prefetch(StoryView.story, Story.characters, Story.categories, Story.contributors, StoryContributor.user)
+    views = views.prefetch(StoryView.story, Story.characters, Story.contributors, StoryContributor.user, Story.tags, StoryTag.tag, Tag.category)
     views = views.order_by(-2)
 
     page_obj = Paginator(page, views.count(), per_page=10)
@@ -122,7 +122,7 @@ def top(page):
         objects = objects.filter(lambda x: x.first_published_at >= since)
 
     objects = objects.order_by(Story.vote_value.desc(), Story.id.desc())
-    objects = objects.prefetch(Story.characters, Story.categories, Story.contributors, StoryContributor.user)
+    objects = objects.prefetch(Story.characters, Story.contributors, StoryContributor.user, Story.tags, StoryTag.tag, Tag.category)
 
     page_obj = Paginator(
         page,

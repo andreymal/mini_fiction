@@ -1,7 +1,10 @@
 import webpack from 'webpack';
+import MiniCssExtractPlugin from 'mini-css-extract-plugin';
+import autoprefixer from 'autoprefixer';
 import path from 'path';
 
 const ENV = process.env.NODE_ENV || 'development';
+const isDev = ENV !== 'production';
 
 
 const reactAliases = {
@@ -46,12 +49,44 @@ module.exports = {
         exclude: /node_modules/,
         use: 'babel-loader',
       },
+      {
+        test: /\.(styl|css)$/,
+        use: [
+          {
+            loader: MiniCssExtractPlugin.loader,
+          },
+          {
+            loader: 'css-loader',
+            options: {
+              modules: false,
+              sourceMap: isDev,
+              importLoaders: 1,
+              minimize: true,
+            },
+          },
+          {
+            loader: 'postcss-loader',
+            options: {
+              sourceMap: isDev,
+              plugins: () => autoprefixer({ browsers: ['last 2 versions'] }),
+            },
+          },
+          {
+            loader: 'stylus-loader',
+            options: { sourceMap: isDev },
+          },
+        ],
+      },
     ],
   },
   plugins: ([
     new webpack.NoEmitOnErrorsPlugin(),
     new webpack.DefinePlugin({
       'process.env.NODE_ENV': JSON.stringify(ENV),
+    }),
+    new MiniCssExtractPlugin({
+      filename: '[name].css',
+      chunkFilename: '[id].css',
     }),
   ]),
 

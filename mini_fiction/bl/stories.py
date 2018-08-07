@@ -995,10 +995,12 @@ class StoryBL(BaseBL, Commentable):
         if dump_collections:
             for x in sorted(story.characters, key=lambda c: c.id):
                 yield mdf.obj2json(x, 'character')
-            for x in sorted(story.categories, key=lambda c: c.id):
-                yield mdf.obj2json(x, 'category')
-            for x in sorted(story.classifications, key=lambda c: c.id):
-                yield mdf.obj2json(x, 'classifier')
+            # for x in sorted(story.categories, key=lambda c: c.id):
+            #     yield mdf.obj2json(x, 'category')
+            # for x in sorted(story.classifications, key=lambda c: c.id):
+            #     yield mdf.obj2json(x, 'classifier')
+            for x in sorted(self.get_tags_list(), key=lambda c: c.id):
+                yield mdf.obj2json(x, 'storytag')
         for x in sorted(story.favorites, key=lambda c: c.id):
             yield mdf.obj2json(x, 'favorites')
         for x in sorted(story.bookmarks, key=lambda c: c.id):
@@ -1100,7 +1102,7 @@ class StoryBL(BaseBL, Commentable):
         # В зависимости от состояния рассказа определяем поля, считающиеся
         # публичными
         only = [
-            'id', 'title', 'characters', 'categories', 'classifications',
+            'id', 'title', 'characters', # 'categories', 'classifications',
             'date', 'first_published_at', 'draft', 'approved', 'finished',
             'freezed', 'notes', 'original', 'rating', 'summary', 'updated',
             'words', 'vote_total', 'vote_value', 'vote_extra', 'source_link',
@@ -1122,6 +1124,13 @@ class StoryBL(BaseBL, Commentable):
             override['vote_extra'] = current_app.story_voting.get_default_vote_extra()
 
         yield mdf.obj2json(story, 'story', params={'exclude': None, 'only': only}, override=override)
+
+        # Теги
+        # (StoryTag ссылается на Tag, а дамп Tag'ов нужно получать из mini_fiction_dump.zip)
+        for x in sorted(self.get_tags_list(), key=lambda c: c.id):
+            yield mdf.obj2json(x, 'storytag', params={'exclude': None, 'only': [
+                'id', 'story', 'tag', 'created_at',
+            ]})
 
         # Дампим только публично видимых авторов
         # (override прячет авторов, с которыми поругались)

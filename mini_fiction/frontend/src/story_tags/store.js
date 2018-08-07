@@ -4,9 +4,15 @@ const store = new Deferred();
 
 const getStore = () => store;
 
-const setStore = data => store.resolve(data);
+const setStoreFromUrl = (url) => {
+  fetch(url, { credentials: 'include' })
+    .then(response => response.json())
+    .then(({ tags }) => {
+      store.resolve(tags);
+    });
+};
 
 export {
   getStore,
-  setStore,
+  setStoreFromUrl,
 };

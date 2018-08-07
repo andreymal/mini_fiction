@@ -7,6 +7,7 @@ import TagsInput from 'react-tagsinput';
 
 import Tag from './tag';
 import Input from './input';
+import { setStoreFromUrl } from './store';
 
 const Layout = (tagComponents, inputComponent) => (
   <span className="tags-container">
@@ -47,5 +48,7 @@ class TagComponent extends React.Component {
 }
 
 export default (node) => {
+  const { autocompleteUrl } = node.dataset;
+  setStoreFromUrl(autocompleteUrl);
   ReactDOM.render(ReactDOM.createElement(TagComponent), node);
 };

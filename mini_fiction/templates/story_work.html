@@ -15,6 +15,7 @@
 {{ html_block('story_add') }}
         {% endif %}
         {% if saved %}<div class="alert-mini green">Изменения сохранены</div>{% endif %}
+        {% if not_saved %}<div class="alert-mini alert-error">Изменения не сохранены, проверьте форму</div>{% endif %}
 
         <form method="POST" enctype="multipart/form-data" class="form-horizontal">
             <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />

@@ -354,6 +354,15 @@ def add():
     user = current_user._get_current_object()
     rating = Rating.select().order_by(Rating.id.desc()).first()
     form = StoryForm(data={'status': 0, 'original': 1, 'rating': rating.id if rating else 1})
+
+    data = {
+        'page_title': gettext('New story'),
+        'form': form,
+        'story_add': True,
+        'saved': False,
+        'not_saved': False,
+    }
+
     if form.validate_on_submit():
         formdata = dict(form.data)
         if formdata['status'] == 0:
@@ -366,13 +375,10 @@ def add():
             story = Story.bl.create([user], formdata)
         except ValidationError as exc:
             form.set_errors(exc.errors)
+            data['not_saved'] = True
         else:
             return redirect(url_for('story.edit', pk=story.id))
-    data = {
-        'page_title': gettext('New story'),
-        'form': form,
-        'story_add': True
-    }
+
     return render_template('story_work.html', **data)
 
 
@@ -440,6 +446,7 @@ def edit(pk):
                 story = story.bl.update(user, formdata)
             except ValidationError as exc:
                 form.set_errors(exc.errors)
+                data['not_saved'] = True
             else:
                 data['saved'] = True
                 # Заголовок могли изменить, обновляем

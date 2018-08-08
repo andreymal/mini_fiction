@@ -10,6 +10,27 @@
     <div class="span12">
         <h2>{{ page_title }}</h2>
 
+        <div>
+            Сортировать:
+            &nbsp; &nbsp;
+
+            {% if sort != 'name' %}<a href="{{ url_for('tags.index') }}">{% endif -%}
+            по названию
+            {%- if sort != 'name' %}</a>{% endif %}
+            &nbsp; &nbsp;
+
+            {% if sort != 'date' %}<a href="{{ url_for('tags.index', sort='date') }}">{% endif -%}
+            по дате создания
+            {%- if sort != 'date' %}</a>{% endif %}
+            &nbsp; &nbsp;
+
+            {% if sort != 'stories' %}<a href="{{ url_for('tags.index', sort='stories') }}">{% endif -%}
+            по числу рассказов
+            {%- if sort != 'stories' %}</a>{% endif %}
+
+            <br/><br/>
+        </div>
+
         <ul class="all-categories-list">{% for info in categories %}
             <li>
                 <h3>{% if info.category %}{{ info.category.name }}{% else %}Прочее{% endif %}</h3>

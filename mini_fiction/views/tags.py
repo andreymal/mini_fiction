@@ -17,8 +17,12 @@ bp = Blueprint('tags', __name__)
 @bp.route('/tags/')
 @db_session
 def index():
-    categories = Tag.bl.get_tags_with_categories()
-    return render_template('tags/index.html', page_title='Теги', categories=categories)
+    sort = request.args.get('sort')
+    if sort not in ('stories', 'date', 'name'):
+        sort = 'name'
+
+    categories = Tag.bl.get_tags_with_categories(sort=sort)
+    return render_template('tags/index.html', page_title='Теги', categories=categories, sort=sort)
 
 
 @bp.route('/tag/<tag_name>/page/last/', defaults={'page': -1})

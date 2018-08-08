@@ -105,13 +105,20 @@ class TagBL(BaseBL):
         categories = list(q)
         return categories
 
-    def get_tags_with_categories(self):
+    def get_tags_with_categories(self, sort='name'):
         from mini_fiction.models import Tag
 
         categories_dict = {}
 
         tags = list(Tag.select().prefetch(Tag.category))
-        tags.sort(key=lambda tag: tag.published_stories_count, reverse=True)
+        if sort == 'stories':
+            tags.sort(key=lambda tag: tag.published_stories_count, reverse=True)
+        elif sort == 'date':
+            tags.sort(key=lambda tag: tag.created_at, reverse=True)
+        elif sort == 'name':
+            tags.sort(key=lambda tag: tag.iname)
+        else:
+            raise ValueError('Invalid tags sorting: {!r}'.format(sort))
 
         categories_dict = {}
         others = {'category': None, 'tags': []}

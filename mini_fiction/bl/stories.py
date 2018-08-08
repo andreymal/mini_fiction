@@ -1234,8 +1234,8 @@ class StoryBL(BaseBL, Commentable):
                 )
                 story_tag_log.flush()
 
-        if update_search:
-            later(current_app.tasks['sphinx_update_story'].delay, story.id, ('tag',))
+            if update_search:
+                later(current_app.tasks['sphinx_update_story'].delay, story.id, ('tag',))
 
         return story_tag, story_tag_log
 
@@ -1276,8 +1276,8 @@ class StoryBL(BaseBL, Commentable):
                 )
                 story_tag_log.flush()
 
-        if update_search:
-            later(current_app.tasks['sphinx_update_story'].delay, story.id, ('tag',))
+            if update_search:
+                later(current_app.tasks['sphinx_update_story'].delay, story.id, ('tag',))
 
         return story_tag_log
 

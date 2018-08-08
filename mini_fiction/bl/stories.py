@@ -1264,7 +1264,7 @@ class StoryBL(BaseBL, Commentable):
             tag.stories_count -= 1
             assert tag.stories_count >= 0
             if story.published:
-                tag.published_stories_count += 1
+                tag.published_stories_count -= 1
                 assert tag.published_stories_count >= 0
             story_tag.delete()
             if log:

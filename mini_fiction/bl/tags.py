@@ -75,6 +75,7 @@ class TagBL(BaseBL):
                 tag = Tag(name=x, iname=iname, created_by=user)
                 tag.flush()  # получаем id у базы данных
                 result.append(tag)
+                tags_db[tag.iname] = tag  # На случай, если у следующего тега в цикле совпадёт iname
 
             else:
                 result.append(None)

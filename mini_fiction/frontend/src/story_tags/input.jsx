@@ -33,7 +33,7 @@ class Suggester extends React.Component {
   @autobind
   onSuggestionSelected(e, { suggestion }) {
     const { addTag } = this.props;
-    addTag(getSuggestionValue(suggestion));
+    addTag(suggestion);
   }
 
   render() {

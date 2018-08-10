@@ -29,6 +29,7 @@ class TagComponent extends React.Component {
     const { tags } = this.state;
     return (
       <TagsInput
+        onlyUnique
         renderLayout={Layout}
         renderTag={Tag}
         renderInput={Input}

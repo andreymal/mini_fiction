@@ -5,7 +5,7 @@ import ReactDOM from 'react-dom';
 import autobind from 'autobind-decorator';
 import TagsInput from 'react-tagsinput';
 
-import Tag from './tag';
+import { CloseableTag } from './tag';
 import Input from './input';
 import { setStoreFromUrl } from './store';
 
@@ -31,14 +31,10 @@ class TagComponent extends React.Component {
       <TagsInput
         onlyUnique
         renderLayout={Layout}
-        renderTag={Tag}
+        renderTag={CloseableTag}
         renderInput={Input}
         value={tags}
         onChange={this.handleChange}
-        tagProps={{
-          className: 'tag-item',
-          classNameRemove: 'tag-remove',
-        }}
         inputProps={{
           className: 'tag-block dropdown-input',
           placeholder: 'Добавить тег',

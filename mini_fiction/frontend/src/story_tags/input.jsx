@@ -3,13 +3,7 @@ import Autosuggest from 'react-autosuggest';
 import autobind from 'autobind-decorator';
 
 import { getSuggestion, getSuggestionValue } from './autocomplete';
-
-
-const Suggestion = suggestion => (
-  <span>
-    {getSuggestionValue(suggestion)}
-  </span>
-);
+import { PlainTag } from './tag';
 
 
 class Suggester extends React.Component {
@@ -58,7 +52,7 @@ class Suggester extends React.Component {
         onSuggestionsFetchRequested={this.onSuggestionsFetchRequested}
         onSuggestionsClearRequested={this.onSuggestionsClearRequested}
         getSuggestionValue={getSuggestionValue}
-        renderSuggestion={Suggestion}
+        renderSuggestion={s => <PlainTag tag={s} />}
         inputProps={inputProps}
         onSuggestionSelected={this.onSuggestionSelected}
       />

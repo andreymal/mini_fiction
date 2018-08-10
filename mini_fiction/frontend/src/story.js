@@ -8,7 +8,4 @@ Baz.register({
   storyTags,
 });
 
-// eslint-disable-next-line no-undef
-document.addEventListener('DOMContentLoaded', () => {
-  Baz.refresh();
-});
+Baz.refresh();

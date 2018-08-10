@@ -52,7 +52,7 @@ class Suggester extends React.Component {
         onSuggestionsFetchRequested={this.onSuggestionsFetchRequested}
         onSuggestionsClearRequested={this.onSuggestionsClearRequested}
         getSuggestionValue={getSuggestionValue}
-        renderSuggestion={s => <PlainTag tag={s} />}
+        renderSuggestion={s => <PlainTag withCount tag={s} />}
         inputProps={inputProps}
         onSuggestionSelected={this.onSuggestionSelected}
       />

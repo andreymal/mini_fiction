@@ -1,7 +1,12 @@
+import path from 'path';
 import webpack from 'webpack';
 import MiniCssExtractPlugin from 'mini-css-extract-plugin';
-import autoprefixer from 'autoprefixer';
-import path from 'path';
+
+import postCSSAutoPrefixer from 'autoprefixer';
+import postCSSNesting from 'postcss-nesting';
+import postCSSCustomProperties from 'postcss-custom-properties';
+import postCSSMixins from 'postcss-mixins';
+import postCSSNano from 'cssnano';
 
 const ENV = process.env.NODE_ENV || 'development';
 const isDev = ENV !== 'production';
@@ -12,12 +17,31 @@ const reactAliases = {
   'react-dom': 'preact-compat',
 };
 
+const postCSSLoaderOptions = {
+  sourceMap: isDev,
+  plugins: () => [
+    postCSSAutoPrefixer({ browsers: ['last 2 versions'] }),
+    postCSSMixins(),
+    postCSSNesting(),
+    postCSSCustomProperties({
+      preserve: false,
+      warnings: true,
+    }),
+  ].concat(isDev ? [] : [postCSSNano({ preset: 'advanced' })]),
+};
+
+const cssLoaderOptions = {
+  modules: false,
+  sourceMap: isDev,
+  importLoaders: 1,
+  minimize: !isDev,
+};
 
 module.exports = {
   mode: ENV,
   context: path.resolve(__dirname, 'src'),
   entry: {
-    story: './story.js',
+    story: ['./story.js', './story.css'],
   },
 
   output: {
@@ -50,31 +74,11 @@ module.exports = {
         use: 'babel-loader',
       },
       {
-        test: /\.(styl|css)$/,
+        test: /\.css$/,
         use: [
-          {
-            loader: MiniCssExtractPlugin.loader,
-          },
-          {
-            loader: 'css-loader',
-            options: {
-              modules: false,
-              sourceMap: isDev,
-              importLoaders: 1,
-              minimize: true,
-            },
-          },
-          {
-            loader: 'postcss-loader',
-            options: {
-              sourceMap: isDev,
-              plugins: () => autoprefixer({ browsers: ['last 2 versions'] }),
-            },
-          },
-          {
-            loader: 'stylus-loader',
-            options: { sourceMap: isDev },
-          },
+          { loader: MiniCssExtractPlugin.loader },
+          { loader: 'css-loader', options: cssLoaderOptions },
+          { loader: 'postcss-loader', options: postCSSLoaderOptions },
         ],
       },
     ],

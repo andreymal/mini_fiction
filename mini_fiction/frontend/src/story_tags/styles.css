@@ -1,0 +1,83 @@
+:root {
+  --background: #fff;
+  --default: #999;
+  --base-filters: saturate(96%);
+  --highlight-filters: saturate(104%) brightness(104%);
+}
+
+@define-mixin tag-box {
+  min-height: 2.5em;
+  background-color: var(--background);
+  border: 1px solid #ccc;
+  border-radius: 0.25em;
+  box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075);
+}
+
+.tags-container {
+  @mixin tag-box;
+
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+
+  margin-bottom: 1em;
+  padding: 0.3em 0.5em;
+
+  width: 80%
+}
+
+.tag-block {
+  margin: 0.15em;
+  padding: 0.5em;
+}
+
+.tag-item {
+  border-radius: 0.25em;
+  font-weight: bold;
+  line-height: 1em;
+  color: var(--background);
+  white-space: nowrap;
+  text-shadow: 0 -1px 0 rgba(0, 0, 0, 0.25);
+  filter: var(--base-filters);
+  & span {
+    &::before {
+      content: " ×";
+    }
+  }
+  &:hover {
+    filter: var(--highlight-filters);
+  }
+}
+
+.tag-item-type-default {
+  background-color: var(--default);
+}
+
+.tag-remove {
+  cursor: pointer;
+  font-weight: bold;
+}
+
+.react-autosuggest__suggestions-container {
+  @mixin tag-box;
+  margin: 0.15em;
+  position: absolute;
+  z-index: 1000;
+  visibility: hidden;
+}
+
+.react-autosuggest__suggestions-container--open {
+  visibility: visible;
+}
+
+.react-autosuggest__suggestions-list {
+  padding: 0.3em;
+  display: flex;
+  flex-direction: column;
+  list-style: none;
+  margin: 0;
+}
+
+.react-autosuggest__suggestion--highlighted {
+  filter: var(--highlight-filters);
+}

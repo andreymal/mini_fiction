@@ -75,8 +75,8 @@ class StoryBL(BaseBL, Commentable):
             vote_extra=current_app.story_voting.get_default_vote_extra() if current_app.story_voting else '{}',
         )
         story.flush()  # получаем id у базы данных
-        story.categories.add(list(Category.select(lambda x: x.id in data['categories'])))
-        story.characters.add(list(Character.select(lambda x: x.id in data['characters'])))
+        # story.categories.add(list(Category.select(lambda x: x.id in data['categories'])))
+        # story.characters.add(list(Character.select(lambda x: x.id in data['characters'])))
         # story.classifications.add(list(Classifier.select(lambda x: x.id in data['classifications'])))
         story.bl.set_tags(authors[0], data['tags'], update_search=False)
         for author in authors:

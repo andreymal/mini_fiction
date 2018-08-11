@@ -609,4 +609,4 @@ def normalize_tag(s, whitelist=None, delimeters=None):
     ))
     while '__' in s:
         s = s.replace('__', '_')
-    return s.strip('_') or None
+    return s.strip('_')[:32] or None

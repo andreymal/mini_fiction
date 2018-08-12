@@ -7,6 +7,8 @@
 
 @define-mixin tag-box {
   min-height: 2.5em;
+  max-height: 15em;
+  overflow-x: scroll;
   background-color: var(--background);
   border: 1px solid #ccc;
   border-radius: 0.25em;

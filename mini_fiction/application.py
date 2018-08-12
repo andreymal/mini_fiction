@@ -9,8 +9,10 @@ import logging
 import importlib
 from datetime import datetime
 from logging.handlers import SMTPHandler
+from pathlib import Path
 
 import jinja2
+import click
 from celery import Celery
 from werkzeug.urls import iri_to_uri
 from werkzeug.contrib import cache
@@ -29,6 +31,8 @@ from mini_fiction.bl import init_bl
 
 
 __all__ = ['create_app']
+
+FRONTEND_VERSION = 'static/dist/frontend.version'
 
 
 def create_app():
@@ -70,6 +74,7 @@ def create_app():
     configure_story_voting(app)
     configure_misc(app)
     configure_development(app)
+    configure_frontend(app)
 
     app.context_processor(templates_context)
 
@@ -510,6 +515,16 @@ def configure_development(app):
 
             app.before_request(ponydbg.clear_queries)
             app.csrf.exempt(module)
+
+
+def configure_frontend(app: Flask):
+    try:
+        version = Path(FRONTEND_VERSION).read_text().strip()
+    except IOError as _:
+        version = 'dev'
+        click.echo('Unable to read frontend version, assuming dev', color='orange')
+
+    app.config['FRONTEND_VERSION'] = version
 
 
 def init_plugins(app):

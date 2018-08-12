@@ -50,6 +50,8 @@ const cssLoaderOptions = {
   minimize: !isDev,
 };
 
+const devPrefix = isDev ? 'dev' : '[hash]';
+
 module.exports = {
   mode: ENV,
   context: path.resolve(__dirname, 'src'),
@@ -60,7 +62,7 @@ module.exports = {
   output: {
     path: path.resolve(__dirname, 'build'),
     publicPath: '/',
-    filename: '[name].bundle.js',
+    filename: `[name].${devPrefix}.js`,
   },
 
   resolve: {
@@ -98,7 +100,7 @@ module.exports = {
   },
   plugins: ([
     new MiniCssExtractPlugin({
-      filename: '[name].css',
+      filename: `[name].${devPrefix}.css`,
       chunkFilename: '[id].css',
     }),
     new WriteVersionPlugin('frontend.version', isDev),

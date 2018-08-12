@@ -11,11 +11,16 @@
 {%- block head_css %}
     <link rel="stylesheet" href="{{ url_for('static', filename='css/bootstrap.css') }}" />
     <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}" />
+    <link rel="stylesheet" href="{{ url_for('static', filename='build/story.{}.css'.format(config['FRONTEND_VERSION'])) }}" />
     <link rel="stylesheet" href="{{ url_for('static', filename='css/markitup.main.css') }}" />
     <link rel="stylesheet" href="{{ url_for('static', filename='css/markitup.set.css') }}" />
 {%- for css_link in extra_css %}
     <link rel="stylesheet" href="{{ css_link }}" />
 {%- endfor -%}
+{% endblock -%}
+
+{%- block head_js %}
+    <script async src="{{ url_for('static', filename='build/story.{}.js'.format(config['FRONTEND_VERSION'])) }}"></script>
 {% endblock -%}
 
 {%- block meta_robots_tag %}{% if robots_noindex or robots_nofollow %}

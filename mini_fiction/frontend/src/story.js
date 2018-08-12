@@ -6,7 +6,7 @@ Baz.register({
 });
 
 if (window.document.readyState !== 'loading') {
-  Baz.refresh();
+  Baz.watch();
 } else {
-  window.document.addEventListener('DOMContentLoaded', Baz.refresh);
+  window.document.addEventListener('DOMContentLoaded', Baz.watch);
 }

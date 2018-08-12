@@ -1,4 +1,3 @@
-// eslint-disable-next-line import/no-extraneous-dependencies, import/no-unresolved
 import React from 'react';
 import ReactDOM from 'react-dom';
 

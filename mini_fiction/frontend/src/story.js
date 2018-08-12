@@ -5,4 +5,8 @@ Baz.register({
   storyTags,
 });
 
-Baz.refresh();
+if (window.document.readyState !== 'loading') {
+  Baz.refresh();
+} else {
+  window.document.addEventListener('DOMContentLoaded', Baz.refresh);
+}

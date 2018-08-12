@@ -17,6 +17,7 @@ class Suggester extends React.Component {
   state = {
     suggestions: [],
     value: '',
+    highlighted: null,
   };
 
 
@@ -64,6 +65,29 @@ class Suggester extends React.Component {
     addTag(suggestion);
   }
 
+  @autobind
+  onSuggestionHighlighted({ suggestion: highlighted }) {
+    this.setState({ highlighted });
+  }
+
+  @autobind
+  renderSuggestionsContainer({ containerProps, children }) {
+    const { highlighted } = this.state;
+    const help = highlighted && (
+      <div>
+        {highlighted.description}
+      </div>
+    );
+
+    return (
+      <div {...containerProps}>
+        { children }
+        { help }
+      </div>
+    );
+  }
+
+
   render() {
     const { ref } = this.props;
     const { suggestions } = this.state;
@@ -76,8 +100,10 @@ class Suggester extends React.Component {
         shouldRenderSuggestions={Suggester.shouldRenderSuggestions}
         onSuggestionsFetchRequested={this.onSuggestionsFetchRequested}
         onSuggestionsClearRequested={this.onSuggestionsClearRequested}
+        onSuggestionHighlighted={this.onSuggestionHighlighted}
         getSuggestionValue={getSuggestionValue}
         renderSuggestion={s => <PlainTag withCount tag={s} />}
+        renderSuggestionsContainer={this.renderSuggestionsContainer}
         inputProps={inputProps}
         onSuggestionSelected={this.onSuggestionSelected}
       />

@@ -72,17 +72,14 @@ class Suggester extends React.Component {
 
   @autobind
   renderSuggestionsContainer({ containerProps, children }) {
-    const { highlighted } = this.state;
-    const help = highlighted && (
-      <div>
-        {highlighted.description}
-      </div>
-    );
-
+    const { highlighted, suggestions } = this.state;
+    const tag = highlighted || (suggestions.length === 1 && suggestions[0]);
     return (
       <div {...containerProps}>
         { children }
-        { help }
+        <div className="tag-help">
+          {tag && tag.description}
+        </div>
       </div>
     );
   }

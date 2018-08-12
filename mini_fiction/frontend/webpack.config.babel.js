@@ -1,5 +1,5 @@
+import fs from 'fs';
 import path from 'path';
-import webpack from 'webpack';
 import MiniCssExtractPlugin from 'mini-css-extract-plugin';
 
 import postCSSAutoPrefixer from 'autoprefixer';
@@ -11,6 +11,19 @@ import postCSSNano from 'cssnano';
 const ENV = process.env.NODE_ENV || 'development';
 const isDev = ENV !== 'production';
 
+class WriteVersionPlugin {
+  constructor(filename, dev) {
+    this.filename = filename;
+    this.dev = dev;
+  }
+
+  apply = (compiler) => {
+    compiler.plugin('done', stats => fs.writeFileSync(
+      path.join(stats.compilation.compiler.outputPath, this.filename),
+      this.dev ? 'dev' : stats.hash,
+    ));
+  }
+}
 
 const reactAliases = {
   react: 'preact-compat',
@@ -88,6 +101,7 @@ module.exports = {
       filename: '[name].css',
       chunkFilename: '[id].css',
     }),
+    new WriteVersionPlugin('frontend.version', isDev),
   ]),
 
   stats: { colors: true },

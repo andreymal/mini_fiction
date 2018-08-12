@@ -19,8 +19,19 @@ const getSuggestion = (rawVal) => {
 
 const getSuggestionValue = suggestion => suggestion.name;
 
+const synthesizeSuggestion = value => ({
+  aliases: [],
+  color: '#1D2A4F',
+  description: '',
+  id: 0,
+  name: value,
+  stories_count: 0,
+  url: '',
+});
+
 
 export {
   getSuggestion,
   getSuggestionValue,
+  synthesizeSuggestion,
 };

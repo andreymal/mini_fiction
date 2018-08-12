@@ -2,8 +2,11 @@ import React from 'react';
 import Autosuggest from 'react-autosuggest';
 import autobind from 'autobind-decorator';
 
-import { getSuggestion, getSuggestionValue } from './autocomplete';
+import { getSuggestion, getSuggestionValue, synthesizeSuggestion } from './autocomplete';
 import { PlainTag } from './tag';
+
+
+const ENTER = 13;
 
 
 class Suggester extends React.Component {
@@ -11,7 +14,38 @@ class Suggester extends React.Component {
     return value && value.trim().length > 0;
   }
 
-  state = { suggestions: [] };
+  state = {
+    suggestions: [],
+    value: '',
+  };
+
+
+  @autobind
+  onChange(event, { method, newValue: value }) {
+    const { onChange } = this.props;
+    if (method === 'enter') {
+      event.preventDefault();
+    } else {
+      onChange(event);
+    }
+    this.setState({ value });
+  }
+
+  @autobind
+  onKeyDown(event) {
+    const { addTag, syntheticTags, addFirst } = this.props;
+    const { suggestions, value } = this.state;
+    const { keyCode } = event;
+
+    if (keyCode === ENTER) {
+      event.preventDefault();
+      if (syntheticTags && suggestions.length === 0) {
+        addTag(synthesizeSuggestion(value));
+      } else if (addFirst && suggestions.length === 1) {
+        addTag(suggestions[0]);
+      }
+    }
+  }
 
   @autobind
   onSuggestionsFetchRequested({ value }) {
@@ -31,18 +65,9 @@ class Suggester extends React.Component {
   }
 
   render() {
-    const { onChange, ref } = this.props;
+    const { ref } = this.props;
     const { suggestions } = this.state;
-
-    const handleOnChange = (e, { method }) => {
-      if (method === 'enter') {
-        e.preventDefault();
-      } else {
-        onChange(e);
-      }
-    };
-
-    const inputProps = { ...this.props, onChange: handleOnChange };
+    const inputProps = { ...this.props, onChange: this.onChange, onKeyDown: this.onKeyDown };
 
     return (
       <Autosuggest

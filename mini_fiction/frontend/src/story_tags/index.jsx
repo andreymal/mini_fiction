@@ -38,6 +38,8 @@ class TagComponent extends React.Component {
         inputProps={{
           className: 'tag-block dropdown-input',
           placeholder: 'Добавить тег',
+          addFirst: true,
+          syntheticTags: false,
         }}
       />
     );

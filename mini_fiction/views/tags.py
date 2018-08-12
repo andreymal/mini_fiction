@@ -31,6 +31,8 @@ def index():
 @db_session
 def tag_index(tag_name, page):
     iname = normalize_tag(tag_name)
+    if not iname:
+        abort(404)
     tag = Tag.get(iname=iname)
     if not tag:
         abort(404)

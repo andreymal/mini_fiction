@@ -1,10 +1,11 @@
 import { getStore } from './store';
 
-const lookup = value => suggestion => suggestion
-  .name
+const find = (haystack, needle) => haystack
   .toLowerCase()
-  .slice(0, value.length) === value;
+  .slice(0, needle.length) === needle;
 
+const lookup = value => ({ name, aliases }) => find(name, value)
+    || aliases.findIndex(alias => find(alias, value)) !== -1;
 
 const getSuggestion = (rawVal) => {
   const value = rawVal.trim().toLowerCase();

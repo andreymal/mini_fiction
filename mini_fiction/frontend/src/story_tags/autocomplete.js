@@ -30,9 +30,12 @@ const synthesizeSuggestion = value => ({
   url: '',
 });
 
+const shouldRenderSuggestion = value => value && value.trim().length > 0;
+
 
 export {
   getSuggestion,
   getSuggestionValue,
   synthesizeSuggestion,
+  shouldRenderSuggestion,
 };

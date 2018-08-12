@@ -2,7 +2,12 @@ import React from 'react';
 import Autosuggest from 'react-autosuggest';
 import autobind from 'autobind-decorator';
 
-import { getSuggestion, getSuggestionValue, synthesizeSuggestion } from './autocomplete';
+import {
+  getSuggestion,
+  getSuggestionValue,
+  synthesizeSuggestion,
+  shouldRenderSuggestion,
+} from './autocomplete';
 import { PlainTag } from './tag';
 
 
@@ -10,10 +15,6 @@ const ENTER = 13;
 
 
 class Suggester extends React.Component {
-  static shouldRenderSuggestions(value) {
-    return value && value.trim().length > 0;
-  }
-
   state = {
     suggestions: [],
     value: '',
@@ -94,7 +95,7 @@ class Suggester extends React.Component {
       <Autosuggest
         ref={ref}
         suggestions={suggestions}
-        shouldRenderSuggestions={Suggester.shouldRenderSuggestions}
+        shouldRenderSuggestions={shouldRenderSuggestion}
         onSuggestionsFetchRequested={this.onSuggestionsFetchRequested}
         onSuggestionsClearRequested={this.onSuggestionsClearRequested}
         onSuggestionHighlighted={this.onSuggestionHighlighted}

@@ -6,18 +6,44 @@ import TagsInput from 'react-tagsinput';
 
 import { CloseableTag } from './tag';
 import Input from './input';
-import { setStoreFromUrl } from './store';
+import { getStore, setStoreFromUrl } from './store';
+import { shouldRenderSuggestion, synthesizeSuggestion } from './autocomplete';
 
 const Layout = (tagComponents, inputComponent) => (
-  <span className="tags-container">
+  <div className="tags-container">
     {tagComponents}
     {inputComponent}
-  </span>
+  </div>
 );
+
+const getHolderValue = tags => tags.map(t => t.name).join(', ');
+
+const extractPlainTags = node => node
+  .getElementsByTagName('input')[0]
+  .value
+  .split(/,\s+/)
+  .filter(shouldRenderSuggestion);
+
+// TODO: make actual lookup
+const transformPlainTag = data => tag => synthesizeSuggestion(tag);
 
 
 class TagComponent extends React.Component {
-  state = { tags: [] };
+  constructor(props) {
+    super(props);
+    this.state = { tags: [] };
+  }
+
+  @autobind
+  componentDidMount() {
+    const { rawTags } = this.props;
+    getStore().then((data) => {
+      // debugger
+      const tagTransformer = transformPlainTag(data);
+      this.setState({ tags: rawTags.map(tagTransformer) });
+    });
+  }
+
 
   @autobind
   handleChange(tags) {
@@ -27,7 +53,7 @@ class TagComponent extends React.Component {
   render() {
     const { tags } = this.state;
     const { holderName } = this.props;
-    const holderValue = tags.map(t => t.name).join(', ');
+    const value = getHolderValue(tags);
 
     return (
       <div>
@@ -45,7 +71,7 @@ class TagComponent extends React.Component {
             syntheticTags: false,
           }}
         />
-        <input className="tags-input-container" name={holderName} value={holderValue} />
+        <input className="tags-input-container" name={holderName} value={value} />
       </div>
     );
   }
@@ -53,6 +79,7 @@ class TagComponent extends React.Component {
 
 export default (node) => {
   const { autocompleteUrl, holderName } = node.dataset;
+  const rawTags = extractPlainTags(node);
   setStoreFromUrl(autocompleteUrl);
-  ReactDOM.render(<TagComponent holderName={holderName} />, node);
+  ReactDOM.render(<TagComponent holderName={holderName} rawTags={rawTags} />, node);
 };

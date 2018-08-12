@@ -26,27 +26,33 @@ class TagComponent extends React.Component {
 
   render() {
     const { tags } = this.state;
+    const { holderName } = this.props;
+    const holderValue = tags.map(t => t.name).join(', ');
+
     return (
-      <TagsInput
-        onlyUnique
-        renderLayout={Layout}
-        renderTag={CloseableTag}
-        renderInput={Input}
-        value={tags}
-        onChange={this.handleChange}
-        inputProps={{
-          className: 'tag-block dropdown-input',
-          placeholder: 'Добавить тег',
-          addFirst: true,
-          syntheticTags: false,
-        }}
-      />
+      <div>
+        <TagsInput
+          onlyUnique
+          renderLayout={Layout}
+          renderTag={CloseableTag}
+          renderInput={Input}
+          value={tags}
+          onChange={this.handleChange}
+          inputProps={{
+            className: 'tag-block dropdown-input',
+            placeholder: 'Добавить тег',
+            addFirst: true,
+            syntheticTags: false,
+          }}
+        />
+        <input className="tags-input-container" name={holderName} value={holderValue} />
+      </div>
     );
   }
 }
 
 export default (node) => {
-  const { autocompleteUrl } = node.dataset;
+  const { autocompleteUrl, holderName } = node.dataset;
   setStoreFromUrl(autocompleteUrl);
-  ReactDOM.render(ReactDOM.createElement(TagComponent), node);
+  ReactDOM.render(<TagComponent holderName={holderName} />, node);
 };

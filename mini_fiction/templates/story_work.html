@@ -54,7 +54,10 @@
                 <!-- Теги -->
                 <div class="control-group{% if form.tags.errors %} error{% endif %}">
                     {{ form.tags.label(class_='control-label') }}
-                    <div class="controls">{{ form.tags }}
+                    <div class="controls">
+                        <div data-autocomplete-url="{{ url_for('tags.autocomplete') }}"
+                             data-holder-name="tags"
+                             data-bazooka="storyTags">{{ form.tags }}</div>
                         {% if form.tags.errors %}
                             {% for error in form.tags.errors %}
                         <span class="help-inline">{{ error }}</span>
@@ -156,16 +159,6 @@
                             <span class="help-inline small">{{ form.original.description }}</span>
                         {% endif %}
                       </div>
-                </div>
-
-                <!-- Tags -->
-                <div class="control-group">
-                    <label class="control-label">Теги</label>
-                    <div
-                        class="controls"
-                        data-autocomplete-url="http://localhost:5000/static/js/autocomplete.json"
-                        data-bazooka="storyTags"
-                    ></div>
                 </div>
 
                 <!-- Не завершен/завершен/заморожен -->

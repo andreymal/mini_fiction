@@ -26,6 +26,10 @@
   width: 80%
 }
 
+.tags-input-container {
+  display: none!important;
+}
+
 .tag-block {
   margin: 0.15em;
   padding: 0.5em;

@@ -32,8 +32,6 @@ from mini_fiction.bl import init_bl
 
 __all__ = ['create_app']
 
-FRONTEND_VERSION = 'static/dist/frontend.version'
-
 
 def create_app():
     select_default_settings()
@@ -304,7 +302,7 @@ def configure_views(app):
 
     @app.url_defaults
     def static_postfix(endpoint, values):
-        if endpoint in ('static', 'localstatic') and 'v' not in values and app.static_v:
+        if endpoint in ('static', 'localstatic') and 'v' not in values and not values['filename'].startswith('build/') and app.static_v:
             values['v'] = app.static_v
 
 
@@ -519,11 +517,11 @@ def configure_development(app):
 
 def configure_frontend(app: Flask):
     try:
-        with Path(FRONTEND_VERSION).open() as f:
+        with Path(app.config['FRONTEND_VERSION_PATH']).open() as f:
             version = f.readline().strip()
     except IOError as _:
         version = 'dev'
-        click.echo('Unable to read frontend version, assuming dev', color='orange')
+        app.logger.info('Unable to read frontend version, assuming dev')
 
     app.config['FRONTEND_VERSION'] = version
 

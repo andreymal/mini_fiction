@@ -7,7 +7,7 @@ import TagsInput from 'react-tagsinput';
 import { CloseableTag } from './tag';
 import Input from './input';
 import { getStore, setStoreFromUrl } from './store';
-import { shouldRenderSuggestion, synthesizeSuggestion } from './autocomplete';
+import { shouldRenderSuggestion } from './autocomplete';
 
 const Layout = (tagComponents, inputComponent) => (
   <div className="tags-container">
@@ -24,9 +24,7 @@ const extractPlainTags = node => node
   .split(/,\s+/)
   .filter(shouldRenderSuggestion);
 
-// TODO: make actual lookup
-const transformPlainTag = data => tag => synthesizeSuggestion(tag);
-
+const transformPlainTag = data => name => data.filter(tag => tag.name === name)[0] || null;
 
 class TagComponent extends React.Component {
   constructor(props) {
@@ -38,9 +36,9 @@ class TagComponent extends React.Component {
   componentDidMount() {
     const { rawTags } = this.props;
     getStore().then((data) => {
-      // debugger
       const tagTransformer = transformPlainTag(data);
-      this.setState({ tags: rawTags.map(tagTransformer) });
+      const tags = rawTags.map(tagTransformer).filter(t => t !== null);
+      this.setState({ tags });
     });
   }
 

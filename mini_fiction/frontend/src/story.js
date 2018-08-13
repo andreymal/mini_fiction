@@ -1,6 +1,10 @@
 import Baz from 'bazooka';
 import storyTags from './story_tags/index';
 
+/* devblock:start */
+require('preact/debug');
+/* devblock:end */
+
 Baz.register({
   storyTags,
 });

@@ -10,7 +10,6 @@ var common = {
     _pasteEvents: [],
     _formSavingFields: {},
     _formSavingTask: null,
-    _tagsAutocomplete: [],
 
     allowedTags: null,
 
@@ -47,7 +46,6 @@ var common = {
         this.buttonsFor(content);
         this.bootstrapFor(content);
         this.formSavingFor(content);
-        this.tagsAutocompleteFor(content);
 
         // Переключение мобильного меню
         document.getElementById('mobile-menu-btn').addEventListener('click', function(event) {
@@ -86,7 +84,6 @@ var common = {
         this.markitupFor(content);
         this.buttonsFor(content);
         this.bootstrapFor(content);
-        this.tagsAutocompleteFor(content);
     },
 
     unload: function(content) {
@@ -96,12 +93,10 @@ var common = {
         this.subforms = [];
         this.markitupDestroy(content);
         this.formSavingDestroy(content);
-        this.tagsAutocompleteDestroy(content);
     },
 
     unloadModal: function(content) {
         this.markitupDestroy(content);
-        this.tagsAutocompleteDestroy(content);
     },
 
     initSubscriptionForm: function(form) {
@@ -529,287 +524,7 @@ var common = {
         }
 
         return changed;
-    },
-
-    // Автодополнение тегов
-
-    tagsAutocompleteFor: function(elem) {
-        var widgets = elem.getElementsByClassName('js-input-tags');
-        for (var i = 0; i < widgets.length; i++) {
-            var widget = new common.TagsInput(widgets[i]);
-            this._tagsAutocomplete.push(widget);
-        }
-    },
-
-    tagsAutocompleteDestroy: function(elem) {
-        for (var i = this._tagsAutocomplete.length - 1; i >= 0; i--) {
-            var widget = this._tagsAutocomplete[i];
-            if (elem.contains(widget.getDOM())) {
-                widget.destroy();
-                this._tagsAutocomplete.splice(i, 1);
-            }
-        }
     }
-};
-
-
-common.TagsInput = function(cont) {
-    this._dom = {
-        cont: cont,
-        input: cont.getElementsByTagName('input')[0],
-        popup: cont.getElementsByClassName('js-input-tags-popup')[0]
-    };
-
-    this._delay = 150;
-    this._fetchURL = '/tags/autocomplete.json?tag={}';
-
-    this._tagsCache = {};  // {tag_prefix: DOM array}
-    this._lockPopup = false;
-    this._lastInputTag = null;
-    this._popupTag = null;
-    this._delayTask = null;
-
-    this._updateBind = this.update.bind(this);
-    this._blurBind = this._blurEvent.bind(this);
-    this._popupEnterBind = this._popupEnterEvent.bind(this);
-    this._popupLeaveBind = this._popupLeaveEvent.bind(this);
-
-    this._dom.input.addEventListener('input', this._updateBind);
-    this._dom.input.addEventListener('change', this._updateBind);
-    this._dom.input.addEventListener('keyup', this._updateBind);
-    this._dom.input.addEventListener('mousedown', this._updateBind);
-    this._dom.input.addEventListener('focus', this._updateBind);
-    this._dom.input.addEventListener('blur', this._blurBind);
-    this._dom.popup.addEventListener('mouseenter', this._popupEnterBind);
-    this._dom.popup.addEventListener('mouseleave', this._popupLeaveBind);
-};
-
-
-common.TagsInput.prototype.destroy = function() {
-    if (this._delayTask !== null) {
-        clearTimeout(this._delayTask);
-        this._delayTask = null;
-    }
-
-    this._tagsCache = {};
-    this._dom.popup.innerHTML = '';
-
-    this._dom.input.removeEventListener('input', this._updateBind);
-    this._dom.input.removeEventListener('change', this._updateBind);
-    this._dom.input.removeEventListener('keyup', this._updateBind);
-    this._dom.input.removeEventListener('focus', this._updateBind);
-    this._dom.input.removeEventListener('mousedown', this._updateBind);
-    this._dom.input.removeEventListener('blur', this._blurBind);
-    this._dom.popup.removeEventListener('mouseenter', this._popupEnterBind);
-    this._dom.popup.removeEventListener('mouseleave', this._popupLeaveBind);
-
-    this._updateBind = null;
-    this._blurBind = null;
-    this._popupEnterBind = null;
-    this._popupLeaveBind = null;
-
-    this._lastInputTag = null;
-    this._popupTag = null;
-    this._dom = null;
-};
-
-
-common.TagsInput.prototype.getDOM = function() {
-    return this._dom.cont;
-};
-
-
-common.TagsInput.prototype.update = function() {
-    if (this._dom.input.selectionStart !== this._dom.input.value.length) {
-        this.hide();
-        return;
-    }
-
-    this._lastInputTag = this.getCurrentTag();
-    this.loadSuggestions();
-};
-
-
-common.TagsInput.prototype.loadSuggestions = function() {
-    var tag = this._lastInputTag;
-
-    // Если в popup сейчас уже загружен контент для текущего тега,
-    // то тупо отображаем его
-    if (this._popupTag === tag) {
-        this._dom.popup.classList.remove('popup-hidden');
-        return;
-    }
-
-    // Предыдущее ожидание отменяем, потому что вызов loadSuggestions означает,
-    // что пользователь ввёл что-то другое
-    if (this._delayTask !== null) {
-        clearTimeout(this._delayTask);
-        this._delayTask = null;
-    }
-
-    // Если DOM для этого тега уже есть, то просто отображаем его
-    if (this._tagsCache.hasOwnProperty(tag)) {
-        this._dom.popup.scrollTop = 0;
-        this._dom.popup.innerHTML = '';
-        for (var i = 0; i < this._tagsCache[tag].length; i++) {
-            this._dom.popup.appendChild(this._tagsCache[tag][i]);
-        }
-        this._popupTag = tag;
-        this._dom.popup.classList.remove('popup-hidden');
-        return;
-    }
-
-    // Если нет, то выполняем AJAX-запрос (с небольшой задержкой)
-    this._delayTask = setTimeout(function() {
-        this._delayTask = null;
-
-        // Всюду стоят clearTimeout'ы, поэтому должно быть равно
-        if (tag !== this._lastInputTag) {
-            console.warn('delayTask: tag !== this._lastInputTag');
-            return;
-        }
-
-        this.fetchTags(tag).then(function(tagsList) {
-            // Проверяем, что ответ на AJAX-запрос не опоздал
-            if (tag !== this._lastInputTag) {
-                return;
-            }
-            this.setTags(tag, tagsList);
-        }.bind(this), function(err) {
-            console.error(err);
-        });
-    }.bind(this), this._delay);
-};
-
-
-common.TagsInput.prototype.fetchTags = function(tag) {
-    var url = this._fetchURL.replace('{}', encodeURIComponent(tag));
-
-    return core.ajax.fetch(url).then(function(response) {
-        return response.json();
-    }).then(function(data) {
-        if (!data.success) {
-            var err = new Error('Tags fetch failed');
-            err.data = data;
-            throw err;
-        }
-        return data.tags;
-    }.bind(this));
-};
-
-
-common.TagsInput.prototype.setTags = function(tag, tags) {
-    this._popupTag = tag;
-
-    this._dom.popup.scrollTop = 0;
-    this._dom.popup.innerHTML = '';
-    for (var i = 0; i < tags.length; i++) {
-        var tagData = tags[i];
-
-        var tagCont = document.createElement('span');
-        tagCont.className = 'input-tags-popup-item';
-
-        var tagName = document.createElement('span');
-        tagName.className = 'input-tags-popup-item-name';
-        tagName.textContent = tagData.name;
-
-        var tagCount = document.createElement('span');
-        tagCount.className = 'input-tags-popup-item-count';
-        tagCount.textContent = '(' + tagData.stories_count + ')';
-
-        var tagDesc = document.createElement('span');
-        tagDesc.className = 'input-tags-popup-item-description';
-        tagDesc.innerHTML = tagData.description;
-
-        tagCont.appendChild(tagName);
-        tagCont.appendChild(document.createTextNode(' '));
-        tagCont.appendChild(tagCount);
-        tagCont.appendChild(tagDesc);
-
-        tagCont.setAttribute('data-tag', tagData.name);
-        tagCont.addEventListener('click', this._tagClick.bind(this));
-
-        this._dom.popup.appendChild(tagCont);
-    }
-
-    if (tags.length > 0) {
-        this._dom.popup.classList.remove('popup-hidden');
-    } else {
-        this._dom.popup.classList.add('popup-hidden');
-    }
-
-    // Пустой тег означает предложения по умолчанию — сохраняем их отдельно,
-    // чтобы не плодить AJAX-запросов на пустоту
-    if (tag === '') {
-        this._tagsCache[tag] = Array.prototype.slice.call(this._dom.popup.children);
-    }
-};
-
-
-common.TagsInput.prototype.hide = function(force) {
-    if (!force && this._lockPopup) {
-        return false;
-    }
-
-    this._dom.popup.scrollTop = 0;
-    this._dom.popup.classList.add('popup-hidden');
-    this._lockPopup = false;
-    return true;
-};
-
-
-common.TagsInput.prototype.getCurrentTag = function() {
-    var text = this._dom.input.value.substring(0, this._dom.input.selectionStart);
-    var comma = text.lastIndexOf(',');
-
-    var result = text;
-    if (comma >= 0) {
-        result = result.substring(comma + 1);
-    }
-    result = result.trim();
-    if (!result || result.length < 2) {
-        return '';
-    }
-    return result;
-};
-
-
-common.TagsInput.prototype._blurEvent = function() {
-    this.hide();
-};
-
-
-common.TagsInput.prototype._popupEnterEvent = function() {
-    this._lockPopup = true;
-};
-
-
-common.TagsInput.prototype._popupLeaveEvent = function() {
-    this._lockPopup = false;
-};
-
-
-common.TagsInput.prototype._tagClick = function(event) {
-    var tagCont = event.currentTarget;
-    var tag = tagCont.getAttribute('data-tag');
-
-    if (!tag || this._lastInputTag === null || this._lastInputTag !== this._popupTag) {
-        this.hide(true);
-        return;
-    }
-
-    var value = this._dom.input.value;
-    var comma = value.lastIndexOf(',');
-    if (comma > 0) {
-        value = value.substring(0, comma) + ', ' + tag;
-    } else {
-        value = tag;
-    }
-    value += ', ';
-    this._dom.input.value = value;
-
-    this._dom.input.focus();
-    this.hide(true);
 };
 
 

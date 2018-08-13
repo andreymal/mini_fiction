@@ -519,7 +519,8 @@ def configure_development(app):
 
 def configure_frontend(app: Flask):
     try:
-        version = Path(FRONTEND_VERSION).read_text().strip()
+        with Path(FRONTEND_VERSION).open() as f:
+            version = f.readline().strip()
     except IOError as _:
         version = 'dev'
         click.echo('Unable to read frontend version, assuming dev', color='orange')

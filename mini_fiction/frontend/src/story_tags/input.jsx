@@ -1,6 +1,5 @@
 import React from 'react';
 import Autosuggest from 'react-autosuggest';
-import autobind from 'autobind-decorator';
 
 import {
   getSuggestion,
@@ -21,9 +20,7 @@ class Suggester extends React.Component {
     highlighted: null,
   };
 
-
-  @autobind
-  onChange(event, { method, newValue: value }) {
+  onChange = (event, { method, newValue: value }) => {
     const { onChange } = this.props;
     if (method === 'enter') {
       event.preventDefault();
@@ -31,10 +28,9 @@ class Suggester extends React.Component {
       onChange(event);
     }
     this.setState({ value });
-  }
+  };
 
-  @autobind
-  onKeyDown(event) {
+  onKeyDown = (event) => {
     const { addTag, syntheticTags, addFirst } = this.props;
     const { suggestions, value } = this.state;
     const { keyCode } = event;
@@ -47,32 +43,23 @@ class Suggester extends React.Component {
         addTag(suggestions[0]);
       }
     }
-  }
+  };
 
-  @autobind
-  onSuggestionsFetchRequested({ value }) {
+  onSuggestionsFetchRequested = ({ value }) => {
     getSuggestion(value)
       .then(suggestions => this.setState({ suggestions }));
-  }
+  };
 
-  @autobind
-  onSuggestionsClearRequested() {
-    this.setState({ suggestions: [] });
-  }
+  onSuggestionsClearRequested = () => this.setState({ suggestions: [] });
 
-  @autobind
-  onSuggestionSelected(e, { suggestion }) {
+  onSuggestionSelected = (e, { suggestion }) => {
     const { addTag } = this.props;
     addTag(suggestion);
-  }
+  };
 
-  @autobind
-  onSuggestionHighlighted({ suggestion: highlighted }) {
-    this.setState({ highlighted });
-  }
+  onSuggestionHighlighted = ({ suggestion: highlighted }) => this.setState({ highlighted });
 
-  @autobind
-  renderSuggestionsContainer({ containerProps, children }) {
+  renderSuggestionsContainer = ({ containerProps, children }) => {
     const { highlighted, suggestions } = this.state;
     const tag = highlighted || (suggestions.length === 1 && suggestions[0]);
     return (
@@ -83,8 +70,7 @@ class Suggester extends React.Component {
         </div>
       </div>
     );
-  }
-
+  };
 
   render() {
     const { ref } = this.props;

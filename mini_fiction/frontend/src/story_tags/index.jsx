@@ -1,7 +1,6 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 
-import autobind from 'autobind-decorator';
 import TagsInput from 'react-tagsinput';
 
 import { CloseableTag } from './tag';
@@ -27,26 +26,19 @@ const extractPlainTags = node => node
 const transformPlainTag = data => name => data.filter(tag => tag.name === name)[0] || null;
 
 class TagComponent extends React.Component {
-  constructor(props) {
-    super(props);
-    this.state = { tags: [] };
-  }
+  state = { tags: [] };
 
-  @autobind
-  componentDidMount() {
+  componentDidMount = () => {
     const { rawTags } = this.props;
     getStore().then((data) => {
       const tagTransformer = transformPlainTag(data);
       const tags = rawTags.map(tagTransformer).filter(t => t !== null);
       this.setState({ tags });
     });
-  }
+  };
 
 
-  @autobind
-  handleChange(tags) {
-    this.setState({ tags });
-  }
+  handleChange = tags => this.setState({ tags });
 
   render() {
     const { tags } = this.state;

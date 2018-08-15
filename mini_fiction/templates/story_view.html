@@ -50,6 +50,8 @@
             </p>
             #}
             <p class="story-genres">
+                {%- set main_tags = story.bl.get_main_tags(sort=True) -%}
+                {%- set more_tags = story.bl.get_more_tags(sort=True) -%}
                 {% for st in main_tags %}
                     <a class="gen"
                         {%- if st.tag.get_color() -%} style="background-color: {{- st.tag.get_color() -}}"{%- endif %}

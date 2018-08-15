@@ -1497,6 +1497,15 @@ p.meta .chapter-controls {
 }
 
 /* Search page and results */
+.search-input {
+    width: 384px;
+    margin-right: 20px;
+}
+
+.search-type-buttons {
+    padding-left: 0px;
+}
+
 .search-results {
     margin-bottom: 100px;
     overflow: visible;
@@ -1672,6 +1681,11 @@ a.invisible-link:hover {
 img.ui-selected {
     background-color: #66CC66;
     border-color: transparent;
+}
+
+/* Workaround for small resolutions */
+.btn-group.btn-group-wrap {
+    white-space: normal;
 }
 
 /* Add and edit story */
@@ -2761,6 +2775,9 @@ ul.editlog .editlog-item:nth-child(2n+1) {
         max-width: 400px;
         max-height: 200px;
     }
+    .search-input {
+        width: 256px;
+    }
     .story-chapter-page .story-panel {
         height: auto;
     }
@@ -2816,6 +2833,11 @@ ul.editlog .editlog-item:nth-child(2n+1) {
         width: 95%;
         width: calc(100% - 12px - 12px);
     }
+    .search-input {
+        width: 95%;
+        width: calc(100% - 12px - 2px);
+        margin-right: 0;
+    }
     .main-menu .logolink {
         font-size: 15px;
         padding-right: 6px;
@@ -2847,9 +2869,11 @@ ul.editlog .editlog-item:nth-child(2n+1) {
         display: inline;
         padding-right: 0;
     }
+    /*
     .padded>.bootstrap.radio {
         display: none;
     }
+    */
     .input-tags {
         width: 95%;
         width: calc(100% - 12px + 2px);

@@ -76,14 +76,8 @@ def view(pk, comments_page):
     else:
         comment_votes_cache = {i: 0 for i in comment_ids}
 
-    tags = story.bl.get_tags_list(sort=True)
-    main_tags = [x for x in tags if x.tag.is_main_tag]
-    more_tags = [x for x in tags if not x.tag.is_main_tag]
-
     data = {
         'story': story,
-        'main_tags': main_tags,
-        'more_tags': more_tags,
         'contributors': story.bl.get_contributors_for_view(),
         'vote': user_vote,
         'author_ids': [x.id for x in story.authors],

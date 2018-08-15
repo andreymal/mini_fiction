@@ -102,22 +102,8 @@ def autocomplete():
     return response
 
 
-def _get_default_tags(limit=20):
-    tags = []
-    all_tags = Tag.bl.get_all_tags()
-
-    # В начале основные теги
-    tags = [x for x in all_tags if x.is_main_tag]
-    tags.sort(key=lambda x: (x.category.id if x.category else 2 ** 31, x.iname))
-
-    # Потом двадцать самых популярных
-    cnt = 0
-    all_tags.sort(key=lambda x: x.published_stories_count, reverse=True)
-    for x in all_tags:
-        if not x.is_main_tag:
-            tags.append(x)
-            cnt += 1
-            if cnt >= limit:
-                break
-
+def _get_default_tags():
+    # Отдаём все теги, отсортированные по популярности
+    tags = list(Tag.bl.get_all_tags())
+    tags.sort(key=lambda x: x.published_stories_count, reverse=True)
     return tags

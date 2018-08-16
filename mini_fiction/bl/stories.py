@@ -75,8 +75,8 @@ class StoryBL(BaseBL, Commentable):
             vote_extra=current_app.story_voting.get_default_vote_extra() if current_app.story_voting else '{}',
         )
         story.flush()  # получаем id у базы данных
-        story.categories.add(list(Category.select(lambda x: x.id in data['categories'])))
-        story.characters.add(list(Character.select(lambda x: x.id in data['characters'])))
+        # story.categories.add(list(Category.select(lambda x: x.id in data['categories'])))
+        # story.characters.add(list(Character.select(lambda x: x.id in data['characters'])))
         # story.classifications.add(list(Classifier.select(lambda x: x.id in data['classifications'])))
         story.bl.set_tags(authors[0], data['tags'], update_search=False)
         for author in authors:
@@ -1197,6 +1197,12 @@ class StoryBL(BaseBL, Commentable):
         if sort:
             result.sort(key=lambda x: (x.tag.category.id if x.tag.category else 2 ** 31, x.tag.iname))
         return result
+
+    def get_main_tags(self, sort=False):
+        return [x for x in self.get_tags_list(sort=sort) if x.tag.is_main_tag]
+
+    def get_more_tags(self, sort=False):
+        return [x for x in self.get_tags_list(sort=sort) if not x.tag.is_main_tag]
 
     def add_tag(self, user, tag, check_blacklist=True, log=True, update_search=True):
         from mini_fiction.models import Tag, TagBlacklist, StoryTag, StoryTagLog

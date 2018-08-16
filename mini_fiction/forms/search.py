@@ -14,13 +14,13 @@ class SearchForm(Form):
     checkbox_attrs = {
         'btn_attrs': {'type': 'button', 'class': 'btn'},
         'data_attrs': {'class': 'hidden'},
-        'btn_container_attrs': {'class': 'btn-group buttons-visible', 'data-toggle': 'buttons-checkbox'},
+        'btn_container_attrs': {'class': 'btn-group btn-group-wrap buttons-visible', 'data-toggle': 'buttons-checkbox'},
         'data_container_attrs': {'class': 'buttons-data'},
     }
     radio_attrs = {
         'btn_attrs': {'type': 'button', 'class': 'btn'},
         'data_attrs': {'class': 'hidden'},
-        'btn_container_attrs': {'class': 'btn-group buttons-visible', 'data-toggle': 'buttons-radio'},
+        'btn_container_attrs': {'class': 'btn-group btn-group-wrap buttons-visible', 'data-toggle': 'buttons-radio'},
         'data_container_attrs': {'class': 'buttons-data'},
     }
     img_attrs = {
@@ -39,8 +39,7 @@ class SearchForm(Form):
         render_kw={
             'size': 32,
             'placeholder': 'Пинки-поиск',
-            'id': 'appendedInputButtons',
-            'class': 'span3',
+            'class': 'search-input',
             'maxlength': 128,
         }
     )

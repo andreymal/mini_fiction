@@ -773,12 +773,11 @@ h1 .alert {
 
 p.meta .gen {
     padding: 2px 7px;
-    margin: 0 4px 0 0;
+    margin: 0 4px 2px 0;
 }
 
 a.gen:hover {
     color: #fff;
-    background-color: #999 !important;
 }
 
 label.gen {
@@ -787,6 +786,28 @@ label.gen {
 
 label.gen input {
     margin: 2px 4px 0 0 !important;
+}
+
+.gen.more-tags-btn {
+  background-color: #ddd;
+}
+
+.gen.more-tags-btn:hover {
+  background-color: #bbb;
+}
+
+p.meta .gen.more-tags-btn {
+  padding: 2px 4px;
+}
+
+.show-more-tags-link {
+    display: inline-block;
+    margin: 0 4px 4px 0;
+    padding: 4px 2px;
+    line-height: 16px;
+
+    text-decoration: underline;
+    text-decoration-style: dotted;
 }
 
 /* Tags list page */
@@ -1417,6 +1438,15 @@ p.meta .chapter-controls {
 }
 
 /* Search page and results */
+.search-input {
+    width: 384px;
+    margin-right: 20px;
+}
+
+.search-type-buttons {
+    padding-left: 0px;
+}
+
 .search-results {
     margin-bottom: 100px;
     overflow: visible;
@@ -1587,6 +1617,11 @@ a.invisible-link:hover {
 img.ui-selected {
     background-color: #66CC66;
     border-color: transparent;
+}
+
+/* Workaround for small resolutions */
+.btn-group.btn-group-wrap {
+    white-space: normal;
 }
 
 /* Add and edit story */
@@ -2676,6 +2711,9 @@ ul.editlog .editlog-item:nth-child(2n+1) {
         max-width: 400px;
         max-height: 200px;
     }
+    .search-input {
+        width: 256px;
+    }
     .story-chapter-page .story-panel {
         height: auto;
     }
@@ -2731,6 +2769,11 @@ ul.editlog .editlog-item:nth-child(2n+1) {
         width: 95%;
         width: calc(100% - 12px - 12px);
     }
+    .search-input {
+        width: 95%;
+        width: calc(100% - 12px - 2px);
+        margin-right: 0;
+    }
     .main-menu .logolink {
         font-size: 15px;
         padding-right: 6px;
@@ -2762,9 +2805,11 @@ ul.editlog .editlog-item:nth-child(2n+1) {
         display: inline;
         padding-right: 0;
     }
+    /*
     .padded>.bootstrap.radio {
         display: none;
     }
+    */
     .all-tags-list > li {
         width: 100%;
     }

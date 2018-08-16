@@ -369,6 +369,9 @@ class StoryTag(db.Entity):
 
     orm.composite_key(story, tag)
 
+    def __repr__(self):
+        return '<StoryTag: {} for {}>'.format(self.tag.name, self.story.id)
+
 
 class StoryTagLog(db.Entity):
     """ Модель изменения действующих тегов рассказа """

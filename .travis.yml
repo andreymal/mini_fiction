@@ -1,30 +1,38 @@
 language: python
+
 addons:
-  - chrome: stable
+  chrome: stable
+
 cache:
   directories:
     - $HOME/.cache/pip
+
 before_cache:
   - rm -f $HOME/.cache/pip/log/debug.log
+
 python:
   - "3.4"
   - "3.5"
   - "3.6"
+
 before_install:
   - mkdir /tmp/chromedriver
-  - wget https://chromedriver.storage.googleapis.com/2.35/chromedriver_linux64.zip -O /tmp/chromedriver/chromedriver.zip
+  - wget https://chromedriver.storage.googleapis.com/2.41/chromedriver_linux64.zip -O /tmp/chromedriver/chromedriver.zip
   - unzip /tmp/chromedriver/chromedriver.zip -d /tmp/chromedriver
   - chmod 700 /tmp/chromedriver/chromedriver
+
 install:
-  - pip install git+https://github.com/ponyorm/pony.git#egg=pony
-  - pip install -r requirements.txt
-  - pip install -r optional-requirements.txt
-  - pip install -r test-requirements.txt
+  - pip install -r requirements.txt -r optional-requirements.txt -r test-requirements.txt
   - pip install -e .
   - pybabel compile -d mini_fiction/translations
+
 env:
   - PYTHONPATH=. MINIFICTION_SETTINGS=mini_fiction.settings.Test
+
 before_script:
   - export PATH=$PATH:/tmp/chromedriver
+  - google-chrome-stable --version
+  - chromedriver --version
+
 script:
   - python setup.py test

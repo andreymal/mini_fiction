@@ -43,16 +43,16 @@
                     <h4>Теги</h4>
                     <p>
                         <span
-                            data-autocomplete-url="{{ url_for('tags.autocomplete') }}"
-                            data-holder-name="tags"
+                            data-ti-autocomplete-url="{{ url_for('tags.autocomplete') }}"
+                            data-ti-holder-name="tags"
                             data-bazooka="storyTags">{{ form.tags }}
                         </span>
                     </p>
                     <h4>Исключить рассказы с этими тегами</h4>
                     <p>
                         <span
-                                data-autocomplete-url="{{ url_for('tags.autocomplete') }}"
-                                data-holder-name="exclude_tags"
+                                data-ti-autocomplete-url="{{ url_for('tags.autocomplete') }}"
+                                data-ti-holder-name="exclude_tags"
                                 data-bazooka="storyTags">{{ form.exclude_tags }}
                         </span>
                     </p>

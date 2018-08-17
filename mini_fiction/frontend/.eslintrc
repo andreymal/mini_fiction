@@ -2,6 +2,16 @@
   "parser": "babel-eslint",
   "extends": "airbnb",
   "rules": {
+    "import/no-unresolved": [
+      2,
+      {
+        "ignore": [
+          "react",
+          "react-dom"
+        ]
+      }
+    ],
+    "import/no-extraneous-dependencies": 0,
     "react/prop-types": 0,
     "jsx-a11y/anchor-has-content": 0,
     "jsx-a11y/click-events-have-key-events": 0,
@@ -10,11 +20,5 @@
   },
   "globals": {
     "window": true
-  },
-  "settings": {
-    "import/ignore": [
-      "react",
-      "react-dom"
-    ]
   }
 }

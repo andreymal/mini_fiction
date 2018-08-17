@@ -55,8 +55,9 @@
                 <div class="control-group{% if form.tags.errors %} error{% endif %}">
                     {{ form.tags.label(class_='control-label') }}
                     <div class="controls">
-                        <div data-autocomplete-url="{{ url_for('tags.autocomplete') }}"
-                             data-holder-name="tags"
+                        <div data-ti-autocomplete-url="{{ url_for('tags.autocomplete') }}"
+                             data-ti-holder-name="tags"
+                             data-ti-synthetic-tags
                              data-bazooka="storyTags">{{ form.tags }}</div>
                         {% if form.tags.errors %}
                             {% for error in form.tags.errors %}

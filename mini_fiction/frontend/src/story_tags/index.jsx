@@ -42,7 +42,7 @@ class TagComponent extends React.Component {
 
   render() {
     const { tags } = this.state;
-    const { holderName } = this.props;
+    const { holderName, allowSyntheticTags } = this.props;
     const value = getHolderValue(tags);
 
     return (
@@ -58,7 +58,7 @@ class TagComponent extends React.Component {
             className: 'tag-block dropdown-input',
             placeholder: 'Добавить тег',
             addFirst: true,
-            syntheticTags: false,
+            allowSyntheticTags,
           }}
         />
         <input className="tags-input-container" name={holderName} value={value} />
@@ -67,9 +67,30 @@ class TagComponent extends React.Component {
   }
 }
 
+const getKey = (prefix, key) => {
+  const k = key.slice(prefix.length);
+  return k.charAt(0).toLowerCase() + k.slice(1);
+};
+
+const filterParams = (prefix, obj) => Object.keys(obj)
+  .filter(k => k.startsWith(prefix))
+  .reduce((acc, k) => {
+    acc[getKey(prefix, k)] = obj[k];
+    return acc;
+  }, {});
+
 export default (node) => {
-  const { autocompleteUrl, holderName } = node.dataset;
+  const attrPrefix = 'ti';
+  const {
+    autocompleteUrl,
+    holderName,
+    syntheticTags,
+  } = filterParams(attrPrefix, node.dataset);
   const rawTags = extractPlainTags(node);
   setStoreFromUrl(autocompleteUrl);
-  ReactDOM.render(<TagComponent holderName={holderName} rawTags={rawTags} />, node);
+  ReactDOM.render(<TagComponent
+    holderName={holderName}
+    rawTags={rawTags}
+    allowSyntheticTags={Boolean(syntheticTags)}
+  />, node);
 };

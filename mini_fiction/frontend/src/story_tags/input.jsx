@@ -31,13 +31,13 @@ class Suggester extends React.Component {
   };
 
   onKeyDown = (event) => {
-    const { addTag, syntheticTags, addFirst } = this.props;
+    const { addTag, allowSyntheticTags, addFirst } = this.props;
     const { suggestions, value } = this.state;
     const { keyCode } = event;
 
     if (keyCode === ENTER) {
       event.preventDefault();
-      if (syntheticTags && suggestions.length === 0) {
+      if (allowSyntheticTags && suggestions.length === 0) {
         addTag(synthesizeSuggestion(value));
       } else if (addFirst && suggestions.length === 1) {
         addTag(suggestions[0]);

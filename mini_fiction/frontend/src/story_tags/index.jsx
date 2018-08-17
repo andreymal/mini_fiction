@@ -91,6 +91,6 @@ export default (node) => {
   ReactDOM.render(<TagComponent
     holderName={holderName}
     rawTags={rawTags}
-    allowSyntheticTags={Boolean(syntheticTags)}
+    allowSyntheticTags={syntheticTags !== undefined}
   />, node);
 };

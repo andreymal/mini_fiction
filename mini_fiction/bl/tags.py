@@ -54,6 +54,7 @@ class TagBL(BaseBL):
 
         # Собираем результат, попутно создавая недостающие теги
         result = []
+        created_tags = []
         for x in tags:
             if isinstance(x, Tag):
                 result.append(x)
@@ -76,9 +77,14 @@ class TagBL(BaseBL):
                 tag.flush()  # получаем id у базы данных
                 result.append(tag)
                 tags_db[tag.iname] = tag  # На случай, если у следующего тега в цикле совпадёт iname
+                created_tags.append(tag)
 
             else:
                 result.append(None)
+
+        if created_tags:
+            # see views/tags.py
+            current_app.cache.delete('tags_autocomplete_default')
 
         assert len(tags) == len(result)
         return result

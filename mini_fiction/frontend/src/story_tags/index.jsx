@@ -27,6 +27,19 @@ const transformPlainTag = data => name => (
   data.filter(tag => tag.name === name)[0] || synthesizeSuggestion(name)
 );
 
+const splitSeparators = [',', ';', '\\(', '\\)', '\\*', '/', ':', '\\?', '\n', '\r'];
+const splitRegex = new RegExp(splitSeparators.join('|'));
+
+const capitalize = v => v.charAt(0).toUpperCase() + v.slice(1);
+
+const normalize = v => v.toLowerCase().trim();
+
+const pasteSplit = input => input
+  .split(splitRegex)
+  .map(normalize)
+  .map(capitalize)
+  .map(synthesizeSuggestion);
+
 class TagComponent extends React.Component {
   state = { tags: [] };
 
@@ -52,11 +65,13 @@ class TagComponent extends React.Component {
       <div>
         <TagsInput
           onlyUnique
+          addOnPaste
           renderLayout={Layout}
           renderTag={CloseableTag}
           renderInput={Input}
           value={tags}
           onChange={this.handleChange}
+          pasteSplit={pasteSplit}
           inputProps={{
             className: 'tag-block dropdown-input',
             placeholder: 'Добавить тег',

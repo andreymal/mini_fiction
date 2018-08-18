@@ -2,7 +2,6 @@
   "name": "mini_fiction",
   "version": "1.0.0",
   "description": "Frontend components",
-  "main": "index.js",
   "scripts": {
     "webpack": "webpack --progress",
     "webpack:watch": "webpack --progress --watch",
@@ -14,11 +13,12 @@
     "email": "me@orhideous.name",
     "url": "https://orhideous.name/"
   },
-  "license": "ISC",
+  "contributors": [
+  ],
+  "license": "GPLv3",
   "dependencies": {
     "bazooka": "^0.9.0",
     "classnames": "^2.2.6",
-    "fbjs": "^0.8.17",
     "preact": "^8.2.9",
     "preact-compat": "^3.18.2",
     "react-autosuggest": "^9.3.4",

@@ -789,15 +789,15 @@ label.gen input {
 }
 
 .gen.more-tags-btn {
-    background-color: #ddd;
+  background-color: #ddd;
 }
 
 .gen.more-tags-btn:hover {
-    background-color: #bbb;
+  background-color: #bbb;
 }
 
 p.meta .gen.more-tags-btn {
-    padding: 2px 4px;
+  padding: 2px 4px;
 }
 
 .show-more-tags-link {
@@ -808,65 +808,6 @@ p.meta .gen.more-tags-btn {
 
     text-decoration: underline;
     text-decoration-style: dotted;
-}
-
-/* Tags widget */
-.input-tags {
-    display: inline-block;
-    position: relative;
-}
-
-.input-tags-popup {
-    display: block;
-    position: absolute;
-    top: 100%;
-    left: 0;
-    right: 0;
-    background-color: white;
-    z-index: 2;
-    overflow-x: hidden;
-    overflow-y: scroll;
-
-    border: 1px solid #ccc;
-    box-sizing: border-box;
-    max-height: 192px;
-
-    font-size: 14px;
-    line-height: 20px;
-}
-
-.input-tags-popup.popup-hidden {
-    display: none;
-}
-
-.input-tags-popup-item {
-    display: block;
-    cursor: pointer;
-    border-bottom: 1px solid #ccc;
-    background-color: white;
-    padding: 0 4px;
-}
-
-.input-tags-popup-item:hover {
-    background-color: #eef;
-}
-
-.input-tags-popup-item-name {
-    font-weight: bold;
-}
-
-.input-tags-popup-item-count {
-    font-style: italic;
-    font-size: 0.75em;
-    color: #999;
-}
-
-.input-tags-popup-item-description {
-    display: block;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    font-size: 0.75em;
 }
 
 /* Tags list page */
@@ -1546,11 +1487,6 @@ p.meta .chapter-controls {
 
 .checkbox.inline {
     margin-right: 10px;
-}
-
-.genres-select  .checkbox.inline {
-    margin-bottom: 6px;
-    margin-right: 0;
 }
 
 div.padded {
@@ -2874,14 +2810,6 @@ ul.editlog .editlog-item:nth-child(2n+1) {
         display: none;
     }
     */
-    .input-tags {
-        width: 95%;
-        width: calc(100% - 12px + 2px);
-    }
-    .input-tags > input {
-        width: 95%;
-        width: calc(100% - 12px - 2px); /* bootstrap is crap */
-    }
     .all-tags-list > li {
         width: 100%;
     }

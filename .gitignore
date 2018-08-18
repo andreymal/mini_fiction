@@ -4,8 +4,6 @@
 
 # Byte-compiled / optimized files
 __pycache__/
-*.pyc
-*.pyo
 
 # virtualenv
 /env
@@ -46,3 +44,4 @@ dist/
 *.sqlite3
 /celerybeat-schedule
 /celerybeat.pid
+node_modules

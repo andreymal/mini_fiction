@@ -127,6 +127,8 @@ class Config(object):
     LOCALSTATIC_ROOT = None
     LOCALTEMPLATES = None
 
+    FRONTEND_VERSION_PATH = os.path.join(os.path.dirname(__file__), 'static/build/frontend.version')
+
     SPHINX_DISABLED = False
     SPHINX_CONFIG = {
         'connection_params': {'unix_socket': '/tmp/sphinx_fanfics.socket', 'charset': 'utf8'},

@@ -8,5 +8,9 @@ recursive-exclude * *.py[co]
 recursive-include mini_fiction/filters *
 recursive-include mini_fiction/fixtures *
 recursive-include mini_fiction/static *
+recursive-include mini_fiction/frontend *
+prune mini_fiction/frontend/node_modules
+recursive-exclude mini_fiction/frontend/node_modules
+recursive-exclude mini_fiction/frontend/build *
 recursive-include mini_fiction/templates *
 recursive-include mini_fiction/translations *

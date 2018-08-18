@@ -54,7 +54,11 @@
                 <!-- Теги -->
                 <div class="control-group{% if form.tags.errors %} error{% endif %}">
                     {{ form.tags.label(class_='control-label') }}
-                    <div class="controls">{{ form.tags }}
+                    <div class="controls">
+                        <div data-ti-autocomplete-url="{{ url_for('tags.autocomplete') }}"
+                             data-ti-holder-name="tags"
+                             data-ti-synthetic-tags
+                             data-bazooka="storyTags">{{ form.tags }}</div>
                         {% if form.tags.errors %}
                             {% for error in form.tags.errors %}
                         <span class="help-inline">{{ error }}</span>
@@ -157,6 +161,7 @@
                         {% endif %}
                       </div>
                 </div>
+
                 <!-- Не завершен/завершен/заморожен -->
                 <div class="control-group{% if form.status.errors %} error{% endif %}">
                     {{ form.status.label(class_='control-label', for=False) }}

@@ -9,8 +9,10 @@ import logging
 import importlib
 from datetime import datetime
 from logging.handlers import SMTPHandler
+from pathlib import Path
 
 import jinja2
+import click
 from celery import Celery
 from werkzeug.urls import iri_to_uri
 from werkzeug.contrib import cache
@@ -70,6 +72,7 @@ def create_app():
     configure_story_voting(app)
     configure_misc(app)
     configure_development(app)
+    configure_frontend(app)
 
     app.context_processor(templates_context)
 
@@ -299,7 +302,7 @@ def configure_views(app):
 
     @app.url_defaults
     def static_postfix(endpoint, values):
-        if endpoint in ('static', 'localstatic') and 'v' not in values and app.static_v:
+        if endpoint in ('static', 'localstatic') and 'v' not in values and not values['filename'].startswith('build/') and app.static_v:
             values['v'] = app.static_v
 
 
@@ -510,6 +513,17 @@ def configure_development(app):
 
             app.before_request(ponydbg.clear_queries)
             app.csrf.exempt(module)
+
+
+def configure_frontend(app: Flask):
+    try:
+        with Path(app.config['FRONTEND_VERSION_PATH']).open() as f:
+            version = f.readline().strip()
+    except IOError as _:
+        version = 'dev'
+        app.logger.info('Unable to read frontend version, assuming dev')
+
+    app.config['FRONTEND_VERSION'] = version
 
 
 def init_plugins(app):

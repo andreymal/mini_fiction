@@ -41,9 +41,21 @@
                     <p class="genres-select">{{ form.genre }}</p>
                     #}
                     <h4>Теги</h4>
-                    <p class="genres-select">{{ form.tags }}</p>
+                    <p>
+                        <span
+                            data-ti-autocomplete-url="{{ url_for('tags.autocomplete') }}"
+                            data-ti-holder-name="tags"
+                            data-bazooka="storyTags">{{ form.tags }}
+                        </span>
+                    </p>
                     <h4>Исключить рассказы с этими тегами</h4>
-                    <p class="genres-select">{{ form.exclude_tags }}</p>
+                    <p>
+                        <span
+                                data-ti-autocomplete-url="{{ url_for('tags.autocomplete') }}"
+                                data-ti-holder-name="exclude_tags"
+                                data-bazooka="storyTags">{{ form.exclude_tags }}
+                        </span>
+                    </p>
                     {% if form.char.choices %}
                     <h4>Персонажи</h4>
                     <div class="characters-select" >{{ form.char }}</div>

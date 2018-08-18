@@ -44,6 +44,8 @@ virtualenv env
   Если не используется virtualenv, можно воспользоваться репозиториями
   дистрибутивов Linux.
 
+* [Устанавливаем NodeJS](https://nodejs.org/en/download/package-manager/).
+
 * Устанавливаем проект командой `make develop` (пользователям Windows
   придётся открыть `Makefile` и перепечатать команды вручную или
   использовать make из MinGW)

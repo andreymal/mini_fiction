@@ -3,6 +3,7 @@
 PYTHON?=python3
 PIP?=pip3
 FIND?=find
+NPM?=npm
 
 help:
 	@echo "mini_fiction"
@@ -26,7 +27,7 @@ help:
 	@echo "babel-update - update .po translation files"
 	@echo "babel-compile - compile .po translation files to .mo"
 
-clean: clean-build clean-pyc clean-translations
+clean: clean-build clean-pyc clean-translations clean-frontend
 
 clean-build:
 	rm -fr build/
@@ -44,6 +45,9 @@ clean-pyc:
 
 clean-translations:
 	rm -f mini_fiction/translations/*/LC_MESSAGES/*.mo
+
+clean-frontend:
+	rm -f mini_fiction/frontend/build/*
 
 lint:
 	$(PYTHON) setup.py lint \
@@ -78,6 +82,7 @@ release-sign-test: dist
 dist: clean
 	$(PYTHON) setup.py sdist
 	pybabel compile -d mini_fiction/translations
+	cd mini_fiction/frontend && $(NPM) run-script build
 	$(PYTHON) setup.py bdist_wheel
 	ls -lh dist
 
@@ -90,6 +95,9 @@ develop:
 	$(PIP) install -r test-requirements.txt
 	$(PYTHON) setup.py develop
 	pybabel compile -d mini_fiction/translations
+	cd mini_fiction/frontend && $(NPM) install
+	cd mini_fiction/frontend && $(NPM) run-script webpack
+	ln -s ../frontend/build mini_fiction/static/ --force
 
 babel-extract:
 	pybabel extract \

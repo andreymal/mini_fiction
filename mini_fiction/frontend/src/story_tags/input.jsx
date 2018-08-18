@@ -8,6 +8,7 @@ import {
   shouldRenderSuggestion,
 } from './autocomplete';
 import { PlainTag } from './tag';
+import { addEphemeral } from './store';
 
 
 const ENTER = 13;
@@ -38,7 +39,9 @@ class Suggester extends React.Component {
     if (keyCode === ENTER) {
       event.preventDefault();
       if (allowSyntheticTags && suggestions.length === 0) {
-        addTag(synthesizeSuggestion(value));
+        const newTag = synthesizeSuggestion(value);
+        addTag(newTag);
+        addEphemeral(newTag);
       } else if (addFirst && suggestions.length === 1) {
         addTag(suggestions[0]);
       }
@@ -49,8 +52,6 @@ class Suggester extends React.Component {
     getSuggestion(value)
       .then(suggestions => this.setState({ suggestions }));
   };
-
-  onSuggestionsClearRequested = () => this.setState({ suggestions: [] });
 
   onSuggestionSelected = (e, { suggestion }) => {
     const { addTag } = this.props;
@@ -83,7 +84,6 @@ class Suggester extends React.Component {
         suggestions={suggestions}
         shouldRenderSuggestions={shouldRenderSuggestion}
         onSuggestionsFetchRequested={this.onSuggestionsFetchRequested}
-        onSuggestionsClearRequested={this.onSuggestionsClearRequested}
         onSuggestionHighlighted={this.onSuggestionHighlighted}
         getSuggestionValue={getSuggestionValue}
         renderSuggestion={s => <PlainTag withCount tag={s} />}

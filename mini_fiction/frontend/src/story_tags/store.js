@@ -1,16 +1,17 @@
-import Deferred from 'fbjs/lib/Deferred';
-
-const store = new Deferred();
+let isSettled = false;
+let resolver;
+const store = new Promise((res) => { resolver = res; });
 
 const getStore = () => store;
 
 const setStoreFromUrl = (url) => {
-  if (store.isSettled()) return;
+  if (isSettled) return;
 
   window.fetch(url, { credentials: 'include' })
     .then(response => response.json())
     .then(({ tags }) => {
-      store.resolve(tags);
+      resolver(tags);
+      isSettled = true;
     });
 };
 

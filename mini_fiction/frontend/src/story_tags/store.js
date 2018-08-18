@@ -1,8 +1,16 @@
 let isSettled = false;
 let resolver;
+
+const ephemeralStore = [];
 const store = new Promise((res) => { resolver = res; });
 
-const getStore = () => store;
+const addEphemeral = value => ephemeralStore.push(value);
+
+const getEphemeral = () => Promise.all(ephemeralStore);
+
+const getStore = () => Promise
+  .all([store, getEphemeral()])
+  .then(([data, ephemeral]) => data.concat(ephemeral));
 
 const setStoreFromUrl = (url) => {
   if (isSettled) return;
@@ -16,6 +24,7 @@ const setStoreFromUrl = (url) => {
 };
 
 export {
+  addEphemeral,
   getStore,
   setStoreFromUrl,
 };

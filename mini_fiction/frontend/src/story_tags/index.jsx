@@ -6,7 +6,7 @@ import TagsInput from 'react-tagsinput';
 import { CloseableTag } from './tag';
 import Input from './input';
 import { getStore, setStoreFromUrl } from './store';
-import { shouldRenderSuggestion } from './autocomplete';
+import { shouldRenderSuggestion, synthesizeSuggestion } from './autocomplete';
 
 const Layout = (tagComponents, inputComponent) => (
   <div className="tags-container">
@@ -23,7 +23,9 @@ const extractPlainTags = node => node
   .split(/,\s+/)
   .filter(shouldRenderSuggestion);
 
-const transformPlainTag = data => name => data.filter(tag => tag.name === name)[0] || null;
+const transformPlainTag = data => name => (
+  data.filter(tag => tag.name === name)[0] || synthesizeSuggestion(name)
+);
 
 class TagComponent extends React.Component {
   state = { tags: [] };
@@ -32,7 +34,8 @@ class TagComponent extends React.Component {
     const { rawTags } = this.props;
     getStore().then((data) => {
       const tagTransformer = transformPlainTag(data);
-      const tags = rawTags.map(tagTransformer).filter(t => t !== null);
+      // TODO: Fix O(N*M) complexity; consider migration to more efficient structure
+      const tags = rawTags.map(tagTransformer);
       this.setState({ tags });
     });
   };

@@ -87,6 +87,7 @@ def autocomplete():
                 'id': tag.id,
                 'name': tag.name,
                 'url': url_for('tags.tag_index', tag_name=tag.iname),
+                'is_main_tag': tag.is_main_tag,
                 'description': tag.description,
                 'stories_count': tag.published_stories_count,
                 'aliases': [x.iname for x in aliases[tag.id]],

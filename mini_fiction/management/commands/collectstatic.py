@@ -12,7 +12,7 @@ from flask import current_app
 from mini_fiction.management.manager import cli
 
 
-def collect_files(src, only=None, ignore=None):
+def collect_files(src, only=None, ignore=None, follow_symlinks=False):
     only = frozenset(only or ())
     ignore = frozenset(ignore or ())
     result = []
@@ -23,7 +23,7 @@ def collect_files(src, only=None, ignore=None):
         path = queue.pop()
         abspath = os.path.join(src, path)
 
-        if os.path.islink(abspath) or os.path.isfile(abspath):
+        if (not follow_symlinks and os.path.islink(abspath)) or os.path.isfile(abspath):
             if only and path not in only:
                 continue
             if path not in ignore:
@@ -40,7 +40,7 @@ def collect_files(src, only=None, ignore=None):
     return result
 
 
-def copyfile(src, dst, global_hash, verbose=True):
+def copyfile(src, dst, global_hash, follow_symlinks=False, verbose=True):
     if verbose:
         print(dst, end='', flush=True)
 
@@ -48,10 +48,11 @@ def copyfile(src, dst, global_hash, verbose=True):
     if not os.path.isdir(dstdir):
         os.makedirs(dstdir)  # TODO: что-то сделать с правами
 
-    if os.path.islink(src):
+    if not follow_symlinks and os.path.islink(src):
         changed = False
         if not os.path.islink(dst) or os.readlink(src) != os.readlink(dst):
-            os.remove(dst)
+            if os.path.exists(dst):
+                os.remove(dst)
             os.symlink(os.readlink(src), dst)
             changed = True
         if verbose:
@@ -109,10 +110,17 @@ def collectstatic(verbose, destination):
     if verbose:
         print('Project static folder: {}'.format(projectstatic))
 
-    copy_static_directory(modulestatic, projectstatic, verbose=verbose, static_version_file=current_app.config.get('STATIC_VERSION_FILE'))
+    copy_static_directory(
+        modulestatic, projectstatic, verbose=verbose,
+        static_version_file=current_app.config.get('STATIC_VERSION_FILE'),
+        follow_symlinks=True,
+    )
 
 
-def copy_static_directory(src, dst, verbose=True, static_version_file=None, only=None, ignore=None):
+def copy_static_directory(
+    src, dst, verbose=True, static_version_file=None,
+    only=None, ignore=None, follow_symlinks=False
+):
     modulestatic = src
     projectstatic = dst
 
@@ -122,7 +130,7 @@ def copy_static_directory(src, dst, verbose=True, static_version_file=None, only
 
     if verbose:
         print('Collect files list...', end=' ', flush=True)
-    srcfiles = collect_files(modulestatic, only=only, ignore=ignore)
+    srcfiles = collect_files(modulestatic, only=only, ignore=ignore, follow_symlinks=follow_symlinks)
     if verbose:
         print('found {} files.'.format(len(srcfiles)), flush=True)
 
@@ -132,7 +140,7 @@ def copy_static_directory(src, dst, verbose=True, static_version_file=None, only
     for path in srcfiles:
         src = os.path.join(modulestatic, path)
         dst = os.path.join(projectstatic, path)
-        if copyfile(src, dst, global_hash=global_hash, verbose=verbose):
+        if copyfile(src, dst, global_hash=global_hash, verbose=verbose, follow_symlinks=follow_symlinks):
             changed_cnt += 1
 
     if verbose:

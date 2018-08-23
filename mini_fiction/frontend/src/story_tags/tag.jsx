@@ -20,7 +20,7 @@ const PlainTag = ({ tag, children, withCount = false }) => {
   return (
     <div className={classes} style={style}>
       {text}
-      {...children}
+      {children}
     </div>
   );
 };

@@ -33,7 +33,13 @@ const reactAliases = {
 const postCSSLoaderOptions = {
   sourceMap: isDev,
   plugins: () => [
-    postCSSAutoPrefixer({ browsers: ['last 2 versions'] }),
+    postCSSAutoPrefixer({
+      browsers: [
+        'last 3 versions',
+        '> 1%',
+        'IE 11',
+      ],
+    }),
     postCSSMixins(),
     postCSSNesting(),
     postCSSCustomProperties({

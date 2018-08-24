@@ -1,0 +1,71 @@
+.markItUp {
+  & .edit-bold a {
+    background-image: url(../../images/markitup/edit-bold.png);
+  }
+  & .edit-italic a {
+    background-image: url(../../images/markitup/edit-italic.png);
+  }
+  & .edit-strike a {
+    background-image: url(../../images/markitup/edit-strike.png);
+  }
+  & .edit-underline a {
+    background-image: url(../../images/markitup/edit-underline.png);
+  }
+  & .edit-h3 a {
+    background-image: url(../../images/markitup/edit-h3.png);
+  }
+  & .edit-h4 a {
+    background-image: url(../../images/markitup/edit-h4.png);
+  }
+  & .edit-h5 a {
+    background-image: url(../../images/markitup/edit-h5.png);
+  }
+  & .edit-alignment-left a {
+    background-image: url(../../images/markitup/edit-alignment-left.png);
+  }
+  & .edit-alignment-center a {
+    background-image: url(../../images/markitup/edit-alignment-center.png);
+  }
+  & .edit-alignment-right a {
+    background-image: url(../../images/markitup/edit-alignment-right.png);
+  }
+  & .edit-hr a {
+    background-image: url(../../images/markitup/edit-hr.png);
+  }
+  & .edit-br a {
+    background-image: url(../../images/markitup/edit-br.png);
+  }
+  & .edit-image a {
+    background-image: url(../../images/markitup/edit-image.png);
+  }
+  & .edit-anchor a {
+    background-image: url(../../images/markitup/edit-anchor.png);
+  }
+  & .edit-list a {
+    background-image: url(../../images/markitup/edit-list.png);
+  }
+  & .edit-list-order a {
+    background-image: url(../../images/markitup/edit-list-order.png);
+  }
+  & .edit-list-item a {
+    background-image: url(../../images/markitup/edit-list-item.png);
+  }
+  & .edit-quotation a {
+    background-image: url(../../images/markitup/edit-quotation.png);
+  }
+  & .edit-superscript a {
+    background-image: url(../../images/markitup/edit-superscript.png);
+  }
+  & .edit-subscript a {
+    background-image: url(../../images/markitup/edit-subscript.png);
+  }
+  & .edit-code a {
+    background-image: url(../../images/markitup/edit-code.png);
+  }
+  & .edit-small a {
+    background-image: url(../../images/markitup/edit-small.png);
+  }
+  & .edit-tag a {
+    background-image: url(../../images/markitup/edit-tag.png);
+  }
+}

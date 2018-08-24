@@ -13,8 +13,6 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}" />
     <link rel="stylesheet" href="{{ url_for('static', filename='build/index.{}.css'.format(config['FRONTEND_VERSION'])) }}" />
     <link rel="stylesheet" href="{{ url_for('static', filename='build/story.{}.css'.format(config['FRONTEND_VERSION'])) }}" />
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/markitup.main.css') }}" />
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/markitup.set.css') }}" />
 {%- for css_link in extra_css %}
     <link rel="stylesheet" href="{{ css_link }}" />
 {%- endfor -%}

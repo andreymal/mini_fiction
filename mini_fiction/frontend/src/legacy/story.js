@@ -3,6 +3,10 @@
 import Hypher from 'hypher';
 import ruHyphenation from 'hyphenation.ru';
 
+import core from './core';
+import common from './common';
+
+
 const hypher = new Hypher(ruHyphenation);
 
 
@@ -1172,7 +1176,4 @@ var story = {
     }
 };
 
-
-core.oninit(story.init.bind(story));
-core.onload(story.load.bind(story));
-core.onunload(story.unload.bind(story));
+export default story;

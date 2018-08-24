@@ -1,3 +1,5 @@
+import core from './core';
+
 'use strict';
 
 /* global core: false */
@@ -174,5 +176,4 @@ var bell = {
     }
 };
 
-
-core.onload(bell.load.bind(bell));
+export default bell;

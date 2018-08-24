@@ -495,5 +495,4 @@ core.utils = {
     }
 };
 
-document.addEventListener('DOMContentLoaded', core.init.bind(core)); // new browsers
-document.addEventListener('load', core.init.bind(core)); // old browsers
+export default core;

@@ -1,3 +1,5 @@
+import core from './core';
+
 'use strict';
 
 /* global core: false */
@@ -38,6 +40,4 @@ var editlog = {
     },
 };
 
-
-core.onload(editlog.load.bind(editlog));
-core.onloadModal(editlog.loadModal.bind(editlog));
+export default editlog;

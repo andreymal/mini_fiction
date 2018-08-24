@@ -1,3 +1,7 @@
+import core from './core';
+import common from './common';
+
+
 'use strict';
 
 /* global amajaxify: false, core: false, captcha: false, common: false */
@@ -219,10 +223,10 @@ var comments = {
             this.bindLinksFor(d.firstElementChild);
 
             if (!this._addComment(d.firstElementChild, parentComment)) {
-                amajaxify.goto('GET', data.link);
+                window.amajaxify.goto('GET', data.link);
             }
         } else if (data.link) {
-            amajaxify.goto('GET', data.link);
+            window.amajaxify.goto('GET', data.link);
         }
     },
 

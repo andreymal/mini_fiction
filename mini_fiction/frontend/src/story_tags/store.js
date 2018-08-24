@@ -1,5 +1,4 @@
 import 'whatwg-fetch';
-import Promise from 'core-js/es/promise';
 
 let isSettled = false;
 let resolver;

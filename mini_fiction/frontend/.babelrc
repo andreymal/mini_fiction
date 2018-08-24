@@ -10,7 +10,8 @@
             "> 1%",
             "IE 11"
           ]
-        }
+        },
+        "useBuiltIns": "usage"
       }
     ]
   ],

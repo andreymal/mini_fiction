@@ -11,6 +11,7 @@
 {%- block head_css %}
     <link rel="stylesheet" href="{{ url_for('static', filename='css/bootstrap.css') }}" />
     <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}" />
+    <link rel="stylesheet" href="{{ url_for('static', filename='build/index.{}.css'.format(config['FRONTEND_VERSION'])) }}" />
     <link rel="stylesheet" href="{{ url_for('static', filename='build/story.{}.css'.format(config['FRONTEND_VERSION'])) }}" />
     <link rel="stylesheet" href="{{ url_for('static', filename='css/markitup.main.css') }}" />
     <link rel="stylesheet" href="{{ url_for('static', filename='css/markitup.set.css') }}" />
@@ -20,6 +21,7 @@
 {% endblock -%}
 
 {%- block head_js %}
+    <script async src="{{ url_for('static', filename='build/index.{}.js'.format(config['FRONTEND_VERSION'])) }}"></script>
     <script async src="{{ url_for('static', filename='build/story.{}.js'.format(config['FRONTEND_VERSION'])) }}"></script>
 {% endblock -%}
 

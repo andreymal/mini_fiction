@@ -1,6 +1,7 @@
 import fs from 'fs';
 import path from 'path';
 import MiniCssExtractPlugin from 'mini-css-extract-plugin';
+import CleanWebpackPlugin from 'clean-webpack-plugin';
 
 import postCSSAutoPrefixer from 'autoprefixer';
 import postCSSNesting from 'postcss-nesting';
@@ -10,6 +11,9 @@ import postCSSNano from 'cssnano';
 
 const ENV = process.env.NODE_ENV || 'development';
 const isDev = ENV !== 'production';
+
+const outputPath = path.resolve(__dirname, 'build');
+const outputName = `[name].${isDev ? 'dev' : '[hash]'}`;
 
 class WriteVersionPlugin {
   constructor(filename, dev) {
@@ -31,7 +35,6 @@ const reactAliases = {
 };
 
 const postCSSLoaderOptions = {
-  sourceMap: isDev,
   plugins: () => [
     postCSSAutoPrefixer({
       browsers: [
@@ -51,28 +54,37 @@ const postCSSLoaderOptions = {
 
 const cssLoaderOptions = {
   modules: false,
-  sourceMap: isDev,
   importLoaders: 1,
   minimize: !isDev,
+  url: true,
 };
 
-const devPrefix = isDev ? 'dev' : '[hash]';
+const extractLoaderOptions = {
+  publicPath: './',
+};
+
+const urlLoaderOptions = {
+  fallback: 'file-loader',
+  limit: 8192,
+  name: `${outputName}.[ext]`,
+};
 
 module.exports = {
   mode: ENV,
   context: path.resolve(__dirname, 'src'),
   entry: {
     story: ['./story.js', './story.css'],
+    index: ['./index.js', './index.css'],
   },
 
   output: {
-    path: path.resolve(__dirname, 'build'),
+    path: outputPath,
     publicPath: '/',
-    filename: `[name].${devPrefix}.js`,
+    filename: `${outputName}.js`,
   },
 
   resolve: {
-    extensions: ['.jsx', '.js', '.json'],
+    extensions: ['.jsx', '.js', '.json', 'png', '.jpg', '.gif', '.svg', '.eot', '.ttf', '.woff', '.woff2'],
     modules: [
       path.resolve(__dirname, 'src'),
       path.resolve(__dirname, 'node_modules'),
@@ -100,19 +112,26 @@ module.exports = {
       {
         test: /\.css$/,
         use: [
-          { loader: MiniCssExtractPlugin.loader },
+          { loader: MiniCssExtractPlugin.loader, options: extractLoaderOptions },
           { loader: 'css-loader', options: cssLoaderOptions },
           { loader: 'postcss-loader', options: postCSSLoaderOptions },
+        ],
+      },
+      {
+        test: /\.(png|jpg|gif|svg|eot|ttf|woff|woff2)$/,
+        use: [
+          { loader: 'url-loader', options: urlLoaderOptions },
         ],
       },
     ],
   },
   plugins: ([
     new MiniCssExtractPlugin({
-      filename: `[name].${devPrefix}.css`,
+      filename: `${outputName}.css`,
       chunkFilename: '[id].css',
     }),
     new WriteVersionPlugin('frontend.version', isDev),
+    new CleanWebpackPlugin(outputPath, { watch: true, beforeEmit: true }),
   ]),
 
   stats: { colors: true },

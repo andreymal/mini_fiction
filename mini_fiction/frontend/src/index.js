@@ -7,8 +7,7 @@ import editlog from './legacy/editlog';
 
 const { document } = window;
 
-document.addEventListener('DOMContentLoaded', core.init.bind(core)); // new browsers
-document.addEventListener('load', core.init.bind(core)); // old browsers
+document.addEventListener('DOMContentLoaded', core.init.bind(core));
 
 core.oninit(common.init.bind(common));
 core.onload(common.load.bind(common));

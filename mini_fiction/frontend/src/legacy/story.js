@@ -1,5 +1,31 @@
 'use strict';
 
+import Hypher from 'hypher';
+import ruHyphenation from 'hyphenation.ru';
+
+const hypher = new Hypher(ruHyphenation);
+
+
+/**
+ * (This method is created by andreymal)
+ *
+ * Recursively hyphenates a array of DOM nodes.
+ *
+ * @param {object} nodes - DOM node or list of DOM nodes (text or elements)
+ */
+const hyphenateDOM = (nodes) => {
+  if ((nodes instanceof HTMLElement) || (node instanceof Text)) {
+    nodes = [nodes];
+  }
+  nodes.foreach(node => {
+    if (node.nodeType === document.TEXT_NODE) {
+      node.nodeValue = hypher.hyphenateText(node.nodeValue);
+    } else if (node.childNodes && node.childNodes.length > 0) {
+      hyphenateDOM([...node.childNodes]);
+    }
+  });
+};
+
 /* global core: false, $: false, Hypher: false, common: false */
 
 
@@ -1020,9 +1046,9 @@ var story = {
 
         // hyphens
         if (current.hyphens == 'yes') {
-            if (!element.classList.contains('with-hypher') && window.Hypher) {
+            if (!element.classList.contains('with-hypher')) {
                 // TODO: internationalization
-                Hypher.languages.ru.hyphenateDOM(element);
+                hyphenateDOM(element);
                 element.classList.add('with-hypher');
             }
             element.classList.add('mode-hyphens');

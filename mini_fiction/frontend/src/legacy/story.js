@@ -3,6 +3,7 @@
 import Hypher from 'hypher';
 import ruHyphenation from 'hyphenation.ru';
 
+import amajaxify from './amajaxify';
 import core from './core';
 import common from './common';
 
@@ -473,7 +474,7 @@ var story = {
     },
 
     contributorsStuff: function() {
-        if (!window.amajaxify.isEnabled()) {
+        if (!amajaxify.isEnabled()) {
             return;
         }
         this.contributorsForm = document.getElementById('story-edit-contributors-form');

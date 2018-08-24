@@ -1,3 +1,4 @@
+import amajaxify from './amajaxify';
 import core from './core';
 import common from './common';
 
@@ -223,10 +224,10 @@ var comments = {
             this.bindLinksFor(d.firstElementChild);
 
             if (!this._addComment(d.firstElementChild, parentComment)) {
-                window.amajaxify.goto('GET', data.link);
+                amajaxify.goto('GET', data.link);
             }
         } else if (data.link) {
-            window.amajaxify.goto('GET', data.link);
+            amajaxify.goto('GET', data.link);
         }
     },
 

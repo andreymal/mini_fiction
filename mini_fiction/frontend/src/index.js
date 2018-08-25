@@ -3,6 +3,7 @@ import common from './legacy/common';
 import bell from './legacy/bell';
 import story from './legacy/story';
 import editlog from './legacy/editlog';
+import captcha from './legacy/captcha';
 
 
 const { document } = window;
@@ -23,3 +24,6 @@ core.onunload(story.unload.bind(story));
 
 core.onload(editlog.load.bind(editlog));
 core.onloadModal(editlog.loadModal.bind(editlog));
+
+core.onload(captcha.load);
+core.onunload(captcha.unload);

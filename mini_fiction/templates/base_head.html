@@ -19,7 +19,6 @@
 {% endblock -%}
 
 {%- block head_js %}
-    <script async src="{{ url_for('static', filename='build/index.{}.js'.format(config['FRONTEND_VERSION'])) }}"></script>
     <script async src="{{ url_for('static', filename='build/story.{}.js'.format(config['FRONTEND_VERSION'])) }}"></script>
 {% endblock -%}
 

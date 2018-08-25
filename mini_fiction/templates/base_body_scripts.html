@@ -4,18 +4,12 @@
     <script src="{{ url_for('static', filename='js/lib/jquery.markitup.js') }}"></script>
     <script src="{{ url_for('static', filename='js/lib/jquery.slides.3.0.4.min.js') }}"></script>
     <script src="{{ url_for('static', filename='js/lib/bootstrap.min.js') }}"></script>
-    <script src="{{ url_for('static', filename='js/lib/amajaxify.js') }}"></script>
-    <script src="{{ url_for('static', filename='js/lib/htmlsanitizer.js') }}"></script>
 
     <!-- mini_fiction stuff -->
-    <script src="{{ url_for('static', filename='js/markitup.set.js') }}"></script>
-    <script src="{{ url_for('static', filename='js/core.js') }}"></script>
-    <script src="{{ url_for('static', filename='js/common.js') }}"></script>
-    <script src="{{ url_for('static', filename='js/captcha.js') }}"></script>
-    <script src="{{ url_for('static', filename='js/bell.js') }}"></script>
-    <script src="{{ url_for('static', filename='js/story.js') }}"></script>
-    <script src="{{ url_for('static', filename='js/comments.js') }}"></script>
-    <script src="{{ url_for('static', filename='js/editlog.js') }}"></script>
+    {# NOTE: Main bundle remains synchronous as long as it depends on jQuery crap #}
+    {# TODO: Fix it! #}
+    <script src="{{ url_for('static', filename='build/index.{}.js'.format(config['FRONTEND_VERSION'])) }}"></script>
+
 {%- for js_link in extra_js %}
     <script src="{{ js_link }}"></script>
 {%- endfor -%}

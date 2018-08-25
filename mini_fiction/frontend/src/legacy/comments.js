@@ -1,4 +1,5 @@
 import amajaxify from './amajaxify';
+import captcha from './captcha';
 import core from './core';
 import common from './common';
 
@@ -472,6 +473,4 @@ var comments = {
     }
 };
 
-
-core.onload(comments.load.bind(comments));
-core.onunload(comments.unload.bind(comments));
+export default comments;

@@ -1,5 +1,6 @@
 import core from './legacy/core';
 import common from './legacy/common';
+import comments from './legacy/comments';
 import bell from './legacy/bell';
 import story from './legacy/story';
 import editlog from './legacy/editlog';
@@ -27,3 +28,6 @@ core.onloadModal(editlog.loadModal.bind(editlog));
 
 core.onload(captcha.load);
 core.onunload(captcha.unload);
+
+core.onload(comments.load.bind(comments));
+core.onunload(comments.unload.bind(comments));

@@ -140,7 +140,7 @@ class Config(object):
     LOCALSTATIC_ROOT = None
     LOCALTEMPLATES = None
 
-    FRONTEND_VERSION_PATH = os.path.join(os.path.dirname(__file__), 'static/build/frontend.version')
+    FRONTEND_MANIFEST_PATH = os.path.join(os.path.dirname(__file__), 'static/build/manifest.json')
 
     SPHINX_DISABLED = False
     SPHINX_ROOT = os.path.join(os.getcwd(), 'sphinx')

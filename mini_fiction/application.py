@@ -6,11 +6,12 @@
 import os
 import re
 import sys
-import importlib
-from pathlib import Path
-from datetime import datetime
 import logging
+import importlib
+from collections import namedtuple
+from datetime import datetime
 from logging.handlers import SMTPHandler
+from pathlib import Path
 
 import jinja2
 from celery import Celery
@@ -541,14 +542,23 @@ def configure_development(app):
 
 
 def configure_frontend(app: Flask):
-    try:
-        with Path(app.config['FRONTEND_VERSION_PATH']).open() as f:
-            version = f.readline().strip()
-    except IOError as _:
-        version = 'dev'
-        app.logger.info('Unable to read frontend version, assuming dev')
+    Asset = namedtuple('Asset', ['src', 'integrity'])
+    default = Asset('', '')
 
-    app.config['FRONTEND_VERSION'] = version
+    try:
+        with Path(app.config['FRONTEND_MANIFEST_PATH']).open() as f:
+            manifest = {k: Asset(**v) for k, v in flask_json.load(f).items()}
+    except IOError as _:
+        app.logger.error((
+            'Unable to read frontend manifest; '
+            'did you install mini_fiction package via make install/develop?'
+        ))
+        exit(0)
+
+    app.add_template_global(
+        lambda n: manifest.get(n, default),
+        name='webpack_asset'
+    )
 
 
 def configure_sidebar(app: Flask):

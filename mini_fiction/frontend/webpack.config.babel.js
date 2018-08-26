@@ -119,7 +119,7 @@ module.exports = {
       cacheGroups: {
         vendor: {
           test: /[\\/](node_modules|legacy\/lib)[\\/]/,
-          name: 'vendors',
+          name: 'vendor',
           chunks: 'all',
         },
       },
@@ -134,7 +134,6 @@ module.exports = {
     new AssetsManifestPlugin({
       output: 'manifest.json',
       integrity: true,
-      integrityHashes: ['sha384'],
       customize: (_, original) => original,
     }),
   ].concat(isDev ? [] : new HashedModuleIdsPlugin()),

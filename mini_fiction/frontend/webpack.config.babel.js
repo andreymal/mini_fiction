@@ -125,6 +125,9 @@ module.exports = {
       },
     ],
   },
+  optimization: {
+    minimize: !isDev,
+  },
   plugins: ([
     new MiniCssExtractPlugin({
       filename: `${outputName}.css`,

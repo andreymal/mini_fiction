@@ -7,6 +7,8 @@ import amajaxify from './amajaxify';
 import core from './core';
 import common from './common';
 
+import arrowLeft from '../images/arrow-left.png';
+import arrowRight from '../images/arrow-right.png';
 
 const hypher = new Hypher(ruHyphenation);
 
@@ -102,9 +104,8 @@ var story = {
                     restartDelay: 3500
                 }
             });
-            // TODO: расхардкодить
-            $('#slides .slidesjs-previous').html('<img src="/static/i/arrow-left.png" />');
-            $('#slides .slidesjs-next').html('<img src="/static/i/arrow-right.png" />');
+            $('#slides .slidesjs-previous').html(`<img src="${arrowLeft}"/>`);
+            $('#slides .slidesjs-next').html(`<img src="${arrowRight}"/>`);
             slides.classList.remove('carousel-inactive');
         }
 

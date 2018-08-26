@@ -230,22 +230,22 @@ ul.nav-main-links {
 }
 
 .nav-icon-add {
-    background-image: url('../i/icon-add.png');
+    background-image: url(../images/icon-add.png);
     float: left;
 }
 
 .nav-icon-add:hover, .nav-icon-add.active {
-    background-image: url('../i/icon-add-active.png');
+    background-image: url(../images/icon-add-active.png);
 }
 
 /* Notification button */
 .nav-icon-bell {
-    background-image: url('../i/icon-bell.png');
+    background-image: url(../images/icon-bell.png);
     float: left;
     position: relative;
 }
 .nav-icon-bell:hover, .nav-icon-bell.active {
-    background-image: url('../i/icon-bell-active.png');
+    background-image: url(../images/icon-bell-active.png);
 }
 
 .nav-icon-bell > .new-count {
@@ -335,11 +335,11 @@ ul.nav-main-links {
 .mobile-menu-btn {
     display: none;
     float: left;
-    background-image: url('../i/mobile-menu.png');
+    background-image: url(../images/mobile-menu.png);
 }
 
 .mobile-menu-btn:hover, .mobile-menu-btn.active {
-    background-image: url('../i/mobile-menu-active.png');
+    background-image: url(../images/mobile-menu-active.png);
 }
 
 .nav-profile-menu {
@@ -364,7 +364,7 @@ ul.nav-main-links {
     content: '';
     width: 12px;
     height: 12px;
-    background: url('../i/menu-arrow.png') center center no-repeat;
+    background: url(../images/menu-arrow.png) center center no-repeat;
     background-size: 12px 12px;
     vertical-align: middle;
     margin-right: 5px;
@@ -377,7 +377,7 @@ ul.nav-main-links {
 }
 
 .nav-profile-menu-header:hover .nav-profile-menu-text:before {
-    background: url('../i/menu-arrow-active.png') center center no-repeat;
+    background: url(../images/menu-arrow-active.png) center center no-repeat;
     background-size: 12px 12px;
 }
 
@@ -594,7 +594,7 @@ h4 {
     content: '';
     width: 12px;
     height: 12px;
-    background-image: url('../i/chapter-viewed.png');
+    background-image: url(../images/chapter-viewed.png);
     background-size: 12px 12px;
 }
 
@@ -692,7 +692,7 @@ img.avatar-small {
 }
 
 .starvote {
-    background: transparent url('../i/votes.png') no-repeat;
+    background: transparent url(../images/votes.png) no-repeat;
     width: 24px;
     height: 24px;
     display: inline-block;
@@ -1191,7 +1191,7 @@ select.select-size {
     height: 12px;
     margin: 3px;
     vertical-align: top;
-    background: url('../i/story-formatting-button.png');
+    background: url(../images/story-formatting-button.png);
     background-size: 12px 12px;
     background-repeat: no-repeat;
     background-position: 0px 0px;
@@ -1360,23 +1360,23 @@ select.select-size {
 }
 
 .pdf {
-    background: transparent url('../i/pdf.png') no-repeat 0 0;
+    background: transparent url(../images/pdf.png) no-repeat 0 0;
 }
 
 .txt {
-    background: transparent url('../i/txt.png') no-repeat 0 0;
+    background: transparent url(../images/txt.png) no-repeat 0 0;
 }
 
 .html {
-    background: transparent url('../i/html.png') no-repeat 0 0;
+    background: transparent url(../images/html.png) no-repeat 0 0;
 }
 
 .fb2, .fb2-zip {
-    background: transparent url('../i/fb2.png') no-repeat 0 0;
+    background: transparent url(../images/fb2.png) no-repeat 0 0;
 }
 
 .mobi {
-    background: transparent url('../i/epub.png') no-repeat 0 0;
+    background: transparent url(../images/epub.png) no-repeat 0 0;
 }
 
 .jsonl {
@@ -1384,31 +1384,31 @@ select.select-size {
 }
 
 .up {
-    background: transparent url('../i/up.png') no-repeat 0 0;
+    background: transparent url(../images/up.png) no-repeat 0 0;
 }
 
 .down {
-    background: transparent url('../i/down.png') no-repeat 0 0;
+    background: transparent url(../images/down.png) no-repeat 0 0;
 }
 
 .smaller {
-    background: transparent url('../i/smaller.png') no-repeat 0 0;
+    background: transparent url(../images/smaller.png) no-repeat 0 0;
 }
 
 .bigger {
-    background: transparent url('../i/bigger.png') no-repeat 0 0;
+    background: transparent url(../images/bigger.png) no-repeat 0 0;
 }
 
 .favorite {
-    background: transparent url('../i/star.png') no-repeat 0 0;
+    background: transparent url(../images/star.png) no-repeat 0 0;
 }
 
 .bookmark {
-    background: transparent url('../i/bookmark.png') no-repeat 0 0;
+    background: transparent url(../images/bookmark.png) no-repeat 0 0;
 }
 
 .feed {
-    background: transparent url('../i/feed.png') no-repeat 0 0;
+    background: transparent url(../images/feed.png) no-repeat 0 0;
 }
 
 .feed:hover,.favorited,.scon.favorite:hover,.bookmarked,.bookmark:hover
@@ -1901,11 +1901,11 @@ a.btn {
 }
 
 .comment-vote-area .vote-up {
-    background: url('../i/upvote.png') center center no-repeat;
+    background: url(../images/upvote.png) center center no-repeat;
 }
 
 .comment-vote-area .vote-down {
-    background: url('../i/downvote.png') center center no-repeat;
+    background: url(../images/downvote.png) center center no-repeat;
 }
 
 .comment-abuse-area {
@@ -2011,7 +2011,7 @@ a.btn {
     width: 8px;
     height: 8px;
     vertical-align: baseline;
-    background-image: url('../i/edit.png');
+    background-image: url(../images/edit.png);
     background-size: 8px 8px;
     background-repeat: no-repeat;
     background-position: center center;

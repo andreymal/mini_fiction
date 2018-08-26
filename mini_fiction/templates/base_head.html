@@ -9,8 +9,6 @@
 {% endblock -%}
 
 {%- block head_css %}
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/bootstrap.css') }}" />
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}" />
     <link rel="stylesheet" href="{{ url_for('static', filename='build/index.{}.css'.format(config['FRONTEND_VERSION'])) }}" />
     <link rel="stylesheet" href="{{ url_for('static', filename='build/story.{}.css'.format(config['FRONTEND_VERSION'])) }}" />
 {%- for css_link in extra_css %}

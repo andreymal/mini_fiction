@@ -3,7 +3,7 @@
 import Hypher from 'hypher';
 import ruHyphenation from 'hyphenation.ru';
 
-import amajaxify from './amajaxify';
+import amajaxify from './lib/amajaxify';
 import core from './core';
 import common from './common';
 

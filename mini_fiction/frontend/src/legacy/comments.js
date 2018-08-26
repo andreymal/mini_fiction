@@ -1,4 +1,4 @@
-import amajaxify from './amajaxify';
+import amajaxify from './lib/amajaxify';
 import captcha from './captcha';
 import core from './core';
 import common from './common';

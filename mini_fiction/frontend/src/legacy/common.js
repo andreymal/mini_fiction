@@ -1,6 +1,6 @@
 import core from './core';
 import mySettings from './markitup-settings';
-import HTMLSanitizer from './htmlsanitizer';
+import HTMLSanitizer from './lib/htmlsanitizer';
 
 'use strict';
 

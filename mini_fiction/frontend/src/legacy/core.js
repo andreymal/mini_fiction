@@ -1,4 +1,4 @@
-import amajaxify from './amajaxify';
+import amajaxify from './lib/amajaxify';
 
 'use strict';
 

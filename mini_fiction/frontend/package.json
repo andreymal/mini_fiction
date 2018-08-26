@@ -4,8 +4,8 @@
   "description": "Frontend components",
   "scripts": {
     "webpack": "webpack --progress",
-    "webpack:watch": "webpack --progress --watch -p --display-modules --display-chunks",
-    "build": "NODE_ENV=production webpack --progress -p --display-modules --display-chunks",
+    "webpack:watch": "webpack --progress --watch -p --display-chunks",
+    "build": "NODE_ENV=production webpack --progress -p --display-chunks",
     "lint": "eslint src test"
   },
   "author": {

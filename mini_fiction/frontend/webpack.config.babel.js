@@ -1,7 +1,8 @@
-import fs from 'fs';
 import path from 'path';
+import AssetsManifestPlugin from 'webpack-assets-manifest';
 import MiniCssExtractPlugin from 'mini-css-extract-plugin';
 import CleanWebpackPlugin from 'clean-webpack-plugin';
+import HashedModuleIdsPlugin from 'webpack/lib/HashedModuleIdsPlugin';
 
 import postCSSAutoPrefixer from 'autoprefixer';
 import postCSSNesting from 'postcss-nesting';
@@ -13,21 +14,8 @@ const ENV = process.env.NODE_ENV || 'development';
 const isDev = ENV !== 'production';
 
 const outputPath = path.resolve(__dirname, 'build');
-const outputName = `[name].${isDev ? 'dev' : '[hash]'}`;
+const outputName = `[name].${isDev ? 'dev' : '[contenthash]'}`;
 
-class WriteVersionPlugin {
-  constructor(filename, dev) {
-    this.filename = filename;
-    this.dev = dev;
-  }
-
-  apply = (compiler) => {
-    compiler.plugin('done', stats => fs.writeFileSync(
-      path.join(stats.compilation.compiler.outputPath, this.filename),
-      this.dev ? 'dev' : stats.hash,
-    ));
-  }
-}
 
 const reactAliases = {
   react: 'preact-compat',
@@ -127,15 +115,29 @@ module.exports = {
   },
   optimization: {
     minimize: !isDev,
+    splitChunks: {
+      cacheGroups: {
+        vendor: {
+          test: /[\\/](node_modules|legacy\/lib)[\\/]/,
+          name: 'vendors',
+          chunks: 'all',
+        },
+      },
+    },
   },
-  plugins: ([
+  plugins: [
     new MiniCssExtractPlugin({
       filename: `${outputName}.css`,
       chunkFilename: '[id].css',
     }),
-    new WriteVersionPlugin('frontend.version', isDev),
     new CleanWebpackPlugin(outputPath, { watch: true, beforeEmit: true }),
-  ]),
+    new AssetsManifestPlugin({
+      output: 'manifest.json',
+      integrity: true,
+      integrityHashes: ['sha384'],
+      customize: (_, original) => original,
+    }),
+  ].concat(isDev ? [] : new HashedModuleIdsPlugin()),
 
   stats: { colors: true },
 

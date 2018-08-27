@@ -549,11 +549,18 @@ def configure_frontend(app: Flask):
         with Path(app.config['FRONTEND_MANIFEST_PATH']).open() as f:
             manifest = {k: Asset(**v) for k, v in flask_json.load(f).items()}
     except IOError as _:
-        app.logger.error((
-            'Unable to read frontend manifest; '
-            'did you install mini_fiction package via make install/develop?'
-        ))
-        exit(0)
+        if app.config['TESTING']:
+            app.logger.warn((
+                'In test environments frontend manifest is '
+                'intentionally skipped'
+            ))
+            manifest = {}
+        else:
+            app.logger.error((
+                'Unable to read frontend manifest; '
+                'did you install mini_fiction package via make install/develop?'
+            ))
+            exit(1)
 
     app.add_template_global(
         lambda n: manifest.get(n, default),

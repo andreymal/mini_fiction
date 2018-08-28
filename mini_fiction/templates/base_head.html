@@ -10,8 +10,8 @@
 
 {%- block head_css %}
     {% set index_css, story_css = webpack_asset('index.css'), webpack_asset('story.css') %}
-    <link rel="stylesheet" href="{{ url_for('static', filename='build/{}'.format(index_css.src)) }}" integrity="{{ index_css.integrity }}" />
-    <link rel="stylesheet" href="{{ url_for('static', filename='build/{}'.format(story_css.src)) }}" integrity="{{ story_css.integrity }}" />
+    <link rel="stylesheet" href="{{ url_for('static', filename='build/{}'.format(index_css.src)) }}" integrity="{{ index_css.integrity }}" crossorigin="anonymous"/>
+    <link rel="stylesheet" href="{{ url_for('static', filename='build/{}'.format(story_css.src)) }}" integrity="{{ story_css.integrity }}" crossorigin="anonymous"/>
 {%- for css_link in extra_css %}
     <link rel="stylesheet" href="{{ css_link }}" />
 {%- endfor -%}

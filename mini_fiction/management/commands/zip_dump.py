@@ -17,7 +17,7 @@ from mini_fiction.management.manager import cli
     'Stories, comments, news and other user content will not be added.'
 ))
 @click.option('-k', '--keep-broken', 'keep_broken', help='Don\'t delete ZIP file if something goes wrong (useful for debugging).', is_flag=True)
-@click.argument('path', 'path/to/destination.zip')
+@click.argument('path')
 def zip_dump(path, keep_broken):
     from mini_fiction.dumpload import zip_dump as cmd
     orm.sql_debug(False)

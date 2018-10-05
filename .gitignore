@@ -6,25 +6,32 @@
 __pycache__/
 
 # virtualenv
-/env
+/env*
 
 # Tests
 /.tox/
 /.cache/
+/.pytest_cache/
+/.mypy_cache/
 /htmlcov/
 /.coverage
 /ghostdriver.log
 /testmedia
 
 # Distribution / packaging
-build/
-dist/
+/build/
+/dist/
 *.egg-info/
 .cache/
 .eggs/
 
 # gettext binary files
 *.mo
+
+# Frontend
+/mini_fiction/frontend/build
+/mini_fiction/static/build
+node_modules
 
 # mini_fiction stuff
 /.env
@@ -44,4 +51,3 @@ dist/
 *.sqlite3
 /celerybeat-schedule
 /celerybeat.pid
-node_modules

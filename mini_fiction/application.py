@@ -4,6 +4,7 @@
 # pylint: disable=unused-variable
 
 import os
+import re
 import sys
 import logging
 import importlib
@@ -73,6 +74,7 @@ def create_app():
     configure_misc(app)
     configure_development(app)
     configure_frontend(app)
+    configure_sidebar(app)
 
     app.context_processor(templates_context)
 
@@ -524,6 +526,19 @@ def configure_frontend(app: Flask):
         app.logger.info('Unable to read frontend version, assuming dev')
 
     app.config['FRONTEND_VERSION'] = version
+
+
+def configure_sidebar(app: Flask):
+    app.index_sidebar = {}
+
+    for block_name, func_path in app.config['INDEX_SIDEBAR'].items():
+        if not re.match(r'^[A-Za-z][A-Za-z0-9_]*$', block_name):
+            raise ValueError('Invalid sidebar block name: {!r}'.format(block_name))
+
+        module_name, func_name = func_path.rsplit('.', 1)
+        module = importlib.import_module(module_name)
+        func = getattr(module, func_name)
+        app.index_sidebar[block_name] = func
 
 
 def init_plugins(app):

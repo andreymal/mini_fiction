@@ -1,0 +1,13 @@
+<div>
+    <h2>Последние новости</h2>
+
+    <div class="news-list news-list-short">{% for newsitem in news %}
+        <div class="newsitem newsitem-listitem" id="newsitem_{{ newsitem.id }}">
+            <a href="{{ url_for('news.show', name=newsitem.name) }}" class="newsitem-title-link">{{ newsitem.title }}</a><br/>
+            <time datetime="{{ newsitem.date.strftime('%Y-%m-%dT%H:%M:%SZ') }}" class="newsitem-date">
+                {{- newsitem.date|datetimeformat('d MMMM Y') -}}, {{ ngettext("%(num)d comment", "%(num)d comments", newsitem.comments_count) }}
+            </time>
+        </div>
+    {% endfor %}</div>
+    <p class="more"><a href="{{ url_for('news.index') }}">Все новости</a></p>
+</div>

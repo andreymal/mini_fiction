@@ -364,6 +364,18 @@ class Config(object):
     SITEMAP_STORIES_PER_FILE = 1000
     SITEMAP_PING_URLS = []  # ['http://google.com/ping?sitemap={url}', ...]
 
+    # Index sidebar
+    INDEX_SIDEBAR = {
+        'chapters_updates': 'mini_fiction.views.sidebar.chapters_updates',
+        'comments_updates': 'mini_fiction.views.sidebar.comments_updates',
+        'news': 'mini_fiction.views.sidebar.news',
+    }
+    INDEX_SIDEBAR_ORDER = [
+        'chapters_updates',
+        'comments_updates',
+        'news',
+    ]
+
     # Testing
     TESTING = False
     SELENIUM_HEADLESS = True

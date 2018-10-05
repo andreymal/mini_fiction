@@ -19,7 +19,6 @@
     "@babel/polyfill": "^7.0.0-rc.2",
     "bazooka": "^0.9.0",
     "classnames": "^2.2.6",
-    "core-js": "^2.5.7",
     "preact": "^8.2.9",
     "preact-compat": "^3.18.2",
     "react-autosuggest": "^9.3.4",

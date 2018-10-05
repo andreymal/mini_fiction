@@ -19,7 +19,7 @@ python:
 
 before_install:
   - mkdir /tmp/chromedriver
-  - wget https://chromedriver.storage.googleapis.com/2.41/chromedriver_linux64.zip -O /tmp/chromedriver/chromedriver.zip
+  - wget https://chromedriver.storage.googleapis.com/2.42/chromedriver_linux64.zip -O /tmp/chromedriver/chromedriver.zip
   - unzip /tmp/chromedriver/chromedriver.zip -d /tmp/chromedriver
   - chmod 700 /tmp/chromedriver/chromedriver
 

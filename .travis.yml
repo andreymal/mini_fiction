@@ -1,4 +1,6 @@
 language: python
+sudo: false
+dist: trusty
 
 addons:
   chrome: stable

@@ -28,7 +28,7 @@ class AuthorRegistrationForm(Form):
     )
     password2 = PasswordField(
         'Пароль (опять)',
-        [validators.Required()],
+        [validators.DataRequired()],
         render_kw=attrs_dict,
         description='Повторите пароль, чтобы не забыть'
     )
@@ -38,7 +38,7 @@ class AuthorPasswordResetForm(Form):
     email = TextField(
         'Ваш e-mail',
         [
-            validators.Required(),
+            validators.DataRequired(),
             validators.Length(min=6, max=75),
             validators.Email('Введите правильный адрес электронной почты.')
         ],
@@ -52,7 +52,7 @@ class AuthorNewPasswordForm(Form):
     new_password1 = PasswordField(
         "",
         [
-            validators.Required('Поле нельзя оставить пустым'),
+            validators.DataRequired('Поле нельзя оставить пустым'),
             validators.EqualTo('new_password2', message=lazy_gettext('Passwords do not match'))
         ],
         render_kw=dict(attrs_dict, placeholder='****************'),
@@ -61,7 +61,7 @@ class AuthorNewPasswordForm(Form):
     new_password2 = PasswordField(
         "",
         [
-            validators.Required('Поле нельзя оставить пустым'),
+            validators.DataRequired('Поле нельзя оставить пустым'),
         ],
         render_kw=dict(attrs_dict, placeholder='****************'),
     )

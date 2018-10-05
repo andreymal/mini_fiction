@@ -51,7 +51,7 @@ class AdminEditPasswordForm(Form):
     new_password_1 = PasswordField(
         "Новый пароль",
         [
-            validators.Required('Поле нельзя оставить пустым'),
+            validators.DataRequired('Поле нельзя оставить пустым'),
             validators.EqualTo('new_password_2', message=lazy_gettext('Passwords do not match'))
         ],
         render_kw=dict(attrs_dict, placeholder='****************'),
@@ -61,7 +61,7 @@ class AdminEditPasswordForm(Form):
     new_password_2 = PasswordField(
         "Новый пароль (опять)",
         [
-            validators.Required('Поле нельзя оставить пустым'),
+            validators.DataRequired('Поле нельзя оставить пустым'),
         ],
         render_kw=dict(attrs_dict, placeholder='****************'),
         description='Повторите новый пароль',

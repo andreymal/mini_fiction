@@ -1,4 +1,5 @@
 Flask-WTF
+WTForms>=2.2.1,<4.0
 Flask-Login>=0.4.1
 Flask-Babel
 Flask>=1.0,<1.1

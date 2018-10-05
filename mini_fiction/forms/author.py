@@ -16,7 +16,7 @@ from mini_fiction.widgets import StoriesButtons, ContactsWidget
 class ContactForm(Form):
     name = LazySelectField(
         '',
-        [validators.Required()],
+        [validators.DataRequired()],
         choices=lambda: [
             (x['name'], x['label'].get(g.locale.language) or x['label']['default'])
             for x in current_app.config['CONTACTS']
@@ -144,7 +144,7 @@ class AuthorEditEmailForm(Form):
     email = TextField(
         'Электропочта',
         [
-            validators.Required(),
+            validators.DataRequired(),
             validators.Email('Пожалуйста, исправьте ошибку в адресе e-mail: похоже, он неправильный'),
             validators.Length(max=75),
         ],
@@ -154,7 +154,7 @@ class AuthorEditEmailForm(Form):
     password = PasswordField(
         "Пароль",
         [
-            validators.Required(),
+            validators.DataRequired(),
         ],
         render_kw=dict(attrs_dict, placeholder='****************'),
         description='Для безопасной смены почты введите пароль',
@@ -167,7 +167,7 @@ class AuthorEditPasswordForm(Form):
     old_password = PasswordField(
         "Старый пароль",
         [
-            validators.Required('Поле нельзя оставить пустым'),
+            validators.DataRequired('Поле нельзя оставить пустым'),
         ],
         render_kw=dict(attrs_dict, placeholder='****************'),
         description='Для безопасной смены пароля введите старый пароль',
@@ -176,7 +176,7 @@ class AuthorEditPasswordForm(Form):
     new_password_1 = PasswordField(
         "Новый пароль",
         [
-            validators.Required('Поле нельзя оставить пустым'),
+            validators.DataRequired('Поле нельзя оставить пустым'),
             validators.EqualTo('new_password_2', message=lazy_gettext('Passwords do not match'))
         ],
         render_kw=dict(attrs_dict, placeholder='****************'),
@@ -186,7 +186,7 @@ class AuthorEditPasswordForm(Form):
     new_password_2 = PasswordField(
         "Новый пароль (опять)",
         [
-            validators.Required('Поле нельзя оставить пустым'),
+            validators.DataRequired('Поле нельзя оставить пустым'),
         ],
         render_kw=dict(attrs_dict, placeholder='****************'),
         description='Повторите новый пароль, чтобы не забыть',

@@ -23,15 +23,23 @@ class ValidationError(ValueError):
     def __init__(self, errors):
         super().__init__()
         self.errors = errors
+        if not isinstance(errors, dict):
+            raise TypeError('errors must be dict')
 
-    def __str__(self):
-        msgs = []
-        for field, errors in self.errors.items():
-            error_msg = ', '.join(str(x) for x in errors)
-            msgs.append('{}: {}'.format(field, error_msg))
-        return '; '.join(msgs)
+    def __str__(self):  # pragma: no cover
+        return self._str_value(self.errors)[:-2]
 
-    def __repr__(self):
+    def _str_value(self, e):
+        if isinstance(e, list):
+            return ', '.join(str(x) for x in e)
+        if not isinstance(e, dict):
+            return str(e)
+        return '; '.join(
+            '{}: {}'.format(k, self._str_value(v))
+            for k, v in sorted(e.items())
+        ) + '; '
+
+    def __repr__(self):  # pragma: no cover
         return 'ValidationError({})'.format(repr(self.errors))
 
 

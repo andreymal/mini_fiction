@@ -1310,11 +1310,11 @@ msgstr "Недопустимые значения {0}"
 
 #: mini_fiction/validation/__init__.py:63
 msgid "Field '{field}' cannot be coerced: {0}"
-msgstr "Поле {field} не может быть преобразовано: {0}"
+msgstr "Поле '{field}' не может быть преобразовано: {0}"
 
 #: mini_fiction/validation/__init__.py:64
 msgid "Field '{field}' cannot be renamed: {0}"
-msgstr "Поле {field} не может быть переименовано: {0}"
+msgstr "Поле '{field}' не может быть переименовано: {0}"
 
 #: mini_fiction/validation/__init__.py:65
 msgid "Field is read-only"

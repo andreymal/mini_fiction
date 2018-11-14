@@ -452,8 +452,10 @@ def edit(pk):
             formdata['tags'] = [x.strip() for x in formdata['tags'].split(',')]
             formdata['tags'] = [x for x in formdata['tags'] if x]
 
+            minor = formdata.pop('minor', False)
+
             try:
-                story = story.bl.update(user, formdata)
+                story = story.bl.update(user, formdata, minor=minor)
             except ValidationError as exc:
                 form.set_errors(exc.errors)
                 data['not_saved'] = True

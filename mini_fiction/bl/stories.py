@@ -114,8 +114,11 @@ class StoryBL(BaseBL, Commentable):
 
         return sl
 
-    def update(self, editor, data):
+    def update(self, editor, data, minor=False):
         from mini_fiction.models import Category, Character, Classifier, Rating, Tag, StoryTag
+
+        if minor and (not editor or not editor.is_staff):
+            minor = False
 
         data = Validator(STORY).validated(data, update=True)
 
@@ -189,7 +192,8 @@ class StoryBL(BaseBL, Commentable):
             changed_sphinx_fields.add('tag')
 
         if edited_data or add_tags or rm_tags:
-            story.updated = datetime.utcnow()
+            if not minor:
+                story.updated = datetime.utcnow()
             current_app.cache.delete('index_updated_chapters')
             current_app.cache.delete('index_comments_html')
 

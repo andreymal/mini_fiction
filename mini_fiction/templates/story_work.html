@@ -193,6 +193,11 @@
                 </div>
                 {% endif %}
                 #}
+
+                {% if current_user.is_staff -%}
+                    <label style="display: inline;">{{ form.minor }} Малое изменение (не обновлять дату последнего изменения рассказа)</label>
+                {%- endif %}
+
                 <!-- Действия -->
                   <div class="form-actions">
                 {% if story_edit %}

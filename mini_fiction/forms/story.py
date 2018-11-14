@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-from wtforms import SelectField, TextField, TextAreaField
+from wtforms import SelectField, TextField, TextAreaField, BooleanField
 from pony import orm
 
 from mini_fiction.models import Category, Character, Rating, Classifier
@@ -122,3 +122,5 @@ class StoryForm(Form):
     #     coerce=int,
     #     render_kw={'label_attrs': ['checkbox', 'inline']}
     # )
+
+    minor = BooleanField('', default=False)

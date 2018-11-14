@@ -72,7 +72,7 @@ STORY = {
         'default': '',
         'maxlength': 4096,
     },
-    'source_link': {
+    'original_url': {
         'type': 'string',
         'coerce': (safe_string_coerce, 'strip'),
         'required': False,
@@ -84,7 +84,15 @@ STORY = {
             'regex': 'Это не очень похоже на ссылку',
         },
     },
-    'source_title': {
+    'original_title': {
+        'type': 'string',
+        'coerce': (safe_string_coerce, 'strip'),
+        'required': False,
+        'default': '',
+        'minlength': 0,
+        'maxlength': 255,
+    },
+    'original_author': {
         'type': 'string',
         'coerce': (safe_string_coerce, 'strip'),
         'required': False,

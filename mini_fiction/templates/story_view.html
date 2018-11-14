@@ -98,9 +98,14 @@
         <blockquote class="more-info">
             <p><strong>Подробности и статистика</strong></p>
 
-            {% if story.source_link %}
-                <p class="story-source">Источник: <a href="{{ story.source_link }}" target="_blank">{{ story.source_title or story.source_link }}</a></p>
-            {% endif %}
+            {% if story.original_url -%}
+                <p class="story-source">
+                    Оригинал: <a href="{{ story.original_url }}" target="_blank">
+                        {{- story.original_title or story.original_url -}}
+                    </a>
+                    {%- if story.original_author %} <span title="Автор оригинала">({{ story.original_author }})</span>{% endif -%}
+                </p>
+            {%- endif %}
 
             <p>
                 Рейтинг — <a href="{{ url_for('search.simple', search_type='rating', search_id=story.rating.id) }}">{{ story.rating.name }}</a><br/>

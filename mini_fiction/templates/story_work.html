@@ -110,28 +110,40 @@
                         {% endif %}
                       </div>
                 </div>
-                <!-- Источник -->
-                <div class="control-group{% if form.source_link.errors %} error{% endif %}">
-                    {{ form.source_link.label(class_='control-label') }}
-                    <div class="controls">{{ form.source_link }}
-                        {% if form.source_link.errors %}
-                            {% for error in form.source_link.errors %}
+                <!-- Оригинал -->
+                <div class="control-group{% if form.original_url.errors %} error{% endif %}">
+                    {{ form.original_url.label(class_='control-label') }}
+                    <div class="controls">{{ form.original_url }}
+                        {% if form.original_url.errors %}
+                            {% for error in form.original_url.errors %}
                         <span class="help-inline">{{ error }}</span>
                             {% endfor %}
                         {% else %}
-                            <span class="help-inline small">{{ form.source_link.description }}</span>
+                            <span class="help-inline small">{{ form.original_url.description }}</span>
                         {% endif %}
                       </div>
                 </div>
-                <div class="control-group{% if form.source_title.errors %} error{% endif %}">
-                    {{ form.source_title.label(class_='control-label') }}
-                    <div class="controls">{{ form.source_title }}
-                        {% if form.source_title.errors %}
-                            {% for error in form.source_title.errors %}
+                <div class="control-group{% if form.original_title.errors %} error{% endif %}">
+                    {{ form.original_title.label(class_='control-label') }}
+                    <div class="controls">{{ form.original_title }}
+                        {% if form.original_title.errors %}
+                            {% for error in form.original_title.errors %}
                         <span class="help-inline">{{ error }}</span>
                             {% endfor %}
                         {% else %}
-                            <span class="help-inline small">{{ form.source_title.description }}</span>
+                            <span class="help-inline small">{{ form.original_title.description }}</span>
+                        {% endif %}
+                      </div>
+                </div>
+                <div class="control-group{% if form.original_author.errors %} error{% endif %}">
+                    {{ form.original_author.label(class_='control-label') }}
+                    <div class="controls">{{ form.original_author }}
+                        {% if form.original_author.errors %}
+                            {% for error in form.original_author.errors %}
+                        <span class="help-inline">{{ error }}</span>
+                            {% endfor %}
+                        {% else %}
+                            <span class="help-inline small">{{ form.original_author.description }}</span>
                         {% endif %}
                       </div>
                 </div>

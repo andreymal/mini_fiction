@@ -77,16 +77,20 @@ class StoryForm(Form):
         render_kw=dict(attrs_markitup_dict, id='id_notes', cols=40, rows=10, maxlength=4096, placeholder='Заметки к рассказу'),
     )
 
-    source_link = TextField(
-        'Ссылка на источник (если есть)',
+    original_url = TextField(
+        'Ссылка на оригинал (если есть)',
         render_kw=dict(attrs_dict, maxlength=255, placeholder='http://'),
         description='Не забудьте указать, если вы не являетесь непосредственным автором произведения'
     )
 
-    source_title = TextField(
-        'Название источника',
+    original_title = TextField(
+        'Название рассказа в оригинале',
         render_kw=dict(attrs_dict, maxlength=255),
-        description='Этот текст будет отображён в описании рассказа как ссылка на источник'
+    )
+
+    original_author = TextField(
+        'Автор оригинала',
+        render_kw=dict(attrs_dict, maxlength=255),
     )
 
     rating = LazySelectField(

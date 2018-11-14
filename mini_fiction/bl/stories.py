@@ -65,8 +65,9 @@ class StoryBL(BaseBL, Commentable):
             original=data['original'],
             freezed=data['status'] == 'freezed',
             finished=data['status'] == 'finished',
-            source_link=data['source_link'],
-            source_title=data['source_title'],
+            original_url=data['original_url'],
+            original_title=data['original_title'],
+            original_author=data['original_author'],
             notes=data['notes'],
             draft=True,
             approved=approved,
@@ -143,13 +144,13 @@ class StoryBL(BaseBL, Commentable):
                 changed_sphinx_fields.add('freezed')
                 changed_sphinx_fields.add('finished')
 
-        for key in ('title', 'summary', 'notes', 'original'):
+        for key in ('title', 'summary', 'notes', 'original', 'original_title', 'original_author'):
             if key in data and getattr(story, key) != data[key]:
                 edited_data[key] = [getattr(story, key), data[key]]
                 setattr(story, key, data[key])
                 changed_sphinx_fields.add(key)
 
-        for key in ('source_link', 'source_title'):
+        for key in ('original_url',):
             if key in data and getattr(story, key) != data[key]:
                 edited_data[key] = [getattr(story, key), data[key]]
                 setattr(story, key, data[key])
@@ -803,6 +804,8 @@ class StoryBL(BaseBL, Commentable):
                 'summary': normalize_text_for_search_index(story.summary, html=True),
                 'notes': normalize_text_for_search_index(story.notes, html=True),
                 'match_author': ' '.join(x.username for x in story.authors),
+                'original_title': normalize_text_for_search_index(story.original_title, html=False),
+                'original_author': normalize_text_for_search_index(story.original_author, html=False),
 
                 'first_published_at': int(((story.first_published_at or story.date) - datetime(1970, 1, 1, 0, 0, 0)).total_seconds()),
                 'words': story.words,
@@ -1109,8 +1112,8 @@ class StoryBL(BaseBL, Commentable):
             'id', 'title', 'characters', # 'categories', 'classifications',
             'date', 'first_published_at', 'draft', 'approved', 'finished',
             'freezed', 'notes', 'original', 'rating', 'summary', 'updated',
-            'words', 'vote_total', 'vote_value', 'vote_extra', 'source_link',
-            'source_title', 'pinned', 'views',
+            'words', 'vote_total', 'vote_value', 'vote_extra', 'original_url',
+            'original_title', 'original_author', 'pinned', 'views',
         ]
         override = {}
 

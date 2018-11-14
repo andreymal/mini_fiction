@@ -414,8 +414,9 @@ def edit(pk):
         'characters': [x.id for x in story.characters],
         # 'classifications': [x.id for x in story.classifications],
         'rating': story.rating.id,
-        'source_link': story.source_link,
-        'source_title': story.source_title,
+        'original_url': story.original_url,
+        'original_title': story.original_title,
+        'original_author': story.original_author,
     }
     for key in ('title', 'summary', 'notes', 'original'):
         story_data[key] = getattr(story, key)

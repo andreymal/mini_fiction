@@ -462,8 +462,9 @@ class Story(db.Entity):
     vote_extra = orm.Required(orm.LongStr, lazy=False, default='{}', optimistic=False)
 
     comments_count = orm.Required(int, size=16, unsigned=True, default=0, optimistic=False)
-    source_link = orm.Optional(str, 255)
-    source_title = orm.Optional(str, 255)
+    original_url = orm.Optional(str, 255)
+    original_title = orm.Optional(str, 255)
+    original_author = orm.Optional(str, 255)
     pinned = orm.Required(bool, default=False)
     robots_noindex = orm.Required(bool, default=False)
     comments_mode = orm.Optional(str, 8, py_check=lambda x: x in {'', 'on', 'off', 'pub', 'nodraft'})

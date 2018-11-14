@@ -35,7 +35,7 @@
             {{- story.bl.vote_area_2_html(user=current_user, user_vote=vote)|safe -}}
         </div>
             <p>
-                {%- include 'includes/story_reader_buttons.html' -%}
+                {%- with show_jsonl_link=True %}{%- include 'includes/story_reader_buttons.html' -%}{% endwith -%}
                 {% if current_user.is_authenticated %}
                 <span class="story-abuse-area">
                     <a href="{{ url_for('abuse.abuse_story', story_id=story.id) }}" title="Пожаловаться на рассказ" class="abuse-icon story-abuse-icon">!</a>

@@ -1322,6 +1322,10 @@ select.select-size {
     background: transparent url('../i/epub.png') no-repeat 0 0;
 }
 
+.jsonl {
+    background: transparent url('../i/jsonl.png') no-repeat 0 0;
+}
+
 .up {
     background: transparent url('../i/up.png') no-repeat 0 0;
 }

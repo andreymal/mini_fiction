@@ -147,12 +147,13 @@ class Validator(cerberus.Validator):
 
     def __init__(self, *args, **kwargs):
         if args:
-            if 'schema' in kwargs:
+            if 'schema' in kwargs:  # pragma: no cover
                 raise TypeError("got multiple values for argument 'schema'")
             schema = args[0]
         else:
             schema = kwargs.pop('schema')
 
+        self.custom_messages = {}
         if isinstance(schema, dict):
             schema = copy.deepcopy(schema)
             self.populate_custom_messages(schema)
@@ -162,7 +163,6 @@ class Validator(cerberus.Validator):
         if 'purge_unknown' not in kwargs:
             kwargs['purge_unknown'] = True
         super().__init__(*args, **kwargs)
-        self.custom_messages = {}
         self._allowed_func_caches = {}
 
     def populate_custom_messages(self, schema):
@@ -188,7 +188,7 @@ class Validator(cerberus.Validator):
     def _validate_allowed_func(self, allowed_func, field, value):
         """ {'nullable': False} """
         if allowed_func not in self._allowed_func_caches:
-            self._allowed_func_caches[allowed_func] = allowed_func()
+            self._allowed_func_caches[allowed_func] = set(allowed_func())
         choices = self._allowed_func_caches[allowed_func]
         if value not in choices:
             self._error(field, gettext("Unallowed value {value}").format(value=value))
@@ -227,10 +227,8 @@ class Validator(cerberus.Validator):
         if not isinstance(value, str):
             return
         pattern = pattern_func()
-        if not pattern.endswith('$'):
-            pattern += '$'
         re_obj = re.compile(pattern)
-        if not re_obj.match(value):
+        if not re_obj.fullmatch(value):
             self._error(field, DYNREGEX_MISMATCH, pattern)
 
     def _normalize_coerce_strip(self, value):

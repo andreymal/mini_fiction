@@ -12,7 +12,7 @@ from pony.orm import db_session
 
 from mini_fiction.forms.story import StoryForm
 from mini_fiction.forms.comment import CommentForm
-from mini_fiction.models import Author, Story, Chapter, Rating, StoryLog, Favorites, Bookmark
+from mini_fiction.models import Author, Story, Chapter, Rating, StoryLog, Favorites, Bookmark, Subscription
 from mini_fiction.validation import ValidationError
 from mini_fiction.utils.misc import calc_maxdepth
 from mini_fiction.views.editlog import load_users_for_editlog
@@ -76,6 +76,10 @@ def view(pk, comments_page):
     else:
         comment_votes_cache = {i: 0 for i in comment_ids}
 
+    chapter_subscriptions_count = Subscription.select().filter(
+        lambda x: x.type == 'story_chapter' and x.target_id == story.id
+    ).count()
+
     data = {
         'story': story,
         'contributors': story.bl.get_contributors_for_view(),
@@ -96,6 +100,7 @@ def view(pk, comments_page):
         'robots_noindex': not story.published or story.robots_noindex,
         'favorites_count': story.favorites.select().count(),
         'show_meta_description': comments_page == -1,
+        'chapter_subscriptions_count': chapter_subscriptions_count,
     }
 
     return render_template('story_view.html', **data)

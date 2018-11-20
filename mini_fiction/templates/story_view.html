@@ -136,6 +136,10 @@
                 {% endif %}
             </p>
 
+            {% if not story.finished and chapter_subscriptions_count > 0 -%}
+                <p title="Число пользователей, подписавшихся на новые главы">{{ ngettext("%(num)d user waiting for the continuation", "%(num)d users are waiting for the continuation", chapter_subscriptions_count) }}</p>
+            {%- endif %}
+
             {% if current_user.is_authenticated -%}
             <form method="POST" action="{{ url_for('story.subscribe', pk=story.id) }}" class="subscription-form js-subscription-form">
                 <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />

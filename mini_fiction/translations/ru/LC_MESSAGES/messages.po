@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version:  0.0.4\n"
 "Report-Msgid-Bugs-To: andriyano-31@mail.ru\n"
-"POT-Creation-Date: 2018-06-09 23:37+0300\n"
+"POT-Creation-Date: 2018-11-20 21:24+0300\n"
 "Last-Translator: andreymal <andriyano-31@mail.ru>\n"
 "Language: ru\n"
 "Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && "
@@ -18,7 +18,7 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 2.6.0\n"
 
-#: mini_fiction/models.py:525 mini_fiction/models.py:792
+#: mini_fiction/models.py:639 mini_fiction/models.py:906
 msgid "Chapter {}"
 msgstr "Глава {}"
 
@@ -449,6 +449,8 @@ msgstr[2] "%(num)d минут"
 
 #: mini_fiction/templates/author_dashboard.html:20
 #: mini_fiction/templates/includes/series.html:14
+#: mini_fiction/templates/tags/index.html:44
+#: mini_fiction/templates/tags/tag_index.html:16
 #, python-format
 msgid "%(num)d story"
 msgid_plural "%(num)d stories"
@@ -466,9 +468,9 @@ msgstr[2] "%(num)d раз"
 
 #: mini_fiction/templates/author_dashboard.html:29
 #: mini_fiction/templates/includes/series.html:27
-#: mini_fiction/templates/includes/stories.html:26
-#: mini_fiction/templates/index.html:60
+#: mini_fiction/templates/includes/stories.html:31
 #: mini_fiction/templates/news/index.html:18
+#: mini_fiction/templates/sidebar/news.html:8
 #: mini_fiction/templates/story_confirm_delete.html:24
 #, python-format
 msgid "%(num)d comment"
@@ -510,12 +512,12 @@ msgstr "Предпросмотр"
 msgid "Preview selected"
 msgstr "Предпросмотр выделенного"
 
-#: mini_fiction/templates/index.html:35
+#: mini_fiction/templates/index.html:37
 msgid "Moderation log"
 msgstr "Лог модерации"
 
 #: mini_fiction/templates/includes/story_control_buttons.html:33
-#: mini_fiction/templates/index.html:36 mini_fiction/views/editlog.py:63
+#: mini_fiction/templates/index.html:38 mini_fiction/views/editlog.py:63
 #: mini_fiction/views/editlog.py:83
 msgid "Edit log"
 msgstr "Лог изменений"
@@ -545,7 +547,7 @@ msgstr[2] "Комментарий был отредактирован %(num)d р
 msgid "Show older"
 msgstr "Показать более старые"
 
-#: mini_fiction/templates/search.html:110
+#: mini_fiction/templates/search.html:130
 #, python-format
 msgid "Found %(num)d story"
 msgid_plural "Found %(num)d stories"
@@ -553,7 +555,7 @@ msgstr[0] "Всего нашли %(num)d рассказ"
 msgstr[1] "Всего нашли %(num)d рассказа"
 msgstr[2] "Всего нашли %(num)d рассказов"
 
-#: mini_fiction/templates/search.html:123
+#: mini_fiction/templates/search.html:143
 #, python-format
 msgid "Found %(num)d chapter"
 msgid_plural "Found %(num)d chapters"
@@ -579,7 +581,7 @@ msgstr[1] "%(num)d голоса"
 msgstr[2] "%(num)d голосов"
 
 #: mini_fiction/templates/story_favorites.html:10
-#: mini_fiction/templates/story_view.html:104
+#: mini_fiction/templates/story_view.html:135
 #, python-format
 msgid "Added to favorites by %(num)d user"
 msgid_plural "Added to favorites by %(num)d users"
@@ -592,10 +594,10 @@ msgstr[2] "В избранном у %(num)d пользователей"
 #: mini_fiction/templates/includes/ajax/story_ajax_publish_warning.html:9
 #: mini_fiction/templates/includes/chapter_preview.html:4
 #: mini_fiction/templates/includes/notifications.html:49
-#: mini_fiction/templates/includes/stories.html:21
-#: mini_fiction/templates/includes/stories.html:51
-#: mini_fiction/templates/story_view.html:85
-#: mini_fiction/templates/story_view.html:146
+#: mini_fiction/templates/includes/stories.html:26
+#: mini_fiction/templates/includes/stories.html:56
+#: mini_fiction/templates/story_view.html:116
+#: mini_fiction/templates/story_view.html:181
 #, python-format
 msgid "%(num)d word"
 msgid_plural "%(num)d words"
@@ -605,10 +607,10 @@ msgstr[2] "%(num)d слов"
 
 #: mini_fiction/templates/includes/series.html:15
 #: mini_fiction/templates/includes/series.html:26
-#: mini_fiction/templates/includes/stories.html:25
-#: mini_fiction/templates/includes/stories.html:51
-#: mini_fiction/templates/story_view.html:85
-#: mini_fiction/templates/story_view.html:146
+#: mini_fiction/templates/includes/stories.html:30
+#: mini_fiction/templates/includes/stories.html:56
+#: mini_fiction/templates/story_view.html:116
+#: mini_fiction/templates/story_view.html:181
 #, python-format
 msgid "%(num)d view"
 msgid_plural "%(num)d views"
@@ -616,9 +618,17 @@ msgstr[0] "%(num)d просмотр"
 msgstr[1] "%(num)d просмотра"
 msgstr[2] "%(num)d просмотров"
 
+#: mini_fiction/templates/story_view.html:140
+#, python-format
+msgid "%(num)d user waiting for the continuation"
+msgid_plural "%(num)d users are waiting for the continuation"
+msgstr[0] "%(num)d пользователь ждёт продолжение"
+msgstr[1] "%(num)d пользователя ждут продолжение"
+msgstr[2] "%(num)d пользователей ждут продолжение"
+
 #: mini_fiction/templates/includes/chapter_single.html:5
-#: mini_fiction/templates/includes/stories.html:46
-#: mini_fiction/templates/story_view.html:133
+#: mini_fiction/templates/includes/stories.html:51
+#: mini_fiction/templates/story_view.html:168
 msgid "Draft"
 msgstr "Черновик"
 
@@ -699,15 +709,11 @@ msgstr "Новости"
 msgid "Header pictures"
 msgstr "Картинки в шапке"
 
-#: mini_fiction/templates/admin/index.html:60
-msgid "Categories (genres)"
-msgstr "Категории (жанры)"
-
 #: mini_fiction/templates/admin/characters/delete.html:8
 #: mini_fiction/templates/admin/characters/delete.html:25
 #: mini_fiction/templates/admin/characters/work.html:10
 #: mini_fiction/templates/admin/characters/work.html:34
-#: mini_fiction/templates/admin/index.html:64
+#: mini_fiction/templates/admin/index.html:66
 #: mini_fiction/views/admin/characters.py:30
 msgid "Characters"
 msgstr "Персонажи"
@@ -716,29 +722,25 @@ msgstr "Персонажи"
 #: mini_fiction/templates/admin/charactergroups/delete.html:25
 #: mini_fiction/templates/admin/charactergroups/work.html:10
 #: mini_fiction/templates/admin/charactergroups/work.html:38
-#: mini_fiction/templates/admin/index.html:68
+#: mini_fiction/templates/admin/index.html:70
 #: mini_fiction/views/admin/charactergroups.py:30
 msgid "Character groups"
 msgstr "Группы персонажей"
-
-#: mini_fiction/templates/admin/index.html:72
-msgid "Classifications (events)"
-msgstr "Классификаторы (события)"
 
 #: mini_fiction/templates/admin/htmlblocks/delete.html:9
 #: mini_fiction/templates/admin/htmlblocks/delete.html:26
 #: mini_fiction/templates/admin/htmlblocks/work.html:10
 #: mini_fiction/templates/admin/htmlblocks/work.html:30
-#: mini_fiction/templates/admin/index.html:76
+#: mini_fiction/templates/admin/index.html:80
 #: mini_fiction/views/admin/htmlblocks.py:23
 msgid "HTML Blocks"
 msgstr "HTML-блоки"
 
-#: mini_fiction/templates/admin/index.html:84
+#: mini_fiction/templates/admin/index.html:88
 msgid "Last actions"
 msgstr "Последние действия"
 
-#: mini_fiction/templates/admin/index.html:85
+#: mini_fiction/templates/admin/index.html:89
 msgid "(nothing)"
 msgstr "(ничего)"
 
@@ -1140,7 +1142,7 @@ msgstr[0] "%(num)d глава"
 msgstr[1] "%(num)d главы"
 msgstr[2] "%(num)d глав"
 
-#: mini_fiction/templates/includes/stories.html:36
+#: mini_fiction/templates/includes/stories.html:41
 #, python-format
 msgid "Show %(num)d chapter"
 msgid_plural "Show %(num)d chapters"
@@ -1172,11 +1174,11 @@ msgstr[2] ""
 msgid "Edit"
 msgstr "Редактировать"
 
-#: mini_fiction/utils/debugtoolbar.py:96
+#: mini_fiction/utils/debugtoolbar.py:98
 msgid "Pony ORM"
 msgstr "Pony ORM"
 
-#: mini_fiction/utils/debugtoolbar.py:107
+#: mini_fiction/utils/debugtoolbar.py:109
 msgid "Pony ORM queries"
 msgstr "Запросы Pony ORM"
 
@@ -1238,126 +1240,126 @@ msgstr[0] "Показать %(num)s неизменённый символ"
 msgstr[1] "Показать %(num)s неизменённых символа"
 msgstr[2] "Показать %(num)s неизменённых символов"
 
-#: mini_fiction/validation/__init__.py:41
+#: mini_fiction/validation/__init__.py:49
 msgid "Required field"
 msgstr "Обязательное поле"
 
-#: mini_fiction/validation/__init__.py:42
+#: mini_fiction/validation/__init__.py:50
 msgid "Unknown field"
 msgstr "Неизвестное поле"
 
-#: mini_fiction/validation/__init__.py:43
+#: mini_fiction/validation/__init__.py:51
 msgid "Field '{0}' is required"
 msgstr "Обязательное поле {0}"
 
-#: mini_fiction/validation/__init__.py:44
+#: mini_fiction/validation/__init__.py:52
 msgid "Depends on these values: {constraint}"
 msgstr "Зависит от следующих значений: {constraint}"
 
-#: mini_fiction/validation/__init__.py:45
+#: mini_fiction/validation/__init__.py:53
 msgid "{0} must not be present with '{field}'"
 msgstr "'{0}' не должно быть вместе с '{field}'"
 
-#: mini_fiction/validation/__init__.py:47
+#: mini_fiction/validation/__init__.py:55
 msgid "'{0}' is not a document, must be a dict"
 msgstr "'{0}' не документ, должен быть словарь"
 
-#: mini_fiction/validation/__init__.py:48
-#: mini_fiction/validation/__init__.py:49
+#: mini_fiction/validation/__init__.py:56
+#: mini_fiction/validation/__init__.py:57
 msgid "Field should not be empty"
 msgstr "Поле не может быть пустым"
 
-#: mini_fiction/validation/__init__.py:50
+#: mini_fiction/validation/__init__.py:58
 msgid "Must be of {constraint} type"
 msgstr "Должно иметь тип {constraint}"
 
-#: mini_fiction/validation/__init__.py:51
+#: mini_fiction/validation/__init__.py:59
 msgid "Length of list should be {constraint}, it is {0}"
 msgstr "Длина списка должна быть {constraint}, а не {0}"
 
-#: mini_fiction/validation/__init__.py:52
-#: mini_fiction/validation/__init__.py:79
+#: mini_fiction/validation/__init__.py:60
+#: mini_fiction/validation/__init__.py:87
 msgid "Min length is {constraint}"
 msgstr "Минимальная длина {constraint}"
 
-#: mini_fiction/validation/__init__.py:53
-#: mini_fiction/validation/__init__.py:80
+#: mini_fiction/validation/__init__.py:61
+#: mini_fiction/validation/__init__.py:88
 msgid "Max length is {constraint}"
 msgstr "Максимальная длина {constraint}"
 
-#: mini_fiction/validation/__init__.py:55
+#: mini_fiction/validation/__init__.py:63
 msgid "Value does not match regex '{constraint}'"
 msgstr "Значение не соответствует регулярному выражению {constraint}"
 
-#: mini_fiction/validation/__init__.py:56
+#: mini_fiction/validation/__init__.py:64
 msgid "Min value is {constraint}"
 msgstr "Минимальное значение {constraint}"
 
-#: mini_fiction/validation/__init__.py:57
+#: mini_fiction/validation/__init__.py:65
 msgid "Max value is {constraint}"
 msgstr "Максимальное значение {constraint}"
 
-#: mini_fiction/validation/__init__.py:58
-#: mini_fiction/validation/__init__.py:60
-#: mini_fiction/validation/__init__.py:186
+#: mini_fiction/validation/__init__.py:66
+#: mini_fiction/validation/__init__.py:68
+#: mini_fiction/validation/__init__.py:194
 msgid "Unallowed value {value}"
 msgstr "Недопустимое значение {value}"
 
-#: mini_fiction/validation/__init__.py:59
-#: mini_fiction/validation/__init__.py:61
+#: mini_fiction/validation/__init__.py:67
+#: mini_fiction/validation/__init__.py:69
 msgid "Unallowed values {0}"
 msgstr "Недопустимые значения {0}"
 
-#: mini_fiction/validation/__init__.py:63
+#: mini_fiction/validation/__init__.py:71
 msgid "Field '{field}' cannot be coerced: {0}"
 msgstr "Поле '{field}' не может быть преобразовано: {0}"
 
-#: mini_fiction/validation/__init__.py:64
+#: mini_fiction/validation/__init__.py:72
 msgid "Field '{field}' cannot be renamed: {0}"
 msgstr "Поле '{field}' не может быть переименовано: {0}"
 
-#: mini_fiction/validation/__init__.py:65
+#: mini_fiction/validation/__init__.py:73
 msgid "Field is read-only"
 msgstr "Поле доступно только для чтения"
 
-#: mini_fiction/validation/__init__.py:66
+#: mini_fiction/validation/__init__.py:74
 msgid "Default value for '{field}' cannot be set: {0}"
 msgstr "Не получилось установить значение по умолчанию для поля {field}: {0}"
 
-#: mini_fiction/validation/__init__.py:68
+#: mini_fiction/validation/__init__.py:76
 msgid "Mapping doesn't validate subschema: {0}"
 msgstr ""
 
-#: mini_fiction/validation/__init__.py:69
-#: mini_fiction/validation/__init__.py:72
+#: mini_fiction/validation/__init__.py:77
+#: mini_fiction/validation/__init__.py:80
 msgid "One or more sequence-items don't validate: {0}"
 msgstr ""
 
-#: mini_fiction/validation/__init__.py:70
+#: mini_fiction/validation/__init__.py:78
 msgid "One or more properties of a mapping  don't validate: {0}"
 msgstr ""
 
-#: mini_fiction/validation/__init__.py:71
+#: mini_fiction/validation/__init__.py:79
 msgid "One or more values in a mapping don't validate: {0}"
 msgstr ""
 
-#: mini_fiction/validation/__init__.py:74
+#: mini_fiction/validation/__init__.py:82
 msgid "One or more definitions validate"
 msgstr ""
 
-#: mini_fiction/validation/__init__.py:75
+#: mini_fiction/validation/__init__.py:83
 msgid "None or more than one rule validate"
 msgstr ""
 
-#: mini_fiction/validation/__init__.py:76
+#: mini_fiction/validation/__init__.py:84
 msgid "No definitions validate"
 msgstr ""
 
-#: mini_fiction/validation/__init__.py:77
+#: mini_fiction/validation/__init__.py:85
 msgid "One or more definitions don't validate"
 msgstr ""
 
-#: mini_fiction/validation/__init__.py:81
+#: mini_fiction/validation/__init__.py:89
 msgid "Value does not match regex '{0}'"
 msgstr "Значение не соответствует регулярному выражению {0}"
 
@@ -1422,8 +1424,8 @@ msgid "Confirm restore comment"
 msgstr "Подтверждение восстановления комментария"
 
 #: mini_fiction/views/search.py:21 mini_fiction/views/search.py:29
-#: mini_fiction/views/search.py:37 mini_fiction/views/search.py:77
-#: mini_fiction/views/search.py:103 mini_fiction/views/search.py:122
+#: mini_fiction/views/search.py:37 mini_fiction/views/search.py:79
+#: mini_fiction/views/search.py:107 mini_fiction/views/search.py:126
 msgid "Search of stories"
 msgstr "Поиск рассказов"
 
@@ -1431,7 +1433,7 @@ msgstr "Поиск рассказов"
 msgid "Search results"
 msgstr "Результаты поиска"
 
-#: mini_fiction/views/story.py:371
+#: mini_fiction/views/story.py:364
 msgid "New story"
 msgstr "Новый рассказ"
 
@@ -1442,3 +1444,9 @@ msgstr "Картинка в шапке"
 #: mini_fiction/views/admin/logopics.py:112
 msgid "Delete header picture"
 msgstr "Удалить картинку в шапке"
+
+#~ msgid "Categories (genres)"
+#~ msgstr "Категории (жанры)"
+
+#~ msgid "Classifications (events)"
+#~ msgstr "Классификаторы (события)"

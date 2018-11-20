@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
 import re
@@ -6,7 +6,7 @@ from .base import html_text_transform
 
 
 typo_patterns = [
-    (r'(^|\n)(<[^>]+?>)?[-—]-?[ \t\r\f\v]+', '\\1\\2— '),
+    (r'(^|\n)((<[^>]+?>)?)[-—]-?[ \t\r\f\v]+', '\\1\\2— '),
     (r'[ \t\r\f\v]+[-—]-?[ \t\r\f\v]+', '\xa0— '),
 ]
 typo_patterns = [(re.compile(p_), r_) for p_, r_ in typo_patterns]

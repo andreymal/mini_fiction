@@ -55,6 +55,8 @@ def dump_query(statement, params):
 
 
 def load_query(data):
+    from flask import request
+
     try:
         statement, params = query_signer().loads(request.args['query'])
     except (itsdangerous.BadSignature, TypeError):

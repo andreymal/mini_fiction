@@ -1057,6 +1057,37 @@ hr {
     border-bottom: 1px solid #ddd;
 }
 
+.spoiler-gray {
+    background-color: #ccc;
+    color: #ccc;
+}
+
+.spoiler-gray a,
+.spoiler-gray a:visited,
+.spoiler-gray {
+    color: #ccc;
+}
+
+.spoiler-gray:hover {
+    background-color: transparent;
+    color: #666;
+}
+
+.spoiler-gray:hover a {
+    background-color: transparent;
+    color: #09f;
+}
+
+.spoiler-gray img {
+    -webkit-filter: contrast(0%) brightness(159.375%);
+    filter: contrast(0%) brightness(159.375%);
+}
+
+.spoiler-gray:hover img {
+    -webkit-filter: inherit;
+    filter: inherit;
+}
+
 /* Storypanel */
 .story-panel {
     margin-left: -12px;

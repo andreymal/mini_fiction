@@ -33,6 +33,7 @@ window.mySettings = {
         {name: 'Нижний индекс', className:'edit-subscript', openWith:'<sub>', closeWith:'</sub>'},
         {name: 'Код', className:'edit-code', openWith: '<pre>', closeWith:'</pre>'},
         {name: 'Уменьшить размер', className:'edit-small', openWith:'<small>', closeWith:'</small>'},
+        {name: 'Lite-спойлер', className:'edit-spoiler-gray', openWith:'<span class="spoiler-gray">', closeWith:'</span>'},
         {separator: '---------------'},
         {name: 'Очистка от тегов', className:'edit-tag', replaceWith: function(markitup) {return markitup.selection.replace(/<(.*?)>/g, "")}},
     ]

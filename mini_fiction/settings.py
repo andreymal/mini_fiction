@@ -221,7 +221,7 @@ class Config(object):
 
     ALLOWED_TAGS = [
         'b', 'i', 'strong', 'em', 's', 'u',
-        'p', 'br', 'hr',
+        'p', 'span', 'br', 'hr',
         'img', 'a',
         'ul', 'ol', 'li',
         'blockquote', 'sup', 'sub', 'pre', 'small', 'tt'
@@ -230,6 +230,9 @@ class Config(object):
     ALLOWED_ATTRIBUTES = {
         'img': ['src', 'alt', 'title', 'width', 'height'],
         'a': ['href', 'rel', 'title', 'target'],
+        'span': {
+            'class': ['spoiler-gray'],
+        },
     }
 
     CHAPTER_ALLOWED_TAGS = [

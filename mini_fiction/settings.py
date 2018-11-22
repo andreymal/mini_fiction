@@ -244,8 +244,12 @@ class Config(object):
     CHAPTER_ALLOWED_ATTRIBUTES = {
         'img': ['src', 'alt', 'title', 'width', 'height'],
         'a': ['href', 'rel', 'title', 'target'],
-        'span': ['align'],
-        'p': ['align'],
+        'span': {
+            'align': ['left', 'center', 'right'],
+        },
+        'p': {
+            'align': ['left', 'center', 'right'],
+        },
         'footnote': ['id'],
         'font': ['size', 'color'],
     }

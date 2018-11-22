@@ -50,8 +50,16 @@ def _filter_html(doc, tags, attributes, **kw):
         filters = []
         filters.extend(tags)
         for tag, attrs in attributes.items():
-            for attr in attrs:
-                filters.append('%s/@%s' % (tag, attr))
+            if isinstance(attrs, dict):
+                for attr, attr_values in attrs.items():
+                    if attr_values is None:
+                        filters.append('%s/@%s' % (tag, attr))
+                    else:
+                        cond = ['@%s=%r' % (attr, attr_value) for attr_value in attr_values]
+                        filters.append('%s[%s]/@%s' % (tag, ' or '.join(cond), attr))
+            else:
+                for attr in attrs:
+                    filters.append('%s/@%s' % (tag, attr))
         filters = '|'.join(filters)
         data = HTML_FILTER_TEMPLATE.replace('@FILTERS@', filters)
 

@@ -1,0 +1,13 @@
+<div class="modal-header">
+    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+    <h3>{{ page_title }}</h3>
+</div>
+<div class="modal-body">
+    <div class="story-item">
+        <p>Возможность публикации рассказа <strong>«{{ story.title }}»</strong> временно заблокирована.</p>
+        <p>На <a href="{{ url_for('story_local_comment.view', story_id=story.id) }}">странице обсуждения</a> могут быть подробности.</p>
+    </div>
+</div>
+<div class="modal-footer">
+    <button class="btn" data-dismiss="modal" aria-hidden="true">Вернуться</button>
+</div>

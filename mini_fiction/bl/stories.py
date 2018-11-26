@@ -484,6 +484,8 @@ class StoryBL(BaseBL, Commentable):
         current_app.cache.delete('index_updated_chapters')
 
     def is_publishable(self):
+        if self.model.publishing_blocked_until and self.model.publishing_blocked_until > datetime.utcnow():
+            return False
         return self.model.words >= current_app.config['PUBLISH_SIZE_LIMIT']
 
     def get_activity(self, user):

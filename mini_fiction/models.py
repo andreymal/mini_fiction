@@ -473,6 +473,7 @@ class Story(db.Entity):
     published_by_author = orm.Optional(Author)  # Ему будет отправлено уведомление о публикации
     last_author_notification_at = orm.Optional(datetime, 6)  # Во избежание слишком частых уведомлений
     last_staff_notification_at = orm.Optional(datetime, 6)
+    publishing_blocked_until = orm.Optional(datetime, 6)
     extra = orm.Required(orm.LongStr, lazy=False, default='{}')
 
     in_series_permissions = orm.Set(InSeriesPermissions)

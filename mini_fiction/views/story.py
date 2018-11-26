@@ -217,7 +217,11 @@ def publish(pk):
         'unpublished_chapters_count': Chapter.select(lambda x: x.story == story and x.draft).count(),
     }
 
-    if not story.bl.publish(user, story.draft):  # draft == not published
+    if story.publishing_blocked_until and story.publishing_blocked_until > datetime.utcnow():
+        data['page_title'] = 'Неудачная попытка публикации'
+        modal = render_template('includes/ajax/story_ajax_publish_blocked.html', **data)
+
+    elif not story.bl.publish(user, story.draft):  # draft == not published
         data['page_title'] = 'Неудачная попытка публикации'
         modal = render_template('includes/ajax/story_ajax_publish_warning.html', **data)
 

@@ -528,7 +528,7 @@ class Story(db.Entity):
     # Проверка возможности публикации
     @property
     def publishable(self):
-        return self.words >= current_app.config['PUBLISH_SIZE_LIMIT']
+        return self.bl.is_publishable()
 
     @property
     def nsfw(self):

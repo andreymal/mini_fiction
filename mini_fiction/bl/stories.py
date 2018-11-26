@@ -300,7 +300,7 @@ class StoryBL(BaseBL, Commentable):
         if (not published) == story.draft:
             return True
 
-        if story.publishable or (not story.draft and not story.publishable):
+        if self.is_publishable() or (not story.draft and not self.is_publishable()):
             story.draft = not published
 
             if user:
@@ -482,6 +482,9 @@ class StoryBL(BaseBL, Commentable):
         story.delete()
         orm.flush()
         current_app.cache.delete('index_updated_chapters')
+
+    def is_publishable(self):
+        return self.model.words >= current_app.config['PUBLISH_SIZE_LIMIT']
 
     def get_activity(self, user):
         from mini_fiction.models import Activity

@@ -84,7 +84,11 @@
 {% macro comment_html(comment, short=False, with_controls=True, with_vote=True, author_ids=None) %}
     {%- if comment.deleted and not current_user.is_staff -%}
         <div class="comment-text comment-text-deleted">
-            Комментарий был отправлен на Луну
+            {%- if comment.author and comment.last_deleted_by and comment.author.id == comment.last_deleted_by.id -%}
+                Комментарий удалён пользователем
+            {%- else -%}
+                Комментарий был отправлен на Луну
+            {%- endif -%}
         </div>
     {%- else -%}
         {% if with_vote and comment.bl.can_vote %}

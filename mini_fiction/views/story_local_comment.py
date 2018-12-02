@@ -49,7 +49,7 @@ def view(story_id, comments_page):
         'comments_tree_list': comments_tree_list,
         'comments_count': comments_count,
         'last_viewed_comment': last_viewed_comment,
-        'page_title': 'Обсуждение «{}»'.format(story.title),
+        'page_title': 'Обсуждение',
         'comment_form': CommentForm(),
         'page_obj': paged,
         'sub_comments': story.bl.get_local_comments_subscription(user),

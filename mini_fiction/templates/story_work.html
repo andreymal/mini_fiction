@@ -7,13 +7,14 @@
     </div>
 
     <div class="span12"{% if not story_add %} id="story_{{ story.id }}"{% endif %}>
-        {% include 'includes/story_control_buttons.html' %}
-        <h1>
-            {{ page_title }}
-        </h1>
-        {% if story_add %}
-{{ html_block('story_add') }}
-        {% endif %}
+        {%- if story_add %}
+            <h1>{{ page_title }}</h1>
+            {{- html_block('story_add') -}}
+        {% else %}
+            {% include 'includes/story_control_buttons.html' %}
+            <h1>Редактирование <a class="invisible-link" href="{{ url_for('story.view', pk=story.id, _external=True) }}">«{{ story.title }}»</a></h1>
+        {% endif -%}
+
         {% if saved %}<div class="alert-mini green">Изменения сохранены</div>{% endif %}
         {% if not_saved %}<div class="alert-mini alert-error">Изменения не сохранены, проверьте форму</div>{% endif %}
 

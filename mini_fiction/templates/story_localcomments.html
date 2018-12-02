@@ -1,14 +1,16 @@
 {% extends base %}
 {% from 'macro.html' import breadcrumbs with context %}
-{% block content %}
 
+{% block title %}Обсуждение рассказа «{{ story.title }}»{% endblock %}
+
+{% block content %}
 <div class="row">
     <div class="span12 story-page" id="story_{{ story.id }}">
         {{- breadcrumbs([[url_for('story.view', pk=story.id), story.title]]) }}
 
         {% include 'includes/story_control_buttons.html' %}
         <h1 id="story_title">
-            {{ story.title }}
+            <a class="invisible-link" href="{{ url_for('story.view', pk=story.id, _external=True) }}">{{ story.title }}</a>
             {% include 'includes/story_marks.html' %}
         </h1>
 

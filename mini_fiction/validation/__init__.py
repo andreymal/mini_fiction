@@ -11,10 +11,10 @@ from flask_babel import gettext, lazy_gettext
 
 # when https://github.com/nicolaiarocci/cerberus/issues/174 will be solved, it can be rewritten
 
-# TODO: перепроверить ID на какие-нибудь коллизии в будущем
-MIN_LENGTH_NOSTRIP = cerberus.errors.ErrorDefinition(0x4027, 'minlengthnostrip')
-MAX_LENGTH_NOSTRIP = cerberus.errors.ErrorDefinition(0x4028, 'maxlengthnostrip')
-DYNREGEX_MISMATCH = cerberus.errors.ErrorDefinition(0x4041, 'dynregex')
+
+MIN_LENGTH_NOSTRIP = cerberus.errors.ErrorDefinition(0x4127, 'minlengthnostrip')
+MAX_LENGTH_NOSTRIP = cerberus.errors.ErrorDefinition(0x4128, 'maxlengthnostrip')
+DYNREGEX_MISMATCH = cerberus.errors.ErrorDefinition(0x4141, 'dynregex')
 
 file_type = cerberus.TypeDefinition('file', (FileStorage,), ())
 
@@ -84,9 +84,9 @@ class CustomErrorHandler(cerberus.errors.BasicErrorHandler):
         0x93: lazy_gettext("No definitions validate"),
         0x94: lazy_gettext("One or more definitions don't validate"),
 
-        0x4027: lazy_gettext("Min length is {constraint}"),
-        0x4028: lazy_gettext("Max length is {constraint}"),
-        0x4041: lazy_gettext("Value does not match regex '{0}'"),
+        0x4127: lazy_gettext("Min length is {constraint}"),
+        0x4128: lazy_gettext("Max length is {constraint}"),
+        0x4141: lazy_gettext("Value does not match regex '{0}'"),
     })
 
     def __init__(self, tree=None, custom_messages=None):

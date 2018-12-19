@@ -565,13 +565,13 @@ var story = {
         }
         window.addEventListener('scroll', this.panel.event);
         window.addEventListener('resize', this.panel.eventResize);
-        this.recalcPanelGeometry();
 
         // Кнопка прокрутки наверх
         var scrollDiv = document.getElementById('toTop');
         scrollDiv.addEventListener('click', this.panel.eventToTop);
 
         panelElem.classList.remove('no-js');
+        this.recalcPanelGeometry();
 
         // Из-за того, что панель занимает место вверху страницы, прокрутка
         // до элементов по хэшу в адресе приводит к залезанию контента

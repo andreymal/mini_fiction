@@ -94,7 +94,7 @@ zip_dump_params = {
         'exclude': ('characters',),
     },
     'character': {
-        'include': ('id', 'name', 'description', 'picture', 'group'),
+        'include': ('id', 'name', 'description', 'picture', 'sha256sum', 'group'),
         'exclude': ('stories',),
         'media': ('picture',),
     },

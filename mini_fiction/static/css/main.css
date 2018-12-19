@@ -608,8 +608,14 @@ a.authorlink:hover,a.edit-link:hover {
     color: #999;
 }
 
-img.avatar-small, .character-list img {
+img.avatar-small {
     width: 20px;
+    height: 20px;
+    border-radius: 2px;
+    margin-right: 4px;
+}
+
+.character-list img {
     height: 20px;
     border-radius: 2px;
     margin-right: 4px;

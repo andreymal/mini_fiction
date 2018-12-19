@@ -4,6 +4,7 @@
 # pylint: disable=unexpected-keyword-arg,no-value-for-parameter
 
 import os
+from hashlib import sha256
 
 from flask import current_app
 from flask_babel import lazy_gettext
@@ -86,7 +87,7 @@ class CharacterBL(BaseBL):
 
         picture = self.validate_and_get_picture_data(data.pop('picture'))
 
-        character = self.model(picture='pending', **data)
+        character = self.model(picture='pending', sha256sum='pending', **data)
         character.flush()
         character.bl.set_picture_data(picture)
         AdminLog.bl.create(user=author, obj=character, action=AdminLog.ADDITION)
@@ -180,6 +181,7 @@ class CharacterBL(BaseBL):
             fp.write(data)
 
         self.model.picture = urlpath
+        self.model.sha256sum = sha256(data).hexdigest()
         return urlpath
 
 

@@ -225,6 +225,7 @@ class Character(db.Entity):
     name = orm.Required(str, 256)
     group = orm.Optional(CharacterGroup)
     picture = orm.Required(str, 128)
+    sha256sum = orm.Required(str, 64)
 
     stories = orm.Set('Story')
 
@@ -235,7 +236,10 @@ class Character(db.Entity):
 
     @property
     def thumb(self):
-        return url_for('media', filename=self.picture)
+        return '{}?{}'.format(
+            url_for('media', filename=self.picture),
+            self.sha256sum[:8],
+        )
 
 
 class Category(db.Entity):

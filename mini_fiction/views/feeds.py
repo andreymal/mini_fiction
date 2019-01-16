@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
+from datetime import datetime, timedelta
 
 from flask import Blueprint, Markup, current_app, url_for, request, abort
 from werkzeug.contrib.atom import AtomFeed
@@ -22,6 +23,44 @@ def feed_stories():
     )
     count = current_app.config['RSS'].get('stories', 20)
     stories = Story.select_published().order_by(Story.first_published_at.desc(), Story.id.desc())[:count]
+    for story in stories:
+        author = story.authors[0]
+        feed.add(
+            story.title,
+            Markup(story.summary).striptags(),
+            content_type='text',
+            author=author.username,
+            url=url_for('story.view', pk=story.id, _external=True),
+            updated=story.updated,
+            published=story.first_published_at or story.date
+        )
+    return feed.get_response()
+
+
+@bp.route('/stories/top/', endpoint='top')
+@db_session
+def feed_stories_top():
+    feed = AtomFeed(
+        title='Топ рассказов — {}'.format(sitename()),
+        subtitle='Топ рассказов',
+        feed_url=request.url,
+        url=request.url_root
+    )
+
+    stories = Story.select_published().filter(lambda x: x.vote_total >= current_app.config['MINIMUM_VOTES_FOR_VIEW'])
+
+    period = request.args.get('period', 0)
+    try:
+        period = int(period)
+    except ValueError:
+        period = 0
+
+    if period > 0:
+        since = datetime.utcnow() - timedelta(days=period)
+        stories = stories.filter(lambda x: x.first_published_at >= since)
+
+    count = current_app.config['RSS'].get('stories', 20)
+    stories = stories.order_by(Story.vote_value.desc(), Story.id.desc())[:count]
     for story in stories:
         author = story.authors[0]
         feed.add(

@@ -2,6 +2,11 @@
 
 {% from 'macro.html' import paginator with context %}
 
+{% block extrahead %}
+    {{- super() }}
+    <link rel="alternate" type="application/rss+xml" title="Топ рассказов &mdash; {{ SITE_NAME }}" href="{{ url_for('feeds.top') }}" />
+{% endblock %}
+
 {% block before_list %}
 <div>
     {% if period != 7 %}<a href="{{ modified_url(period='7', page=1) }}">{% endif -%}
@@ -19,6 +24,8 @@
     {% if period != 0 %}<a href="{{ modified_url(period=None, page=1) }}">{% endif -%}
         За всё время
     {%- if period != 0 %}</a>{% endif %}
+
+    <a href="{{ url_for('feeds.top') }}">RSS</a>
 </div>
 {% endblock %}
 

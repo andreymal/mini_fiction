@@ -3,6 +3,7 @@
 from datetime import datetime, timedelta
 
 from flask import Blueprint, Markup, current_app, url_for, request, abort
+from flask_babel import gettext, ngettext
 from werkzeug.contrib.atom import AtomFeed
 from pony.orm import select, db_session
 
@@ -40,18 +41,29 @@ def feed_stories():
 @bp.route('/stories/top/', endpoint='top')
 @db_session
 def feed_stories_top():
-    feed = AtomFeed(
-        title='Топ рассказов — {}'.format(sitename()),
-        subtitle='Топ рассказов',
-        feed_url=request.url,
-        url=request.url_root
-    )
-
     period = request.args.get('period', 0)
     try:
         period = int(period)
     except ValueError:
         period = 0
+
+    if period == 7:
+        title = gettext('Top stories for the week')
+    elif period == 30:
+        title = gettext('Top stories for the month')
+    elif period == 365:
+        title = gettext('Top stories for the year')
+    elif period == 0:
+        title = gettext('Top stories for all time')
+    else:
+        title = ngettext('Top stories in %(num)d day', 'Top stories in %(num)d days', period)
+
+    feed = AtomFeed(
+        title='{} — {}'.format(title, sitename()),
+        subtitle='Топ рассказов',
+        feed_url=request.url,
+        url=request.url_root
+    )
 
     count = current_app.config['RSS'].get('stories', 20)
     stories = Story.bl.select_top(period)[:count]

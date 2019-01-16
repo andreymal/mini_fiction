@@ -4,7 +4,7 @@
 
 {% block extrahead %}
     {{- super() }}
-    <link rel="alternate" type="application/rss+xml" title="Топ рассказов &mdash; {{ SITE_NAME }}" href="{{ url_for('feeds.top') }}" />
+    <link rel="alternate" type="application/rss+xml" title="Топ рассказов &mdash; {{ SITE_NAME }}" href="{{ url_for('feeds.top', period=period or None) }}" />
 {% endblock %}
 
 {% block before_list %}
@@ -24,8 +24,8 @@
     {% if period != 0 %}<a href="{{ modified_url(period=None, page=1) }}">{% endif -%}
         За всё время
     {%- if period != 0 %}</a>{% endif %}
-
-    <a href="{{ url_for('feeds.top') }}">RSS</a>
+    &nbsp; &nbsp;
+    <a href="{{ url_for('feeds.top', period=period or None) }}" data-noajax="1">RSS</a>
 </div>
 {% endblock %}
 

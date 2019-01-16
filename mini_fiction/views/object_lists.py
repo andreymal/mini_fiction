@@ -6,6 +6,7 @@ from datetime import datetime, timedelta
 from pony.orm import select, db_session
 from flask import Blueprint, current_app, abort, render_template, request
 from flask_login import current_user, login_required
+from flask_babel import gettext, ngettext
 
 from mini_fiction.models import Author, Story, StoryContributor, Favorites, Bookmark, StoryView, StoryTag, Tag
 from mini_fiction.utils.misc import Paginator
@@ -127,11 +128,22 @@ def top(page):
 
     stories = page_obj.slice_or_404(objects)
 
+    if period == 7:
+        page_title = gettext('Top stories for the week')
+    elif period == 30:
+        page_title = gettext('Top stories for the month')
+    elif period == 365:
+        page_title = gettext('Top stories for the year')
+    elif period == 0:
+        page_title = gettext('Top stories for all time')
+    else:
+        page_title = ngettext('Top stories in %(num)d day', 'Top stories in %(num)d days', period)
+
     data = dict(
         stories=stories,
         page_obj=page_obj,
         count=objects.count(),
-        page_title='Топ рассказов',
+        page_title=page_title,
         period=period,
     )
     data.update(cached_lists([x.id for x in stories]))

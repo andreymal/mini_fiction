@@ -600,6 +600,17 @@ class StoryBL(BaseBL, Commentable):
             return cls.select()
         return default_queryset
 
+    def select_top(self, period=0):
+        queryset = self.model.select(
+            lambda x: x.approved and not x.draft and x.vote_total >= current_app.config['MINIMUM_VOTES_FOR_VIEW']
+        ).order_by(self.model.vote_value.desc(), self.model.id.desc())
+
+        if period > 0:
+            since = datetime.utcnow() - timedelta(days=period)
+            queryset = queryset.filter(lambda x: x.first_published_at >= since)
+
+        return queryset
+
     def select_by_author(self, author, for_user=None):
         from mini_fiction.models import StoryContributor
 

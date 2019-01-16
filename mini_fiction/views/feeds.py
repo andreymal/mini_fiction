@@ -47,20 +47,14 @@ def feed_stories_top():
         url=request.url_root
     )
 
-    stories = Story.select_published().filter(lambda x: x.vote_total >= current_app.config['MINIMUM_VOTES_FOR_VIEW'])
-
     period = request.args.get('period', 0)
     try:
         period = int(period)
     except ValueError:
         period = 0
 
-    if period > 0:
-        since = datetime.utcnow() - timedelta(days=period)
-        stories = stories.filter(lambda x: x.first_published_at >= since)
-
     count = current_app.config['RSS'].get('stories', 20)
-    stories = stories.order_by(Story.vote_value.desc(), Story.id.desc())[:count]
+    stories = Story.bl.select_top(period)[:count]
     for story in stories:
         author = story.authors[0]
         feed.add(

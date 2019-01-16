@@ -109,19 +109,13 @@ def viewed(page):
 @bp.route('/story/top/page/<int:page>/')
 @db_session
 def top(page):
-    objects = Story.select_published().filter(lambda x: x.vote_total >= current_app.config['MINIMUM_VOTES_FOR_VIEW'])
-
     period = request.args.get('period')
     if period and period.isdigit():
         period = int(period)
     else:
         period = 0
 
-    if period > 0:
-        since = datetime.utcnow() - timedelta(days=period)
-        objects = objects.filter(lambda x: x.first_published_at >= since)
-
-    objects = objects.order_by(Story.vote_value.desc(), Story.id.desc())
+    objects = Story.bl.select_top(period)
     objects = objects.prefetch(Story.characters, Story.contributors, StoryContributor.user, Story.tags, StoryTag.tag, Tag.category)
 
     page_obj = Paginator(

@@ -1,14 +1,14 @@
 # Russian translations for mini_fiction.
-# Copyright (C) 2018 andreymal
+# Copyright (C) 2019 andreymal
 # This file is distributed under the same license as the mini_fiction
 # project.
-# andreymal <andriyano-31@mail.ru>, 2018.
+# andreymal <andriyano-31@mail.ru>, 2019.
 #
 msgid ""
 msgstr ""
 "Project-Id-Version:  0.0.4\n"
 "Report-Msgid-Bugs-To: andriyano-31@mail.ru\n"
-"POT-Creation-Date: 2018-11-20 21:24+0300\n"
+"POT-Creation-Date: 2019-01-16 11:49+0300\n"
 "Last-Translator: andreymal <andriyano-31@mail.ru>\n"
 "Language: ru\n"
 "Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && "
@@ -18,7 +18,7 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 2.6.0\n"
 
-#: mini_fiction/models.py:639 mini_fiction/models.py:906
+#: mini_fiction/models.py:644 mini_fiction/models.py:911
 msgid "Chapter {}"
 msgstr "Глава {}"
 
@@ -140,31 +140,31 @@ msgstr "Не удалось отрисовать новость «{0}» для �
 msgid "Cannot render news item \"{0}\" for you: {1}"
 msgstr "Не удалось отрисовать новость «{0}» для вас: {1}"
 
-#: mini_fiction/bl/sorting.py:24 mini_fiction/bl/sorting.py:42
+#: mini_fiction/bl/sorting.py:25 mini_fiction/bl/sorting.py:43
 msgid "Category already exists"
 msgstr "Категория уже существует"
 
-#: mini_fiction/bl/sorting.py:76 mini_fiction/bl/sorting.py:108
+#: mini_fiction/bl/sorting.py:77 mini_fiction/bl/sorting.py:109
 msgid "Character already exists"
 msgstr "Персонаж уже существует"
 
-#: mini_fiction/bl/sorting.py:82 mini_fiction/bl/sorting.py:115
+#: mini_fiction/bl/sorting.py:83 mini_fiction/bl/sorting.py:116
 msgid "Group not found"
 msgstr "Группа не найдена"
 
-#: mini_fiction/bl/sorting.py:161 mini_fiction/forms/admin/sorting.py:44
+#: mini_fiction/bl/sorting.py:162 mini_fiction/forms/admin/sorting.py:44
 msgid "PNG only"
 msgstr "Только PNG"
 
-#: mini_fiction/bl/sorting.py:165
+#: mini_fiction/bl/sorting.py:166
 msgid "Maximum picture size is {maxsize} KiB"
 msgstr "Максимальный размер картинки {maxsize} КиБ"
 
-#: mini_fiction/bl/sorting.py:194 mini_fiction/bl/sorting.py:211
+#: mini_fiction/bl/sorting.py:196 mini_fiction/bl/sorting.py:213
 msgid "Group already exists"
 msgstr "Группа уже существует"
 
-#: mini_fiction/bl/sorting.py:243 mini_fiction/bl/sorting.py:260
+#: mini_fiction/bl/sorting.py:245 mini_fiction/bl/sorting.py:262
 msgid "Classifier already exists"
 msgstr "Классификатор уже существует"
 
@@ -526,15 +526,15 @@ msgstr "Лог изменений"
 msgid "Send"
 msgstr "Отправить"
 
-#: mini_fiction/templates/macro.html:149
+#: mini_fiction/templates/macro.html:161
 msgid "This comment was edited once"
 msgstr "Комментарий был отредактирован один раз"
 
-#: mini_fiction/templates/macro.html:151
+#: mini_fiction/templates/macro.html:163
 msgid "This comment was edited twice"
 msgstr "Комментарий был отредактирован два раза"
 
-#: mini_fiction/templates/macro.html:153
+#: mini_fiction/templates/macro.html:165
 #, python-format
 msgid "This comment was edited %(num)d time"
 msgid_plural "This comment was edited %(num)d times"
@@ -1423,6 +1423,30 @@ msgstr "Подтверждение удаления комментария"
 msgid "Confirm restore comment"
 msgstr "Подтверждение восстановления комментария"
 
+#: mini_fiction/views/feeds.py:51 mini_fiction/views/object_lists.py:132
+msgid "Top stories for the week"
+msgstr "Топ рассказов за неделю"
+
+#: mini_fiction/views/feeds.py:53 mini_fiction/views/object_lists.py:134
+msgid "Top stories for the month"
+msgstr "Топ рассказов за месяц"
+
+#: mini_fiction/views/feeds.py:55 mini_fiction/views/object_lists.py:136
+msgid "Top stories for the year"
+msgstr "Топ рассказов за год"
+
+#: mini_fiction/views/feeds.py:57 mini_fiction/views/object_lists.py:138
+msgid "Top stories for all time"
+msgstr "Топ рассказов за всё время"
+
+#: mini_fiction/views/feeds.py:59 mini_fiction/views/object_lists.py:140
+#, python-format
+msgid "Top stories in %(num)d day"
+msgid_plural "Top stories in %(num)d days"
+msgstr[0] "Топ рассказов за %(num)d день"
+msgstr[1] "Топ рассказов за %(num)d дня"
+msgstr[2] "Топ рассказов за %(num)d дней"
+
 #: mini_fiction/views/search.py:21 mini_fiction/views/search.py:29
 #: mini_fiction/views/search.py:37 mini_fiction/views/search.py:79
 #: mini_fiction/views/search.py:107 mini_fiction/views/search.py:126
@@ -1433,7 +1457,7 @@ msgstr "Поиск рассказов"
 msgid "Search results"
 msgstr "Результаты поиска"
 
-#: mini_fiction/views/story.py:364
+#: mini_fiction/views/story.py:368
 msgid "New story"
 msgstr "Новый рассказ"
 

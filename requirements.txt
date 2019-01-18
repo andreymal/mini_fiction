@@ -9,7 +9,7 @@ unidecode
 python3-memcached
 redis
 celery>=4.0,<5.0
-pony>=0.7.6
+pony==0.7.6
 lxml
 pytz
 python-dotenv

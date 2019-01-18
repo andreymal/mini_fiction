@@ -5,7 +5,7 @@ from datetime import datetime, timedelta
 
 from flask import Blueprint, current_app, render_template, abort, redirect, url_for, request
 from flask_babel import gettext
-from flask_login import login_user, current_user
+from flask_login import login_user, logout_user, current_user
 from pony.orm import db_session
 
 from mini_fiction.validation import ValidationError
@@ -183,5 +183,29 @@ def password_reset_link(pk):
         abort(403)
 
     author.bl.generate_password_reset_profile()
+
+    return redirect(url_for('admin_authors.update', pk=pk))
+
+
+@bp.route('/<pk>/logout_all/', methods=('POST',))
+@db_session
+def logout_all(pk):
+    if not current_user.is_superuser:
+        abort(403)
+
+    try:
+        pk = int(pk)
+    except Exception:
+        abort(404)
+
+    author = Author.get(id=pk)
+    if not author:
+        abort(404)
+
+    author.bl.reset_session_token()
+
+    if author.id == current_user.id:
+        logout_user()
+        return redirect(url_for('auth.login'))
 
     return redirect(url_for('admin_authors.update', pk=pk))

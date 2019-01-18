@@ -105,6 +105,13 @@
         </div>
         </form>
 
+        <form action="{{ url_for('admin_authors.logout_all', pk=author.id) }}" class="form-horizontal" method="POST" target="_blank">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+        <div class="controls">
+            <input type="submit" value="{{ _('Log out on all devices') }}" class="btn" />
+        </div>
+        </form>
+
         <form action="{{ url_for('admin_authors.password_reset_link', pk=author.id) }}" class="form-horizontal" method="POST" target="_blank">
         <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
         <div class="controls">

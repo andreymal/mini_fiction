@@ -31,5 +31,13 @@
 {% endif %}
 
 Укажите причину жалобы:<br/>
-<textarea style="width: 100%; height: 6em; box-sizing: border-box;" name="reason" required placeholder="Спам, оскорбление, чрезмерное количество мата и т. д." autocomplete="off"></textarea>
+<div class="control-group{% if errors %} error{% endif %}">
+{% if errors %}
+    <div class="help-block">{% for error in errors %}
+        {{ error }}
+        {%- if not loop.last1 %}<br/>{% endif %}
+    {% endfor %}</div>
+{% endif %}
+<textarea style="width: 100%; height: 6em; box-sizing: border-box;" name="reason" required placeholder="Спам, оскорбление, чрезмерное количество мата и т. д." autocomplete="off">{{ reason }}</textarea>
+</div>
 {%- endif -%}

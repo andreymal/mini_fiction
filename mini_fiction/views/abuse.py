@@ -27,6 +27,8 @@ def abuse_common(target_type, target):
         'next': request.referrer or url_for('index.index'),
         'abuse': None,
         'can_abuse': True,
+        'reason': '',
+        'errors': [],
     }
 
     # Если пользователь уже отправлял жалобу, то он не может отправить её ещё раз
@@ -39,28 +41,36 @@ def abuse_common(target_type, target):
         data['abuse'] = abuse
         data['can_abuse'] = False
 
-    reason = request.form.get('reason') or ''
-    if abuse or request.method != 'POST' or not reason.strip() or len(reason) > 8192:
-        if g.is_ajax:
-            return jsonify({'page_content': {'modal': render_template('abuse_report_ajax.html', **data)}})
-        return render_template('abuse_report.html', **data)
+    if not abuse and request.method == 'POST':
+        reason = request.form.get('reason') or ''
+        data['reason'] = reason
 
-    abuse = AbuseReport(
-        target_type=target_type,
-        target_id=target.id,
-        user=user,
-        reason=request.form['reason'],
-    )
-    abuse.flush()
+        if not reason.strip():
+            data['errors'].append('Причина жалобы не может отсутствовать')
 
-    # Если это первая жалоба на объект, то уведомляем админов
-    if AbuseReport.select(
-        lambda x: x.target_type == target_type and x.target_id == target.id and not x.ignored and x.resolved_at is None
-    ).count() == 1:
-        later(current_app.tasks['notify_abuse_report'].delay, abuse.id)
+        elif len(reason) > 8192:
+            data['errors'].append('Слишком длинно; опишите причину покороче')
 
-    return redirect(request.form.get('next') or url_for('index.index'), 302)
+        else:
+            abuse = AbuseReport(
+                target_type=target_type,
+                target_id=target.id,
+                user=user,
+                reason=request.form['reason'],
+            )
+            abuse.flush()
 
+            # Если это первая жалоба на объект, то уведомляем админов
+            if AbuseReport.select(
+                lambda x: x.target_type == target_type and x.target_id == target.id and not x.ignored and x.resolved_at is None
+            ).count() == 1:
+                later(current_app.tasks['notify_abuse_report'].delay, abuse.id)
+
+            return redirect(request.form.get('next') or url_for('index.index'), 302)
+
+    if g.is_ajax:
+        return jsonify({'page_content': {'modal': render_template('abuse_report_ajax.html', **data)}})
+    return render_template('abuse_report.html', **data)
 
 
 @bp.route('/story/<int:story_id>/', methods=['GET', 'POST'])

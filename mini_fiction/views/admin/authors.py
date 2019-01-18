@@ -101,6 +101,7 @@ def update(pk):
         'is_staff': author.is_staff,
         'is_superuser': author.is_superuser,
         'premoderation_mode': author.premoderation_mode,
+        'ban_reason': author.ban_reason,
     })
 
     password_edit_form = AdminEditPasswordForm()

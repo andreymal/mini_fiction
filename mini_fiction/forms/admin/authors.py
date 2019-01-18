@@ -20,7 +20,7 @@ class AdminAuthorForm(Form):
     is_active = BooleanField(
         lazy_gettext('Is active'),
         render_kw=attrs_dict,
-        description=lazy_gettext("Inactive users can't log in"),
+        description=lazy_gettext("Only active accounts can log in"),
     )
 
     is_staff = BooleanField(
@@ -42,6 +42,11 @@ class AdminAuthorForm(Form):
             ('on', lazy_gettext('Enable premoderation')),
             ('off', lazy_gettext('Disable premoration (verified author)')),
         ]
+    )
+
+    ban_reason = TextField(
+        lazy_gettext('Ban reason'),
+        render_kw=dict(attrs_dict, placeholder=lazy_gettext('This text will be displayed if account is not active')),
     )
 
 

@@ -62,6 +62,7 @@ class Author(db.Entity, UserMixin):
     email = orm.Optional(str, 254, index=True)
     is_staff = orm.Required(bool, default=False, optimistic=False)
     is_active = orm.Required(bool, default=True, optimistic=False)
+    ban_reason = orm.Optional(orm.LongStr)
     date_joined = orm.Required(datetime, 6, default=datetime.utcnow, optimistic=False)  # Дата отправки формы регистрации
     activated_at = orm.Optional(datetime, 6, optimistic=False)  # Дата перехода по ссылке активации из письма
     session_token = orm.Required(str, 32, optimistic=False)

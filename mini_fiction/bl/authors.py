@@ -70,6 +70,7 @@ class AuthorBL(BaseBL):
             username=data['username'],
             email=data.get('email') or '',
             is_active=bool(data.get('is_active', True)),
+            ban_reason=data.get('ban_reason') or '',
             is_staff=bool(data.get('is_staff', False)),
             is_superuser=bool(data.get('is_superuser', False)),
             date_joined=data.get('date_joined', datetime.utcnow()),
@@ -95,7 +96,7 @@ class AuthorBL(BaseBL):
                 cep.delete()
             changed_fields |= {'email',}
 
-        for field in ('bio', 'premoderation_mode'):
+        for field in ('bio', 'premoderation_mode', 'ban_reason'):
             if field in data and getattr(user, field) != data[field]:
                 setattr(user, field, data[field])
                 changed_fields |= {field,}
@@ -715,7 +716,7 @@ class AuthorBL(BaseBL):
         if not user.is_active:
             if remote_addr and current_app.config['AUTH_LOG']:
                 current_app.logger.info('%s tried to log in, but account is disabled (ID: %s, IP: %s)', user.username, user.id, remote_addr)
-            raise ValidationError({'username': [lazy_gettext('Account is disabled')]})
+            raise ValidationError({'username': [user.ban_reason or lazy_gettext('Account is disabled')]})
 
         # Если дошли сюда, значит всё хорошо
         if remote_addr and current_app.config['AUTH_LOG']:

@@ -1,4 +1,4 @@
-.PHONY: help clean clean-build clean-pyc clean-translations lint test test-all coverage release release-test release-sign release-sign-test dist install develop babel-extract babel-update babel-compile
+.PHONY: help clean clean-build clean-pyc clean-translations clean-frontend lint test test-all coverage release release-test release-sign release-sign-test dist install develop babel-extract babel-update babel-compile
 
 PYTHON?=python3
 PIP?=pip3
@@ -12,6 +12,7 @@ help:
 	@echo "clean-build - remove build artifacts"
 	@echo "clean-pyc - remove Python file artifacts"
 	@echo "clean-translations - remove gettext *.mo files"
+	@echo "clean-frontend - remove frontend build"
 	@echo "lint - check style with pylint"
 	@echo "test - run tests quickly with the default Python with pytest"
 	@echo "test-all - run tests on every Python version with tox"
@@ -90,10 +91,8 @@ install: clean
 	$(PYTHON) setup.py install
 
 develop:
-	$(PIP) install -r requirements.txt
-	$(PIP) install -r dev-requirements.txt
-	$(PIP) install -r test-requirements.txt
-	$(PYTHON) setup.py develop
+	$(PIP) install -r requirements.txt -r optional-requirements.txt -r dev-requirements.txt -r test-requirements.txt
+	$(PIP) install -e .
 	pybabel compile -d mini_fiction/translations
 	cd mini_fiction/frontend && $(NPM) install
 	cd mini_fiction/frontend && $(NPM) run-script webpack

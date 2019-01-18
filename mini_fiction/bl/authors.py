@@ -817,7 +817,7 @@ class AuthorBL(BaseBL):
         current_app.cache.set('bell_{}'.format(user.id), cnt, 600)
         return cnt
 
-    def get_notifications(self, older=None, offset=0, count=100):
+    def get_notifications(self, older=None, offset=0, count=50):
         from mini_fiction.models import Notification, Story, Chapter, StoryComment, StoryLocalThread, StoryLocalComment, NewsComment
 
         user = self.model

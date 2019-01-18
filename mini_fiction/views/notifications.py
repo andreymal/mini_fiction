@@ -27,7 +27,7 @@ def index():
 
     older = request.args.get('older')
     older = int(older) if older and older.isdigit() else None
-    count = 100
+    count = 50
 
     notifications = current_user.bl.get_notifications(older=older, count=count + 1)
     show_older_link = len(notifications) > count

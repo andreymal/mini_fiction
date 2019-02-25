@@ -1490,6 +1490,54 @@ class StoryBL(BaseBL, Commentable):
         random.shuffle(stories)
         return stories
 
+    def get_unread_chapters_count(self, user, story_ids):
+        from mini_fiction.models import Chapter, StoryView
+
+        if isinstance(story_ids, int):
+            story_ids = [story_ids]
+
+        read_chapters_count = dict(orm.select(
+            (x.story.id, orm.count(x.id)) for x in StoryView
+            if x.author == user and x.story.id in story_ids and x.chapter is not None
+        ))
+        all_chapters_count = dict(orm.select(
+            (x.story.id, orm.count(x.id)) for x in Chapter
+            if x.story.id in story_ids and not x.draft
+        ))
+
+        result = {}
+        for story_id in story_ids:
+            if not read_chapters_count.get(story_id):
+                result[story_id] = 0
+                continue
+            result[story_id] = max(0, all_chapters_count[story_id] - read_chapters_count[story_id])
+
+        return result
+
+    def get_unread_comments_count(self, user, story_ids):
+        from mini_fiction.models import Story, Activity
+
+        if isinstance(story_ids, int):
+            story_ids = [story_ids]
+
+        read_comments_count = dict(orm.select(
+            (x.story.id, x.last_comments) for x in Activity
+            if x.author == user and x.story.id in story_ids
+        ))
+        all_comments_count = dict(orm.select(
+            (x.id, x.comments_count) for x in Story
+            if x.id in story_ids and x.published
+        ))
+
+        result = {}
+        for story_id in story_ids:
+            if not all_comments_count.get(story_id) or not read_comments_count.get(story_id):
+                result[story_id] = 0
+                continue
+            result[story_id] = max(0, all_comments_count[story_id] - read_comments_count[story_id])
+
+        return result
+
 
 class StoryLocalThreadBL(BaseBL, Commentable):
     def has_comments_access(self, author=None):

@@ -7,6 +7,7 @@ from flask_babel import gettext
 from flask_login import current_user
 from pony.orm import db_session
 
+from mini_fiction.utils.views import cached_lists
 from mini_fiction.forms.search import SearchForm
 from mini_fiction.models import Story, Chapter
 from mini_fiction.utils.misc import Paginator
@@ -116,6 +117,12 @@ def search_action(postform):
     data['total'] = int(raw_result['total_found'])
     data['result'] = result
     data['weights'] = [(x['id'], x['weight']) for x in raw_result['matches']]
+
+    if search_type == 0:
+        data.update(cached_lists([x.id for x in result]))
+    else:
+        data.update(cached_lists([x[0].story.id for x in result]))
+
     return render_template('search.html', **data)
 
 

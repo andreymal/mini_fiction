@@ -199,6 +199,8 @@ class BaseCommentBL(BaseBL):
             comment.root_id = comment.id
         if hasattr(target, 'comments_count'):
             target.comments_count += 1
+        if hasattr(target, 'last_comment_id'):
+            target.last_comment_id = comment.id
         if parent:
             parent.answers_count += 1
 
@@ -267,12 +269,22 @@ class BaseCommentBL(BaseBL):
         self.model.deleted = True
         self.model.last_deleted_at = datetime.utcnow()
         self.model.last_deleted_by = author if author and author.is_authenticated else None
+
+        target = getattr(self.model, self.target_attr)
+        if hasattr(target, 'last_comment_id') and target.last_comment_id == self.model.id:
+            target.last_comment_id = orm.select(orm.max(x.id) for x in target.comments if not x.deleted).first()
+
         current_app.cache.delete('index_comments_html')
 
     def restore(self, author=None):
         if not self.can_restore_by(author):
             raise ValueError('Permission denied')
         self.model.deleted = False
+
+        target = getattr(self.model, self.target_attr)
+        if hasattr(target, 'last_comment_id'):
+            target.last_comment_id = orm.select(orm.max(x.id) for x in target.comments if not x.deleted).first()
+
         current_app.cache.delete('index_comments_html')
 
     def vote(self, author, value):

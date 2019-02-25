@@ -481,6 +481,7 @@ class Story(db.Entity):
     last_author_notification_at = orm.Optional(datetime, 6)  # Во избежание слишком частых уведомлений
     last_staff_notification_at = orm.Optional(datetime, 6)
     publishing_blocked_until = orm.Optional(datetime, 6)
+    last_comment_id = orm.Required(int, default=0, index=True, optimistic=False)  # Для сортировки списка обсуждаемого
     extra = orm.Required(orm.LongStr, lazy=False, default='{}')
 
     in_series_permissions = orm.Set(InSeriesPermissions)
@@ -932,6 +933,7 @@ class NewsItem(db.Entity):
     extra = orm.Required(orm.LongStr, lazy=False, default='{}')
 
     comments_count = orm.Required(int, size=16, unsigned=True, default=0)
+    last_comment_id = orm.Required(int, default=0, index=True, optimistic=False)  # Для сортировки списка обсуждаемого
     comments = orm.Set('NewsComment')
 
     bl = Resource('bl.newsitem')

@@ -83,11 +83,21 @@ def comments_updates(params):
     comments_html = current_app.cache.get('index_comments_html')
 
     if not comments_html:
-        story_comments = StoryComment.select(lambda x: x.story_published and not x.deleted).order_by(StoryComment.id.desc())
-        story_comments = story_comments[:current_app.config['COMMENTS_COUNT']['main']]
+        # Старая логика, при которой могли появляться несколько комментариев одной сущности
 
-        news_comments = NewsComment.select(lambda x: not x.deleted).order_by(NewsComment.id.desc())
-        news_comments = news_comments[:current_app.config['COMMENTS_COUNT']['main']]
+        # story_comments = StoryComment.select(lambda x: x.story_published and not x.deleted).order_by(StoryComment.id.desc())
+        # story_comments = story_comments[:current_app.config['COMMENTS_COUNT']['main']]
+
+        # news_comments = NewsComment.select(lambda x: not x.deleted).order_by(NewsComment.id.desc())
+        # news_comments = news_comments[:current_app.config['COMMENTS_COUNT']['main']]
+
+        stories = select(x for x in Story if x.published and x.last_comment_id > 0).order_by(Story.last_comment_id.desc())[:current_app.config['COMMENTS_COUNT']['main']]
+        story_comment_ids = [x.last_comment_id for x in stories]
+        story_comments = StoryComment.select(lambda x: x.id in story_comment_ids).order_by(StoryComment.id.desc())[:current_app.config['COMMENTS_COUNT']['main']]
+
+        news_list = select(x for x in NewsItem if x.last_comment_id > 0).order_by(NewsItem.last_comment_id.desc())[:current_app.config['COMMENTS_COUNT']['main']]
+        news_comment_ids = [x.last_comment_id for x in news_list]
+        news_comments = NewsComment.select(lambda x: x.id in news_comment_ids).order_by(NewsComment.id.desc())[:current_app.config['COMMENTS_COUNT']['main']]
 
         comments = [('story', x) for x in story_comments]
         comments += [('news', x) for x in news_comments]

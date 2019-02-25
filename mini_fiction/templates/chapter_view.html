@@ -28,9 +28,11 @@
         <div class="span12 story-chapter-page">
             {% include "includes/story_panel.html" %}
             <h1>{{ story.title }}</h1>
-            {% for chapter in chapters %}
-                {% include "includes/chapter_single.html" %}
-            {% endfor %}
+            {% for chapter in chapters -%}
+                {%- with is_last_chapter=loop.last -%}
+                    {%- include "includes/chapter_single.html" -%}
+                {%- endwith -%}
+            {% endfor -%}
         </div>
     {% else %}
         <div class="span12 story-chapter-page">

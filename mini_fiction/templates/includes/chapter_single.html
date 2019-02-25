@@ -16,9 +16,10 @@
     {{ chapter.text_as_html }}
     {% if not chapter_edit_mode %}
     {% if next_chapter %}
-        <p><a href="{{ url_for('chapter.view', story_id=story.id, chapter_order=next_chapter.order) }}">Читать дальше</a></p>
-    {% elif story.status_string == 'unfinished' and not allchapters %}
-        <p><strong>Продолжение следует...</strong></p>
+        <p class="next-chapter-link"><a rel="next" href="{{ url_for('chapter.view', story_id=story.id, chapter_order=next_chapter.order) }}">{{ _('Read more') }}</a></p>
+    {% endif %}
+    {% if is_last_chapter and story.status_string == 'unfinished' %}
+        <p class="to-be-continued"><strong>{{ _('To be continued...') }}</strong></p>
     {% endif %}
     {% endif %}
 </div>

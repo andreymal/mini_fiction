@@ -43,6 +43,7 @@ def view(story_id, chapter_order=None):
             'chapter': chapter,
             'prev_chapter': prev_chapter,
             'next_chapter': next_chapter,
+            'is_last_chapter': not next_chapter,
             'page_title': page_title,
             'allchapters': False,
             'robots_noindex': not story.published or story.robots_noindex,

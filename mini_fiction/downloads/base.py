@@ -58,8 +58,8 @@ class ZipFileDownloadFormat(BaseDownloadFormat):
         ext = self.chapter_extension
 
         chapters = list(story.chapters.select(lambda x: not x.draft).order_by(Chapter.order, Chapter.id))
-        num_width = len(str(len(chapters)))
-        for i, chapter in enumerate(chapters):
+        num_width = len(str(max(x.order for x in chapters)))
+        for chapter in chapters:
             data = render_template(
                 self.chapter_template,
                 chapter=chapter,
@@ -67,7 +67,7 @@ class ZipFileDownloadFormat(BaseDownloadFormat):
             ).encode(self.chapter_encoding)
 
             name = slugify(chapter.autotitle)
-            num = str(i + 1).rjust(num_width, '0')
+            num = str(chapter.order).rjust(num_width, '0')
             arcname = str('%s/%s_%s.%s' % (dirname, num, name, ext))
 
             zipdate = chapter.updated

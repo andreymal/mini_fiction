@@ -1141,7 +1141,10 @@ class StoryBL(BaseBL, Commentable):
         }
 
         if with_comments:
-            only.append('comments_count')
+            only.extend([
+                'comments_count',
+                'last_comment_id',
+            ])
 
         if story.first_published_at:
             override['date'] = story.first_published_at

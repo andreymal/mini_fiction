@@ -1,6 +1,6 @@
 {% for story in stories %}
     <!-- Вывод рассказа: начало -->
-    {%- set story_chapters_count = chapters_count_cache.get(story.id, 0) if chapters_count_cache is defined else story.bl.select_accessible_chapters(current_user).count() %}
+    {%- set story_chapters_count = chapters_count_cache.get(story.id, 0) %}
     <div class="story-item" id="story_{{ story.id }}">
         {% include 'includes/story_control_buttons.html' with context %}
         <h3>
@@ -24,15 +24,15 @@
                     {%- include 'includes/story_main_tags.html' -%}
                 </span>
                 {{ ngettext("%(num)d word", "%(num)d words", story.words) }} от {% include 'includes/story_authors_list.html' %}
-                {% if current_user.is_authenticated and current_user.detail_view %}
-                    <br/>
-                    <span>
-                    {{- ngettext("%(num)d view", "%(num)d views", story.views) }},
-                    {{ ngettext("%(num)d comment", "%(num)d comments", story.comments_count) -}}
-                    </span>
-                    {% set delta = 0 if activities is defined and not activities.get(story.id) else story_comments_delta(story, current_user, activity=activities and activities.get(story.id)) %}
+                <br/>
+                <span>
+                {{- ngettext("%(num)d view", "%(num)d views", story.views) }},
+                {{ ngettext("%(num)d comment", "%(num)d comments", story.comments_count) -}}
+                </span>
+                {% if current_user.is_authenticated %}
+                    {% set delta = unread_comments_count.get(story.id, 0) %}
                     {% if delta > 0 %}
-                    (<span class="green">+{{ delta }}</span>)
+                    (<span class="green" title="Число непрочитанных комментариев">+{{ delta }}</span>)
                     {% endif %}
                 {% endif %}
         </p>

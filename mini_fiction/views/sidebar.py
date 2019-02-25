@@ -3,6 +3,7 @@
 
 from pony.orm import select
 from flask import current_app, render_template
+from flask_login import current_user
 
 from mini_fiction.models import Chapter, Story, StoryContributor, StoryComment, NewsComment, NewsItem
 
@@ -67,7 +68,15 @@ def chapters_updates(params):
             })
         current_app.cache.set('index_updated_chapters', chapters, 600)
 
-    return render_template('sidebar/chapters_updates.html', chapters=chapters)
+    # Число непрочитанных глав у текущего пользователя
+    if current_user.is_authenticated:
+        unread_chapters_count = Story.bl.get_unread_chapters_count(
+            current_user._get_current_object(), [x['story']['id'] for x in chapters]
+        )
+    else:
+        unread_chapters_count = {x['story']['id']: 0 for x in chapters}
+
+    return render_template('sidebar/chapters_updates.html', chapters=chapters, unread_chapters_count=unread_chapters_count)
 
 
 def comments_updates(params):

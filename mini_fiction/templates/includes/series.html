@@ -24,7 +24,7 @@
                         {{ ngettext("%(num)d chapter", "%(num)d chapters", story.published_chapters_count) }},
                     {% endif %}
                     {{ ngettext("%(num)d view", "%(num)d views", story.views) }},
-                    {{ ngettext("%(num)d comment", "%(num)d comments", story.comments.count()) }}
+                    {{ ngettext("%(num)d comment", "%(num)d comments", story.comments_count) }}
                 </li>
             {% endfor %}
         </ul>

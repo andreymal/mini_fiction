@@ -26,14 +26,23 @@
                 <br/>
                 <span>
                 {{- ngettext("%(num)d view", "%(num)d views", story.views) }},
+                {%- if story.published_chapters_count > 1 %}
+                    {{ ngettext("%(num)d chapter", "%(num)d chapters", story.published_chapters_count) }}
+                    {%- if current_user.is_authenticated -%}
+                        {%- set delta = unread_chapters_count.get(story.id, 0) -%}
+                        {%- if delta > 0 %}
+                        (<span class="green" title="Число непрочитанных глав">+{{ delta }}</span>)
+                        {%- endif -%}
+                    {%- endif %},
+                {%- endif %}
                 {{ ngettext("%(num)d comment", "%(num)d comments", story.comments_count) -}}
-                </span>
                 {% if current_user.is_authenticated %}
                     {% set delta = unread_comments_count.get(story.id, 0) %}
                     {% if delta > 0 %}
                     (<span class="green" title="Число непрочитанных комментариев">+{{ delta }}</span>)
                     {% endif %}
                 {% endif %}
+                </span>
         </p>
         <p>{{ story.summary|striptags }}</p>
         {% if (stories_detail_view or current_user.detail_view) and story.published_chapters_count > 1 %}

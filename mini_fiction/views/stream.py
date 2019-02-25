@@ -53,6 +53,7 @@ def chapters(page):
         chapters=objects,
         page_obj=page_obj,
         robots_noindex=True,
+        **cached_lists([x.story.id for x in objects])
     )
 
 

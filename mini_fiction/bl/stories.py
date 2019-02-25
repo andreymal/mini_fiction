@@ -1134,8 +1134,11 @@ class StoryBL(BaseBL, Commentable):
             'freezed', 'notes', 'original', 'rating', 'summary', 'updated',
             'words', 'vote_total', 'vote_value', 'vote_extra', 'original_url',
             'original_title', 'original_author', 'pinned', 'views',
+            'published_chapters_count',
         ]
-        override = {}
+        override = {
+            'all_chapters_count': story.published_chapters_count,
+        }
 
         if with_comments:
             only.append('comments_count')

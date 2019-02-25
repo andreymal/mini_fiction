@@ -1,6 +1,5 @@
 {% for story in stories %}
     <!-- Вывод рассказа: начало -->
-    {%- set story_chapters_count = chapters_count_cache.get(story.id, 0) %}
     <div class="story-item" id="story_{{ story.id }}">
         {% include 'includes/story_control_buttons.html' with context %}
         <h3>
@@ -37,8 +36,8 @@
                 {% endif %}
         </p>
         <p>{{ story.summary|striptags }}</p>
-        {% if (stories_detail_view or current_user.detail_view) and story_chapters_count > 1 %}
-            <button class="btn btn-collapse btn-small" data-toggle="collapse" data-target="#story-{{ story.id }}">{{ ngettext("Show %(num)d chapter", "Show %(num)d chapters", story_chapters_count) }}</button>
+        {% if (stories_detail_view or current_user.detail_view) and story.published_chapters_count > 1 %}
+            <button class="btn btn-collapse btn-small" data-toggle="collapse" data-target="#story-{{ story.id }}">{{ ngettext("Show %(num)d chapter", "Show %(num)d chapters", story.published_chapters_count) }}</button>
             <div id="story-{{ story.id }}" class="collapse">
                 <ul class="chapters-list">
                     {% for chapter in story.bl.select_accessible_chapters(current_user)|sort(attribute='order') %}

@@ -46,7 +46,7 @@ class AdminAuthorForm(Form):
 
     ban_reason = TextField(
         lazy_gettext('Ban reason'),
-        render_kw=dict(attrs_dict, placeholder=lazy_gettext('This text will be displayed if account is not active')),
+        render_kw=dict(attrs_dict, placeholder=lazy_gettext('This text will be displayed when a user tries to log into an inactive account')),
     )
 
 

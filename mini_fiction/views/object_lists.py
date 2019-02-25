@@ -1,8 +1,6 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-from datetime import datetime, timedelta
-
 from pony.orm import select, db_session
 from flask import Blueprint, current_app, abort, render_template, request
 from flask_login import current_user, login_required
@@ -10,7 +8,7 @@ from flask_babel import gettext, ngettext
 
 from mini_fiction.models import Author, Story, StoryContributor, Favorites, Bookmark, StoryView, StoryTag, Tag
 from mini_fiction.utils.misc import Paginator
-from mini_fiction.utils.views import paginate_view, cached_lists
+from mini_fiction.utils.views import cached_lists
 
 
 bp = Blueprint('object_lists', __name__)
@@ -35,14 +33,18 @@ def favorites(user_id, page):
     else:
         page_title = 'Избранное автора %s' % user.username
 
-    return paginate_view(
-        'favorites.html',
-        objects,
-        count=objects.count(),
+    page_obj = Paginator(page, objects.count(), per_page=10)
+    stories = page_obj.slice_or_404(objects)
+
+    data = dict(
+        stories=stories,
+        page_obj=page_obj,
         page_title=page_title,
         author=user,
-        objlistname='stories',
     )
+    data.update(cached_lists([x.id for x in stories]))
+
+    return render_template('favorites.html', **data)
 
 
 @bp.route('/submitted/page/last/', defaults={'page': -1})
@@ -53,14 +55,17 @@ def submitted(page):
     if not current_user.is_staff:
         abort(403)
     objects = Story.select_submitted()
+    page_obj = Paginator(page, objects.count(), per_page=10)
+    stories = page_obj.slice_or_404(objects)
 
-    return paginate_view(
-        'submitted.html',
-        objects,
-        count=objects.count(),
+    data = dict(
+        stories=stories,
+        page_obj=page_obj,
         page_title='Новые поступления',
-        objlistname='stories',
     )
+    data.update(cached_lists([x.id for x in stories]))
+
+    return render_template('submitted.html', **data)
 
 
 @bp.route('/bookmarks/page/last/', defaults={'page': -1})
@@ -70,14 +75,17 @@ def submitted(page):
 @login_required
 def bookmarks(page):
     objects = select(x.story for x in Bookmark if x.author.id == current_user.id).without_distinct().order_by('-x.id')
+    page_obj = Paginator(page, objects.count(), per_page=10)
+    stories = page_obj.slice_or_404(objects)
 
-    return paginate_view(
-        'bookmarks.html',
-        objects,
-        count=objects.count(),
+    data = dict(
+        stories=stories,
+        page_obj=page_obj,
         page_title='Прочитать позже',
-        objlistname='stories',
     )
+    data.update(cached_lists([x.id for x in stories]))
+
+    return render_template('bookmarks.html', **data)
 
 
 @bp.route('/viewed/page/last/', defaults={'page': -1})
@@ -102,6 +110,7 @@ def viewed(page):
         page_obj=page_obj,
         page_title='Просмотренные рассказы',
         stories_detail_view=True,
+        **cached_lists([x.id for x in stories])
     )
 
 

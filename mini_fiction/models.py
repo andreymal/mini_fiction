@@ -466,6 +466,8 @@ class Story(db.Entity):
     vote_value = orm.Required(int, default=0, optimistic=False)
     vote_extra = orm.Required(orm.LongStr, lazy=False, default='{}', optimistic=False)
 
+    all_chapters_count = orm.Required(int, size=16, unsigned=True, default=0, optimistic=False)
+    published_chapters_count = orm.Required(int, size=16, unsigned=True, default=0, optimistic=False)
     comments_count = orm.Required(int, size=16, unsigned=True, default=0, optimistic=False)
     original_url = orm.Optional(str, 255)
     original_title = orm.Optional(str, 255)

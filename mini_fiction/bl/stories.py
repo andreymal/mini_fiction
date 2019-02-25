@@ -387,7 +387,9 @@ class StoryBL(BaseBL, Commentable):
         published_chapter_ids = []
         tm = datetime.utcnow()
 
+        chapters_count = 0
         for c in sorted(story.chapters, key=lambda x: x.order):
+            chapters_count += 1
             if not c.draft:
                 continue
             c.draft = False
@@ -398,6 +400,8 @@ class StoryBL(BaseBL, Commentable):
                 c.bl.first_publish(tm=tm, notify=False, caused_by_user=user)  # Уведомления разошлём сами чуть ниже
                 published_chapter_ids.append(c.id)
 
+        story.all_chapters_count = chapters_count
+        story.published_chapters_count = chapters_count
         later(current_app.tasks['sphinx_update_story'].delay, story.id, ('words',))
 
         if published_chapter_ids:
@@ -1598,6 +1602,9 @@ class ChapterBL(BaseBL):
         self.update_words_count(chapter)
         chapter.flush()
         chapter.bl.edit_log(editor, 'add', {}, text_md5=chapter.text_md5)
+        story.all_chapters_count += 1
+        if not chapter.draft:
+            story.published_chapters_count += 1
         story.updated = datetime.utcnow()
         later(current_app.tasks['sphinx_update_chapter'].delay, chapter.id)
         # current_app.cache.delete('index_updated_chapters') не нужен, если draft=True
@@ -1695,7 +1702,9 @@ class ChapterBL(BaseBL):
 
         chapter = self.model
         story = chapter.story
+        story.all_chapters_count -= 1
         if not chapter.draft:
+            story.published_chapters_count -= 1
             story.words = story.words - chapter.words
         later(current_app.tasks['sphinx_delete_chapter'].delay, story.id, chapter.id)
 
@@ -1929,8 +1938,10 @@ class ChapterBL(BaseBL):
             self.edit_log(user, 'edit', {'draft': [not chapter.draft, chapter.draft]})
 
         if chapter.draft:
+            story.published_chapters_count -= 1
             story.words -= chapter.words
         else:
+            story.published_chapters_count += 1
             story.words += chapter.words
 
         if not story.draft and story.published and not chapter.first_published_at:

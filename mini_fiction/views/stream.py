@@ -86,6 +86,7 @@ def comments(page):
         comment_votes_cache=comment_votes_cache,
         page_obj=page_obj,
         robots_noindex=True,
+        **cached_lists([x[1].story.id for x in objects])
     )
 
 

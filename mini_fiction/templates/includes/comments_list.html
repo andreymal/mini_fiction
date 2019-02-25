@@ -7,6 +7,7 @@
                 <span class="comment-story-link">
                 к рассказу
                 <a href="{{ url_for('story.view', pk=comment.story.id) }}"><b>{{ comment.story.title }}</b></a>
+                {%- if unread_comments_count.get(comment.story.id) %} (<span class="green" title="Число непрочитанных комментариев">+{{ unread_comments_count[comment.story.id] }}</span>){% endif -%}
                 </span>
             {% elif ctype == 'local' %}
                 <span class="comment-story-link">

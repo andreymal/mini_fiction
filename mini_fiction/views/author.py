@@ -82,7 +82,13 @@ def info(user_id=None, comments_page=1):
         'comments_short': True,
         'page_obj': paged,
     })
-    data.update(cached_lists([x.id for x in stories]))
+
+    story_ids = set(x.id for x in stories)
+    if contributing_stories:
+        story_ids |= set(x.id for x in contributing_stories)
+    story_ids |= set(x.story.id for x in comments)
+
+    data.update(cached_lists(story_ids))
 
     return render_template(template, **data)
 

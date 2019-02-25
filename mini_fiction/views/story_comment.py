@@ -7,6 +7,7 @@ from pony.orm import db_session
 
 from mini_fiction.models import Story, StoryComment, Author
 from mini_fiction.utils.misc import Paginator
+from mini_fiction.utils.views import cached_lists
 from mini_fiction.views import common_comment
 
 bp = Blueprint('story_comment', __name__)
@@ -179,6 +180,7 @@ def ajax_author_dashboard(page):
         'page_obj': paged,
         'comments_short': True,
     }
+    data.update(cached_lists([x.story.id for x in comments]))
 
     return jsonify({
         'success': True,
@@ -215,6 +217,7 @@ def ajax_author_overview(user_id, page):
         'page_obj': paged,
         'comments_short': True,
     }
+    data.update(cached_lists([x.story.id for x in comments]))
 
     return jsonify({
         'success': True,

@@ -5,6 +5,7 @@ from pony.orm import select
 from flask import current_app, render_template
 from flask_login import current_user
 
+from mini_fiction.utils.views import cached_lists
 from mini_fiction.models import Chapter, Story, StoryContributor, StoryComment, NewsComment, NewsItem
 
 
@@ -80,7 +81,9 @@ def chapters_updates(params):
 
 
 def comments_updates(params):
-    comments_html = current_app.cache.get('index_comments_html')
+    comments_html = None
+    if not current_user.is_authenticated:
+        comments_html = current_app.cache.get('index_comments_html_guest')
 
     if not comments_html:
         # Старая логика, при которой могли появляться несколько комментариев одной сущности
@@ -104,13 +107,21 @@ def comments_updates(params):
         comments.sort(key=lambda x: x[1].date, reverse=True)
         comments = comments[:current_app.config['COMMENTS_COUNT']['main']]
 
-        comments_html = render_template(
-            'includes/comments_list.html',
+        data = dict(
             comments=comments,
             comments_short=True,
         )
 
-        current_app.cache.set('index_comments_html', comments_html, 3600)
+        # Для счётчика непрочитанных комментариев
+        data.update(cached_lists([x.id for x in stories]))
+
+        comments_html = render_template(
+            'includes/comments_list.html',
+            **data
+        )
+
+        if not current_user.is_authenticated:
+            current_app.cache.set('index_comments_html_guest', comments_html, 3600)
 
     return render_template('sidebar/comments_updates.html', comments_html=comments_html)
 

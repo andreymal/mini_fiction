@@ -34,10 +34,14 @@ def tag_index(tag_name, page):
     if not iname:
         abort(404)
     tag = Tag.get(iname=iname)
-    if not tag:
+    if not tag or tag.is_blacklisted:
         abort(404)
-    if iname != tag_name:
-        return redirect(url_for('tags.tag_index', tag_name=iname, page=page))
+    if tag.is_alias_for is not None:
+        if tag.is_alias_for.is_alias_for:
+            raise RuntimeError('Tag alias {} refers to another alias {}!'.format(tag.id, tag.is_alias_for.id))
+        tag = tag.is_alias_for
+    if tag.iname != tag_name:
+        return redirect(url_for('tags.tag_index', tag_name=tag.iname, page=page))
 
     objects = Story.bl.select_by_tag(tag, user=current_user._get_current_object())
     objects = objects.prefetch(Story.characters, Story.contributors, StoryContributor.user, Story.tags, StoryTag.tag, Tag.category)
@@ -79,7 +83,7 @@ def autocomplete():
         tags = Tag.bl.search_by_prefix(tag_name)
 
     if not data:
-        aliases = Tag.bl.get_aliases_for(tags)
+        aliases = Tag.bl.get_aliases_for(tags, hidden=True)
 
         result = {
             'success': True,

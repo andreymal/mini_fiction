@@ -599,6 +599,9 @@ def timedelta_format(tm):
 def normalize_tag(s, whitelist=None, delimeters=None):
     from mini_fiction.validation.utils import safe_string_coerce
 
+    if not s:
+        return None
+
     if whitelist is None:
         whitelist = current_app.config['NORMALIZED_TAGS_WHITELIST']
     if delimeters is None:

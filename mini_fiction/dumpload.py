@@ -113,18 +113,13 @@ zip_dump_params = {
     'tag': {
         'include': (
             'id', 'name', 'iname', 'category', 'color', 'description',
-            'is_main_tag', 'created_at', 'updated_at',
+            'is_main_tag', 'created_at', 'updated_at', 'is_alias_for',
+            'is_hidden_alias', 'reason_to_blacklist',
         ),
         'exclude': (
             'created_by', 'stories_count', 'published_stories_count',
             'aliases', 'stories', 'log',
         ),
-    },
-    'tagalias': {
-        'include': (
-            'id', 'name', 'iname', 'tag', 'created_at',
-        ),
-        'exclude': ('created_by',),
     },
     'rating': {
         'include': ('id', 'name', 'description', 'nsfw'),
@@ -437,6 +432,12 @@ def zip_dump_db_entity(z, mfd, name, e_params, media_files):
             # Убираем из дампа скрытые картинки в шапке
             if obj['_entity'] == 'logopic':
                 if not obj['visible']:
+                    dump.remove(obj)
+                    continue
+
+            # Убираем из дампа теги из черного списка
+            if obj['_entity'] == 'tag':
+                if obj['reason_to_blacklist']:
                     dump.remove(obj)
                     continue
 

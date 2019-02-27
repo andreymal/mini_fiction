@@ -62,6 +62,7 @@
                              data-bazooka="storyTags">{{ form.tags }}</div>
                         {% if form.tags.errors %}
                             {% for error in form.tags.errors %}
+                            {% if not loop.first %}<br/>{% endif %}
                         <span class="help-inline">{{ error }}</span>
                             {% endfor %}
                         {% else %}

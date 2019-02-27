@@ -124,8 +124,6 @@ class Author(db.Entity, UserMixin):
     abuse_reports = orm.Set('AbuseReport')
     admin_log = orm.Set('AdminLog')
     tags_created = orm.Set('Tag')
-    tags_aliases = orm.Set('TagAlias')
-    tags_blacklist = orm.Set('TagBlacklist')
     tags_log = orm.Set('StoryTagLog')
 
     bl = Resource('bl.author')
@@ -314,8 +312,11 @@ class Tag(db.Entity):
     created_by = orm.Optional(Author)
     stories_count = orm.Required(int, unsigned=True, default=0)
     published_stories_count = orm.Required(int, unsigned=True, default=0)
+    is_alias_for = orm.Optional('Tag')
+    is_hidden_alias = orm.Required(bool, default=False)
+    reason_to_blacklist = orm.Optional(str, 255)
 
-    aliases = orm.Set('TagAlias')
+    aliases = orm.Set('Tag', reverse='is_alias_for')
     stories = orm.Set('StoryTag')
     log = orm.Set('StoryTagLog')
 
@@ -325,7 +326,11 @@ class Tag(db.Entity):
         return self.name
 
     def __repr__(self):
-        return '<Tag: {}>'.format(str(self))
+        return '<Tag{}{}: {}>'.format(
+            ' [alias]' if self.is_alias else '',
+            ' [blacklist]' if self.is_blacklisted else '',
+            str(self)
+        )
 
     def get_color(self):
         if self.color:
@@ -334,35 +339,13 @@ class Tag(db.Entity):
             return self.category.color
         return ''
 
+    @property
+    def is_alias(self):
+        return self.is_alias_for is not None
 
-class TagAlias(db.Entity):
-    """ Модель синонимов тега """
-
-    name = orm.Required(str, 255)
-    iname = orm.Required(str, 32, unique=True)
-    tag = orm.Required(Tag)
-    created_at = orm.Required(datetime, 6, default=datetime.utcnow)
-    created_by = orm.Optional(Author)
-
-    def __str__(self):
-        return '{} -> {}'.format(self.iname, self.tag.name)
-
-    def __repr__(self):
-        return '<TagAlias: {}>'.format(str(self))
-
-
-class TagBlacklist(db.Entity):
-    """ Модель для хранения запрещённых тегов """
-
-    iname = orm.Required(str, 32, unique=True)
-    created_at = orm.Required(datetime, 6, default=datetime.utcnow)
-    created_by = orm.Optional(Author)
-
-    def __str__(self):
-        return self.iname
-
-    def __repr__(self):
-        return '<TagBlacklist: {}>'.format(str(self))
+    @property
+    def is_blacklisted(self):
+        return self.reason_to_blacklist != ''
 
 
 class StoryTag(db.Entity):

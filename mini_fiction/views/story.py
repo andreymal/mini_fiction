@@ -62,9 +62,11 @@ def view(pk, comments_page):
     if not user.is_staff and not story.bl.is_contributor(user):
         chapters = [x for x in chapters if not x.draft]
 
+    show_first_chapter = len(chapters) == 1 and not chapters[0].draft
+
     if user.is_authenticated:
         story.bl.viewed(user)
-        if len(chapters) == 1:
+        if show_first_chapter:
             chapters[0].bl.viewed(user)
         user_vote = story.votes.select(lambda x: x.author == user).first()
     else:
@@ -92,6 +94,7 @@ def view(pk, comments_page):
         'local_comments_count': local_comments_count,
         'new_local_comments_count': new_local_comments_count,
         'chapters': chapters,
+        'show_first_chapter': show_first_chapter,
         'page_title': story.title,
         'comment_form': CommentForm(),
         'page_obj': paged,

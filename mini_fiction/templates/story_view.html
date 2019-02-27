@@ -153,7 +153,7 @@
         </div><!-- /story-info -->
 
         <div class="story-chapters">
-            {% if chapters|length > 1 %}
+            {% if not show_first_chapter and chapters|length > 0 %}
                 <h2>Содержание</h2>
             {% include "includes/story_panel.html" %}
                 <ul class="story-chapters-list">
@@ -181,7 +181,7 @@
                       {{ ngettext("%(num)d word", "%(num)d words", chapter.words) }}, {{ ngettext("%(num)d view", "%(num)d views", chapter.views) }}<li>
                 {% endfor %}
                 </ul>
-            {% elif chapters|length > 0 %}
+            {% elif show_first_chapter %}
               {% with chapter=chapters[0] %}
                 {% include "includes/story_panel.html" %}
                 {% include "includes/chapter_single.html" %}

@@ -8,6 +8,7 @@ import factory
 from pony import orm
 
 from mini_fiction import models
+from mini_fiction.utils.misc import normalize_tag
 
 
 class PonyFactory(factory.Factory):
@@ -35,6 +36,20 @@ class AuthorFactory(PonyFactory):
     date_joined = factory.LazyAttribute(lambda obj: datetime.utcnow())
     activated_at = factory.LazyAttribute(lambda obj: datetime.utcnow())
     session_token = factory.Sequence(lambda n: "veryrandomtoken%d" % n)
+
+
+class TagFactory(PonyFactory):
+    class Meta(object):
+        model = models.Tag
+
+    name = factory.Sequence(lambda n: "Тег %d" % n)
+    iname = factory.LazyAttribute(lambda obj: normalize_tag(obj.name))
+
+    @factory.post_generation
+    def aliases(self, create, extracted, **kwargs):
+        if create and extracted:
+            for tag_alias in extracted:
+                TagFactory(name=tag_alias, is_alias_for=self)
 
 
 class StoryFactory(PonyFactory):

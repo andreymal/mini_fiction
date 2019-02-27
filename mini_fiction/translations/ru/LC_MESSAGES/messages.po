@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version:  0.0.4\n"
 "Report-Msgid-Bugs-To: andriyano-31@mail.ru\n"
-"POT-Creation-Date: 2019-02-26 01:19+0300\n"
+"POT-Creation-Date: 2019-02-28 01:46+0300\n"
 "Last-Translator: andreymal <andriyano-31@mail.ru>\n"
 "Language: ru\n"
 "Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && "
@@ -18,9 +18,14 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 2.6.0\n"
 
-#: mini_fiction/models.py:648 mini_fiction/models.py:915
+#: mini_fiction/models.py:631 mini_fiction/models.py:898
 msgid "Chapter {}"
 msgstr "Глава {}"
+
+#: mini_fiction/bl/tags.py:210 mini_fiction/bl/tags.py:281
+#: mini_fiction/settings.py:108
+msgid "Empty tag"
+msgstr "Пустой тег"
 
 #: mini_fiction/widgets.py:162
 msgid "Add new"
@@ -1487,7 +1492,7 @@ msgstr "Поиск рассказов"
 msgid "Search results"
 msgstr "Результаты поиска"
 
-#: mini_fiction/views/story.py:368
+#: mini_fiction/views/story.py:371
 msgid "New story"
 msgstr "Новый рассказ"
 

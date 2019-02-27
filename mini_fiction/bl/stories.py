@@ -1519,7 +1519,7 @@ class StoryBL(BaseBL, Commentable):
 
         result = {}
         for story_id in story_ids:
-            if not read_chapters_count.get(story_id):
+            if not read_chapters_count.get(story_id) or not all_chapters_count.get(story_id):
                 result[story_id] = 0
                 continue
             result[story_id] = max(0, all_chapters_count[story_id] - read_chapters_count[story_id])

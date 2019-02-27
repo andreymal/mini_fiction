@@ -280,4 +280,8 @@ class TagBL(BaseBL):
         if not iname:
             return lazy_gettext('Empty tag')
 
+        for regex, reason in current_app.config['TAGS_BLACKLIST_REGEX'].items():
+            if re.search(regex, iname, flags=re.IGNORECASE):
+                return reason
+
         return None

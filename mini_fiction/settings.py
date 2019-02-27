@@ -5,6 +5,7 @@ import os
 import logging
 
 from celery.schedules import crontab
+from flask_babel import lazy_gettext
 
 
 class Config(object):
@@ -103,6 +104,9 @@ class Config(object):
     NORMALIZED_TAGS_DELIMETERS = (
         ' \u00a0/\\—–[]<>:;?!%&@*+=«»|'
     )
+    TAGS_BLACKLIST_REGEX = {
+        r'^[_\-()×°]+$': lazy_gettext('Empty tag'),
+    }
 
     SERVER_NAME = 'localhost:5000'
     PREFERRED_URL_SCHEME = 'http'

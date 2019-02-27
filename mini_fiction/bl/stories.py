@@ -920,8 +920,10 @@ class StoryBL(BaseBL, Commentable):
     def search(self, query, limit, sort_by=0, only_published=True, extended_syntax=True, **filters):
         from mini_fiction.models import Tag
 
+        raw_result = {'total': 0, 'total_found': 0, 'matches': []}
+
         if current_app.config['SPHINX_DISABLED']:
-            return {}, []
+            return raw_result, []
 
         if sort_by not in self.sort_types:
             sort_by = 0
@@ -2075,8 +2077,10 @@ class ChapterBL(BaseBL):
     def search(self, query, limit, sort_by=0, only_published=True, extended_syntax=True, **filters):
         from mini_fiction.models import Tag
 
+        raw_result = {'total': 0, 'total_found': 0, 'matches': []}
+
         if current_app.config['SPHINX_DISABLED']:
-            return {}, []
+            return raw_result, []
 
         if sort_by not in self.sort_types:
             sort_by = 0

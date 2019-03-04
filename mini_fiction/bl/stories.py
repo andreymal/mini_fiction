@@ -1296,6 +1296,7 @@ class StoryBL(BaseBL, Commentable):
                 story_tag_log = StoryTagLog(
                     story=story,
                     tag=tag,
+                    tag_name=tag.name,
                     action_flag=StoryTagLog.ADDITION,
                     modified_by=user,
                 )
@@ -1341,6 +1342,7 @@ class StoryBL(BaseBL, Commentable):
                 story_tag_log = StoryTagLog(
                     story=story,
                     tag=tag,
+                    tag_name=tag.name,
                     action_flag=StoryTagLog.DELETION,
                     modified_by=user,
                 )

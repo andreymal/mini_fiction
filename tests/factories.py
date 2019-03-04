@@ -38,6 +38,13 @@ class AuthorFactory(PonyFactory):
     session_token = factory.Sequence(lambda n: "veryrandomtoken%d" % n)
 
 
+class TagCategoryFactory(PonyFactory):
+    class Meta(object):
+        model = models.TagCategory
+
+    name = factory.Sequence(lambda n: "Категория %d" % n)
+
+
 class TagFactory(PonyFactory):
     class Meta(object):
         model = models.Tag

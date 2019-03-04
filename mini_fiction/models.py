@@ -294,6 +294,8 @@ class TagCategory(db.Entity):
 
     tags = orm.Set('Tag')
 
+    bl = Resource('bl.tag_category')
+
     def __str__(self):
         return self.name
 

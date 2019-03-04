@@ -70,6 +70,8 @@ def get_adminlog_object_url(typ, pk):
         return url_for('admin_news.update', pk=pk)
     if typ == 'staticpage':
         return url_for('admin_staticpages.update', name=pk[0], lang=pk[1])
+    if typ == 'tagcategory':
+        return url_for('admin_tag_categories.update', pk=pk)
     if typ == 'tag':
         return url_for('admin_tags.update', pk=pk)
     return None

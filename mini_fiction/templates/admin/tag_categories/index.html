@@ -1,0 +1,23 @@
+{% extends base %}
+{% from 'macro.html' import breadcrumbs, paginator with context %}
+{% block content %}
+
+<div class="row">
+    <div class="span12">
+        {{- breadcrumbs([[url_for('admin_index.index'), _('Administration')]]) }}
+        <h1>{{ page_title }}</h1>
+
+        <ul>
+        {% for tag_category in tag_categories %}
+            <li><a class="gen" style="background-color: {{ tag_category.color }}" href="{{ url_for('admin_tag_categories.update', pk=tag_category.id) }}">{{ tag_category.name }}</a></li>
+        {% endfor %}
+        </ul>
+
+        {{ paginator(page_obj) }}
+
+        <a href="{{ url_for('admin_tag_categories.create') }}">{{ _('Create') }}</a>
+
+        {{- breadcrumbs([[url_for('admin_index.index'), _('Administration')]]) }}
+    </div>
+</div>
+{% endblock %}

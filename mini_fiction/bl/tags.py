@@ -4,6 +4,7 @@
 # pylint: disable=unexpected-keyword-arg,no-value-for-parameter
 
 import re
+from datetime import datetime
 
 from flask import current_app
 from flask_babel import lazy_gettext
@@ -11,7 +12,8 @@ from pony import orm
 
 from mini_fiction.bl.utils import BaseBL
 from mini_fiction.validation import Validator, ValidationError
-from mini_fiction.utils.misc import normalize_tag
+from mini_fiction.validation.tags import TAG
+from mini_fiction.utils.misc import normalize_tag, call_after_request as later
 
 
 class TagBL(BaseBL):
@@ -285,3 +287,241 @@ class TagBL(BaseBL):
                 return reason
 
         return None
+
+    def create(self, user, data):
+        from mini_fiction.models import Tag, AdminLog
+
+        if not user or not user.is_staff:
+            raise ValueError('Not authorized')
+
+        data = Validator(TAG).validated(data)
+
+        errors = {}
+
+        bad_reason = self.validate_tag_name(data['name'])
+        if bad_reason:
+            errors['name'] = [bad_reason]
+
+        iname = normalize_tag(data['name'])
+        if not bad_reason and Tag.get(iname=iname):
+            errors['name'] = [lazy_gettext('Tag already exists')]
+
+        canonical_tag = None
+        if data.get('is_alias_for'):
+            canonical_tag = Tag.get(iname=normalize_tag(data['is_alias_for']))
+            if not canonical_tag:
+                errors['is_alias_for'] = [lazy_gettext('Tag not found')]
+
+        if errors:
+            raise ValidationError(errors)
+
+        tag = Tag(
+            name=data['name'],
+            iname=iname,
+            category=data.get('category'),
+            color=data.get('color') or '',
+            description=data.get('description') or '',
+            is_main_tag=data.get('is_main_tag', False),
+            created_by=user,
+            is_alias_for=None,
+            reason_to_blacklist='',
+        )
+        tag.flush()
+
+        AdminLog.bl.create(user=user, obj=tag, action=AdminLog.ADDITION)
+
+        if data.get('reason_to_blacklist'):
+            tag.bl.set_blacklist(user, data['reason_to_blacklist'])
+        elif canonical_tag:
+            tag.bl.make_alias_for(user, canonical_tag, hidden=data.get('is_hidden_alias', False))
+
+        return tag
+
+    def update(self, user, data):
+        from mini_fiction.models import Tag, AdminLog
+
+        if not user or not user.is_staff:
+            raise ValueError('Not authorized')
+
+        tag = self.model
+
+        data = Validator(TAG).validated(data, update=True)
+        changes = {}
+        errors = {}
+
+        if 'name' in data and data['name'] != tag.name:
+            bad_reason = self.validate_tag_name(data['name'])
+            if bad_reason:
+                errors['name'] = [bad_reason]
+
+            iname = normalize_tag(data['name'])
+            if not bad_reason and iname != tag.iname and Tag.get(iname=iname):
+                errors['name'] = [lazy_gettext('Tag already exists')]
+
+            changes['name'] = data['name']
+            if iname != tag.iname:
+                changes['iname'] = iname
+
+        if 'category' in data:
+            old_category_id = tag.category.id if tag.category else None
+            if old_category_id != data['category']:
+                changes['category'] = data['category']
+
+        for key in ('color', 'description', 'is_main_tag'):
+            if key in data and data[key] != getattr(tag, key):
+                changes[key] = data[key]
+
+        canonical_tag = tag.is_alias_for
+        if 'is_alias_for' in data:
+            if data.get('is_alias_for'):
+                canonical_tag = Tag.get(iname=normalize_tag(data['is_alias_for']))
+                if not canonical_tag:
+                    errors['is_alias_for'] = [lazy_gettext('Tag not found')]
+                elif canonical_tag == tag:
+                    errors['is_alias_for'] = [lazy_gettext('Tag cannot refer to itself')]
+            else:
+                canonical_tag = None
+
+        if errors:
+            raise ValidationError(errors)
+        if changes:
+            changes['updated_at'] = datetime.utcnow()
+            tag.set(**changes)
+
+            AdminLog.bl.create(
+                user=user,
+                obj=tag,
+                action=AdminLog.CHANGE,
+                fields=set(changes) - {'updated_at'},
+            )
+
+        if 'reason_to_blacklist' in data:
+            self.set_blacklist(user, data['reason_to_blacklist'])
+        if not tag.is_blacklisted and ('is_alias_for' in data or 'is_hidden_alias' in data):
+            self.make_alias_for(user, canonical_tag, data.get('is_hidden_alias', tag.is_hidden_alias))
+
+    def set_blacklist(self, user, reason):
+        from mini_fiction.models import StoryTag, StoryTagLog, AdminLog
+
+        if not user or not user.is_staff:
+            raise ValueError('Not authorized')
+
+        tag = self.model
+        if reason == tag.reason_to_blacklist:
+            return
+
+        old_reason = tag.reason_to_blacklist
+        tm = datetime.utcnow()
+
+        if reason:
+            tag.reason_to_blacklist = reason
+            tag.is_alias_for = None
+            tag.is_hidden_alias = False
+
+            story_tags = list(StoryTag.select(lambda x: x.tag == tag))
+            for st in story_tags:
+                StoryTagLog(
+                    story=st.story.id,
+                    tag=tag,
+                    tag_name=tag.name,
+                    action_flag=StoryTagLog.DELETION,
+                    modified_by=user,
+                    date=tm,
+                ).flush()
+                # FIXME: кажется, следующая строчка должна находиться не здесь, но я ленивый
+                later(current_app.tasks['sphinx_update_story'].delay, st.story.id, ('tag',))
+                st.delete()
+
+        else:
+            tag.reason_to_blacklist = ''
+
+        tag.updated_at = tm
+
+        if tag.reason_to_blacklist and old_reason:
+            log_message = 'Изменена причина попадания тега в чёрный список.'
+        elif tag.reason_to_blacklist:
+            log_message = 'Тег добавлен в чёрный список.'
+        else:
+            log_message = 'Тег убран из чёрного списка.'
+        AdminLog.bl.create(
+            user=user,
+            obj=tag,
+            action=AdminLog.CHANGE,
+            change_message=log_message,
+        )
+
+    def make_alias_for(self, user, canonical_tag, hidden=False):
+        from mini_fiction.models import StoryTag, StoryTagLog, AdminLog
+
+        if not user or not user.is_staff:
+            raise ValueError('Not authorized')
+
+        if canonical_tag and canonical_tag.is_alias_for:
+            if canonical_tag.is_alias_for.is_alias_for:
+                raise RuntimeError('Tag alias {} refers to another alias {}!'.format(canonical_tag.id, canonical_tag.is_alias_for.id))
+            canonical_tag = canonical_tag.is_alias_for
+
+        tag = self.model
+        if tag.is_alias_for == canonical_tag:
+            if canonical_tag and bool(hidden) != tag.is_hidden_alias:
+                tag.is_hidden_alias = bool(hidden)
+                tag.updated_at = datetime.utcnow()
+                AdminLog.bl.create(
+                    user=user,
+                    obj=tag,
+                    action=AdminLog.CHANGE,
+                    fields=('is_hidden_alias',),
+                )
+            return
+
+        tm = datetime.utcnow()
+
+        if canonical_tag:
+            if canonical_tag == tag:
+                raise RuntimeError('Self-reference!')
+
+            tag.is_alias_for = canonical_tag
+            tag.is_hidden_alias = bool(hidden)
+
+            story_tags = list(StoryTag.select(lambda x: x.tag == tag))
+            stories_with_canonical_tag = list(orm.select(x.story.id for x in StoryTag if x.tag == canonical_tag))
+            for st in story_tags:
+                StoryTagLog(
+                    story=st.story.id,
+                    tag=tag,
+                    tag_name=tag.name,
+                    action_flag=StoryTagLog.DELETION,
+                    modified_by=user,
+                    date=tm,
+                ).flush()
+                if st.story.id not in stories_with_canonical_tag:
+                    StoryTagLog(
+                        story=st.story.id,
+                        tag=canonical_tag,
+                        tag_name=canonical_tag.name,
+                        action_flag=StoryTagLog.ADDITION,
+                        modified_by=user,
+                        date=tm,
+                    ).flush()
+                    st.tag = canonical_tag
+                    st.flush()
+                else:
+                    st.delete()
+                later(current_app.tasks['sphinx_update_story'].delay, st.story.id, ('tag',))
+
+        else:
+            tag.is_alias_for = None
+            tag.is_hidden_alias = False
+
+        tag.updated_at = tm
+
+        if tag.is_alias_for:
+            log_message = 'Тег стал синонимом тега «{}».'.format(tag.is_alias_for.name)
+        else:
+            log_message = 'Тег перестал быть синонимом.'
+        AdminLog.bl.create(
+            user=user,
+            obj=tag,
+            action=AdminLog.CHANGE,
+            change_message=log_message,
+        )

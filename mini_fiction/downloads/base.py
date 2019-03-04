@@ -58,7 +58,7 @@ class ZipFileDownloadFormat(BaseDownloadFormat):
         ext = self.chapter_extension
 
         chapters = list(story.chapters.select(lambda x: not x.draft).order_by(Chapter.order, Chapter.id))
-        num_width = len(str(max(x.order for x in chapters)))
+        num_width = len(str(max(x.order for x in chapters))) if chapters else 1
         for chapter in chapters:
             data = render_template(
                 self.chapter_template,

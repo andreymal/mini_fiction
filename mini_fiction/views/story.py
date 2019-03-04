@@ -586,6 +586,8 @@ def download(story_id, filename):
     debug = current_app.config['DEBUG'] and request.args.get('debug')
 
     story = get_story(pk=story_id)
+    if not story.published_chapters_count:
+        abort(404)
     fmt = get_format(extension)
     if fmt is None:
         abort(404)

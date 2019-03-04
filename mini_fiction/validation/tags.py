@@ -41,6 +41,7 @@ TAG = {
     },
     'is_alias_for': {
         'type': 'string',
+        'nullable': True,
         'coerce': (safe_string_coerce, 'strip'),
         'maxlength': 255,
     },

@@ -13,6 +13,8 @@ bp = Blueprint('staticpages', __name__)
 @bp.route('/page/<path:name>/')
 @db_session
 def index(name):
+    if len(name) > 64:
+        abort(404)
     page = StaticPage.get(name=name, lang=g.locale.language)
     if not page:
         page = StaticPage.get(name=name, lang='none')

@@ -34,12 +34,12 @@ def tag_index(tag_name, page):
     if not iname:
         abort(404)
     tag = Tag.get(iname=iname)
-    if not tag or tag.is_blacklisted:
-        abort(404)
-    if tag.is_alias_for is not None:
+    if tag and tag.is_alias_for is not None:
         if tag.is_alias_for.is_alias_for:
             raise RuntimeError('Tag alias {} refers to another alias {}!'.format(tag.id, tag.is_alias_for.id))
         tag = tag.is_alias_for
+    if not tag or tag.is_blacklisted:
+        abort(404)
     if tag.iname != tag_name:
         return redirect(url_for('tags.tag_index', tag_name=tag.iname, page=page))
 

@@ -613,3 +613,16 @@ def normalize_tag(s, whitelist=None, delimeters=None):
     while '__' in s:
         s = s.replace('__', '_')
     return s.strip('_')[:32] or None
+
+
+def smart_split(s, delimeter=','):
+    """Допиленный split. Делит строку по разделителю, удаляя пробельные
+    символы в начале и конце разделённых строк. Пустые строки удаляет; если
+    исходная строка пуста или состоит только из пробельных символов,
+    возвращает пустой список. На None тоже возвращает пустой список.
+    """
+
+    if not s:
+        return []
+    result = [x.strip() for x in s.split(delimeter)]
+    return [x for x in result if x]

@@ -1549,8 +1549,8 @@ class StoryBL(BaseBL, Commentable):
             if x.author == user and x.story.id in story_ids and x.chapter is not None
         ))
         all_chapters_count = dict(orm.select(
-            (x.story.id, orm.count(x.id)) for x in Chapter
-            if x.story.id in story_ids and not x.draft
+            (x.id, x.published_chapters_count) for x in self.select_accessible(user)
+            if x.id in story_ids
         ))
 
         result = {}
@@ -1573,8 +1573,8 @@ class StoryBL(BaseBL, Commentable):
             if x.author == user and x.story.id in story_ids
         ))
         all_comments_count = dict(orm.select(
-            (x.id, x.comments_count) for x in Story
-            if x.id in story_ids and x.published
+            (x.id, x.comments_count) for x in self.select_accessible(user)
+            if x.id in story_ids
         ))
 
         result = {}

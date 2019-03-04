@@ -88,15 +88,15 @@ class TagBL(BaseBL):
 
             if tag:
                 # Если тег существует, проверяем, что его можно использовать
-                if resolve_blacklisted and tag.is_blacklisted:
-                    result['blacklisted'].append(tag)
-                    result['success'] = False
-                    tag = None
-                elif resolve_aliases and tag.is_alias_for:
+                if resolve_aliases and tag.is_alias_for:
                     if tag.is_alias_for.is_alias_for:
                         raise RuntimeError('Tag alias {} refers to another alias {}!'.format(tag.id, tag.is_alias_for.id))
                     result['aliases'].append(tag)
                     tag = tag.is_alias_for
+                if resolve_blacklisted and tag.is_blacklisted:
+                    result['blacklisted'].append(tag)
+                    result['success'] = False
+                    tag = None
 
             elif create:
                 # Если не существует — создаём

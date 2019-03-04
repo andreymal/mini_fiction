@@ -1,0 +1,108 @@
+{% extends base %}
+{% from 'macro.html' import breadcrumbs, paginator with context %}
+{% block content %}
+
+<div class="row"><div class="span12">
+    {{- breadcrumbs([[url_for('admin_index.index'), _('Administration')]]) }}
+    <h1>{{ page_title }}</h1>
+
+    <div class="admin-index">
+        <table class="admin-index-table">
+        <thead><tr>
+            <th>{{ admin_sorting_link('Название', 'iname', view_args=args) }}</th>
+            <th>{{ admin_sorting_link('Дата создания', 'created_at', view_args=args) }}</th>
+            <th>Категория</th>
+            <th>Кем создан</th>
+            <th>{{ admin_sorting_link('Рассказы', 'stories_count', view_args=args) }}</th>
+        </tr></thead>
+
+        <tbody>
+        {%- for tag in tags %}<tr>
+            <td class="col-tag-iname">
+                <a class="gen"{% if tag.get_color() %} style="background-color:
+                    {{- tag.get_color() -}}
+                "{%- endif %} href="{{ url_for('admin_tags.update', pk=tag.id) }}">
+                    {%- if tag.is_blacklisted -%}<s>{%- endif -%}
+                    {{ tag.name }}
+                    {%- if tag.is_blacklisted -%}</s>{%- endif -%}
+                </a>
+                {% if tag.is_alias %}
+                    →
+                    <a class="gen"{% if tag.is_alias_for.get_color() %} style="background-color:
+                        {{- tag.is_alias_for.get_color() -}}
+                    "{%- endif %} href="{{ url_for('admin_tags.update', pk=tag.is_alias_for.id) }}">
+                        {%- if tag.is_alias_for.is_blacklisted -%}<s>{%- endif -%}
+                        {{ tag.is_alias_for.name }}
+                        {%- if tag.is_alias_for.is_blacklisted -%}</s>{%- endif -%}
+                    </a>
+                {% endif %}
+            </td>
+
+            <td class="col-tag-created-at">
+                <time datetime="{{ tag.created_at.strftime('%Y-%m-%dT%H:%M:%SZ') }}">
+                    {{ tag.created_at|datetimeformat('d MMMM Y, HH:mm') }}
+                </time>
+            </td>
+
+            <td class="col-tag-category">
+                {% if tag.category -%}
+                    {{ tag.category.name }}
+                {%- endif %}
+            </td>
+
+            <td class="col-tag-created-by">
+                {% if tag.created_by -%}
+                    <a href="{{ url_for('admin_authors.update', pk=tag.created_by.id) }}">
+                        {{- tag.created_by.username -}}
+                    </a>
+                {%- else -%}
+                    N/A
+                {% endif %}
+            </td>
+
+            <td class="col-tag-stories-count">{% if (not tag.is_alias and not tag.is_blacklisted) or tag.stories_count -%}
+                {{ tag.published_stories_count }} ({{ tag.stories_count }})
+            {%- endif %}</td>
+        </tr>{% endfor -%}
+        </tbody>
+        </table>
+
+        <div class="admin-index-filters">
+            <form action="{{ url_for('admin_tags.index') }}" method="GET">
+                {% for k, v in args.items() if k not in ['page', 'name', 'category', 'is_blacklisted'] %}
+                    <input type="hidden" name="{{ k }}" value="{{ v }}" />
+                {%- endfor %}
+
+                <label for="name">Название:</label>
+                <input type="text" id="name" name="name" class="admin-input-text-full" value="{{ args.name or '' }}" /><br/>
+
+                <label for="category">Категория:</label>
+                <select name="category" id="category" class="admin-input-select-full">
+                    <option value="">{{ _('All') }}</option>
+                    <option value="0"{% if args.category == "0" %} selected{% endif %}>Без категории</option>
+                    {%- for tag_category in tag_categories %}
+                    <option value="{{ tag_category.id }}"{% if args.category == tag_category.id|string %} selected{% endif %}>{{ tag_category.name }}</option>
+                    {%- endfor %}
+                </select><br/>
+
+                <label for="is_blacklisted">В чёрном списке:</label>
+                <select name="is_blacklisted" id="is_blacklisted" class="admin-input-select-full">
+                    <option value="">{{ _('All') }}</option>
+                    <option value="1"{% if args.is_blacklisted == "1" %} selected{% endif %}>{{ _('Yes') }}</option>
+                    <option value="0"{% if args.is_blacklisted == "0" %} selected{% endif %}>{{ _('No') }}</option>
+                </select><br/>
+
+                <button type="submit" class="btn btn-primary">{{ _('Search') }}</button>
+            </form>
+        </div>
+
+        <br style="clear: both;" />
+    </div>
+
+    {{ paginator(page_obj) }}
+
+    <a href="{{ url_for('admin_tags.create') }}">{{ _('Create') }}</a>
+
+    {{- breadcrumbs([[url_for('admin_index.index'), _('Administration')]]) }}
+</div></div>
+{% endblock %}

@@ -311,7 +311,7 @@ def configure_views(app):
 def configure_admin_views(app):
     from mini_fiction.views.admin import index, categories, characters, charactergroups, classifications
     from mini_fiction.views.admin import logopics, htmlblocks, staticpages, news, abuse_reports, votes
-    from mini_fiction.views.admin import authors, registrations
+    from mini_fiction.views.admin import authors, registrations, tags
 
     app.register_blueprint(index.bp, url_prefix='/admin')
     app.register_blueprint(logopics.bp, url_prefix='/admin/logopics')
@@ -326,6 +326,7 @@ def configure_admin_views(app):
     app.register_blueprint(votes.bp, url_prefix='/admin/votes')
     app.register_blueprint(authors.bp, url_prefix='/admin/authors')
     app.register_blueprint(registrations.bp, url_prefix='/admin/registrations')
+    app.register_blueprint(tags.bp, url_prefix='/admin/tags')
 
 
 def configure_ajax(app):

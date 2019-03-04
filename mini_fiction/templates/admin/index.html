@@ -44,6 +44,10 @@
     </a>
     {%- endif %}
 
+    <a href="{{ url_for('admin_tags.index') }}" class="short">
+        <div class="admin-dashboard-label">{{ _('Tags') }}</div>
+    </a>
+
     <a href="{{ url_for('admin_staticpages.index') }}" class="short">
         <div class="admin-dashboard-label">{{ _('Static pages') }}</div>
     </a>

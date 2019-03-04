@@ -12,7 +12,11 @@
     <div class="tag-page">
         <a class="gen" href="{{ url_for('tags.tag_index', tag_name=tag.iname) }}"{% if tag.get_color() %} style="background-color: {{ tag.get_color() }}"{% endif %}>
             {{- tag.name -}}
-        </a><br/>
+        </a>
+        {%- if current_user.is_staff %}
+            <a href="{{ url_for('admin_tags.update', pk=tag.id) }}">(админка)</a>
+        {% endif -%}
+        <br/>
         <span class="tag-stories-count">{{ ngettext("%(num)d story", "%(num)d stories", tag.published_stories_count) }}</span>
         {% if aliases -%}
             <br/>

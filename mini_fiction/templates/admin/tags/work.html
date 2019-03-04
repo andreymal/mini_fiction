@@ -1,0 +1,49 @@
+{% extends base %}
+{% from 'macro.html' import breadcrumbs with context %}
+{% from 'macro.html' import form_fields with context %}
+{% block content %}
+
+<div class="row">
+    <div class="span12">
+        {{- breadcrumbs([
+            [url_for('admin_index.index'), _('Administration')],
+            [url_for('admin_tags.index'), _('Tags')]
+        ]) }}
+        <h1>{{ page_title }}</h1>
+
+        {% if saved %}<div class="alert-mini green">{{ _('Saved!') }}</div>{% endif %}
+
+        {% if edit %}
+            <a class="gen"{% if tag.get_color() %} style="background-color:
+                {{- tag.get_color() -}}
+            "{%- endif %} href="{{ url_for('tags.tag_index', tag_name=tag.iname) }}">
+                {%- if tag.is_blacklisted -%}<s>{%- endif -%}
+                {{ tag.name }}
+                {%- if tag.is_blacklisted -%}</s>{%- endif -%}
+            </a>
+            {% if tag.is_alias %}
+                →
+                <a class="gen"{% if tag.is_alias_for.get_color() %} style="background-color:
+                    {{- tag.is_alias_for.get_color() -}}
+                "{%- endif %} href="{{ url_for('tags.tag_index', tag_name=tag.is_alias_for.iname) }}">
+                    {%- if tag.is_alias_for.is_blacklisted -%}<s>{%- endif -%}
+                    {{ tag.is_alias_for.name }}
+                    {%- if tag.is_alias_for.is_blacklisted -%}</s>{%- endif -%}
+                </a>
+            {% endif %}
+        {% endif %}
+
+        <form class="form-horizontal" method="POST" enctype="multipart/form-data">
+        {{ form_fields(form) }}
+        <div class="controls">
+            <input type="submit" value="{{ _('Save') }}" class="btn btn-primary" />
+        </div>
+        </form>
+
+        {{- breadcrumbs([
+            [url_for('admin_index.index'), _('Administration')],
+            [url_for('admin_tags.index'), _('Tags')]
+        ]) }}
+    </div>
+</div>
+{% endblock %}

@@ -377,7 +377,7 @@ class TagBL(BaseBL):
                 canonical_tag = Tag.get(iname=normalize_tag(data['is_alias_for']))
                 if not canonical_tag:
                     errors['is_alias_for'] = [lazy_gettext('Tag not found')]
-                elif canonical_tag == tag:
+                elif canonical_tag == tag or canonical_tag.is_alias_for and canonical_tag.is_alias_for == tag:
                     errors['is_alias_for'] = [lazy_gettext('Tag cannot refer to itself')]
             else:
                 canonical_tag = None

@@ -418,7 +418,7 @@ class TagBL(BaseBL):
             tag.is_alias_for = None
             tag.is_hidden_alias = False
 
-            story_tags = list(StoryTag.select(lambda x: x.tag == tag))
+            story_tags = list(StoryTag.select(lambda x: x.tag == tag).prefetch(StoryTag.story))
             for st in story_tags:
                 StoryTagLog(
                     story=st.story.id,
@@ -431,6 +431,9 @@ class TagBL(BaseBL):
                 # FIXME: кажется, следующая строчка должна находиться не здесь, но я ленивый
                 later(current_app.tasks['sphinx_update_story'].delay, st.story.id, ('tag',))
                 st.delete()
+                tag.stories_count -= 1
+                if st.story.published:
+                    tag.published_stories_count -= 1
 
         else:
             tag.reason_to_blacklist = ''
@@ -483,7 +486,7 @@ class TagBL(BaseBL):
             tag.is_alias_for = canonical_tag
             tag.is_hidden_alias = bool(hidden)
 
-            story_tags = list(StoryTag.select(lambda x: x.tag == tag))
+            story_tags = list(StoryTag.select(lambda x: x.tag == tag).prefetch(StoryTag.story))
             stories_with_canonical_tag = list(orm.select(x.story.id for x in StoryTag if x.tag == canonical_tag))
             for st in story_tags:
                 StoryTagLog(
@@ -505,9 +508,15 @@ class TagBL(BaseBL):
                     ).flush()
                     st.tag = canonical_tag
                     st.flush()
+                    canonical_tag.stories_count += 1
+                    if st.story.published:
+                        canonical_tag.published_stories_count += 1
                 else:
                     st.delete()
                 later(current_app.tasks['sphinx_update_story'].delay, st.story.id, ('tag',))
+                tag.stories_count -= 1
+                if st.story.published:
+                    tag.published_stories_count -= 1
 
         else:
             tag.is_alias_for = None

@@ -34,6 +34,72 @@
         {% endif %}
 
         <form class="form-horizontal" method="POST" enctype="multipart/form-data">
+
+        {% if edit %}
+        <div class="control-group">
+            <label class="control-label">Создан</label>
+            <div class="controls">
+                <span style="display: inline-block; padding-top: 5px;">
+                    <time datetime="{{ tag.created_at.strftime('%Y-%m-%dT%H:%M:%SZ') }}">
+                        {{- tag.created_at|datetimeformat('d MMMM Y, HH:mm') -}}
+                    </time>
+                    {% if tag.created_by %}
+                        пользователем
+                        <a href="{{ url_for('admin_authors.update', pk=tag.created_by.id) }}">{{ tag.created_by.username }}</a>
+                    {% endif %}
+                </span>
+            </div>
+        </div>
+
+        <div class="control-group">
+            <label class="control-label">Последнее изменение</label>
+            <div class="controls">
+                <span style="display: inline-block; padding-top: 5px;"><time datetime="{{ tag.updated_at.strftime('%Y-%m-%dT%H:%M:%SZ') }}">
+                    {{- tag.updated_at|datetimeformat('d MMMM Y, HH:mm') -}}
+                </time></span>
+            </div>
+        </div>
+
+        <div class="control-group">
+            <label class="control-label">Число рассказов</label>
+            <div class="controls">
+                <span style="display: inline-block; padding-top: 5px;">
+                    {{ tag.published_stories_count }} опубликованных ({{ tag.stories_count }} всего)
+                </span>
+            </div>
+        </div>
+
+        {% if visible_tag_aliases %}
+        <div class="control-group">
+            <label class="control-label">Синонимы</label>
+            <div class="controls">
+                <span style="display: inline-block; padding-top: 5px;">
+                    {% for alias in visible_tag_aliases -%}
+                        <a class="gen"{% if alias.get_color() %} style="background-color:
+                            {{- alias.get_color() -}}
+                        "{%- endif %} href="{{ url_for('admin_tags.update', pk=alias.id) }}">{{ alias.name }}</a>
+                    {% endfor %}
+                </span>
+            </div>
+        </div>
+        {% endif %}
+
+        {% if hidden_tag_aliases %}
+        <div class="control-group">
+            <label class="control-label">Скрытые синонимы</label>
+            <div class="controls">
+                <span style="display: inline-block; padding-top: 5px;">
+                    {% for alias in hidden_tag_aliases -%}
+                        <a class="gen"{% if alias.get_color() %} style="background-color:
+                            {{- alias.get_color() -}}
+                        "{%- endif %} href="{{ url_for('admin_tags.update', pk=alias.id) }}">{{ alias.name }}</a>
+                    {% endfor %}
+                </span>
+            </div>
+        </div>
+        {% endif %}
+        {% endif %}
+
         {{ form_fields(form) }}
         <div class="controls">
             <input type="submit" value="{{ _('Save') }}" class="btn btn-primary" />

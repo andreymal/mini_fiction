@@ -46,7 +46,9 @@
 
             <td class="col-tag-category">
                 {% if tag.category -%}
-                    {{ tag.category.name }}
+                    <a href="{{ url_for('admin_tag_categories.update', pk=tag.category.id) }}">
+                        {{- tag.category.name -}}
+                    </a>
                 {%- endif %}
             </td>
 

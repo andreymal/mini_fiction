@@ -138,10 +138,16 @@ def update(pk):
         else:
             saved = True
 
+    tag_aliases = Tag.select(lambda x: x.is_alias_for == tag)
+    visible_tag_aliases = [x for x in tag_aliases if not x.is_hidden_alias]
+    hidden_tag_aliases = [x for x in tag_aliases if x.is_hidden_alias]
+
     return render_template(
         'admin/tags/work.html',
         page_title=tag.name,
         tag=tag,
+        visible_tag_aliases=visible_tag_aliases,
+        hidden_tag_aliases=hidden_tag_aliases,
         form=form,
         edit=True,
         saved=saved,

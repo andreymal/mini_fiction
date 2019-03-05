@@ -434,8 +434,8 @@ def test_tag_update_alias_ok(factories):
     assert tag.is_blacklisted is False
     assert tag.reason_to_blacklist == ''
 
-    story_tags = [x.tag for x in story.bl.get_tags_list()]
-    assert story_tags == [canonical_tag]
+    story_tags = set(x.tag for x in story.bl.get_tags_list())
+    assert story_tags == {canonical_tag}
     assert tag.stories_count == 0
     assert canonical_tag.stories_count == 1
 
@@ -464,8 +464,8 @@ def test_tag_update_alias_ok_when_story_already_contains_tag(factories):
     assert tag.is_blacklisted is False
     assert tag.reason_to_blacklist == ''
 
-    story_tags = [x.tag for x in story.bl.get_tags_list()]
-    assert story_tags == [canonical_tag, tag3]
+    story_tags = set(x.tag for x in story.bl.get_tags_list())
+    assert story_tags == {canonical_tag, tag3}
     assert tag.stories_count == 0
     assert canonical_tag.stories_count == 1
     assert tag3.stories_count == 1
@@ -488,8 +488,8 @@ def test_tag_update_alias_fail_nonexisting(factories):
     assert tag.is_alias is False
     assert tag.is_alias_for is None
 
-    story_tags = [x.tag for x in story.bl.get_tags_list()]
-    assert story_tags == [tag]
+    story_tags = set(x.tag for x in story.bl.get_tags_list())
+    assert story_tags == {tag}
 
 
 def test_tag_update_alias_fail_self_reference(factories):
@@ -509,8 +509,8 @@ def test_tag_update_alias_fail_self_reference(factories):
     assert tag.is_alias is False
     assert tag.is_alias_for is None
 
-    story_tags = [x.tag for x in story.bl.get_tags_list()]
-    assert story_tags == [tag]
+    story_tags = set(x.tag for x in story.bl.get_tags_list())
+    assert story_tags == {tag}
 
 
 def test_tag_update_alias_fail_self_reference_through_another_alias(factories):
@@ -568,8 +568,8 @@ def test_tag_update_blacklist_ok(factories):
     assert tag.is_blacklisted is True
     assert tag.reason_to_blacklist == 'Плохой тег'
 
-    story_tags = [x.tag for x in story.bl.get_tags_list()]
-    assert story_tags == [tag2]
+    story_tags = set(x.tag for x in story.bl.get_tags_list())
+    assert story_tags == {tag2}
     assert tag.stories_count == 0
     assert tag2.stories_count == 1
 

@@ -71,7 +71,7 @@
 
         <div class="admin-index-filters">
             <form action="{{ url_for('admin_tags.index') }}" method="GET">
-                {% for k, v in args.items() if k not in ['page', 'name', 'category', 'is_blacklisted'] %}
+                {% for k, v in args.items() if k not in ['page', 'name', 'category', 'is_blacklisted', 'is_alias', 'is_main_tag'] %}
                     <input type="hidden" name="{{ k }}" value="{{ v }}" />
                 {%- endfor %}
 
@@ -92,6 +92,20 @@
                     <option value="">{{ _('All') }}</option>
                     <option value="1"{% if args.is_blacklisted == "1" %} selected{% endif %}>{{ _('Yes') }}</option>
                     <option value="0"{% if args.is_blacklisted == "0" %} selected{% endif %}>{{ _('No') }}</option>
+                </select><br/>
+
+                <label for="is_alias">Синоним:</label>
+                <select name="is_alias" id="is_alias" class="admin-input-select-full">
+                    <option value="">{{ _('All') }}</option>
+                    <option value="1"{% if args.is_alias == "1" %} selected{% endif %}>{{ _('Yes') }}</option>
+                    <option value="0"{% if args.is_alias == "0" %} selected{% endif %}>{{ _('No') }}</option>
+                </select><br/>
+
+                <label for="is_main_tag">Основной тег:</label>
+                <select name="is_main_tag" id="is_main_tag" class="admin-input-select-full">
+                    <option value="">{{ _('All') }}</option>
+                    <option value="1"{% if args.is_main_tag == "1" %} selected{% endif %}>{{ _('Yes') }}</option>
+                    <option value="0"{% if args.is_main_tag == "0" %} selected{% endif %}>{{ _('No') }}</option>
                 </select><br/>
 
                 <button type="submit" class="btn btn-primary">{{ _('Search') }}</button>

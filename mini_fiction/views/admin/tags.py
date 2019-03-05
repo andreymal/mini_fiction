@@ -50,6 +50,20 @@ def index(page):
         args['is_blacklisted'] = '1'
         objects = objects.filter(lambda x: x.is_blacklisted)
 
+    if request.args.get('is_alias') == '0':
+        args['is_alias'] = '0'
+        objects = objects.filter(lambda x: not x.is_alias)
+    elif request.args.get('is_alias') == '1':
+        args['is_alias'] = '1'
+        objects = objects.filter(lambda x: x.is_alias)
+
+    if request.args.get('is_main_tag') == '0':
+        args['is_main_tag'] = '0'
+        objects = objects.filter(lambda x: not x.is_main_tag)
+    elif request.args.get('is_main_tag') == '1':
+        args['is_main_tag'] = '1'
+        objects = objects.filter(lambda x: x.is_main_tag)
+
     objects = objects.prefetch(Tag.is_alias_for, Tag.created_by, Tag.category)
 
     objects = admin_sort(args['sorting'], objects, {

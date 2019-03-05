@@ -385,6 +385,7 @@ def test_tag_update_fail_conflict(factories):
 
     story = factories.StoryFactory()
     story.bl.add_tag(admin, tag, log=False)
+    assert tag.stories_count == 1
 
     with pytest.raises(ValidationError) as excinfo:
         tag.bl.update(admin, {
@@ -394,6 +395,7 @@ def test_tag_update_fail_conflict(factories):
     assert str(excinfo.value.errors['name'][0]) == 'Тег уже существует'
     assert tag.name == 'Старый тег'
     assert tag.iname == 'старый_тег'
+    assert tag.stories_count == 1
 
 
 def test_tag_update_fail_invalid(factories):
@@ -416,10 +418,11 @@ def test_tag_update_fail_invalid(factories):
 def test_tag_update_alias_ok(factories):
     admin = factories.AuthorFactory(is_staff=True)
     tag = factories.TagFactory(is_alias_for=None)
-    canonical_tag = factories.TagFactory(name='Существующий тег')
+    canonical_tag = factories.TagFactory(name='Существующий тег', stories_count=0)
 
     story = factories.StoryFactory()
     story.bl.add_tag(admin, tag, log=False)
+    assert tag.stories_count == 1
 
     tag.bl.update(admin, {
         'is_alias_for': canonical_tag.name,
@@ -433,6 +436,8 @@ def test_tag_update_alias_ok(factories):
 
     story_tags = [x.tag for x in story.bl.get_tags_list()]
     assert story_tags == [canonical_tag]
+    assert tag.stories_count == 0
+    assert canonical_tag.stories_count == 1
 
 
 def test_tag_update_alias_ok_when_story_already_contains_tag(factories):
@@ -445,6 +450,9 @@ def test_tag_update_alias_ok_when_story_already_contains_tag(factories):
     story.bl.add_tag(admin, tag, log=False)
     story.bl.add_tag(admin, canonical_tag, log=False)
     story.bl.add_tag(admin, tag3, log=False)
+    assert tag.stories_count == 1
+    assert canonical_tag.stories_count == 1
+    assert tag3.stories_count == 1
 
     tag.bl.update(admin, {
         'is_alias_for': canonical_tag.name,
@@ -458,6 +466,9 @@ def test_tag_update_alias_ok_when_story_already_contains_tag(factories):
 
     story_tags = [x.tag for x in story.bl.get_tags_list()]
     assert story_tags == [canonical_tag, tag3]
+    assert tag.stories_count == 0
+    assert canonical_tag.stories_count == 1
+    assert tag3.stories_count == 1
 
 
 def test_tag_update_alias_fail_nonexisting(factories):
@@ -502,6 +513,23 @@ def test_tag_update_alias_fail_self_reference(factories):
     assert story_tags == [tag]
 
 
+def test_tag_update_alias_fail_self_reference_through_another_alias(factories):
+    admin = factories.AuthorFactory(is_staff=True)
+    tag = factories.TagFactory(name='Главный тег', is_alias_for=None)
+    tag_alias = factories.TagFactory(name='Синоним тега', is_alias_for=tag)
+
+    with pytest.raises(ValidationError) as excinfo:
+        tag.bl.update(admin, {
+            'is_alias_for': tag_alias.name,
+        })
+
+    assert str(excinfo.value.errors['is_alias_for'][0]) == 'Тег не может ссылаться сам на себя'
+    assert tag.is_alias is False
+    assert tag.is_alias_for is None
+    assert tag_alias.is_alias is True
+    assert tag_alias.is_alias_for == tag
+
+
 def test_tag_update_alias_remove_ok(factories):
     admin = factories.AuthorFactory(is_staff=True)
     canonical_tag = factories.TagFactory(name='Существующий тег')
@@ -527,6 +555,8 @@ def test_tag_update_blacklist_ok(factories):
     story = factories.StoryFactory()
     story.bl.add_tag(admin, tag, log=False)
     story.bl.add_tag(admin, tag2, log=False)
+    assert tag.stories_count == 1
+    assert tag2.stories_count == 1
 
     tag.bl.update(admin, {
         'reason_to_blacklist': 'Плохой тег',
@@ -540,6 +570,8 @@ def test_tag_update_blacklist_ok(factories):
 
     story_tags = [x.tag for x in story.bl.get_tags_list()]
     assert story_tags == [tag2]
+    assert tag.stories_count == 0
+    assert tag2.stories_count == 1
 
 
 def test_tag_update_alias_to_blacklist(factories):
@@ -556,7 +588,6 @@ def test_tag_update_alias_to_blacklist(factories):
     assert tag.is_hidden_alias is False
     assert tag.is_blacklisted is True
     assert tag.reason_to_blacklist == 'Синоним тоже так себе'
-
 
 
 def test_tag_update_alias_to_hidden(factories):

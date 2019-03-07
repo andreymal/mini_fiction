@@ -155,7 +155,7 @@
         <div class="story-chapters">
             {% if not show_first_chapter and chapters|length > 0 %}
                 <h2>Содержание</h2>
-            {% include "includes/story_panel.html" %}
+                {% include "includes/story_panel.html" %}
                 <ul class="story-chapters-list">
                 {% for chapter in chapters %}
                     <li>
@@ -184,9 +184,11 @@
             {% elif show_first_chapter %}
               {% with chapter=chapters[0] %}
                 {% include "includes/story_panel.html" %}
-                {% include "includes/chapter_single.html" %}
+                {% with is_last_chapter=True %}
+                    {%- include "includes/chapter_single.html" -%}
+                {% endwith %}
               {% endwith %}
-        {% endif %}
+            {% endif %}
         </div>
 
         {% if current_user.is_staff or story.bl.is_contributor(current_user) %}

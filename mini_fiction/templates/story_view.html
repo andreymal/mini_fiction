@@ -63,7 +63,7 @@
                     <a href="#" class="show-more-tags-link js-show-more-tags">показать все теги</a>
                     <span class="js-story-more-tags" style="display: none;">{% for st in more_tags %}
                         <a class="gen"
-                            {%- if st.tag.get_color() -%} style="background-color: {{- st.tag.get_color() -}}"{%- endif %}
+                            {%- if st.tag.get_color() %} style="background-color: {{- st.tag.get_color() -}}"{%- endif %}
                             href="{{ url_for('tags.tag_index', tag_name=st.tag.iname) }}">
                             {{- st.tag.name -}}
                         </a>
@@ -157,7 +157,7 @@
                 <h2>Содержание</h2>
                 {% include "includes/story_panel.html" %}
                 <ul class="story-chapters-list">
-                {% for chapter in chapters %}
+                {%- for chapter in chapters %}
                     <li>
                         <h4>
                             <a href="{{ url_for('chapter.view', story_id=story.id, chapter_order=chapter.order) }}">
@@ -169,17 +169,18 @@
                             {% if story.bl.editable_by(current_user) %}<sup><a class="edit-link" href="{{ url_for('chapter.edit', pk=chapter.id) }}">Редактировать</a></sup>{% endif %}
                         </h4>
 
-                      {% if chapter.first_published_at -%}
+                      {%- if chapter.first_published_at %}
                       <time datetime="{{ chapter.first_published_at.strftime('%Y-%m-%dT%H:%M:%SZ') }}">
                         {{- chapter.first_published_at|datetimeformat('d MMMM Y') -}}
                       </time>
-                      {%- else -%}
+                      {%- else %}
                       <time datetime="{{ chapter.date.strftime('%Y-%m-%dT%H:%M:%SZ') }}">
                         {{- chapter.date|datetimeformat('d MMMM Y') -}}
                       </time>
                       {%- endif -%},
-                      {{ ngettext("%(num)d word", "%(num)d words", chapter.words) }}, {{ ngettext("%(num)d view", "%(num)d views", chapter.views) }}<li>
-                {% endfor %}
+                      {{ ngettext("%(num)d word", "%(num)d words", chapter.words) }}, {{ ngettext("%(num)d view", "%(num)d views", chapter.views) }}
+                    </li>
+                {%- endfor %}
                 </ul>
             {% elif show_first_chapter %}
               {% with chapter=chapters[0] %}

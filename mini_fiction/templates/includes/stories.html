@@ -6,7 +6,7 @@
             {% if story.pinned -%}
                 <img class="story-pin" src="{{ url_for('static', filename='i/fa-pin-45.png') }}" alt="Pin" title="Этот рассказ закреплён на главной странице" />
             {%- endif %}
-            {{ story.bl.vote_view_html(user=current_user, full=False)|safe }}
+            {{- story.bl.vote_view_html(user=current_user, full=False)|safe }}
             {% include 'includes/story_marks.html' with context %}
         </h3>
         <p class="meta">
@@ -48,7 +48,7 @@
             <button class="btn btn-collapse btn-small" data-toggle="collapse" data-target="#story-{{ story.id }}">{{ ngettext("Show %(num)d chapter", "Show %(num)d chapters", story.published_chapters_count) }}</button>
             <div id="story-{{ story.id }}" class="collapse">
                 <ul class="chapters-list">
-                    {% for chapter in story.bl.select_accessible_chapters(current_user)|sort(attribute='order') %}
+                    {%- for chapter in story.bl.select_accessible_chapters(current_user)|sort(attribute='order') %}
                         <li>
                             <a class="chapter-title" href="{{ url_for('chapter.view', story_id=story.id, chapter_order=chapter.order) }}">
                                 {{- chapter.autotitle -}}
@@ -56,13 +56,13 @@
                             {%- set viewed_at = chapter.bl.is_viewed_by(current_user) -%}
                             {%- if viewed_at %} <i class="chapter-viewed-icon" title="Вы просматривали эту главу {{ viewed_at|datetimeformat('d MMMM Y, HH:MM') }}"></i>{% endif %}
                             {%- if chapter.draft %} <sup class="draft">{{ _('Draft') }}</sup>{% endif %}
-                            {% if story.bl.editable_by(current_user) %}
+                            {% if story.bl.editable_by(current_user) -%}
                                 <sup><a class="edit-link" href="{{ url_for('chapter.edit', pk=chapter.id) }}">Редактировать</a></sup>
-                            {% endif %}
+                            {%- endif -%}
                             <br/>
-                            {{ ngettext("%(num)d word", "%(num)d words", chapter.words) }}, {{ ngettext("%(num)d view", "%(num)d views", chapter.views) }}
+                            {{ ngettext("%(num)d word", "%(num)d words", chapter.words) }}, {{ ngettext("%(num)d view", "%(num)d views", chapter.views) -}}
                         </li>
-                    {% endfor %}
+                    {%- endfor %}
                 </ul>
             </div>
         {% endif %}

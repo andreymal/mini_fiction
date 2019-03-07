@@ -1,5 +1,5 @@
-{% if not story_add %}
-    {% if story.bl.editable_by(current_user) %}
+{%- if not story_add -%}
+    {%- if story.bl.editable_by(current_user) %}
         <div class="story-control-btn btn-group">
             {% if current_user.is_staff %}
                 <a class="btn {{ '' if story.approved else 'btn-success' }} btn-mini story-approve-btn js-story-approve-btn" href="{{ url_for('story.approve', pk=story.id) }}">
@@ -20,19 +20,19 @@
             </button>
 
             <ul class="dropdown-menu btn-mini" role="menu">
-            {% if not story_edit and current_user.is_staff %}
+            {% if not story_edit and current_user.is_staff -%}
                 <li><a href="{{ url_for('story.edit', pk=story.id) }}">Редактировать</a></li>
-            {% endif %}
-            {% if current_user.is_staff %}
+            {% endif -%}
+            {% if current_user.is_staff -%}
                 <li><a href="{{ url_for('story.pin', pk=story.id) }}" class="story_pin">{{ 'Открепить' if story.pinned else 'Закрепить на главной' }}</a></li>
-            {% endif %}
-            {% if story.bl.deletable_by(current_user) %}
+            {% endif -%}
+            {% if story.bl.deletable_by(current_user) -%}
                 <li><a class="story_delete" href="{{ url_for('story.delete', pk=story.id) }}">Удалить</a></li>
-            {% endif %}
-            {% if story.bl.can_view_editlog(current_user) %}
+            {% endif -%}
+            {% if story.bl.can_view_editlog(current_user) -%}
                 <li><a href="{{ url_for('story.edit_log', pk=story.id) }}">{{ _('Edit log') }}</a></li>
             {% endif %}
             </ul>
         </div>
-    {% endif %}
-{% endif %}
+    {% endif -%}
+{%- endif -%}

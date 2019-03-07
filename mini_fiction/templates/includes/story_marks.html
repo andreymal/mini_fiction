@@ -1,10 +1,14 @@
-{% if not story.draft and not story.approved %} <sup class="on-moderation">на модерации</sup>{% endif %}
-{% if not story.original %} <sup class="translation">перевод</sup>{% endif %}
-{% set status = story.status_string %}
-{% if status == 'finished' %}
+{% if not story.draft and not story.approved -%}
+  <sup class="on-moderation">на модерации</sup>
+{%- endif %}
+{% if not story.original -%}
+  <sup class="translation">перевод</sup>
+{%- endif %}
+{%- set status = story.status_string %}
+{% if status == 'finished' -%}
     <sup class="complete">завершен</sup>
-{% elif status == 'freezed' %}
+{%- elif status == 'freezed' -%}
     <sup class="suspended">заморожен</sup>
-{% else %}
+{%- else -%}
     <sup class="incomplete">не завершен</sup>
-{% endif%}
+{% endif %}

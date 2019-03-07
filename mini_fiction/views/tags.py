@@ -77,28 +77,15 @@ def autocomplete():
         is_default = True
         data = current_app.cache.get('tags_autocomplete_default')
         if not data:
-            tags = _get_default_tags()
+            tags = get_default_tags_for_autocomplete()
 
     else:
         tags = Tag.bl.search_by_prefix(tag_name)
 
     if not data:
-        aliases = Tag.bl.get_aliases_for(tags, hidden=True)
-
-        result = {
-            'success': True,
-            'tags': [{
-                'id': tag.id,
-                'name': tag.name,
-                'url': url_for('tags.tag_index', tag_name=tag.iname),
-                'is_main_tag': tag.is_main_tag,
-                'description': tag.description,
-                'stories_count': tag.published_stories_count,
-                'aliases': [x.iname for x in aliases[tag.id]],
-                'color': tag.get_color(),
-            } for tag in tags],
-        }
-        data = json.dumps(result, ensure_ascii=False, sort_keys=True)
+        data = build_tags_autocomplete_json(tags)
+        data['success'] = True
+        data = json.dumps(data, ensure_ascii=False, sort_keys=True)
         if is_default:
             current_app.cache.set('tags_autocomplete_default', data, timeout=600)
 
@@ -107,7 +94,28 @@ def autocomplete():
     return response
 
 
-def _get_default_tags():
+def build_tags_autocomplete_json(tags=None):
+    if tags is None:
+        tags = get_default_tags_for_autocomplete()
+    aliases = Tag.bl.get_aliases_for(tags, hidden=True)
+
+    result = {
+        'tags': [{
+            'id': tag.id,
+            'name': tag.name,
+            'url': url_for('tags.tag_index', tag_name=tag.iname),
+            'is_main_tag': tag.is_main_tag,
+            'description': tag.description,
+            'stories_count': tag.published_stories_count,
+            'aliases': [x.iname for x in aliases[tag.id]],
+            'color': tag.get_color(),
+        } for tag in tags],
+    }
+
+    return result
+
+
+def get_default_tags_for_autocomplete():
     # Отдаём все теги, отсортированные по популярности
     tags = list(Tag.bl.get_all_tags())
     tags.sort(key=lambda x: x.published_stories_count, reverse=True)

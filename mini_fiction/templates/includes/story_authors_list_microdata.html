@@ -1,9 +1,12 @@
-{% for author in story.authors %}
-    {% if loop.first %}
-           <span itemscope itemprop="author" itemtype="http://schema.org/Person"><span itemprop="name"><a class="authorlink" href="{{ url_for('author.info', user_id=author.id) }}" itemprop="url">{{ author.username }}</a></span></span>
-           {% if loop.length > 1 %}(в соавторстве с{% endif %}
-       {% endif %}
-    {% if not loop.first %}
-        <span itemscope itemprop="author" itemtype="http://schema.org/Person"><span itemprop="name"><a class="authorlink" href="{{ url_for('author.info', user_id=author.id) }}" itemprop="url">{{ author.username }}</a></span></span>{% if loop.revindex0 == 1 %} и {% endif %}{% if loop.revindex0 > 1 %}, {% endif %}{% if loop.last and loop.length > 1 %}){% endif %}
-    {% endif %}
-{% endfor %}
+{% for author in story.authors -%}
+  <span itemscope itemprop="author" itemtype="http://schema.org/Person"><span itemprop="name"><a class="authorlink" href="{{ url_for('author.info', user_id=author.id) }}" itemprop="url">
+    {{- author.username -}}
+  </a></span></span>
+  {%- if loop.first %}
+    {%- if not loop.last %} (в соавторстве с {% endif -%}
+  {% else %}
+    {%- if loop.revindex0 > 1 %}, {% endif -%}
+    {%- if loop.revindex0 == 1 %} и {% endif -%}
+    {%- if loop.last %}){% endif -%}
+  {%- endif -%}
+{% endfor -%}

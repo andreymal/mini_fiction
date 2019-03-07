@@ -1,6 +1,5 @@
 {% for story in stories %}
-    <!-- Вывод рассказа: начало -->
-    <div class="story-item" id="story_{{ story.id }}">
+    <div id="story_{{ story.id }}" class="story-item">
         {% include 'includes/story_control_buttons.html' with context %}
         <h3>
             <a href="{{ url_for('story.view', pk=story.id) }}">{{ story.title }}</a>
@@ -25,26 +24,26 @@
                 {{ ngettext("%(num)d word", "%(num)d words", story.words) }} от {% include 'includes/story_authors_list.html' %}
                 <br/>
                 <span>
-                {{- ngettext("%(num)d view", "%(num)d views", story.views) }},
-                {%- if story.published_chapters_count > 1 %}
-                    {{ ngettext("%(num)d chapter", "%(num)d chapters", story.published_chapters_count) }}
+                {{ ngettext("%(num)d view", "%(num)d views", story.views) -}}
+                {%- if story.published_chapters_count > 1 -%}
+                    , {{ ngettext("%(num)d chapter", "%(num)d chapters", story.published_chapters_count) }}
                     {%- if current_user.is_authenticated -%}
                         {%- set delta = unread_chapters_count.get(story.id, 0) -%}
                         {%- if delta > 0 %}
                         (<span class="green" title="Число непрочитанных глав">+{{ delta }}</span>)
                         {%- endif -%}
-                    {%- endif %},
+                    {%- endif -%}
+                {%- endif -%}
+                , {{ ngettext("%(num)d comment", "%(num)d comments", story.comments_count) -}}
+                {%- if current_user.is_authenticated -%}
+                    {%- set delta = unread_comments_count.get(story.id, 0) -%}
+                    {%- if delta > 0 %}
+                        (<span class="green" title="Число непрочитанных комментариев">+{{ delta }}</span>)
+                    {%- endif -%}
                 {%- endif %}
-                {{ ngettext("%(num)d comment", "%(num)d comments", story.comments_count) -}}
-                {% if current_user.is_authenticated %}
-                    {% set delta = unread_comments_count.get(story.id, 0) %}
-                    {% if delta > 0 %}
-                    (<span class="green" title="Число непрочитанных комментариев">+{{ delta }}</span>)
-                    {% endif %}
-                {% endif %}
                 </span>
         </p>
-        <p>{{ story.summary|striptags }}</p>
+        <p class="story-summary">{{ story.summary|striptags }}</p>
         {% if (stories_detail_view or current_user.detail_view) and story.published_chapters_count > 1 %}
             <button class="btn btn-collapse btn-small" data-toggle="collapse" data-target="#story-{{ story.id }}">{{ ngettext("Show %(num)d chapter", "Show %(num)d chapters", story.published_chapters_count) }}</button>
             <div id="story-{{ story.id }}" class="collapse">
@@ -74,8 +73,7 @@
                     {%- endfor -%}
                 </span>
         </p>
-    </div>
-    <!-- Вывод рассказа: конец -->
+    </div><!-- /story_{{ story.id }} -->
 {% else %}
     <h3>Здесь пока ничего нет</h3>
 {% endfor %}

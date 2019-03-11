@@ -1380,7 +1380,7 @@ select.select-size {
 }
 
 .jsonl {
-    background: transparent url('../i/jsonl.png') no-repeat 0 0;
+    background: transparent url(../images/jsonl.png) no-repeat 0 0;
 }
 
 .up {

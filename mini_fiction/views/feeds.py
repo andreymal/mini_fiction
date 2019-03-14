@@ -129,7 +129,7 @@ def feed_chapters():
         author = story.authors[0]
         data = chapter.text_preview
         feed.add(
-            chapter.autotitle,
+            '{} : {}'.format(chapter.autotitle, story.title),
             data,
             content_type='text',
             author=author.username,

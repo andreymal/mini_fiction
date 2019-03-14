@@ -51,7 +51,7 @@ class StoryForm(Form):
     tags = TextField(
         'Теги',
         render_kw=dict(attrs_tags_dict, maxlength=512, placeholder='Теги разделяются запятой, например: Флафф, Повседневность, Зарисовка'),
-        description='Перечислите жанры и основные события рассказа',
+        description='Перечислите жанры и основные события рассказа. Вы можете создать новые теги, если существующих не хватает',
         widget=TagsInput(),
     )
 

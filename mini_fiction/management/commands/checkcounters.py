@@ -11,7 +11,7 @@ from mini_fiction.management.manager import cli
 from mini_fiction.models import Tag, StoryTag, Story
 
 
-def check_tag_stories_count(verbosity=0):
+def check_tag_stories_count(verbosity=0, dry_run=False):
     last_id = None
     all_count = 0
     changed_count = 0
@@ -36,12 +36,13 @@ def check_tag_stories_count(verbosity=0):
                 }
 
                 for k, v in data.items():
-                    if verbosity >= 2 or v != getattr(tag, k):
+                    if verbosity >= 2 or (verbosity and v != getattr(tag, k)):
                         print('Tag {} (id={}) {}: {} -> {}'.format(
                             tag.name, tag.id, k, getattr(tag, k), v,
                         ), file=sys.stderr)
                     if v != getattr(tag, k):
-                        setattr(tag, k, v)
+                        if not dry_run:
+                            setattr(tag, k, v)
                         changed = True
 
                 if changed:
@@ -51,7 +52,7 @@ def check_tag_stories_count(verbosity=0):
         print('{} tags available, {} tags changed'.format(all_count, changed_count), file=sys.stderr)
 
 
-def check_story_chapters_count(verbosity=0):
+def check_story_chapters_and_views_count(verbosity=0, dry_run=False):
     last_id = None
     all_count = 0
     changed_count = 0
@@ -76,12 +77,13 @@ def check_story_chapters_count(verbosity=0):
                 }
 
                 for k, v in data.items():
-                    if verbosity >= 2 or v != getattr(story, k):
+                    if verbosity >= 2 or (verbosity and v != getattr(story, k)):
                         print('Story {} {}: {} -> {}'.format(
                             story.id, k, getattr(story, k), v,
                         ), file=sys.stderr)
                     if v != getattr(story, k):
-                        setattr(story, k, v)
+                        if not dry_run:
+                            setattr(story, k, v)
                         changed = True
 
                 if changed:
@@ -91,11 +93,19 @@ def check_story_chapters_count(verbosity=0):
         print('{} stories available, {} stories changed'.format(all_count, changed_count), file=sys.stderr)
 
 
-
 @cli.command(short_help='Recalculates counters', help='Recalculates some cached counters (stories count, chapters count etc.)')
 @click.option('-m', 'only_modified', help='Print only modified values (less verbose output)', is_flag=True)
-def checkcounters(only_modified):
+@click.option('-d', '--dry-run', 'dry_run', help='Only print log with no changes made', is_flag=True)
+def checkcounters(only_modified, dry_run):
     orm.sql_debug(False)
-    check_tag_stories_count(verbosity=1 if only_modified else 2)
-    print('', file=sys.stderr)
-    check_story_chapters_count(verbosity=1 if only_modified else 2)
+
+    verbosity = 1 if only_modified else 2
+
+    check_tag_stories_count(verbosity=verbosity, dry_run=dry_run)
+    if verbosity:
+        print('', file=sys.stderr)
+    check_story_chapters_and_views_count(verbosity=verbosity, dry_run=dry_run)
+
+    if verbosity and dry_run:
+        print('', file=sys.stderr)
+        print('(DRY RUN)', file=sys.stderr)

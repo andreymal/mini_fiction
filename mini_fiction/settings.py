@@ -285,6 +285,8 @@ class Config(object):
         # 'mini_fiction.downloads.txt.TXT_CP1251Download',
     )))
 
+    STORY_DOWNLOAD_SLUGIFY_FILENAMES = False
+
     CONTACTS = [
         {
             'name': 'website',

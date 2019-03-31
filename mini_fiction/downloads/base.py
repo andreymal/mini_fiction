@@ -5,6 +5,7 @@ import re
 import zipfile
 
 from flask import url_for, render_template
+from mini_fiction.utils import misc
 
 
 class BaseDownloadFormat(object):
@@ -14,9 +15,10 @@ class BaseDownloadFormat(object):
     chapter_template = None
     chapter_extension = None
 
-    def __init__(self):
+    def __init__(self, slugify_filenames=False):
         assert self.extension is not None
         assert self.name is not None
+        self.slugify_filenames = bool(slugify_filenames)
 
     def url(self, story):
         return url_for(
@@ -26,7 +28,12 @@ class BaseDownloadFormat(object):
         )
 
     def filename(self, story):
-        return slugify(story.title or str(story.id)) + '.' + self.extension
+        title = (story.title or str(story.id)).strip().replace('.', '')
+        if self.slugify_filenames:
+            title = slugify(title)
+        else:
+            title = misc.sanitize_filename(title, strip=True)
+        return '{}.{}'.format(title, self.extension)
 
     def render(self, **kw):
         raise NotImplementedError

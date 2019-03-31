@@ -579,7 +579,8 @@ def delete(pk):
 def download(story_id, filename):
     if '.' not in filename:
         abort(404)
-    filename, extension = filename.split('.', 1)
+    full_filename = filename
+    filename, extension = full_filename.split('.', 1)
 
     from ..downloads import get_format
 
@@ -592,9 +593,8 @@ def download(story_id, filename):
     if fmt is None:
         abort(404)
 
-    url = fmt.url(story)
-    if url != request.path:
-        return redirect(url)
+    if full_filename != fmt.filename(story):
+        return redirect(fmt.url(story))
     filepath = 'stories/%s/%s.%s' % (story_id, filename, extension)
 
     storage_path = os.path.abspath(os.path.join(current_app.config['MEDIA_ROOT'], filepath))
@@ -604,7 +604,6 @@ def download(story_id, filename):
         datetime.fromtimestamp(os.stat(storage_path).st_mtime) < story.updated or
         debug
     ):
-
         data = fmt.render(
             story=story,
             debug=debug,

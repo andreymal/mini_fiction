@@ -7,12 +7,19 @@ import json
 import math
 import time
 from datetime import timedelta
-from urllib.request import Request, urlopen, quote
+from urllib.request import Request, urlopen
+from urllib.parse import quote
 
 from flask import current_app, g, escape, render_template, abort, url_for, request, has_request_context
 from flask_babel import pgettext, ngettext
 
 from mini_fiction.utils import diff as utils_diff
+
+
+soft_urlquote_unsafe_chars = ''.join(
+    [chr(x) for x in range(32)] +
+    [' :?#[]@!$&\'()*+,;="<>\u007f\u00a0\u00ff\ufffe\ufeff\uffff']
+)
 
 
 class Paginator(object):
@@ -626,3 +633,38 @@ def smart_split(s, delimeter=','):
         return []
     result = [x.strip() for x in s.split(delimeter)]
     return [x for x in result if x]
+
+
+def sanitize_filename(s, strip=False):
+    """Удаляет небезопасные символы из имени файла (в том числе слэши).
+    """
+
+    from mini_fiction.validation.utils import safe_string_coerce
+
+    s = safe_string_coerce(s)
+    if strip:
+        s = s.strip()
+
+    for c in '"':
+        s = s.replace(c, '')
+    for c in '\\/:*?<>|+%@':
+        s = s.replace(c, '_')
+    if strip:
+        while s.startswith('_') or s.endswith('_'):
+            s = s.strip('_').strip()
+    return s or '_'
+
+
+def soft_urlquote(s, chars=None):
+    """«Добрый» вариант urllib.request.quote, который экранирует только
+    заведомо небезопасные для ссылок символы вроде пробела и технических.
+    Слэш по умолчанию не экранирует (можно экранировать пути). Удобно
+    для получения ссылок с русскими буквами.
+    """
+
+    if chars is None:
+        chars = soft_urlquote_unsafe_chars
+    s = s.replace('%', '%25')
+    for c in chars:
+        s = s.replace(c, '%{:02X}'.format(ord(c)))
+    return s

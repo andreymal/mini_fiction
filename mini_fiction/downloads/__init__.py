@@ -21,7 +21,7 @@ def iter_formats():
         mod, _, cls = name.rpartition('.')
         mod = import_module(mod)
         cls = getattr(mod, cls)
-        yield cls()
+        yield cls(slugify_filenames=current_app.config.get('STORY_DOWNLOAD_SLUGIFY_FILENAMES'))
 
 
 def get_format(extension):

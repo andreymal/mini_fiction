@@ -8,7 +8,7 @@ import click
 from pony import orm
 
 from mini_fiction.management.manager import cli
-from mini_fiction.models import Tag, StoryTag, Story
+from mini_fiction.models import Tag, StoryTag, Story, Chapter, StoryView
 
 
 def check_tag_stories_count(verbosity=0, dry_run=False):
@@ -71,9 +71,12 @@ def check_story_chapters_and_views_count(verbosity=0, dry_run=False):
                 all_count += 1
                 changed = False
 
+                views = set(orm.select(x.author.id for x in StoryView if x.story == story))
+
                 data = {
                     'all_chapters_count': story.chapters.select().count(),
                     'published_chapters_count': story.chapters.select(lambda x: not x.draft).count(),
+                    'views': len(views),
                 }
 
                 for k, v in data.items():
@@ -93,7 +96,49 @@ def check_story_chapters_and_views_count(verbosity=0, dry_run=False):
         print('{} stories available, {} stories changed'.format(all_count, changed_count), file=sys.stderr)
 
 
-@cli.command(short_help='Recalculates counters', help='Recalculates some cached counters (stories count, chapters count etc.)')
+def check_chapter_views_count(verbosity=0, dry_run=False):
+    last_id = None
+    all_count = 0
+    changed_count = 0
+
+    while True:
+        with orm.db_session:
+            chapters = Chapter.select().order_by(Chapter.id)
+            if last_id is not None:
+                chapters = chapters.filter(lambda x: x.id > last_id)
+            chapters = list(chapters[:150])
+            if not chapters:
+                break
+            last_id = chapters[-1].id
+
+            for chapter in chapters:
+                all_count += 1
+                changed = False
+
+                views = set(orm.select(x.author.id for x in StoryView if x.chapter == chapter))
+
+                data = {
+                    'views': len(views),
+                }
+
+                for k, v in data.items():
+                    if verbosity >= 2 or (verbosity and v != getattr(chapter, k)):
+                        print('Chapter {}/{} ({}) {}: {} -> {}'.format(
+                            chapter.story.id, chapter.order, chapter.id, k, getattr(chapter, k), v,
+                        ), file=sys.stderr)
+                    if v != getattr(chapter, k):
+                        if not dry_run:
+                            setattr(chapter, k, v)
+                        changed = True
+
+                if changed:
+                    changed_count += 1
+
+    if verbosity >= 1:
+        print('{} chapters available, {} chapters changed'.format(all_count, changed_count), file=sys.stderr)
+
+
+@cli.command(short_help='Recalculates counters', help='Recalculates some cached counters (stories count, chapters count, views etc.)')
 @click.option('-m', 'only_modified', help='Print only modified values (less verbose output)', is_flag=True)
 @click.option('-d', '--dry-run', 'dry_run', help='Only print log with no changes made', is_flag=True)
 def checkcounters(only_modified, dry_run):
@@ -105,6 +150,9 @@ def checkcounters(only_modified, dry_run):
     if verbosity:
         print('', file=sys.stderr)
     check_story_chapters_and_views_count(verbosity=verbosity, dry_run=dry_run)
+    if verbosity:
+        print('', file=sys.stderr)
+    check_chapter_views_count(verbosity=verbosity, dry_run=dry_run)
 
     if verbosity and dry_run:
         print('', file=sys.stderr)

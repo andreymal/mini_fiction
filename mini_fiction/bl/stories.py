@@ -1758,7 +1758,15 @@ class ChapterBL(BaseBL):
         # Помогаем поне удалять связи
         for x in chapter.edit_log:
             x.chapter = None
-        chapter.chapter_views_set.select().delete(bulk=True)
+            x.flush()
+
+        # StoryView оставляем, но сбрасываем chapter в NULL, чтобы сохранить
+        # число просмотров у рассказа
+        # FIXME: для популярного рассказа это скорее всего долгая операция,
+        # надо бы какой-нибудь bulk или raw sql
+        for chapter_view in list(chapter.chapter_views_set.select()):
+            chapter_view.chapter = None
+            chapter_view.flush()
 
         chapter.delete()
         chapter.flush()

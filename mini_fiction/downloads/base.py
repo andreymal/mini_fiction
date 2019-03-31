@@ -11,7 +11,8 @@ from mini_fiction.utils import misc
 class BaseDownloadFormat(object):
     extension = None
     name = None
-    debug_content_type = 'text/plain'
+    content_type = 'application/octet-stream'
+    debug_content_type = 'text/plain; charset=utf-8'
     chapter_template = None
     chapter_extension = None
 
@@ -44,6 +45,7 @@ class BaseDownloadFormat(object):
 
 
 class ZipFileDownloadFormat(BaseDownloadFormat):
+    content_type = 'application/zip'
     chapter_encoding = 'utf-8'
 
     def render(self, **kw):

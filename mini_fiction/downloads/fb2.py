@@ -41,7 +41,8 @@ class FB2BaseDownload:
 class FB2Download(FB2BaseDownload, BaseDownloadFormat):
     extension = 'fb2'
     name = 'FB2'
-    debug_content_type = 'text/xml'
+    content_type = 'application/x-fictionbook+xml; charset=utf-8'
+    debug_content_type = 'text/xml; charset=utf-8'
 
     def render(self, **kw):
         return self.render_fb2(**kw)
@@ -50,7 +51,8 @@ class FB2Download(FB2BaseDownload, BaseDownloadFormat):
 class FB2ZipDownload(FB2BaseDownload, ZipFileDownloadFormat):
     extension = 'fb2.zip'
     name = 'FB2+zip'
-    debug_content_type = 'text/xml'
+    content_type = 'application/x-zip-compressed-fb2'
+    debug_content_type = 'text/xml; charset=utf-8'
 
     def render_zip_contents(self, zipobj, story, **kw):
         data = self.render_fb2(story=story, **kw)

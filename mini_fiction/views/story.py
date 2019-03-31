@@ -622,9 +622,13 @@ def download(story_id, filename):
         # FIXME: fix security before sending static file with nginx
         # TODO: for example, /media/stories/{md5(updated + secret_random_story_key)}/filename.zip
         # return redirect(path to media)
-        return send_file(storage_path)
+        response = send_file(storage_path)
+        response.headers['Content-Type'] = fmt.content_type
+        response.headers['Content-Disposition'] = 'attachment'
 
-    response = Response(data, mimetype=fmt.debug_content_type)
+    else:
+        response = Response(data, content_type=fmt.debug_content_type)
+
     return response
 
 

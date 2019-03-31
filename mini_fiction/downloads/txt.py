@@ -13,6 +13,7 @@ class TXTDownload(ZipFileDownloadFormat):
 
 
 class TXT_CP1251Download(TXTDownload):
+    content_type = 'text/plain; charset=windows-1251'
     extension = 'txt.win.zip'
     name = 'TXT (кодировка Windows)'
     chapter_encoding = 'cp1251'

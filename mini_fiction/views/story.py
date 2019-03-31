@@ -619,11 +619,15 @@ def download(story_id, filename):
 
     # TODO: delete file if story was deleted
     if not debug:
-        # FIXME: fix security before sending static file with nginx
-        # TODO: for example, /media/stories/{md5(updated + secret_random_story_key)}/filename.zip
-        # return redirect(path to media)
-        response = send_file(storage_path)
-        response.headers['Content-Type'] = fmt.content_type
+        if current_app.config.get('ACCEL_REDIRECT_HEADER'):
+            response = Response(b'', content_type=fmt.content_type)
+            response.headers[current_app.config['ACCEL_REDIRECT_HEADER']] = url_for(
+                'media', filename='stories/{}/{}'.format(story.id, full_filename)
+            )
+        else:
+            response = send_file(storage_path)
+            response.headers['Content-Type'] = fmt.content_type
+
         response.headers['Content-Disposition'] = 'attachment'
 
     else:

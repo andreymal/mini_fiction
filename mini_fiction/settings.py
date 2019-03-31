@@ -287,6 +287,8 @@ class Config(object):
 
     STORY_DOWNLOAD_SLUGIFY_FILENAMES = False
 
+    ACCEL_REDIRECT_HEADER = None  # set 'X-Accel-Redirect' if you use nginx
+
     CONTACTS = [
         {
             'name': 'website',

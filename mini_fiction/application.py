@@ -47,6 +47,11 @@ def create_app():
     app.extra_css = []
     app.extra_js = []
 
+    if app.config['UMASK'] is not None:
+        if isinstance(app.config['UMASK'], str):
+            app.config['UMASK'] = int(app.config['UMASK'], 8)
+        os.umask(app.config['UMASK'])
+
     if app.config['TESTING']:
         if not os.path.isdir(app.config['TESTING_DIRECTORY']):
             os.makedirs(app.config['TESTING_DIRECTORY'])

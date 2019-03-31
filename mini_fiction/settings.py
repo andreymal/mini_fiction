@@ -275,6 +275,8 @@ class Config(object):
     STORY_DIRECT_ACCESS = 'none'  # or 'all' or 'nodraft' or 'anodraft'
     STORY_DIRECT_ACCESS_FOR_GUEST = False  # always True for 'anodraft'
 
+    UMASK = 0o022
+
     STORY_DOWNLOAD_FORMATS = tuple(reversed((
         'mini_fiction.downloads.fb2.FB2Download',
         # 'mini_fiction.downloads.fb2.FB2ZipDownload',

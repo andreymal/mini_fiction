@@ -1563,7 +1563,7 @@ class StoryBL(BaseBL, Commentable):
         return result
 
     def get_unread_comments_count(self, user, story_ids):
-        from mini_fiction.models import Story, Activity
+        from mini_fiction.models import Activity
 
         if isinstance(story_ids, int):
             story_ids = [story_ids]
@@ -1579,7 +1579,7 @@ class StoryBL(BaseBL, Commentable):
 
         result = {}
         for story_id in story_ids:
-            if not all_comments_count.get(story_id) or not read_comments_count.get(story_id):
+            if not all_comments_count.get(story_id) or story_id not in read_comments_count:
                 result[story_id] = 0
                 continue
             result[story_id] = max(0, all_comments_count[story_id] - read_comments_count[story_id])

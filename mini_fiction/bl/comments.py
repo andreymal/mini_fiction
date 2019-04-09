@@ -272,7 +272,7 @@ class BaseCommentBL(BaseBL):
 
         target = getattr(self.model, self.target_attr)
         if hasattr(target, 'last_comment_id') and target.last_comment_id == self.model.id:
-            target.last_comment_id = orm.select(orm.max(x.id) for x in target.comments if not x.deleted).first()
+            target.last_comment_id = orm.select(orm.max(x.id) for x in target.comments if not x.deleted).first() or 0
 
         current_app.cache.delete('index_comments_html')
 

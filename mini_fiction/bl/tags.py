@@ -65,7 +65,10 @@ class TagBL(BaseBL):
         inames = [normalize_tag(x) for x in tags_search]
         inames = [x for x in inames if x]
         if inames:
-            tags_db.update({x.iname.replace('ё', 'е'): x for x in Tag.select(lambda t: t.iname in inames).prefetch(Tag.is_alias_for)})
+            tags_db.update({
+                x.iname.replace('ё', 'е'): x
+                for x in Tag.select(lambda t: t.iname in inames).prefetch(Tag.is_alias_for)
+            })
 
         result = {
             'success': True,
@@ -88,8 +91,10 @@ class TagBL(BaseBL):
             else:
                 name = safe_string_coerce(x.strip())
                 iname = normalize_tag(name)
-                tag = tags_db.get(iname.replace('ё', 'е'))
-                assert iname == normalize_tag(x)
+                tag = None
+                if iname:
+                    tag = tags_db.get(iname.replace('ё', 'е'))
+                    assert iname == normalize_tag(x)
 
             if tag:
                 # Если тег существует, проверяем, что его можно использовать

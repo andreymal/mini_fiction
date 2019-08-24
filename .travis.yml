@@ -24,6 +24,7 @@ before_install:
   - chmod 700 /tmp/chromedriver/chromedriver
 
 install:
+  - pip install --upgrade pip
   - pip install -r requirements.txt -r optional-requirements.txt -r test-requirements.txt
   - pip install -e .
   - pybabel compile -d mini_fiction/translations

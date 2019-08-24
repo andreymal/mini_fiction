@@ -51,18 +51,21 @@ class TagBL(BaseBL):
         появиться дубликаты.
         """
 
+        # FIXME: тут костыль с е/ё. Надо бы как-то заменить его на адекватное
+        # юникодное сравнение для соответствия utf8mb4_general_ci
+
         from mini_fiction.validation.utils import safe_string_coerce
         from mini_fiction.models import Tag
 
         # Достаём список строк для поиска тегов
         tags_search = [x for x in tags if not isinstance(x, Tag)]
-        tags_db = {x.iname: x for x in tags if isinstance(x, Tag)}
+        tags_db = {x.iname.replace('ё', 'е'): x for x in tags if isinstance(x, Tag)}
 
         # Ищем недостающие теги в базе
         inames = [normalize_tag(x) for x in tags_search]
         inames = [x for x in inames if x]
         if inames:
-            tags_db.update({x.iname: x for x in Tag.select(lambda t: t.iname in inames).prefetch(Tag.is_alias_for)})
+            tags_db.update({x.iname.replace('ё', 'е'): x for x in Tag.select(lambda t: t.iname in inames).prefetch(Tag.is_alias_for)})
 
         result = {
             'success': True,
@@ -85,7 +88,7 @@ class TagBL(BaseBL):
             else:
                 name = safe_string_coerce(x.strip())
                 iname = normalize_tag(name)
-                tag = tags_db.get(iname)
+                tag = tags_db.get(iname.replace('ё', 'е'))
                 assert iname == normalize_tag(x)
 
             if tag:
@@ -123,13 +126,13 @@ class TagBL(BaseBL):
         # опцией create_if_errors=True)
         if create_tags and (create_if_errors or result['success']):
             for i, name, iname in create_tags:
-                if iname in tags_db:
+                if iname.replace('ё', 'е') in tags_db:
                     # На случай, если пользователь пропихнул дублирующиеся теги
-                    result['tags'][i] = tags_db[iname]
+                    result['tags'][i] = tags_db[iname.replace('ё', 'е')]
                     continue
                 tag = Tag(name=name, iname=iname, created_by=user)
                 tag.flush()  # получаем id у базы данных
-                tags_db[tag.iname] = tag  # На случай, если у следующего тега в цикле совпадёт iname
+                tags_db[tag.iname.replace('ё', 'е')] = tag  # На случай, если у следующего тега в цикле совпадёт iname
                 result['created'].append(tag)
                 result['tags'][i] = tag
 

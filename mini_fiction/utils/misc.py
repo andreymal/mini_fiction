@@ -49,9 +49,17 @@ class Paginator(object):
             self.view_args = None
 
     def slice(self, objlist):
-        if self.offset < 0:
+        min_idx = max(0, self.offset)
+        max_idx = max(0, self.offset + self.per_page)
+        if max_idx - min_idx < 1:
             return []
-        return objlist[self.offset:self.offset + self.per_page]
+        return list(objlist[min_idx:max_idx])
+
+    def slice_or_404(self, objlist):
+        result = self.slice(objlist)
+        if not result and self.number != 1:
+            abort(404)
+        return result
 
     def can_generate_url(self):
         return self.endpoint is not None and self.view_args is not None
@@ -66,12 +74,6 @@ class Paginator(object):
         view_args = dict(self.view_args)
         view_args[self.page_arg_name] = number
         return url_for(self.endpoint, **view_args)
-
-    def slice_or_404(self, objlist):
-        result = self.slice(objlist)
-        if not result and self.number != 1:
-            abort(404)
-        return result
 
     def has_next(self):
         return self.number < self.num_pages
@@ -130,6 +132,21 @@ class Paginator(object):
             if page > last_page and page <= self.num_pages:
                 last_page = page
                 yield page
+
+
+class IndexPaginator(Paginator):
+    # Особый случай пагинации для главной страницы
+    def __init__(self, *args, **kwargs):
+        kwargs['endpoint'] = 'stream.stories'
+        kwargs['view_args'] = {}
+        super().__init__(*args, **kwargs)
+
+    def url_for_page(self, number=None):
+        if number is None:
+            number = self.number
+        if number == 1:
+            return url_for('index.index')
+        return super().url_for_page(number)
 
 
 def sitename():

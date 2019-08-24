@@ -273,6 +273,26 @@ ul.nav-main-links {
     right: 0;
 }
 
+/* simple text-based nav */
+
+.mininav {
+    list-style: none;
+    display: block;
+    margin: 0;
+    padding: 0;
+}
+
+.mininav-item {
+    display: inline;
+    margin: 0;
+    padding: 0;
+}
+
+.mininav-item + .mininav-item:before {
+    content: ' | ';
+    color: #999;
+}
+
 .bell-popup {
     position: absolute;
     right: 0;

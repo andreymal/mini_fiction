@@ -1,5 +1,7 @@
 {% extends base %}
 
+{% from 'macro.html' import paginator with context %}
+
 {% block fulltitle %}
     {%- if full_title -%}
         {{- full_title -}}
@@ -19,25 +21,24 @@
 {% block content %}
 <div class="row welcome-box">
   <div class="span12 genra">
-    {% for category in categories -%}
-        <a class="gen" style="background-color: {{ category.color }}" href="{{ url_for('search.simple', search_type='category', search_id=category.id) }}">{{ category.name }}</a>
-    {%- endfor %}
+    <ul class="mininav">
+        <li class="mininav-item"><a href="{{ url_for('object_lists.top') }}">Лучшее</a></li>
+        <li class="mininav-item"><a href="{{ url_for('tags.index') }}">Теги</a></li>
+        {% if current_user.is_staff -%}
+            <li class="mininav-item"><a href="{{ url_for('editlog.index', all='1', staff='1') }}">{{ _('Moderation log') }}</a></li>
+        {% elif current_user.is_authenticated -%}
+            <li class="mininav-item"><a href="{{ url_for('editlog.index') }}">{{ _('Edit log') }}</a></li>
+        {% endif -%}
+        <li class="mininav-item"><a href="{{ url_for('feeds.stories') }}" data-noajax="1">RSS</a></li>
+    </ul>
   </div>
 </div>
 
 <div class="row">
     <div class="span8 top-list">
-        <h2>Новые добавления</h2>
+        <h2>Новые рассказы</h2>
         {% include "includes/stories.html" %}
-        <p class="more">
-            <a href="{{ url_for('stream.stories') }}">Лента добавлений</a>
-            | <a href="{{ url_for('object_lists.top') }}">Топ</a>
-            | <a href="{{ url_for('feeds.stories') }}" data-noajax="1">RSS</a>
-            | <a href="{{ url_for('tags.index') }}">Теги</a>
-            {% if current_user.is_staff %}| <a href="{{ url_for('editlog.index', all='1', staff='1') }}">{{ _('Moderation log') }}</a>
-            {% elif current_user.is_authenticated %}| <a href="{{ url_for('editlog.index') }}">{{ _('Edit log') }}</a>
-            {% endif %}
-        </p>
+        {% if stories %}{{ paginator(page_obj) }}{% endif %}
     </div>
 
     <div class="span4 sidelist top-list">

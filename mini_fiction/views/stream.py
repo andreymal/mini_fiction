@@ -8,7 +8,7 @@ from flask_login import current_user
 
 from mini_fiction.models import Story, Chapter, StoryContributor, StoryComment, StoryLocalComment, NewsComment, StoryTag, Tag
 from mini_fiction.utils.views import cached_lists
-from mini_fiction.utils.misc import Paginator
+from mini_fiction.utils.misc import Paginator, IndexPaginator
 
 
 bp = Blueprint('stream', __name__)
@@ -19,11 +19,28 @@ bp = Blueprint('stream', __name__)
 @bp.route('/stories/page/<int:page>/')
 @db_session
 def stories(page):
-    objects = Story.select_published().order_by(Story.first_published_at.desc(), Story.id.desc())
-    objects = objects.prefetch(Story.characters, Story.contributors, StoryContributor.user, Story.tags, StoryTag.tag, Tag.category)
+    objects = Story.select_published().filter(lambda x: not x.pinned)
+    objects = objects.order_by(Story.first_published_at.desc(), Story.id.desc())
+    objects = objects.prefetch(
+        Story.characters, Story.contributors, StoryContributor.user,
+        Story.tags, StoryTag.tag, Tag.category,
+    )
 
-    page_obj = Paginator(page, objects.count(), per_page=current_app.config['STORIES_COUNT']['stream'])
-    objects = page_obj.slice_or_404(objects)
+    page_obj = IndexPaginator(
+        page,
+        total=objects.count(),
+        per_page=current_app.config['STORIES_COUNT']['stream'],
+    )
+    objects = page_obj.slice(objects)
+
+    if page == 1:
+        pinned_stories = list(
+            Story.select_published().filter(lambda x: x.pinned).order_by(Story.first_published_at.desc())
+        )
+        objects = pinned_stories + objects
+
+    if not objects and page != 1:
+        abort(404)
 
     return render_template(
         'stream/stories.html',

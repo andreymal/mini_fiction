@@ -7,7 +7,7 @@ from pony.orm import db_session
 
 from mini_fiction.models import Story, StoryContributor, StoryTag, Tag
 from mini_fiction.utils.views import cached_lists
-from mini_fiction.utils.misc import indextitle, sitedescription
+from mini_fiction.utils.misc import IndexPaginator, indextitle, sitedescription
 
 bp = Blueprint('index', __name__)
 
@@ -17,15 +17,22 @@ bp = Blueprint('index', __name__)
 def index():
     page_title = gettext('Index')
 
-    categories = []  # list(Category.select())
+    stories = Story.select_published().filter(lambda x: not x.pinned)
+    stories = stories.order_by(Story.first_published_at.desc(), Story.id.desc())
+    stories = stories.prefetch(
+        Story.characters, Story.contributors, StoryContributor.user,
+        Story.tags, StoryTag.tag, Tag.category,
+    )
+    page_obj = IndexPaginator(
+        1,
+        total=stories.count(),
+        per_page=current_app.config['STORIES_COUNT']['stream'],
+    )
+    stories = page_obj.slice(stories)
 
     pinned_stories = list(
         Story.select_published().filter(lambda x: x.pinned).order_by(Story.first_published_at.desc())
     )
-
-    stories = Story.select_published().filter(lambda x: not x.pinned).order_by(Story.first_published_at.desc())
-    stories = stories.prefetch(Story.characters, Story.contributors, StoryContributor.user, Story.tags, StoryTag.tag, Tag.category)
-    stories = stories[:max(1, current_app.config['STORIES_COUNT']['main'] - len(pinned_stories))]
     stories = pinned_stories + list(stories)
 
     sidebar_blocks = []
@@ -41,8 +48,8 @@ def index():
             sidebar_blocks.append(block_html)
 
     data = {
-        'categories': categories,
         'stories': stories,
+        'page_obj': page_obj,
         'page_title': page_title,
         'full_title': indextitle(),
         'site_description': sitedescription(),

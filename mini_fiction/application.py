@@ -21,6 +21,7 @@ from werkzeug.contrib.fixers import ProxyFix
 from werkzeug.exceptions import HTTPException
 from flask import Flask, current_app, request, g, jsonify
 from flask import json as flask_json
+from flask import sessions as flask_sessions
 import flask_babel
 from flask_login import LoginManager
 from flask.logging import default_handler
@@ -32,6 +33,18 @@ from mini_fiction.bl import init_bl
 
 
 __all__ = ['create_app']
+
+
+class LazySecureCookieSession(flask_sessions.SecureCookieSession):
+    # Flask-Login дёргает сессию, даже когда нет изменений
+    # Таким образом спасаемся от ненужного обновления сессионной куки
+    def __setitem__(self, key, value):
+        if self.get(key) != value:
+            super().__setitem__(key, value)
+
+
+class LazySecureCookieSessionInterface(flask_sessions.SecureCookieSessionInterface):
+    session_class = LazySecureCookieSession
 
 
 def create_app():
@@ -46,6 +59,8 @@ def create_app():
     app.static_folder = app.config['STATIC_ROOT']
     app.extra_css = []
     app.extra_js = []
+
+    app.session_interface = LazySecureCookieSessionInterface()
 
     if app.config['UMASK'] is not None:
         if isinstance(app.config['UMASK'], str):
@@ -482,7 +497,9 @@ def configure_story_voting(app):
 def configure_misc(app):
     @app.after_request
     def after_request(response):
-        response.cache_control.max_age = 0
+        if not getattr(response, 'cache_control_exempt', False):
+            response.cache_control.max_age = 0
+            response.cache_control.private = True
 
         for f, args, kwargs in getattr(g, 'after_request_callbacks', ()):
             f(*args, **kwargs)

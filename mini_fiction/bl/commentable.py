@@ -1,6 +1,8 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
+from pony import orm
+
 from mini_fiction.utils.misc import Paginator
 
 
@@ -49,18 +51,16 @@ class Commentable(object):
             if root_count < 1:
                 return []
 
-            # FIXME: filter не дружит с select_comment_ids, но оптимизировать нужно
-            comment_ids = self.select_comments().filter(lambda x: x.tree_depth == 0).order_by('c.id')
-            comment_ids = [c.id for c in comment_ids]
-            if not comment_ids or len(comment_ids) <= root_offset:
+            root_comment_ids = list(orm.select(
+                x.id for x in self.select_comments()
+                if x.tree_depth == 0
+            ).order_by('x.id')[root_offset:root_offset + root_count])
+
+            if not root_comment_ids:
                 return []
 
-            offset_to = root_offset + root_count - 1
-            if offset_to >= len(comment_ids):
-                offset_to = len(comment_ids) - 1
-
             result = result.filter(
-                lambda x: x.root_id >= comment_ids[root_offset] and x.root_id <= comment_ids[offset_to]
+                lambda x: x.root_id >= root_comment_ids[0] and x.root_id <= root_comment_ids[-1]
             )
 
         elif root_id is not None:

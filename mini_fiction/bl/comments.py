@@ -59,13 +59,13 @@ class BaseCommentBL(BaseBL):
             else:
                 per_page = current_app.config['COMMENTS_COUNT']['page']
 
-        # FIXME: filter не дружит с select_comment_ids, но оптимизировать нужно
-        comment_ids = getattr(c, self.target_attr).bl.select_comments()
-        comment_ids = comment_ids.filter(lambda x: x.tree_depth == 0).order_by('c.id')
-        comment_ids = [c.id for c in comment_ids]
+        root_comment_ids = list(orm.select(
+            x.id for x in getattr(c, self.target_attr).bl.select_comments()
+            if x.tree_depth == 0 and x.id <= c.root_id
+        ).order_by('x.id'))
 
         try:
-            root_order = comment_ids.index(c.root_id)
+            root_order = root_comment_ids.index(c.root_id)
         except ValueError:
             return 1
 

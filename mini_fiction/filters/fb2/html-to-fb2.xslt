@@ -32,7 +32,7 @@
 
 <xsl:template match="body|footnote|annotation" mode="section-content">
     <xsl:apply-templates select="annotation" mode="notes"/>
-    <xsl:apply-templates select="p|blockquote" mode="paragraphs"/>
+    <xsl:apply-templates select="p|blockquote|h3|h4|h5" mode="paragraphs"/>
 </xsl:template>
 
 <xsl:template match="p" mode="paragraphs">
@@ -47,6 +47,10 @@
     <cite><p><xsl:apply-templates select="node()" mode="body"/></p></cite>
 </xsl:template>
 
+<xsl:template match="h3|h4|h5" mode="paragraphs">
+    <subtitle><xsl:apply-templates select="node()" mode="body"/></subtitle>
+</xsl:template>
+
 <xsl:template match="node()" mode="paragraphs">
     <xsl:apply-templates select="node()" mode="paragraphs"/>
 </xsl:template>
@@ -57,6 +61,22 @@
 
 <xsl:template match="b|strong" mode="body">
     <strong><xsl:apply-templates select="node()" mode="body"/></strong>
+</xsl:template>
+
+<xsl:template match="s" mode="body">
+    <strikethrough><xsl:apply-templates select="node()" mode="body"/></strikethrough>
+</xsl:template>
+
+<xsl:template match="sup" mode="body">
+    <sup><xsl:apply-templates select="node()" mode="body"/></sup>
+</xsl:template>
+
+<xsl:template match="sub" mode="body">
+    <sub><xsl:apply-templates select="node()" mode="body"/></sub>
+</xsl:template>
+
+<xsl:template match="tt" mode="body">
+    <code><xsl:apply-templates select="node()" mode="body"/></code>
 </xsl:template>
 
 <xsl:template match="a" mode="body">
@@ -70,17 +90,19 @@
 
 <xsl:template match="img" mode="body">
     <a xlink:href="{@src}">
+        <xsl:text>[Изображение: </xsl:text>
         <xsl:choose>
-            <xsl:when test="@alt">
+            <xsl:when test="@alt != ''">
                 <xsl:value-of select="@alt"/>
             </xsl:when>
-            <xsl:when test="@title">
+            <xsl:when test="@title != ''">
                 <xsl:value-of select="@title"/>
             </xsl:when>
             <xsl:otherwise>
-                <xsl:value-of select="re:replace(@src, '^.*/', '', '')"/>
+                <xsl:value-of select="@src"/>
             </xsl:otherwise>
         </xsl:choose>
+        <xsl:text>]</xsl:text>
     </a>
 </xsl:template>
 

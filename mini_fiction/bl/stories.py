@@ -4,6 +4,7 @@
 # pylint: disable=unexpected-keyword-arg,no-value-for-parameter
 
 import os
+import sys
 import json
 import random
 import ipaddress
@@ -1905,14 +1906,16 @@ class ChapterBL(BaseBL):
             else:
                 doc = self.filter_text(safe_text)
             doc = footnotes_to_html(doc)
-            return Markup(html_doc_to_string(doc))
+            result = html_doc_to_string(doc)
+
         except Exception:
-            import traceback
             if current_app.config['DEBUG']:
                 return traceback.format_exc()
             print(datetime.now().strftime('[%Y-%m-%d %H:%M:%S]'), "story text2html failed", file=sys.stderr)
             traceback.print_exc()
             return "#ERROR#"
+
+        return Markup(result)
 
     def get_version(self, text_md5=None, log_item=None):
         from mini_fiction.models import StoryLog

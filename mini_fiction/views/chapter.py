@@ -4,7 +4,7 @@
 import base64
 import struct
 
-from flask import Blueprint, request, render_template, abort, url_for, redirect, g, jsonify, current_app
+from flask import Response, Blueprint, request, render_template, abort, url_for, redirect, g, jsonify, current_app
 from flask_login import current_user, login_required
 from flask_babel import gettext
 from pony.orm import db_session
@@ -49,7 +49,10 @@ def view(story_id, chapter_order=None):
             'robots_noindex': not story.published or story.robots_noindex,
         }
     else:
-        chapters = list(story.bl.select_accessible_chapters(user).order_by(Chapter.order, Chapter.id))
+        chapters = list(
+            story.bl.select_accessible_chapters(user)
+            .order_by(Chapter.order, Chapter.id)
+        )
         page_title = story.title + ' – все главы'
         if user.is_authenticated:
             for c in chapters:
@@ -62,7 +65,15 @@ def view(story_id, chapter_order=None):
             'robots_noindex': not story.published or story.robots_noindex,
         }
 
-    return render_template('chapter_view.html', **data)
+    response = Response(render_template('chapter_view.html', **data))
+    if (
+        current_app.config['CHAPTER_HTML_FRONTEND_CACHE_TIME'] is not None and
+        not story.bl.editable_by(current_user)
+    ):
+        response.cache_control.max_age = current_app.config['CHAPTER_HTML_FRONTEND_CACHE_TIME']
+        response.cache_control.private = True
+        response.cache_control_exempt = True
+    return response
 
 
 def _gen_preview(form, only_selected=False):

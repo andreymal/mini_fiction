@@ -10,8 +10,9 @@
     {%- elif not chapter_edit_mode and story.bl.editable_by(current_user) -%}
         <h1><a class="btn btn-warning btn-mini" href="{{ url_for('chapter.edit', pk=chapter.id) }}">{{ _('Edit chapter') }}</a></h1>
     {%- endif %}
-    {% if chapter.notes %}
-        <blockquote class="chapter-notes">{{ chapter.notes_as_html }}</blockquote>
+    {%- set notes = chapter.notes_as_html -%}
+    {% if notes %}
+        <blockquote class="chapter-notes">{{ notes_as_html }}</blockquote>
     {% endif %}
     {{ chapter.text_as_html }}
     {% if not chapter_edit_mode %}

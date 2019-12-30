@@ -993,7 +993,9 @@ class AuthorBL(BaseBL):
 
         user = self.model
 
-        sub = Subscription.get(user=user, type=typ, target_id=target_id)
+        sub = Subscription.select(
+            lambda x: x.user == user and x.type == typ and x.target_id == target_id
+        ).first()
         if not sub:
             return {'email': False, 'tracker': False}
         return {'email': sub.to_email, 'tracker': sub.to_tracker}
@@ -1016,7 +1018,7 @@ class AuthorBL(BaseBL):
 
         user = self.model
 
-        sub = Subscription.get(user=user, type=typ, target_id=target_id)
+        sub = Subscription.get_for_update(user=user, type=typ, target_id=target_id)
         if sub:
             old_email = sub.to_email
             old_tracker = sub.to_tracker

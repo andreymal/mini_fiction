@@ -6,14 +6,13 @@
 import os
 import re
 import sys
-import logging
 import importlib
-from datetime import datetime
-from logging.handlers import SMTPHandler
 from pathlib import Path
+from datetime import datetime
+import logging
+from logging.handlers import SMTPHandler
 
 import jinja2
-import click
 from celery import Celery
 from werkzeug.urls import iri_to_uri
 from werkzeug.contrib import cache

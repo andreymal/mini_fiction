@@ -15,7 +15,7 @@
         <div class="admin-dashboard-label">Жалобы</div>
         <div class="admin-dashboard-desc">
             {{ ngettext('%(num)d unresolved abuse report', '%(num)d unresolved abuse reports', abuse_unresolved_count) }}<br/>
-            {% if abuse_last %}Последняя: {{ abuse_last|datetimeformat('d MMMM Y, HH:mm') }}{% endif %}
+            {% if abuse_last %}Последняя: {{ abuse_last|datetimeformat(DEFAULT_DATETIME_FORMAT) }}{% endif %}
         </div>
     </a>
 
@@ -23,7 +23,7 @@
         <div class="admin-dashboard-label">Оценки</div>
         <div class="admin-dashboard-desc">
             {{ ngettext('%(num)d vote in last 24 hours', '%(num)d votes in last 24 hours', vote_last_count) }}<br/>
-            {% if vote_last %}Последняя: {{ vote_last.updated|datetimeformat('d MMMM Y, HH:mm') }} от {{ vote_last.author.username }}{% endif %}
+            {% if vote_last %}Последняя: {{ vote_last.updated|datetimeformat(DEFAULT_DATETIME_FORMAT) }} от {{ vote_last.author.username }}{% endif %}
         </div>
     </a>
 
@@ -32,14 +32,14 @@
         <div class="admin-dashboard-label">{{ _('Authors') }}</div>
         <div class="admin-dashboard-desc">
             {{ ngettext('%(num)d new user in last 24 hours', '%(num)d new users in last 24 hours', author_last_count) }}<br/>
-            {% if author_last %}Последний: {{ author_last.username }} ({{ author_last.activated_at|datetimeformat('d MMMM Y, HH:mm') }}){% endif %}
+            {% if author_last %}Последний: {{ author_last.username }} ({{ author_last.activated_at|datetimeformat(DEFAULT_DATETIME_FORMAT) }}){% endif %}
         </div>
     </a>
     <a href="{{ url_for('admin_registrations.index') }}">
         <div class="admin-dashboard-label">{{ _('Registrations') }}</div>
         <div class="admin-dashboard-desc">
             {{ ngettext('%(num)d account is not activated yet', '%(num)d accounts are not activated yet', registrationprofile_count) }}<br/>
-            {% if registrationprofile_last %}Последняя: {{ registrationprofile_last.username }} ({{ registrationprofile_last.created_at|datetimeformat('d MMMM Y, HH:mm') }}){% endif %}
+            {% if registrationprofile_last %}Последняя: {{ registrationprofile_last.username }} ({{ registrationprofile_last.created_at|datetimeformat(DEFAULT_DATETIME_FORMAT) }}){% endif %}
         </div>
     </a>
     {%- endif %}

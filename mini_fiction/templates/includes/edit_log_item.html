@@ -1,4 +1,4 @@
-<time datetime="{{ item.created_at.strftime('%Y-%m-%dT%H:%M:%SZ') }}" class="editlog-date">{{ item.created_at|datetimeformat }}</time><br/>
+<time datetime="{{ item.created_at.strftime('%Y-%m-%dT%H:%M:%SZ') }}" class="editlog-date">{{ item.created_at|datetimeformat(DEFAULT_DATETIME_FORMAT) }}</time><br/>
 
 {% if extra.mode == 'story' %}
     {%- if item.user and item.user.id in edit_log_users -%}

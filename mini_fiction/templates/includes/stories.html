@@ -54,7 +54,7 @@
                                 {{- chapter.autotitle -}}
                             </a>
                             {%- set viewed_at = chapter.bl.is_viewed_by(current_user) -%}
-                            {%- if viewed_at %} <i class="chapter-viewed-icon" title="Вы просматривали эту главу {{ viewed_at|datetimeformat('d MMMM Y, HH:MM') }}"></i>{% endif %}
+                            {%- if viewed_at %} <i class="chapter-viewed-icon" title="Вы просматривали эту главу {{ viewed_at|datetimeformat(DEFAULT_DATETIME_FORMAT) }}"></i>{% endif %}
                             {%- if chapter.draft %} <sup class="draft">{{ _('Draft') }}</sup>{% endif %}
                             {% if story.bl.editable_by(current_user) -%}
                                 <sup><a class="edit-link" href="{{ url_for('chapter.edit', pk=chapter.id) }}">Редактировать</a></sup>

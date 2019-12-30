@@ -29,7 +29,7 @@
             <label class="control-label">{{ _('Registered at') }}</label>
             <div class="controls">
                 <span style="display: inline-block; padding-top: 5px;">{% if author.date_joined %}<time datetime="{{ author.date_joined.strftime('%Y-%m-%dT%H:%M:%SZ') }}">
-                    {{ author.date_joined|datetimeformat('d MMMM Y, HH:mm') }}
+                    {{ author.date_joined|datetimeformat(DEFAULT_DATETIME_FORMAT) }}
                 </time>{% else %}N/A{% endif %}</span>
             </div>
         </div>
@@ -38,7 +38,7 @@
             <label class="control-label">{{ _('Last visit') }}</label>
             <div class="controls">
                 <span style="display: inline-block; padding-top: 5px;">{% if author.last_visit %}<time datetime="{{ author.last_visit.strftime('%Y-%m-%dT%H:%M:%SZ') }}">
-                    {{ author.last_visit|datetimeformat('d MMMM Y, HH:mm') }}
+                    {{ author.last_visit|datetimeformat(DEFAULT_DATETIME_FORMAT) }}
                 </time>{% else %}N/A{% endif %}</span>
             </div>
         </div>
@@ -82,7 +82,7 @@
             <label class="control-label">{{ _('Last password change') }}</label>
             <div class="controls">
                 <span style="display: inline-block; padding-top: 5px;">{% if author.last_password_change %}<time datetime="{{ author.last_password_change.strftime('%Y-%m-%dT%H:%M:%SZ') }}">
-                    {{ author.last_password_change|datetimeformat('d MMMM Y, HH:mm') }}
+                    {{ author.last_password_change|datetimeformat(DEFAULT_DATETIME_FORMAT) }}
                 </time>{% else %}N/A{% endif %}</span>
             </div>
         </div>

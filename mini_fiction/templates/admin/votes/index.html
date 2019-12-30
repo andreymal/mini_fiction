@@ -41,7 +41,7 @@
 
             <td class="col-nowrap">
                 <time datetime="{{ vote.updated.strftime('%Y-%m-%dT%H:%M:%SZ') }}">
-                    {{ vote.updated|datetimeformat('d MMMM Y, HH:mm') }}
+                    {{ vote.updated|datetimeformat(DEFAULT_DATETIME_FORMAT) }}
                 </time>
             </td>
         </tr>{% endfor -%}

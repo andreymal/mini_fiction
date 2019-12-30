@@ -40,7 +40,7 @@
 
             <td class="col-tag-created-at">
                 <time datetime="{{ tag.created_at.strftime('%Y-%m-%dT%H:%M:%SZ') }}">
-                    {{ tag.created_at|datetimeformat('d MMMM Y, HH:mm') }}
+                    {{ tag.created_at|datetimeformat(DEFAULT_DATETIME_FORMAT) }}
                 </time>
             </td>
 

@@ -9,7 +9,7 @@
 
         <ul>
         {% for rp in registrations %}
-            <li><a href="{{ url_for('admin_registrations.update', pk=rp.id) }}">{{ rp.username }} ({{ rp.email }})</a> ({{ rp.created_at|datetimeformat('d MMMM Y, HH:mm') }})</li>
+            <li><a href="{{ url_for('admin_registrations.update', pk=rp.id) }}">{{ rp.username }} ({{ rp.email }})</a> ({{ rp.created_at|datetimeformat(DEFAULT_DATETIME_FORMAT) }})</li>
         {% endfor %}
         </ul>
 

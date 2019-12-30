@@ -68,6 +68,10 @@ class Config(object):
     BABEL_DEFAULT_LOCALE = 'ru'
     BABEL_DEFAULT_TIMEZONE = 'Europe/Moscow'
 
+    DEFAULT_DATE_FORMAT = 'd MMMM y'
+    DEFAULT_DATETIME_FORMAT = 'd MMMM y, HH:mm'
+    DEFAULT_TIME_FORMAT = 'HH:mm'
+
     DEBUG_TB_ENABLED = False
     DEBUG_TB_INTERCEPT_REDIRECTS = False
     DEBUG_TB_PANELS = [

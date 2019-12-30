@@ -12,7 +12,7 @@
         <div>{{ html_block('dump_description') }}</div>
         <br/>
         <div>
-            Последнее обновление: <time datetime="{{ mtime.strftime('%Y-%m-%dT%H:%M:%SZ') }}" title="{{ mtime|datetimeformat('d MMMM Y, HH:mm') }}">
+            Последнее обновление: <time datetime="{{ mtime.strftime('%Y-%m-%dT%H:%M:%SZ') }}" title="{{ mtime|datetimeformat(DEFAULT_DATETIME_FORMAT) }}">
                         {{- mtime|timesince }}
                     </time><br/><br/>
             <a href="{{ dump_url }}" data-noajax="1" download>Скачать</a> ({{ "{:.1f}".format(dump_size_kib) }} КиБ)

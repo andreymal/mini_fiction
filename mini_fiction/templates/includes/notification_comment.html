@@ -35,7 +35,7 @@
         </span>
 
         <time class="comment-time" datetime="{{ comment.date.strftime('%Y-%m-%dT%H:%M:%SZ') }}">
-            {{ comment.date|datetimeformat('d MMMM Y, HH:mm') }}
+            {{ comment.date|datetimeformat(DEFAULT_DATETIME_FORMAT) }}
         </time>
 
         {{ caller() if caller else '' }}

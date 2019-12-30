@@ -22,7 +22,7 @@
         {{- logitem.user.username -}}
     </a>
     <time class="log-item-time" datetime="{{ logitem.action_time.strftime('%Y-%m-%dT%H:%M:%SZ') }}">
-        {{ logitem.action_time|datetimeformat('d MMMM Y, HH:mm') }}
+        {{ logitem.action_time|datetimeformat(DEFAULT_DATETIME_FORMAT) }}
     </time>
 </div>
 </div>

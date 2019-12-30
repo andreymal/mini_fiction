@@ -15,7 +15,7 @@
 
         {% if story.first_published_at %}
             <p>
-                Он был опубликован {{ story.first_published_at|datetimeformat('d MMMM Y') -}}
+                Он был опубликован {{ story.first_published_at|datetimeformat(DEFAULT_DATE_FORMAT) -}}
                 {%- if story.views %}, {{ ngettext("it was viewed by %(num)d user", "it was viewed by %(num)d users", story.views) }}{% endif %}.
             </p>
             <p>

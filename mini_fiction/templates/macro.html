@@ -131,7 +131,7 @@
         <div class="comment-text comment-text-deleted">
             Комментарий был отправлен на Луну
             {%- if current_user.is_staff and comment.last_deleted_at %}
-                {{ comment.last_deleted_at|datetimeformat('d MMMM Y, HH:mm') -}}
+                {{ comment.last_deleted_at|datetimeformat(DEFAULT_DATETIME_FORMAT) -}}
             {%- endif -%}
             {%- if current_user.is_staff and comment.last_deleted_by %}
                 пользователем {{ comment.last_deleted_by.username -}}
@@ -151,7 +151,7 @@
             </span>
 
             <time class="comment-time" datetime="{{ comment.date.strftime('%Y-%m-%dT%H:%M:%SZ') }}">
-                {{ comment.date|datetimeformat('d MMMM Y, HH:mm') }}
+                {{ comment.date|datetimeformat(DEFAULT_DATETIME_FORMAT) }}
             </time>
 
             {% if not short %}

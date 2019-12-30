@@ -21,7 +21,7 @@
         {% else %}
             {{- userlink(None, None) -}}
         {% endif %}
-        <span>{{ comment.date|datetimeformat('d MMMM Y, HH:mm') }}</span>
+        <span>{{ comment.date|datetimeformat(DEFAULT_DATETIME_FORMAT) }}</span>
         {{ caller() if caller else '' }}
     </div>
 </div>

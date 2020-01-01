@@ -1,5 +1,5 @@
 {% extends 'email/base.html' %}
-{% import 'email/macro.html' as macro %}
+{% import 'email/macro.html' as macro with context %}
 
 {% block body %}
 Пользователь {{ macro.userlink(author.id, author.username) }} опубликовал рассказ {{ macro.storylink(story.id, story.title) }}, но он ещё не был одобрен модераторами. Перейдите к рассказу и одобрите его или отправьте обратно в черновики.

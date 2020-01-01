@@ -1,5 +1,5 @@
 {% extends 'email/base.html' %}
-{% import 'email/macro.html' as macro %}
+{% import 'email/macro.html' as macro with context %}
 
 {% block body %}
 Пользователь {{ macro.userlink(abuse.user.id, abuse.user.username) }} жалуется на

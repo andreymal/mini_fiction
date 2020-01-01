@@ -1,5 +1,5 @@
 {% extends 'email/base.html' %}
-{% import 'email/macro.html' as macro %}
+{% import 'email/macro.html' as macro with context %}
 
 {% block body %}
 В новости <a href="{{ url_for('news.show', name=newsitem.name) }}" target="_blank"><b>{{ newsitem.title }}</b></a> добавлен новый комментарий:<br/>

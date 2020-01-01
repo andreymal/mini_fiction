@@ -1,5 +1,5 @@
 {% extends 'email/base.html' %}
-{% import 'email/macro.html' as macro %}
+{% import 'email/macro.html' as macro with context %}
 
 {% block body %}
 Это письмо отправлено с сайта <a href="{{ url_for('index.index', _external=True) }}" target="_blank">{{ url_for('index.index', _external=True) }}</a> для проверки работоспособности электронной почты. Если вы его получили и обнаружили не в папке «Спам», значит, скорее всего, всё хорошо!

@@ -1,5 +1,5 @@
 {% extends 'email/base.html' %}
-{% import 'email/macro.html' as macro %}
+{% import 'email/macro.html' as macro with context %}
 
 {% block body %}
 Ваш рассказ {{ macro.storylink(story.id, story.title) }} был убран в черновики модератором {{ macro.userlink(staff.id, staff.username) }} и теперь скрыт от читателей.

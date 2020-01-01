@@ -1,5 +1,5 @@
 {% extends 'email/base.html' %}
-{% import 'email/macro.html' as macro %}
+{% import 'email/macro.html' as macro with context %}
 
 {% block body %}
 Кто-то, может, даже вы, зарегистрировался на сайте <a href="{{ url_for('index.index', _external=True) }}" target="_blank">{{ url_for('index.index', _external=True) }}</a>, указав этот почтовый адрес.<br/>

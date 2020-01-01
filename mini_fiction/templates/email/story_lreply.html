@@ -1,5 +1,5 @@
 {% extends 'email/base.html' %}
-{% import 'email/macro.html' as macro %}
+{% import 'email/macro.html' as macro with context %}
 
 {% block body %}
 В <a href="{{ url_for('story_local_comment.view', story_id=story.id) }}" target="_blank">редакторской</a> рассказа {{ macro.storylink(story.id, story.title) }} добавлен новый комментарий от {% if is_staff %}модератора{% elif is_author %}автора{% elif is_editor %}редактора{% else %}бета-читателя{% endif %}:<br/>

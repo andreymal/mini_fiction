@@ -1,5 +1,5 @@
 {% extends 'email/base.html' %}
-{% import 'email/macro.html' as macro %}
+{% import 'email/macro.html' as macro with context %}
 
 {% block body %}
 В рассказе {{ macro.storylink(story.id, story.title) }} {% if chapters|length > 1 -%}

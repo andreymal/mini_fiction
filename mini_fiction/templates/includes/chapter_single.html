@@ -12,7 +12,7 @@
     {%- endif %}
     {%- set notes = chapter.notes_as_html -%}
     {% if notes %}
-        <blockquote class="chapter-notes">{{ notes_as_html }}</blockquote>
+        <blockquote class="chapter-notes">{{ notes }}</blockquote>
     {% endif %}
     {{ chapter.text_as_html }}
     {% if not chapter_edit_mode %}

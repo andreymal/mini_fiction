@@ -607,11 +607,17 @@ class Chapter(db.Entity):
         if cached_result and cached_result[0] == self.updated:
             return Markup(cached_result[1])
 
+        is_new_chapter = (datetime.utcnow() - self.updated).total_seconds() < current_app.config['CHAPTER_NEW_AGE']
+        if is_new_chapter:
+            cache_timeout = current_app.config['CHAPTER_NEW_HTML_BACKEND_CACHE_TIME']
+        else:
+            cache_timeout = current_app.config['CHAPTER_OLD_HTML_BACKEND_CACHE_TIME']
+
         result = self.bl.notes2html(self.notes)
         current_app.cache.set(
             cache_key,
             (self.updated, str(result)),
-            timeout=current_app.config['CHAPTER_HTML_BACKEND_CACHE_TIME'],
+            timeout=cache_timeout,
         )
         return result
 
@@ -624,11 +630,17 @@ class Chapter(db.Entity):
         if cached_result and cached_result[0] == self.updated and cached_result[1] == self.text_md5:
             return Markup(cached_result[2])
 
+        is_new_chapter = (datetime.utcnow() - self.updated).total_seconds() < current_app.config['CHAPTER_NEW_AGE']
+        if is_new_chapter:
+            cache_timeout = current_app.config['CHAPTER_NEW_HTML_BACKEND_CACHE_TIME']
+        else:
+            cache_timeout = current_app.config['CHAPTER_OLD_HTML_BACKEND_CACHE_TIME']
+
         result = self.bl.text2html(self.text)
         current_app.cache.set(
             cache_key,
             (self.updated, self.text_md5, str(result)),
-            timeout=current_app.config['CHAPTER_HTML_BACKEND_CACHE_TIME'],
+            timeout=cache_timeout,
         )
         return result
 

@@ -54,7 +54,9 @@ class Config(object):
     # filesystem
     CACHE_DIR = os.path.join(os.getcwd(), 'cache')
 
-    CHAPTER_HTML_BACKEND_CACHE_TIME = 3600 * 6  # seconds
+    CHAPTER_NEW_HTML_BACKEND_CACHE_TIME = 3600 * 12  # seconds
+    CHAPTER_OLD_HTML_BACKEND_CACHE_TIME = 1800  # seconds
+    CHAPTER_NEW_AGE = 3600 * 24 * 7  # seconds
     CHAPTER_HTML_FRONTEND_CACHE_TIME = 600  # seconds
 
     JSON_AS_ASCII = False

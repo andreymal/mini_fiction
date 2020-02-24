@@ -126,16 +126,20 @@ class SphinxConnection(object):
         args = [query]
 
         # WHERE
+        wsql = ''
+        wargs = []
         if filters:
             wsql, wargs = self.build_where(filters)
+        if wsql:
             sql += ' and ' + wsql
             args.extend(wargs)
 
         # ORDER
         if sort_by is not None:
             if isinstance(sort_by, (tuple, list)):
-                sort_by = ', '.join(sort_by)
-            sql += ' order by ' + sort_by
+                sql += ' order by ' + ', '.join(sort_by)
+            else:
+                sql += ' order by ' + str(sort_by)
 
         # LIMIT
         if limit is not None:
@@ -231,11 +235,13 @@ class SphinxConnection(object):
         sql += ', '.join(('`%s` = %%s' % f) for f in fields_list)
         args = list(fields[f] for f in fields_list)
 
+        wsql = ''
+        wargs = []
         if filters:
-            sql += ' where '
-            q, a = self.build_where(filters)
-            sql += q
-            args.extend(a)
+            wsql, wargs = self.build_where(filters)
+        if wsql:
+            sql += ' where ' + wsql
+            args.extend(wargs)
 
         self.execute(sql, args)
 
@@ -243,11 +249,13 @@ class SphinxConnection(object):
         sql = 'delete from `%s`' % index
         args = []
 
+        wsql = ''
+        wargs = []
         if filters:
-            sql += ' where '
-            q, a = self.build_where(filters)
-            sql += q
-            args.extend(a)
+            wsql, wargs = self.build_where(filters)
+        if wsql:
+            sql += ' where ' + wsql
+            args.extend(wargs)
 
         self.execute(sql, args)
 

@@ -953,7 +953,7 @@ class StoryBL(BaseBL, Commentable):
             sphinx_filters['draft'] = 0
             sphinx_filters['approved'] = 1
 
-        query = normalize_text_for_search_query(query)
+        query = normalize_text_for_search_query(query, query_mode="extended" if extended_syntax else "none")
 
         # TODO: unused, remove it?
         # for ofilter in ('character', 'classifier', 'category', 'rating_id'):
@@ -1005,7 +1005,6 @@ class StoryBL(BaseBL, Commentable):
                 options=current_app.config['SPHINX_CONFIG']['select_options'],
                 limit=limit,
                 sort_by=self.sort_types[sort_by],
-                extended_syntax=extended_syntax,
                 **sphinx_filters
             )
 
@@ -2132,7 +2131,7 @@ class ChapterBL(BaseBL):
         if sort_by not in self.sort_types:
             sort_by = 0
 
-        query = normalize_text_for_search_query(query)
+        query = normalize_text_for_search_query(query, query_mode="extended" if extended_syntax else "none")
 
         sphinx_filters = {}
         if only_published:
@@ -2185,7 +2184,6 @@ class ChapterBL(BaseBL):
                 options=current_app.config['SPHINX_CONFIG']['select_options'],
                 limit=limit,
                 sort_by=self.sort_types[sort_by],
-                extended_syntax=extended_syntax,
                 **sphinx_filters
             )
 

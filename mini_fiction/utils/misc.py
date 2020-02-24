@@ -517,9 +517,34 @@ def normalize_text_for_search_index(s, html=True):
     return ' '.join(words_split(s, html=html, strip_entities=False))
 
 
-def normalize_text_for_search_query(s):
-    s = s.replace('\u00ad', '')
-    return s
+def normalize_text_for_search_query(s, query_mode="extended"):
+    from mini_fiction.apis.amsphinxql import SphinxConnection
+
+    result = s.replace('\u00ad', '')
+
+    if query_mode == "extended":
+        return result
+
+    if query_mode == "exact":
+        # Выпиливаем спецсимволы за ненадобностью, они лишь ошибки синтаксиса генерят
+        result = result
+        toreplace = [
+            '\\', '(', ')', '|', '-', '!', '@', '~', '"', '&', '/', '^', '$', '=', '<',
+        ]
+        for c in toreplace:
+            result = result.replace(c, ' ')
+
+        # Костыль: sphinx настроен на минимальную длину 2 символа (по умолчанию),
+        # и если есть предлог в предложении, то точное совпадение не ищется.
+        # Поэтому предварительно выпиливаем предлоги регуляркой
+        min_word_len = current_app.config['SPHINX_INDEX_OPTIONS']['min_word_len']
+        result = re.sub(r"\s*\b[A-Za-zА-Яа-яЁё]{%d}\b\s*" % (min_word_len - 1), ' ', result)
+
+        result = SphinxConnection.escape_sphinxql(result).strip()
+        return '="{}"'.format(result) if result else ''
+
+    # mode "none"
+    return SphinxConnection.escape_sphinxql(result)
 
 
 def htmlcrop(text, length, end='...', spaces=' \t\r\n\xa0', max_overflow=300, strip=True):

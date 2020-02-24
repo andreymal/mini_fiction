@@ -1,8 +1,8 @@
 # Russian translations for mini_fiction.
-# Copyright (C) 2019 andreymal
+# Copyright (C) 2020 andreymal
 # This file is distributed under the same license as the mini_fiction
 # project.
-# andreymal <andriyano-31@mail.ru>, 2019.
+# andreymal <andriyano-31@mail.ru>, 2020.
 #
 msgid ""
 msgstr ""

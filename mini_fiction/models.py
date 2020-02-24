@@ -1151,21 +1151,31 @@ class AbuseReport(db.Entity):
 
         if self.target_type == 'story':
             target_obj = Story.get(id=self.target_id)
-            target = 'рассказ «{}»'.format(target_obj.title if target_obj else 'N/A')
+            if target_obj is not None:
+                target = 'рассказ «{}»'.format(target_obj.title if target_obj else 'N/A')
+            else:
+                target = 'удалённый рассказ #{}'.format(self.target_id)
 
         elif self.target_type == 'storycomment':
             target_obj = StoryComment.get(id=self.target_id)
-            target = 'комментарий {} к рассказу «{}»'.format(
-                target_obj.author.username if target_obj.author else (target_obj.author_username or 'N/A'),
-                target_obj.story.title,
-            )
+            if target_obj is not None:
+                target = 'комментарий {} к рассказу «{}»'.format(
+                    target_obj.author.username if target_obj.author else (target_obj.author_username or 'N/A'),
+                    target_obj.story.title,
+                )
+            else:
+                target = 'удалённый комментарий к рассказу #{}'.format(self.target_id)
 
         elif self.target_type == 'newscomment':
             target_obj = NewsComment.get(id=self.target_id)
-            target = 'комментарий {} к новости «{}»'.format(
-                target_obj.author.username if target_obj.author else (target_obj.author_username or 'N/A'),
-                target_obj.newsitem.name,
-            )
+            if target_obj is not None:
+                target = 'комментарий {} к новости «{}»'.format(
+                    target_obj.author.username if target_obj.author else (target_obj.author_username or 'N/A'),
+                    target_obj.newsitem.name,
+                )
+            else:
+                target = 'удалённый комментарий к новости #{}'.format(self.target_id)
+
         else:
             target = self.target_type + '/' + str(self.target_id)
 

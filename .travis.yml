@@ -25,6 +25,7 @@ before_install:
 
 install:
   - pip install --upgrade pip
+  - '[ $TRAVIS_PYTHON_VERSION == "3.4" ] && pip install lxml==4.3.5 pytest==4.6.9 "py>=1.5.0" "importlib-metadata<1,>=0.12" "urllib3<1.25,>=1.21.1" || true'
   - pip install -r requirements.txt -r optional-requirements.txt -r test-requirements.txt
   - pip install -e .
   - pybabel compile -d mini_fiction/translations

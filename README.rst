@@ -2,8 +2,8 @@
 mini_fiction
 ============
 
-.. image:: https://api.travis-ci.org/andreymal/mini_fiction.png
-    :target: https://travis-ci.org/andreymal/mini_fiction
+.. image:: https://api.travis-ci.com/andreymal/mini_fiction.svg?branch=master
+    :target: https://travis-ci.com/andreymal/mini_fiction
     :alt: Build Status
 
 Library CMS on Python for fanfics. Currently in development.

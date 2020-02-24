@@ -143,8 +143,9 @@ class Config(object):
     FRONTEND_VERSION_PATH = os.path.join(os.path.dirname(__file__), 'static/build/frontend.version')
 
     SPHINX_DISABLED = False
+    SPHINX_ROOT = os.path.join(os.getcwd(), 'sphinx')
     SPHINX_CONFIG = {
-        'connection_params': {'unix_socket': '/tmp/sphinx_fanfics.socket', 'charset': 'utf8'},
+        'connection_params': {'unix_socket': '/tmp/sphinx_fanfics.socket', 'charset': 'utf8mb4'},
         'excerpts_opts': {'chunk_separator': '…', 'limit': 2048, 'around': 10, 'html_strip_mode': 'strip'},
 
         'stories_rt_mem_limit': '128M',
@@ -163,7 +164,17 @@ class Config(object):
         },
     }
 
-    SPHINX_ROOT = os.path.join(os.getcwd(), 'sphinx')
+    SPHINX_INDEX_OPTIONS = {
+        'morphology': 'stem_enru',
+        # Recommended: 'morphology': 'lemmatize_ru_all, lemmatize_en_all',
+        'min_word_len': 2,
+        'min_infix_len': 3,
+        'index_exact_words': 1,
+        'wordforms': None,
+        'exceptions': None,
+        'expand_keywords': 1,
+    }
+
     SPHINX_SEARCHD = {
         'listen': '/tmp/sphinx_fanfics.socket:mysql41',
         'log': '{sphinxroot}/searchd.log',
@@ -173,6 +184,9 @@ class Config(object):
         'pid_file': '{sphinxroot}/sphinx.pid',
         'binlog_path': '{sphinxroot}/binlog',
         'workers': 'threads',
+    }
+    SPHINX_COMMON = {
+        # 'lemmatizer_base': '/path/to/dicts'
     }
     SPHINX_CUSTOM = ''
 

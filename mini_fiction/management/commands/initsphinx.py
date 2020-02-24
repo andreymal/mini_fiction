@@ -13,7 +13,7 @@ from mini_fiction.models import Story, Chapter
 from mini_fiction.management.manager import cli
 
 
-@cli.command(short_help='Fills the search index.', help='Clears the current index of Sphinx Search and fills it from the database.')
+@cli.command(short_help='Fills the search index.', help='Clears the current index of Sphinx/Manticore search and fills it from the database.')
 def initsphinx():
     if current_app.config.get('SPHINX_DISABLED'):
         print('Please set SPHINX_DISABLED = False before initsphinx.', file=sys.stderr)
@@ -30,7 +30,7 @@ def initsphinx():
         sphinx.flush('stories')
     with current_app.sphinx as sphinx:
         sphinx.flush('chapters')
-    sys.stderr.write('\n')
+    sys.stderr.write('Done.\n')
     sys.stderr.flush()
 
     ok = 0

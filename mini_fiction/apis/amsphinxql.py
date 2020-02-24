@@ -14,7 +14,7 @@ class SphinxError(Exception):
     pass
 
 
-class SphinxConnection(object):
+class SphinxConnection:
     actions_list = {
         'lt': '`%s` < %%s',
         'lte': '`%s` <= %%s',
@@ -45,12 +45,15 @@ class SphinxConnection(object):
             else:
                 self.commit()
 
-
     def execute(self, sql, args=None):
-        if isinstance(sql, str):
-            sql = sql.encode('utf-8')
+        coded_sql = sql.encode('utf-8') if isinstance(sql, str) else sql
+
+        coded_args = None
+        if args:
+            coded_args = tuple((x.encode('utf-8') if isinstance(x, str) else x) for x in args)
+
         cursor = self.mysql_conn.cursor()
-        cursor.execute(sql, tuple((x.encode('utf-8') if isinstance(x, str) else x) for x in args) if args else None)
+        cursor.execute(coded_sql, coded_args)
         return cursor
 
     def build_where(self, filters):
@@ -93,13 +96,15 @@ class SphinxConnection(object):
 
         return sql, args
 
-    def prepare_list(self, l):
+    @classmethod
+    def prepare_list(cls, l):
         if not l:
             return '()', ()
         q = '(' + ('%s, ' * (len(l) - 1)) + '%s)'
         return q, l
 
-    def escape_sphinxql(self, s):
+    @classmethod
+    def escape_sphinxql(cls, s):
         s = str(s)
         toreplace = [
             '\\', '(', ')', '|', '-', '!', '@', '~', '"', '&', '/', '^', '$', '=', '<',
@@ -122,8 +127,7 @@ class SphinxConnection(object):
             rfields = rfields + ', ' + ', '.join(raw_fields)
         sql = 'select %s from `%s` where match(%%s)' % (rfields, index)
 
-        query = self.escape_sphinxql(query) if not extended_syntax else str(query)
-        args = [query]
+        args = [self.escape_sphinxql(query) if not extended_syntax else str(query)]
 
         # WHERE
         wsql = ''
@@ -167,8 +171,8 @@ class SphinxConnection(object):
             if exc.args[0] != 1064:
                 raise
             raise SphinxError(exc.args[1])
-        fields = [x[0] for x in cur.description]
-        matches = [dict(zip(fields, x)) for x in cur.fetchall()]
+        result_fields = [x[0] for x in cur.description]
+        matches = [dict(zip(result_fields, x)) for x in cur.fetchall()]
 
         cur.execute('show meta')
         result = dict(cur.fetchall())
@@ -178,18 +182,20 @@ class SphinxConnection(object):
     def call_snippets(self, index, texts, query, **options):
         if isinstance(texts, str):
             texts = (texts,)
+        if not texts:
+            return []
         sql = 'call snippets(('
         sql += ', '.join('%s' for _ in range(len(texts)))
         sql += '), %s, %s'
-        args = list(texts + (index, query))
+        args = list(texts) + [index, query]
 
         for opt, value in options.items():
             sql += ', %%s as `%s`' % opt
             args.append(value)
         sql += ')'
 
-        cur = self.execute(sql, tuple(args))
-        return [x[0] for x in cur.fetchall()]
+        cur = self.execute(sql, args)
+        return [str(x[0]) for x in cur.fetchall()]
 
     def call_keywords(self, index, query, hits=False):
         sql = 'call keywords(%s, %s, %s)'
@@ -202,12 +208,15 @@ class SphinxConnection(object):
         ]
         return result
 
-    def add(self, index, items):
+    def add(self, index, items, replace=True):
         if not items:
             return
-        fields = tuple(x[0] for x in items[0].items())
+        fields = tuple(k for k, _ in items[0].items())
         sfields = ', '.join('`%s`' % x for x in fields)
-        sql = ['replace into `%s` (%s) values ' % (index, sfields)]
+        sql = [
+            'replace' if replace else 'insert',
+            ' into `%s` (%s) values ' % (index, sfields),
+        ]
 
         args = []
 
@@ -228,6 +237,7 @@ class SphinxConnection(object):
 
                 f = item[fk]
                 if isinstance(f, (tuple, list)):
+                    # rt_attr_multi
                     args.extend(f)
                     isql += '(' + ', '.join('%s' for _ in range(len(f))) + ')'
                 else:
@@ -283,7 +293,7 @@ class SphinxConnection(object):
         self.execute('flush rtindex `%s`' % index)
 
 
-class SphinxPool(object):
+class SphinxPool:
     def __init__(self, conn, max_conns=5, conn_queue=None):
         self.conn = conn
         self.max_conns = max_conns

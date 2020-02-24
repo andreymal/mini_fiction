@@ -10,8 +10,7 @@
             [url_for('admin_abuse_reports.index'), 'Жалобы']
         ]) }}
 
-        {% if not target %}Объект, на который была подана жалоба, удалён из базы данных.{% else %}
-
+        {% if target %}
         <h1>
             Жалоба на
             {%- if abuse.target_type == 'story' %} рассказ «{{ target.title }}»
@@ -31,6 +30,9 @@
             <a href="{{ target.bl.get_permalink() }}">{{ target.bl.get_permalink(_external=True) }}</a>
         {% else %}
             Тип объекта {{ abuse.target_type }} / {{ abuse.target_id }} неизвестен, поэтому ссылки не будет
+        {% endif %}
+        {% else %}
+            Объект, на который была подана жалоба, удалён из базы данных.
         {% endif %}
         <br/><br/>
 
@@ -79,8 +81,6 @@
 
             <button type="submit" class="btn btn-primary">Сохранить</button>
         </form>
-
-        {% endif %}
 
         {{- breadcrumbs([
             [url_for('admin_index.index'), _('Administration')],

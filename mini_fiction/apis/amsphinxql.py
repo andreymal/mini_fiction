@@ -191,6 +191,17 @@ class SphinxConnection(object):
         cur = self.execute(sql, tuple(args))
         return [x[0] for x in cur.fetchall()]
 
+    def call_keywords(self, index, query, hits=False):
+        sql = 'call keywords(%s, %s, %s)'
+        args = [query, index, 1 if hits else 0]
+
+        cur = self.execute(sql, args)
+        result_fields = [x[0] for x in cur.description]
+        result = [
+            dict(zip(result_fields, x)) for x in cur.fetchall()
+        ]
+        return result
+
     def add(self, index, items):
         if not items:
             return

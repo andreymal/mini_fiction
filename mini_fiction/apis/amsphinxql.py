@@ -7,6 +7,9 @@ from threading import local
 import MySQLdb
 
 
+Error = MySQLdb.Error
+
+
 class SphinxError(Exception):
     pass
 
@@ -25,6 +28,23 @@ class SphinxConnection(object):
         self.mysql_conn = MySQLdb.connect(**conn)
         self.mysql_conn.ping(True)
         self.execute('set autocommit=0')
+        self._with_level = 0
+
+    def __enter__(self):
+        self._with_level += 1
+        return self
+
+    def __exit__(self, exc_type, exc, tb):
+        assert self._with_level > 0
+
+        self._with_level -= 1
+        if self._with_level == 0:
+            if exc:
+                if not isinstance(exc, Error) or exc.args[0] not in (2002, 2013):
+                    self.rollback()
+            else:
+                self.commit()
+
 
     def execute(self, sql, args=None):
         if isinstance(sql, str):
@@ -252,19 +272,17 @@ class SphinxPool(object):
         self.local = local()
         self.conn_queue = conn_queue or Queue()
 
-    def __getattr__(self, attr, *args, **kwargs):
-        return getattr(self.local.conn, attr, *args, **kwargs)
-
     def __enter__(self):
         if not hasattr(self.local, 'level') or self.local.level == 0:
             if self.conn_queue.empty() and self.count < self.max_conns:
                 self.conn_queue.put(SphinxConnection(self.conn))
                 self.count += 1
             self.local.conn = self.conn_queue.get()
+            self.local.conn.__enter__()
             self.local.level = 1
         else:
             self.local.level += 1
-        return self
+        return self.local.conn
 
     def __exit__(self, exc_type=None, exc=None, tb=None):
         assert self.local.level > 0
@@ -272,9 +290,7 @@ class SphinxPool(object):
 
         self.local.level -= 1
         if self.local.level == 0:
-            if exc:
-                self.local.conn.rollback()
-            else:
-                self.local.conn.commit()
-            self.conn_queue.put(self.local.conn)
+            c = self.local.conn
             self.local.conn = None
+            c.__exit__(exc_type, exc, tb)
+            self.conn_queue.put(c)

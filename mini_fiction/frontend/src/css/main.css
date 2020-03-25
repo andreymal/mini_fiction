@@ -391,6 +391,9 @@ ul.nav-main-links {
     background: url(../images/userpic.png) no-repeat center / contain;
     vertical-align: middle;
 }
+.nav-user-avatar img {
+    border-radius: inherit;
+}
 
 ul.nav-profile-menu-content {
     position: absolute;

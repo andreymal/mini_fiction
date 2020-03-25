@@ -42,7 +42,11 @@
 
 {% macro user_avatar(user) -%}
     {%- set avatar = user.bl.get_avatar_url() -%}
-    <span {% if avatar %}style="background-image: url({{ avatar }})"{% endif %} class="nav-user-avatar" title="{{ user.username }}"></span>
+    <div class="nav-user-avatar">
+    {% if avatar %}
+        <img src="{{ avatar }}" title="{{ user.username }}" alt="{{ user.username }}"/>
+    {% endif %}
+    </div>
 {%- endmacro %}
 
 

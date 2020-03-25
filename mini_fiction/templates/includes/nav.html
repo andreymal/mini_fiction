@@ -1,4 +1,4 @@
-{%- from 'macro.html' import nav_item -%}
+{%- from 'macro.html' import nav_item, user_avatar -%}
 {%- set next_url = (url_for(request.endpoint, **request.view_args) if request.endpoint and not request.endpoint.startswith('auth.') and request.view_args != None else None) -%}
 
 <div id="mobile-menu-btn" class="nav-icon mobile-menu-btn"></div>
@@ -19,7 +19,8 @@
     <a href="{{ url_for('story.add') }}" class="nav-icon nav-icon-add{% if is_current_endpoint('story.add') %} active{% endif %}" title="{{ _('Add story') }}"></a>
     <div class="nav-profile-menu">
     <div class="nav-profile-menu-header" id="nav-profile-menu-header">
-        <div class="nav-profile-menu-text"><span class="nav-username">{{ current_user.username }}</span></div><img src="{{ current_user.bl.get_avatar_url() }}" alt="" class="nav-user-avatar" />
+        <div class="nav-profile-menu-text"><span class="nav-username">{{ current_user.username }}</span></div>
+        {{- user_avatar(current_user) }}
     </div>
     <ul class="nav-profile-menu-content nav-items" id="nav-profile-menu-content">
         {{ nav_item(

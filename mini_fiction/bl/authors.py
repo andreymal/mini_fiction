@@ -785,29 +785,6 @@ class AuthorBL(BaseBL):
         if self.model.avatar_medium:
             return url_for('media', filename=self.model.avatar_medium)
 
-        default_userpic = dict(current_app.config['DEFAULT_USERPIC'])
-        if 'endpoint' in default_userpic:
-            return url_for(default_userpic.pop('endpoint'), **default_userpic)
-        return default_userpic['url']
-
-    def get_small_avatar_url(self):
-        if self.model.avatar_small:
-            return url_for('media', filename=self.model.avatar_small)
-
-        default_userpic = dict(current_app.config['DEFAULT_USERPIC'])
-        if 'endpoint' in default_userpic:
-            return url_for(default_userpic.pop('endpoint'), **default_userpic)
-        return default_userpic['url']
-
-    def get_large_avatar_url(self):
-        if self.model.avatar_large:
-            return url_for('media', filename=self.model.avatar_large)
-
-        default_userpic = dict(current_app.config['DEFAULT_USERPIC'])
-        if 'endpoint' in default_userpic:
-            return url_for(default_userpic.pop('endpoint'), **default_userpic)
-        return default_userpic['url']
-
     def get_unread_notifications_count(self):
         user = self.model
         cnt = current_app.cache.get('bell_{}'.format(user.id))

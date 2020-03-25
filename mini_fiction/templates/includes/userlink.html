@@ -1,2 +1,3 @@
-<img class="avatar-small" src="{{ user.bl.get_small_avatar_url() }}" alt="" />
+{% from 'macro.html' import user_avatar %}
+{{ user_avatar(user) }}
 <a class="authorlink" href="{{ url_for('author.info', user_id=user.id) }}">{{ user.username }}</a>

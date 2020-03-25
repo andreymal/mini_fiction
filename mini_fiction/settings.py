@@ -397,7 +397,6 @@ class Config(object):
     RECAPTCHA_PRIVATE_KEY = ''
     RECAPTCHA_OPTIONS = {'hl': 'ru'}
 
-    DEFAULT_USERPIC = {'endpoint': 'static', 'filename': 'i/userpic.png'}
     LOADING_ICON = {'endpoint': 'static', 'filename': 'i/ajax-loader.gif'}
 
     # Sitemap

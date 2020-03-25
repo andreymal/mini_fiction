@@ -1,4 +1,5 @@
 {% extends base %}
+{% from 'macro.html' import user_avatar %}
 {% from 'macro.html' import breadcrumbs with context %}
 {% from 'macro.html' import form_fields with context %}
 {% block content %}
@@ -11,16 +12,17 @@
         ]) }}
 
         <h1 id="author-name">
-            <img src="{{ author.bl.get_avatar_url() }}" width="42" title="{{ author.username }}" alt="{{ author.username }}" class="userpic"/>
-            <a class="invisible-link" href="{{ url_for('author.info', user_id=author.id) }}">
-                {{- author.username -}}
-            </a>
+            {{- user_avatar(author) }}
             {% if not author.is_active %}
                 <sup id="banned">Read-only</sup>
             {% endif -%}
+            <span>
+                <a class="invisible-link" href="{{ url_for('author.info', user_id=author.id) }}">
+                    {{- author.username -}}
+                </a>
+                {% if author.id == current_user.id %}<small>{{ _("(it's you)") }}</small>{% endif %}
+            </span>
         </h1>
-
-        {% if author.id == current_user.id %}<h3>{{ _("(it's you)") }}</h3>{% endif %}
 
         {% if saved %}<div class="alert-mini green">{{ _('Saved!') }}</div>{% endif %}
 

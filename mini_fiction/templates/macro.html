@@ -40,6 +40,11 @@
     {% endfor %}
 {% endmacro %}
 
+{% macro user_avatar(user) -%}
+    {%- set avatar = user.bl.get_large_avatar_url() -%}
+    <span {% if avatar %}style="background-image: url({{ avatar }})"{% endif %} class="nav-user-avatar" title="{{ user.username }}"></span>
+{%- endmacro %}
+
 
 {% macro comment_form_content(form, objtype=None, objid=None, parent=None, preview_html=None, reqs=None) %}
     <div class="comment-form-content">

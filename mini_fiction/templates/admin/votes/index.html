@@ -1,5 +1,5 @@
 {% extends base %}
-{% from 'macro.html' import breadcrumbs, paginator with context %}
+{% from 'macro.html' import user_avatar, breadcrumbs, paginator with context %}
 {% block content %}
 
 <div class="row"><div class="span12">
@@ -29,7 +29,7 @@
             </td>
 
             <td class="col-user-name">
-                <img src="{{ vote.author.bl.get_small_avatar_url() }}" alt="" />
+                {{- user_avatar(vote.author) }}
                 <a href="{{ url_for('admin_authors.update', pk=vote.author.id) }}">
                     {{- vote.author.username -}}
                 </a>

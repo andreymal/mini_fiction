@@ -304,8 +304,7 @@ ul.nav-main-links {
     z-index: 15;
 }
 
-.bell-popup-content,
-.bell-popup-content-loading {
+.bell-popup-content {
     min-height: 3em;
     max-height: 25em;
     overflow: auto;
@@ -315,9 +314,10 @@ ul.nav-main-links {
 }
 
 .bell-popup-content-loading {
-    min-height: 0;
-    text-align: center;
-    padding: 1em;
+    width: 128px;
+    height: 128px;
+    background-position: center!important;
+    margin: auto;
 }
 
 .bell-popup:before {
@@ -2113,15 +2113,21 @@ a.btn {
 }
 
 /* ajax loading icon */
-.loader {
+.loader-container {
     position: fixed;
     top: 0;
     left: 0;
     opacity: 1;
+    width: 128px;
+    height: 128px;
     pointer-events: none;
     transition: opacity 0.15s ease;
     transition-delay: 0.15s;
     z-index: 12;
+}
+
+.loader {
+    background: url(../images/ajax-loader.gif) no-repeat;
 }
 
 .loader-hidden {

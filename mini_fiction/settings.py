@@ -397,8 +397,6 @@ class Config(object):
     RECAPTCHA_PRIVATE_KEY = ''
     RECAPTCHA_OPTIONS = {'hl': 'ru'}
 
-    LOADING_ICON = {'endpoint': 'static', 'filename': 'i/ajax-loader.gif'}
-
     # Sitemap
     SITEMAP_STORIES_PER_FILE = 1000
     SITEMAP_PING_URLS = []  # ['http://google.com/ping?sitemap={url}', ...]

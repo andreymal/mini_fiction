@@ -382,16 +382,18 @@ ul.nav-main-links {
 }
 
 
-.nav-user-avatar {
+.user-avatar-container {
     width: 2em;
     height: 2em;
     border-radius: 0.2em;
     margin: 0 0.25em;
     display: inline-block;
-    background: url(../images/userpic.png) no-repeat center / contain;
     vertical-align: middle;
 }
-.nav-user-avatar img {
+.user-avatar-placeholder {
+    background: url(../images/userpic.png) no-repeat center / contain;
+}
+.user-avatar-container img {
     border-radius: inherit;
 }
 

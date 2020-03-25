@@ -42,7 +42,7 @@
 
 {% macro user_avatar(user) -%}
     {%- set avatar = user.bl.get_avatar_url() -%}
-    <div class="nav-user-avatar">
+    <div class="user-avatar-container {% if not avatar %}user-avatar-placeholder{% endif %}">
     {% if avatar %}
         <img src="{{ avatar }}" title="{{ user.username }}" alt="{{ user.username }}"/>
     {% endif %}

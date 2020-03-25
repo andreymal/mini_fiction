@@ -26,6 +26,7 @@ import flask_babel
 from flask_login import LoginManager
 from flask.logging import default_handler
 from flask_wtf.csrf import CSRFProtect, CSRFError
+from flask_cors import CORS
 
 from mini_fiction import models  # pylint: disable=unused-import
 from mini_fiction import database, tasks, context_processors
@@ -100,6 +101,7 @@ def create_app():
 
     init_plugins(app)
     database.configure_for_app(app)
+    CORS(app, resources={r"/static/*": {"origins": "*"}})
 
     return app
 

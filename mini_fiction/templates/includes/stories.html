@@ -4,7 +4,7 @@
         <h3>
             <a href="{{ url_for('story.view', pk=story.id) }}">{{ story.title }}</a>
             {% if story.pinned -%}
-                <img class="story-pin" src="{{ url_for('static', filename='i/fa-pin-45.png') }}" alt="Pin" title="Этот рассказ закреплён на главной странице" />
+                <div class="story-pin"></div>
             {%- endif %}
             {{- story.bl.vote_view_html(user=current_user, full=False)|safe }}
             {% include 'includes/story_marks.html' with context %}

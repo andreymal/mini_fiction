@@ -661,6 +661,13 @@ a.authorlink:hover,a.edit-link:hover {
     opacity: 0.5;
     cursor: default;
 }
+.story-pin {
+    width: 1em;
+    height: 1em;
+    background: url(../images/fa-pin-45.png) no-repeat center;
+    display: inline-block;
+    vertical-align: middle;
+}
 
 /* Vote-buttons */
 

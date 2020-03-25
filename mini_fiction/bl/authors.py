@@ -782,8 +782,8 @@ class AuthorBL(BaseBL):
         return self._model().first_name
 
     def get_avatar_url(self):
-        if self.model.avatar_medium:
-            return url_for('media', filename=self.model.avatar_medium)
+        if self.model.avatar_large:
+            return url_for('media', filename=self.model.avatar_large)
 
     def get_unread_notifications_count(self):
         user = self.model

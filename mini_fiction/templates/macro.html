@@ -84,7 +84,7 @@
         <button type="submit" name="act" value="add" class="btn btn-primary js-comment-submit-btn">{{ _('Send') }}</button>
         <button type="submit" name="act" value="preview" class="btn" id="comment-preview-btn">{{ _('Preview') }}</button>
     </div>
-    <img src="{{ url_for('static', filename='i/ajax-loader.gif') }}" alt="" id="comment-preview-loading-img" style="display: none;" />
+    <div class="loader bell-popup-content-loading" id="comment-preview-loading-img" style="display: none;"></div>
     <div id="comment-preview">{% if preview_html %}{% include 'includes/comment_preview.html' %}{% endif %}</div>
     </div><!-- /comment-form-content -->
 {% endmacro %}

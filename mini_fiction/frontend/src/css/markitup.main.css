@@ -1,0 +1,124 @@
+.markItUp {
+  width: 812px;
+  margin: 5px 0 5px 0;
+
+  & * {
+    margin: 0;
+    padding: 0;
+    outline: none;
+  }
+
+  & a:link, & a:visited {
+    color: #000;
+    text-decoration: none;
+  }
+
+}
+
+.markItUpContainer {
+  font: 11px Verdana, Arial, Helvetica, sans-serif;
+}
+
+.markItUpEditor {
+  font: 12px 'Courier New', Courier, monospace;
+  height: 320px;
+  clear: both;
+  line-height: 18px;
+  overflow: auto;
+  width: 800px;
+  padding: 4px 6px;
+}
+
+.markItUpPreviewFrame {
+  overflow: auto;
+  background-color: #FFF;
+  width: 99.9%;
+  height: 300px;
+  margin: 5px 0;
+}
+
+.markItUpFooter {
+  width: 100%;
+}
+
+.markItUpResizeHandle {
+  overflow: hidden;
+  width: 22px;
+  height: 5px;
+  margin-left: auto;
+  margin-right: auto;
+  cursor: n-resize;
+}
+
+.markItUpHeader {
+  overflow: hidden;
+
+  /* first row of buttons */
+  & ul {
+    & li {
+      list-style: none;
+      float: left;
+      position: relative;
+    }
+    & li:hover > ul {
+      display: block;
+    }
+    & a {
+      display: block;
+      width: 16px;
+      height: 16px;
+      text-indent: -10000px;
+      background-repeat: no-repeat;
+      padding: 3px;
+      margin: 0;
+    }
+    & .markItUpSeparator {
+      width:1px;
+      height:16px;
+      overflow:hidden;
+      background-color:#CCC;
+      margin: 0 7px 6px;
+    }
+  }
+}
+
+@media (max-width: 1100px) {
+  .markItUp {
+    width: 542px;
+  }
+
+  .markItUpEditor {
+    width: 530px !important;
+  }
+}
+
+@media (max-width: 767px) {
+  .markItUp {
+    width: 90%;
+    width: calc(100% - 12px);
+  }
+
+  .markItUpEditor {
+    width: 90% !important;
+    width: calc(100% - 12px) !important;
+  }
+}
+
+.comment-form-content {
+  & .markItUp {
+    width: auto;
+  }
+  & .markItUpEditor {
+    width: 95% !important;
+    width: calc(100% - 12px) !important;
+    max-width: none;
+  }
+  & #markItUpId_text {
+    margin-top: 0;
+    padding-top: 5px;
+  }
+}
+
+.comment-form .markItUp textarea {
+  height: 9em;
+}

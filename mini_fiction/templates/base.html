@@ -30,8 +30,7 @@
 
     <div class="modal-backdrop hide fade" id="modal-bg"></div>
     <div class="modal hide fade" id="modal">{% block modal %}{% endblock %}</div>
-    <img id="loading-icon" src="{{ LOADING_ICON }}" alt="..." class="loader loader-hidden" />
-
+    <div id="loading-icon" class="loader-container loader loader-hidden"></div>
     <div class="popup-notifications" id="popup-notifications"></div>
 {% include 'includes/formatting_window.html' %}
 {% include 'base_body_scripts.html' %}

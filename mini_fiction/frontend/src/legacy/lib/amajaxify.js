@@ -986,3 +986,5 @@ var amajaxify = {
         return document.dispatchEvent(this._createEvent(name, params));
     }
 };
+
+export default amajaxify;

@@ -1,4 +1,4 @@
-{%- from 'macro.html' import nav_item -%}
+{%- from 'macro.html' import nav_item, user_avatar -%}
 {%- set next_url = (url_for(request.endpoint, **request.view_args) if request.endpoint and not request.endpoint.startswith('auth.') and request.view_args != None else None) -%}
 
 <div id="mobile-menu-btn" class="nav-icon mobile-menu-btn"></div>
@@ -10,16 +10,15 @@
         {% set notifications_count = get_unread_notifications_count() %}
         <span class="new-count js-notifications-count"{% if notifications_count < 1 %} style="display: none"{% endif %}>{{ notifications_count }}</span>
         <div class="bell-popup" id="bell-popup" style="display: none;">
-            <div class="bell-popup-content-loading" id="bell-popup-content-loading">
-                <img src="{{ LOADING_ICON }}" alt="..." class="bell-loading-icon" />
-            </div>
+            <div class="bell-popup-content-loading loader" id="bell-popup-content-loading"></div>
             <div class="bell-popup-content" id="bell-popup-content"></div>
         </div>
     </div>
     <a href="{{ url_for('story.add') }}" class="nav-icon nav-icon-add{% if is_current_endpoint('story.add') %} active{% endif %}" title="{{ _('Add story') }}"></a>
     <div class="nav-profile-menu">
     <div class="nav-profile-menu-header" id="nav-profile-menu-header">
-        <div class="nav-profile-menu-text"><span class="nav-username">{{ current_user.username }}</span></div><img src="{{ current_user.bl.get_avatar_url() }}" alt="" class="nav-user-avatar" />
+        <div class="nav-profile-menu-text"><span class="nav-username">{{ current_user.username }}</span></div>
+        {{- user_avatar(current_user) }}
     </div>
     <ul class="nav-profile-menu-content nav-items" id="nav-profile-menu-content">
         {{ nav_item(

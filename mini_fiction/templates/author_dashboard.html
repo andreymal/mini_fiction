@@ -1,5 +1,5 @@
 {% extends base %}
-{% from 'macro.html' import breadcrumbs with context %}
+{% from 'macro.html' import user_avatar, breadcrumbs with context %}
 {% block content %}
 
 <div class="row">
@@ -9,7 +9,7 @@
     <!-- Вывод шапки -->
     <div class="span8">
         <h1 id="author-name">
-            <img src="{{ author.bl.get_avatar_url() }}" width="42" title="{{ author.username }}" alt="{{ author.username }}"/>
+            {{- user_avatar(author) }}
             {{ author.username }}
             {#{% if author.stories.count() > 0 %}Кабинет автора{% else %}Кабинет потенциального автора{% endif %}#}
             {% if not author.is_active %}

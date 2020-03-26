@@ -1,3 +1,5 @@
+import amajaxify from './lib/amajaxify';
+
 'use strict';
 
 
@@ -59,7 +61,7 @@ var core = {
         }
 
         // Имитируем событие загрузки страницы, чтобы другие модули обработали страницу
-        var isModal = window.amajaxify && window.amajaxify.isModalNow();
+        var isModal = amajaxify.isModalNow();
         var content = isModal ? this.modalElement : this.content;
         for (i = 0; i < this.loadCallbacks.length; i++) {
             this.loadCallbacks[i](content, isModal);
@@ -79,7 +81,7 @@ var core = {
     onload: function(callback, noautostart) {
         this.loadCallbacks.push(callback);
         if (this.started && !noautostart) {
-            var isModal = window.amajaxify && window.amajaxify.isModalNow();
+            var isModal = amajaxify.isModalNow();
             var content = isModal ? this.modalElement : this.content;
             callback(content, isModal);
         }
@@ -212,7 +214,7 @@ var core = {
     _modalHideEvent: function(event) {
         event.stopImmediatePropagation();
         event.preventDefault();
-        if (window.amajaxify && window.amajaxify.isModalNow()) {
+        if (amajaxify.isModalNow()) {
             window.history.back();
             return false;
         }
@@ -233,12 +235,6 @@ var core = {
     },
 
     ajaxify: function() {
-        var amajaxify = window.amajaxify;
-        if (!amajaxify) {
-            console.warn('amajaxify library is not found; AJAX is disabled');
-            return;
-        }
-
         if (document.cookie.indexOf('noajax=1') >= 0) {
             console.log('amajaxify disabled by cookie');
             return;
@@ -283,7 +279,7 @@ var core = {
      */
     handleResponse: function(data, url) {
         if (data.page_content) {
-            window.amajaxify.handlePageData(url, data.page_content);
+            amajaxify.handlePageData(url, data.page_content);
             return true;
         }
         if (!data.success) {
@@ -339,7 +335,7 @@ var core = {
     _ajaxUnloadEvent: function(event) {
         var i;
         // Если текущая страница — модальное окно, выгружаем его
-        if (window.amajaxify.isModalNow()) {
+        if (amajaxify.isModalNow()) {
             for (i = 0; i < this.unloadModalCallbacks.length; i++) {
                 this.unloadCallbacks[i](this.modalElement);
             }
@@ -495,5 +491,4 @@ core.utils = {
     }
 };
 
-document.addEventListener('DOMContentLoaded', core.init.bind(core)); // new browsers
-document.addEventListener('load', core.init.bind(core)); // old browsers
+export default core;

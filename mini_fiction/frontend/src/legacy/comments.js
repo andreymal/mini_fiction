@@ -1,3 +1,9 @@
+import amajaxify from './lib/amajaxify';
+import captcha from './captcha';
+import core from './core';
+import common from './common';
+
+
 'use strict';
 
 /* global amajaxify: false, core: false, captcha: false, common: false */
@@ -467,6 +473,4 @@ var comments = {
     }
 };
 
-
-core.onload(comments.load.bind(comments));
-core.onunload(comments.unload.bind(comments));
+export default comments;

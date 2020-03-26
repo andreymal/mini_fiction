@@ -1,5 +1,5 @@
 {% extends base %}
-{% from 'macro.html' import breadcrumbs, author_profile_links with context %}
+{% from 'macro.html' import breadcrumbs, user_avatar, author_profile_links with context %}
 
 {% block extrahead %}
     {{- super() }}
@@ -17,7 +17,7 @@
     <div class="{% if not is_system_user %}span8{% else %}span12{% endif %}">
         {% if not is_system_user %}
         <h1 id="author-name">
-            <img src="{{ author.bl.get_avatar_url() }}" width="42" title="{{ author.username }}" alt="{{ author.username }}" class="userpic"/>
+            {{- user_avatar(author) }}
             {{ author.username }}
             {% if current_user.is_staff and current_user.id != author.id %}
                 <form style="margin: 0; display: inline-block;" method="POST" action="{{ url_for('author.ban', user_id=author.id) }}" id="author_ban">

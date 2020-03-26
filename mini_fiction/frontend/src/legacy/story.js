@@ -1,5 +1,38 @@
 'use strict';
 
+import Hypher from 'hypher';
+import ruHyphenation from 'hyphenation.ru';
+
+import amajaxify from './lib/amajaxify';
+import core from './core';
+import common from './common';
+
+import arrowLeft from '../images/arrow-left.png';
+import arrowRight from '../images/arrow-right.png';
+
+const hypher = new Hypher(ruHyphenation);
+
+
+/**
+ * (This method is created by andreymal)
+ *
+ * Recursively hyphenates a array of DOM nodes.
+ *
+ * @param {object} nodes - DOM node or list of DOM nodes (text or elements)
+ */
+const hyphenateDOM = (nodes) => {
+  if ((nodes instanceof HTMLElement) || (node instanceof Text)) {
+    nodes = [nodes];
+  }
+  nodes.foreach(node => {
+    if (node.nodeType === document.TEXT_NODE) {
+      node.nodeValue = hypher.hyphenateText(node.nodeValue);
+    } else if (node.childNodes && node.childNodes.length > 0) {
+      hyphenateDOM([...node.childNodes]);
+    }
+  });
+};
+
 /* global core: false, $: false, Hypher: false, common: false */
 
 
@@ -71,9 +104,8 @@ var story = {
                     restartDelay: 3500
                 }
             });
-            // TODO: расхардкодить
-            $('#slides .slidesjs-previous').html('<img src="/static/i/arrow-left.png" />');
-            $('#slides .slidesjs-next').html('<img src="/static/i/arrow-right.png" />');
+            $('#slides .slidesjs-previous').html(`<img src="${arrowLeft}"/>`);
+            $('#slides .slidesjs-next').html(`<img src="${arrowRight}"/>`);
             slides.classList.remove('carousel-inactive');
         }
 
@@ -443,7 +475,7 @@ var story = {
     },
 
     contributorsStuff: function() {
-        if (!window.amajaxify.isEnabled()) {
+        if (!amajaxify.isEnabled()) {
             return;
         }
         this.contributorsForm = document.getElementById('story-edit-contributors-form');
@@ -1020,9 +1052,9 @@ var story = {
 
         // hyphens
         if (current.hyphens == 'yes') {
-            if (!element.classList.contains('with-hypher') && window.Hypher) {
+            if (!element.classList.contains('with-hypher')) {
                 // TODO: internationalization
-                Hypher.languages.ru.hyphenateDOM(element);
+                hyphenateDOM(element);
                 element.classList.add('with-hypher');
             }
             element.classList.add('mode-hyphens');
@@ -1146,7 +1178,4 @@ var story = {
     }
 };
 
-
-core.oninit(story.init.bind(story));
-core.onload(story.load.bind(story));
-core.onunload(story.unload.bind(story));
+export default story;

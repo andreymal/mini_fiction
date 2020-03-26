@@ -1,3 +1,7 @@
+import core from './core';
+import mySettings from './markitup-settings';
+import HTMLSanitizer from './lib/htmlsanitizer';
+
 'use strict';
 
 /* global core: false, $: false, mySettings: false, HTMLSanitizer: false */
@@ -704,9 +708,4 @@ common.allowedTags.img.width = common.allowedTags.img.height = function(node, at
     return value;
 };
 
-
-core.oninit(common.init.bind(common));
-core.onload(common.load.bind(common));
-core.onunload(common.unload.bind(common));
-core.onloadModal(common.loadModal.bind(common));
-core.onunloadModal(common.unloadModal.bind(common));
+export default common;

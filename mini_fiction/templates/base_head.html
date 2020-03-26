@@ -9,18 +9,16 @@
 {% endblock -%}
 
 {%- block head_css %}
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/bootstrap.css') }}" />
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}" />
-    <link rel="stylesheet" href="{{ url_for('static', filename='build/story.{}.css'.format(config['FRONTEND_VERSION'])) }}" />
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/markitup.main.css') }}" />
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/markitup.set.css') }}" />
+    {% set index_css, story_css = webpack_asset('index.css'), webpack_asset('story.css') %}
+    <link rel="stylesheet" href="{{ url_for('static', filename='build/{}'.format(index_css.src)) }}" integrity="{{ index_css.integrity }}" crossorigin="anonymous"/>
+    <link rel="stylesheet" href="{{ url_for('static', filename='build/{}'.format(story_css.src)) }}" integrity="{{ story_css.integrity }}" crossorigin="anonymous"/>
 {%- for css_link in extra_css %}
     <link rel="stylesheet" href="{{ css_link }}" />
 {%- endfor -%}
 {% endblock -%}
 
 {%- block head_js %}
-    <script async src="{{ url_for('static', filename='build/story.{}.js'.format(config['FRONTEND_VERSION'])) }}"></script>
+    {# TODO: Pull up here all async stuff... later #}
 {% endblock -%}
 
 {%- block meta_robots_tag %}{% if robots_noindex or robots_nofollow %}

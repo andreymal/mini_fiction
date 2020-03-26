@@ -398,3 +398,5 @@ HTMLSanitizer.prototype.copyAttributes = function(node, cleanNode, copyAttrs) {
         }
     }
 };
+
+export default HTMLSanitizer;

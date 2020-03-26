@@ -61,8 +61,6 @@ font-size: 100%;
 -webkit-text-size-adjust: 100%;
 -ms-text-size-adjust: 100%;
 }
-a:focus {}
-a:hover,a:active {ff3368}
 sub,
 sup {
 position: relative;

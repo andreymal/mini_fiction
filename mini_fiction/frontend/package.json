@@ -4,8 +4,8 @@
   "description": "Frontend components",
   "scripts": {
     "webpack": "webpack --progress",
-    "webpack:watch": "webpack --progress --watch",
-    "build": "NODE_ENV=production webpack --progress -p --display-modules --display-chunks",
+    "webpack:watch": "webpack --progress --watch -p --display-chunks",
+    "build": "NODE_ENV=production webpack --progress -p --display-chunks",
     "lint": "eslint src test"
   },
   "author": {
@@ -19,6 +19,9 @@
     "@babel/polyfill": "^7.0.0-rc.2",
     "bazooka": "^0.9.0",
     "classnames": "^2.2.6",
+    "core-js": "^2.5.7",
+    "hyphenation.ru": "^0.2.1",
+    "hypher": "^0.2.5",
     "preact": "^8.2.9",
     "preact-compat": "^3.18.2",
     "react-autosuggest": "^9.3.4",
@@ -70,6 +73,7 @@
     "autoprefixer": "^9.1.0",
     "babel-eslint": "^8.2.6",
     "babel-loader": "^8.0.0-beta.6",
+    "clean-webpack-plugin": "^0.1.19",
     "css-loader": "^1.0.0",
     "cssnano": "^4.0.5",
     "cssnano-preset-advanced": "^4.0.0",
@@ -78,6 +82,7 @@
     "eslint-plugin-import": "^2.13.0",
     "eslint-plugin-jsx-a11y": "^6.1.1",
     "eslint-plugin-react": "^7.10.0",
+    "file-loader": "^2.0.0",
     "mini-css-extract-plugin": "^0.4.1",
     "postcss-custom-properties": "^7.0.0",
     "postcss-loader": "^2.1.6",
@@ -85,7 +90,9 @@
     "postcss-nesting": "^6.0.0",
     "source-map-loader": "^0.2.3",
     "style-loader": "^0.21.0",
+    "url-loader": "^1.1.1",
     "webpack": "^4.16.4",
+    "webpack-assets-manifest": "^3.0.2",
     "webpack-cli": "^3.1.0",
     "webpack-remove-block-loader": "^1.0.2"
   }

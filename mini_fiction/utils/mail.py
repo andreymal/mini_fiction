@@ -15,28 +15,51 @@ def smtp_connect(config=None):
     if config is None:
         config = current_app.config
 
-    if config.get('EMAIL_USE_SSL'):
+    host = config['EMAIL_HOST']
+    port = config.get('EMAIL_PORT', 25)
+    timeout = config.get('EMAIL_TIMEOUT', 10)
+    user = config.get('EMAIL_HOST_USER')
+    password = config.get('EMAIL_HOST_PASSWORD')
+
+    use_ssl = config.get('EMAIL_USE_SSL', False)
+    use_tls = config.get('EMAIL_USE_TLS', False)
+    ssl_certfile = config.get('EMAIL_SSL_CERTFILE')
+    ssl_keyfile = config.get('EMAIL_SSL_KEYFILE')
+
+    if use_ssl and use_tls:
+        raise ValueError(
+            'EMAIL_USE_TLS/EMAIL_USE_SSL are mutually exclusive, so only set '
+            'one of those settings to True.'
+        )
+
+    ssl_ctx = None
+    if use_ssl or use_tls:
+        import ssl
+        ssl_ctx = ssl.create_default_context()
+        if ssl_certfile or ssl_keyfile:
+            ssl_ctx.load_cert_chain(ssl_certfile, ssl_keyfile)
+
+    if use_ssl:
         s = smtplib.SMTP_SSL(
-            config['EMAIL_HOST'],
-            config['EMAIL_PORT'],
-            timeout=config['EMAIL_TIMEOUT'],
-            keyfile=config['EMAIL_SSL_KEYFILE'],
-            certfile=config['EMAIL_SSL_CERTFILE'],
+            host,
+            port,
+            timeout=timeout,
+            context=ssl_ctx,
         )
     else:
         s = smtplib.SMTP(
-            config['EMAIL_HOST'],
-            config['EMAIL_PORT'],
-            timeout=config['EMAIL_TIMEOUT'],
+            host,
+            port,
+            timeout=timeout,
         )
 
-    if not config.get('EMAIL_USE_SSL') and config.get('EMAIL_USE_TLS'):
+    if use_tls:
         s.ehlo()
-        s.starttls(keyfile=config['EMAIL_SSL_KEYFILE'], certfile=config['EMAIL_SSL_CERTFILE'])
+        s.starttls(context=ssl_ctx)
         s.ehlo()
 
-    if config.get('EMAIL_HOST_USER'):
-        s.login(config['EMAIL_HOST_USER'], config['EMAIL_HOST_PASSWORD'])
+    if user:
+        s.login(user, password)
 
     return s
 

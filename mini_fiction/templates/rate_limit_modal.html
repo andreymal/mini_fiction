@@ -1,0 +1,13 @@
+<div class="modal-header">
+    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+    <h3>429 — слишком много запросов</h3>
+</div>
+<div class="modal-body">
+    <div class="story-item">
+        <p>Похоже, вы слишком быстры! Отдохните, попейте чаю{% if error.ttl %} и возвращайтесь {{ timesince(delta=-error.ttl) }}{% endif %}.</p>
+    </div>
+</div>
+<div class="modal-footer">
+    <a href="#" class="btn" data-dismiss="modal" aria-hidden="true">Вернуться</a>
+</div>
+

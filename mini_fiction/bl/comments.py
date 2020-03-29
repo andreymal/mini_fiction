@@ -9,6 +9,7 @@ from pony import orm
 from flask import Markup, current_app, url_for
 from flask_babel import lazy_gettext
 
+from mini_fiction.ratelimit import RateLimitExceeded
 from mini_fiction.bl.utils import BaseBL
 from mini_fiction.utils.misc import calc_maxdepth, call_after_request as later
 from mini_fiction.validation import Validator, ValidationError
@@ -413,8 +414,24 @@ class StoryCommentBL(BaseCommentBL):
     def _attributes_for(self, data):
         return {'story_published': data['story'].published}
 
-    def create(self, *args, **kwargs):
-        comment = super().create(*args, **kwargs)
+    def create(self, target, author, ip, data):
+        try:
+            if author and not author.is_staff:
+                current_app.rate_limiter.limit(
+                    'comment_newuser' if author.bl.is_new_user() else 'comment',
+                    target=author.id,
+                )
+            if ip and (not author or not author.is_staff):
+                current_app.rate_limiter.limit('comment_ip', target=ip)
+        except RateLimitExceeded as exc:
+            current_app.logger.warning(
+                'User %s reached comment limit (%s)',
+                author.username if author else 'N/A',
+                exc.summary(),
+            )
+            raise
+
+        comment = super().create(target, author, ip, data)
         later(current_app.tasks['notify_story_comment'].delay, comment.id)
         later(current_app.tasks['sphinx_update_comments_count'].delay, comment.story.id)
 
@@ -544,7 +561,23 @@ class NewsCommentBL(BaseCommentBL):
     def get_abuse_link(self, _external=False):
         return url_for('abuse.abuse_newscomment', news_id=self.model.newsitem.id, local_id=self.model.local_id, _external=_external)
 
-    def create(self, *args, **kwargs):
-        comment = super().create(*args, **kwargs)
+    def create(self, target, author, ip, data):
+        try:
+            if author and not author.is_staff:
+                current_app.rate_limiter.limit(
+                    'comment_newuser' if author.bl.is_new_user() else 'comment',
+                    target=author.id,
+                )
+            if ip and (not author or not author.is_staff):
+                current_app.rate_limiter.limit('comment_ip', target=ip)
+        except RateLimitExceeded as exc:
+            current_app.logger.warning(
+                'User %s reached comment limit (%s)',
+                author.username if author else 'N/A',
+                exc.summary(),
+            )
+            raise
+
+        comment = super().create(target, author, ip, data)
         later(current_app.tasks['notify_news_comment'].delay, comment.id)
         return comment

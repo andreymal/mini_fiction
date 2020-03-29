@@ -17,6 +17,7 @@ import lxml.etree
 from pony import orm
 from flask import Markup, current_app
 
+from mini_fiction.ratelimit import RateLimitExceeded
 from mini_fiction.bl.utils import BaseBL
 from mini_fiction.bl.commentable import Commentable
 from mini_fiction.utils.misc import words_count, normalize_tag, call_after_request as later
@@ -69,6 +70,17 @@ class StoryBL(BaseBL, Commentable):
 
         if not authors:
             raise ValueError('Authors are required')
+
+        if not authors[0].is_staff:
+            try:
+                current_app.rate_limiter.limit('story', target=authors[0].id)
+            except RateLimitExceeded as exc:
+                current_app.logger.warning(
+                    'User %s reached story limit (%s)',
+                    authors[0].username,
+                    exc.summary(),
+                )
+                raise
 
         data = Validator(STORY).validated(data)
 
@@ -1633,6 +1645,17 @@ class ChapterBL(BaseBL):
     def create(self, story, editor, data):
         from mini_fiction.models import Chapter
         from mini_fiction.validation.utils import safe_string_coerce, safe_string_multiline_coerce
+
+        if not editor.is_staff:
+            try:
+                current_app.rate_limiter.limit('chapter', target=editor.id)
+            except RateLimitExceeded as exc:
+                current_app.logger.warning(
+                    'User %s reached chapter limit (%s)',
+                    editor.username,
+                    exc.summary(),
+                )
+                raise
 
         new_order = orm.select(orm.max(x.order) for x in Chapter if x.story == story).first()
 

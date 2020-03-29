@@ -54,6 +54,28 @@ class Config(object):
     # filesystem
     CACHE_DIR = os.path.join(os.getcwd(), 'cache')
 
+    # Rate limiter
+    RATE_LIMIT_BACKEND = None
+    # RATE_LIMIT_BACKEND = {
+    #     'host': 'localhost',
+    #     'port': 6379,
+    #     'db': 0,
+    # }
+    RATE_LIMIT_PREFIX = 'mf_rate_limit_'
+
+    RATE_LIMITS = {
+        # max 10 comments per 6 hours
+        'comment_newuser': (10, 3600 * 6),
+        # max 20 comments per hour
+        'comment': (20, 3600),
+        # max 30 comments per hour from single ip
+        'comment_ip': (30, 3600),
+        # max 5 stories per day
+        'story': (5, 3600 * 24),
+        # max 100 chapters per hour
+        'chapter': (100, 3600),
+    }
+
     CHAPTER_NEW_HTML_BACKEND_CACHE_TIME = 3600 * 12  # seconds
     CHAPTER_OLD_HTML_BACKEND_CACHE_TIME = 1800  # seconds
     CHAPTER_NEW_AGE = 3600 * 24 * 7  # seconds

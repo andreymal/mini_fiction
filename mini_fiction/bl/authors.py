@@ -520,7 +520,6 @@ class AuthorBL(BaseBL):
 
         return prp
 
-
     def reset_password_by_email(self):
         user = self.model
         if not user.email:
@@ -772,6 +771,15 @@ class AuthorBL(BaseBL):
         token = utils_random.random_string(32)
         self.model.session_token = token
         return token
+
+    def is_new_user(self):
+        # simple heuristic used by rate limiters
+        user = self.model
+        if user.published_stories_count > 0:
+            return False
+        if user.all_story_comments_count > 100:
+            return False
+        return True
 
     def get_full_name(self):
         user = self._model()

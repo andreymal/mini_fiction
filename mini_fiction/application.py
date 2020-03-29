@@ -29,7 +29,7 @@ from flask_wtf.csrf import CSRFProtect, CSRFError
 from flask_cors import CORS
 
 from mini_fiction import models  # pylint: disable=unused-import
-from mini_fiction import database, tasks, context_processors
+from mini_fiction import database, tasks, context_processors, ratelimit
 from mini_fiction.bl import init_bl
 
 
@@ -79,6 +79,7 @@ def create_app():
     configure_user_agent(app)
     configure_i18n(app)
     configure_cache(app)
+    configure_rate_limit(app)
     configure_forms(app)
     configure_users(app)
     configure_error_handlers(app)
@@ -221,6 +222,13 @@ def configure_cache(app):
 
     else:
         raise ValueError('Unknown cache type: {}'.format(app.config['CACHE_TYPE']))
+
+
+def configure_rate_limit(app):
+    if app.config.get('RATE_LIMIT_BACKEND'):
+        app.rate_limiter = ratelimit.RedisRateLimiter(app)
+    else:
+        app.rate_limiter = ratelimit.NullRateLimiter(app)
 
 
 def configure_forms(app):
@@ -404,6 +412,12 @@ def configure_errorpages(app):
     def _page500(e):
         return _error_common('500.html', '500_modal.html', 500, e)
 
+    def _page_rate_limit(e):
+        response = _error_common('rate_limit.html', 'rate_limit_modal.html', 429, e)
+        if e.ttl > 0:
+            response.headers['Retry-After'] = str(e.ttl)
+        return response
+
     def _pagecsrf(e):
         return _error_common('csrf.html', 'csrf_modal.html', 400, e)
 
@@ -415,6 +429,7 @@ def configure_errorpages(app):
     app.errorhandler(403)(db_session(_page403))
     app.errorhandler(404)(db_session(_page404))
     app.errorhandler(500)(db_session(_page500))
+    app.errorhandler(ratelimit.RateLimitExceeded)(db_session(_page_rate_limit))
     app.errorhandler(CSRFError)(db_session(_pagecsrf))
     app.errorhandler(HTTPException)(db_session(_pageall))
 

@@ -1,5 +1,5 @@
 {% if not story.draft and not story.approved -%}
-  <sup class="on-moderation">на модерации</sup>
+  <sup class="on-moderation">на&nbsp;модерации</sup>
 {%- endif %}
 {% if not story.original -%}
   <sup class="translation">перевод</sup>
@@ -10,5 +10,5 @@
 {%- elif status == 'freezed' -%}
     <sup class="suspended">заморожен</sup>
 {%- else -%}
-    <sup class="incomplete">не завершен</sup>
+    <sup class="incomplete">не&nbsp;завершен</sup>
 {% endif %}

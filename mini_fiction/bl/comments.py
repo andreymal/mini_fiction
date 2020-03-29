@@ -419,6 +419,7 @@ class StoryCommentBL(BaseCommentBL):
         later(current_app.tasks['sphinx_update_comments_count'].delay, comment.story.id)
 
         if comment.author:
+            comment.author.all_story_comments_count += 1
             act = comment.story.bl.get_activity(comment.author)
             if act:
                 act.last_comments += 1

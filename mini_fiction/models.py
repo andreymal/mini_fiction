@@ -78,6 +78,9 @@ class Author(db.Entity, UserMixin):
     comment_spoiler_threshold = orm.Optional(int, size=16, nullable=True, default=None)
     header_mode = orm.Optional(str, 8, py_check=lambda x: x in {'', 'off', 'l', 'ls'})
 
+    published_stories_count = orm.Required(int, unsigned=True, default=0, optimistic=False)
+    all_story_comments_count = orm.Required(int, unsigned=True, default=0, optimistic=False)  # С учётом удалённых
+
     # Если хранить подписки наизнанку, проще регистрировать народ и добавлять
     # новые типы подписок
     silent_email = orm.Optional(orm.LongStr, lazy=False)

@@ -8,7 +8,58 @@ import click
 from pony import orm
 
 from mini_fiction.management.manager import cli
-from mini_fiction.models import Tag, StoryTag, Story, Chapter, StoryView
+from mini_fiction.models import (
+    Author, Tag, StoryTag, Story, StoryContributor, Chapter, StoryView,
+    StoryComment
+)
+
+
+def check_author_counters(verbosity=0, dry_run=False):
+    last_id = 0
+    all_count = 0
+    changed_count = 0
+
+    while True:
+        with orm.db_session:
+            qs = Author.select().order_by(Author.id)
+            if last_id is not None:
+                qs = qs.filter(lambda x: x.id > last_id)
+            authors = list(qs[:50])
+            if not authors:
+                break
+            last_id = authors[-1].id
+
+            for author in authors:
+                all_count += 1
+                changed = False
+
+                data = {}
+
+                data['published_stories_count'] = orm.count(
+                    c.story.id
+                    for c in StoryContributor
+                    if not c.story.draft and c.story.approved and c.user == author and c.is_author
+                )
+
+                data['all_story_comments_count'] = orm.count(
+                    c for c in StoryComment if c.author == author
+                )
+
+                for k, v in data.items():
+                    if verbosity >= 2 or (verbosity and v != getattr(author, k)):
+                        print('Author {} (id={}) {}: {} -> {}'.format(
+                            author.username, author.id, k, getattr(author, k), v,
+                        ), file=sys.stderr)
+                    if v != getattr(author, k):
+                        if not dry_run:
+                            setattr(author, k, v)
+                        changed = True
+
+                if changed:
+                    changed_count += 1
+
+    if verbosity >= 1:
+        print('{} authors available, {} authors changed'.format(all_count, changed_count), file=sys.stderr)
 
 
 def check_tag_stories_count(verbosity=0, dry_run=False):
@@ -146,6 +197,9 @@ def checkcounters(only_modified, dry_run):
 
     verbosity = 1 if only_modified else 2
 
+    check_author_counters(verbosity=verbosity, dry_run=dry_run)
+    if verbosity:
+        print('', file=sys.stderr)
     check_tag_stories_count(verbosity=verbosity, dry_run=dry_run)
     if verbosity:
         print('', file=sys.stderr)

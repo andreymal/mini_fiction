@@ -239,6 +239,13 @@ class StoryBL(BaseBL, Commentable):
         story = self.model
         published = story.published
 
+        # Обновляем число опубликованных авторами рассказов
+        for author in self.get_authors():
+            if published:
+                author.published_stories_count += 1
+            else:
+                author.published_stories_count -= 1
+
         # Обновляем число рассказов в тегах
         for story_tag in story.tags.select().prefetch(StoryTag.tag):
             if published:

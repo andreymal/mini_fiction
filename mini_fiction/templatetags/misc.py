@@ -5,6 +5,7 @@ from flask import Markup, escape, request, url_for
 
 from mini_fiction.templatetags import registry
 from mini_fiction.utils import misc as utils_misc
+from mini_fiction.utils import timesince as utils_timesince
 
 
 @registry.simple_tag()
@@ -89,3 +90,8 @@ def safe_password_hash(password_hash):
         return '*' * len(password_hash)
 
     return password_hash[:4] + '*' * (len(password_hash) - 4)
+
+
+@registry.simple_tag()
+def timesince(dt=None, now=None, delta=None):
+    return utils_timesince.timesince(dt=dt, now=now, delta=delta)

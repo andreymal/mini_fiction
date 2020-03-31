@@ -57,14 +57,16 @@ class FB2ZipDownload(FB2BaseDownload, ZipFileDownloadFormat):
     def render_zip_contents(self, zipobj, story, **kw):
         data = self.render_fb2(story=story, **kw)
 
+        filename = kw.pop('filename', slugify(story.title or str(story.id))) + '.fb2'
+
         zipinfo = zipfile.ZipInfo(
-            kw.pop('filename', slugify(story.title or str(story.id))),
+            filename,
             date_time=story.updated.timetuple()[:6],
         )
         zipinfo.compress_type = zipfile.ZIP_DEFLATED
         zipinfo.external_attr = 0o644 << 16  # Python 3.4 ставит файлам права 000, фиксим
 
-        zipobj.writestr(zipinfo + '.fb2', data)
+        zipobj.writestr(zipinfo, data)
 
     def render(self, **kw):
         if kw.get('debug'):

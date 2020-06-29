@@ -1,4 +1,5 @@
 factory-boy
+faker<2.0.4
 pytest-runner
 pytest-selenium
 pytest-flask

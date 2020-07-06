@@ -84,7 +84,6 @@ class NullRateLimiter(BaseRateLimiter):
         return 0
 
     def incr_key(self, key, timeout):
-        print('null', key)
         return 0
 
     def get_key_ttl(self, key):

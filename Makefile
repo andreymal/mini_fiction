@@ -1,4 +1,4 @@
-.PHONY: help clean clean-build clean-pyc clean-translations clean-frontend lint test test-all coverage release release-test release-sign release-sign-test dist install develop babel-extract babel-update babel-compile
+.PHONY: help clean clean-build clean-pyc clean-translations clean-frontend lint test test-all coverage release release-test release-sign release-sign-test dist install develop babel-extract babel-update babel-compile frontend frontend-build
 
 PYTHON?=python3
 PIP?=pip3
@@ -27,6 +27,8 @@ help:
 	@echo "babel-extract - create messages.pot translation template"
 	@echo "babel-update - update .po translation files"
 	@echo "babel-compile - compile .po translation files to .mo"
+	@echo "frontend - build development bundle"
+	@echo "frontend-build - build production bundle"
 
 clean: clean-build clean-pyc clean-translations clean-frontend
 
@@ -114,3 +116,9 @@ babel-update: babel-extract
 
 babel-compile:
 	pybabel compile -d mini_fiction/translations
+
+frontend:
+	cd mini_fiction/frontend && $(NPM) run-script webpack
+
+frontend-build:
+	cd mini_fiction/frontend && $(NPM) run-script build

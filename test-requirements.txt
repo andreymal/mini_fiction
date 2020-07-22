@@ -1,5 +1,4 @@
 factory-boy
-faker<2.0.4
 pytest-runner
 pytest-selenium
 pytest-flask>=0.15,<1.0
@@ -12,3 +11,7 @@ importlib-metadata<1,>=0.12
 pluggy>=0.12,<0.14
 # Travis CI
 py>=1.4.29
+# py34 pin
+faker<2.0.4
+requests<2.22
+idna>=2.5,<2.9

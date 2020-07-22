@@ -1,5 +1,4 @@
 Flask-WTF
-email_validator
 WTForms>=2.2.1,<4.0
 Flask-Login>=0.4.1
 Flask-Babel>=0.11,<0.12
@@ -16,3 +15,5 @@ pony==0.7.11
 lxml<4.4.0
 pytz
 python-dotenv
+# py34 pin
+email_validator

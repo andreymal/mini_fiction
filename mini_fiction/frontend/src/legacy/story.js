@@ -21,10 +21,10 @@ const hypher = new Hypher(ruHyphenation);
  * @param {object} nodes - DOM node or list of DOM nodes (text or elements)
  */
 const hyphenateDOM = (nodes) => {
-  if ((nodes instanceof HTMLElement) || (node instanceof Text)) {
+  if ((nodes instanceof HTMLElement) || (nodes instanceof Text)) {
     nodes = [nodes];
   }
-  nodes.foreach(node => {
+  nodes.forEach(node => {
     if (node.nodeType === document.TEXT_NODE) {
       node.nodeValue = hypher.hyphenateText(node.nodeValue);
     } else if (node.childNodes && node.childNodes.length > 0) {

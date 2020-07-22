@@ -1,3 +1,5 @@
+import 'whatwg-fetch'; // init polyfill for IE11
+
 import core from './legacy/core';
 import common from './legacy/common';
 import comments from './legacy/comments';
@@ -8,8 +10,6 @@ import captcha from './legacy/captcha';
 
 
 const { document } = window;
-
-document.addEventListener('DOMContentLoaded', core.init.bind(core));
 
 core.oninit(common.init.bind(common));
 core.onload(common.load.bind(common));
@@ -31,3 +31,9 @@ core.onunload(captcha.unload);
 
 core.onload(comments.load.bind(comments));
 core.onunload(comments.unload.bind(comments));
+
+if (window.document.readyState !== 'loading') {
+  core.init();
+} else {
+  window.document.addEventListener('DOMContentLoaded', () => core.init());
+}

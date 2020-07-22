@@ -1,7 +1,7 @@
 import path from 'path';
 import AssetsManifestPlugin from 'webpack-assets-manifest';
 import MiniCssExtractPlugin from 'mini-css-extract-plugin';
-import CleanWebpackPlugin from 'clean-webpack-plugin';
+import { CleanWebpackPlugin } from 'clean-webpack-plugin';
 import HashedModuleIdsPlugin from 'webpack/lib/HashedModuleIdsPlugin';
 
 import postCSSAutoPrefixer from 'autoprefixer';
@@ -18,19 +18,13 @@ const outputName = `[name].${isDev ? 'dev' : '[contenthash]'}`;
 
 
 const reactAliases = {
-  react: 'preact-compat',
-  'react-dom': 'preact-compat',
+  react: 'preact/compat',
+  'react-dom': 'preact/compat',
 };
 
 const postCSSLoaderOptions = {
   plugins: () => [
-    postCSSAutoPrefixer({
-      browsers: [
-        'last 3 versions',
-        '> 1%',
-        'IE 11',
-      ],
-    }),
+    postCSSAutoPrefixer(),
     postCSSMixins(),
     postCSSNesting(),
     postCSSCustomProperties({
@@ -43,7 +37,6 @@ const postCSSLoaderOptions = {
 const cssLoaderOptions = {
   modules: false,
   importLoaders: 1,
-  minimize: !isDev,
   url: true,
 };
 
@@ -130,10 +123,11 @@ module.exports = {
       filename: `${outputName}.css`,
       chunkFilename: '[id].css',
     }),
-    new CleanWebpackPlugin(outputPath, { watch: true, beforeEmit: true }),
+    new CleanWebpackPlugin(),
     new AssetsManifestPlugin({
       output: 'manifest.json',
       integrity: true,
+      integrityHashes: ['sha256'],
       customize: (_, original) => original,
     }),
   ].concat(isDev ? [] : new HashedModuleIdsPlugin()),

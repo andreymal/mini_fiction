@@ -22,7 +22,7 @@
     "core-js": "^3.6.5",
     "hyphenation.ru": "^0.2.1",
     "hypher": "^0.2.5",
-    "jquery": "^2.2.4",
+    "jquery": "^3.5.1",
     "preact": "^10.4.6",
     "prop-types": "^15.7.2",
     "react-autosuggest": "^10.0.2",

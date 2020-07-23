@@ -1,6 +1,6 @@
 // ----------------------------------------------------------------------------
 // markItUp! Universal MarkUp Engine, JQuery plugin
-// v 1.1.x
+// v 1.1.15 (slightly patched by andreymal and github contributors)
 // Dual licensed under the MIT and GPL licenses.
 // ----------------------------------------------------------------------------
 // Copyright (C) 2007-2012 Jay Salvat
@@ -24,6 +24,7 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 // ----------------------------------------------------------------------------
+'use strict';
 (function($) {
 	$.fn.markItUp = function(settings, extraSettings) {
 		var method, params, options, ctrlKey, shiftKey, altKey; ctrlKey = shiftKey = altKey = false;
@@ -45,6 +46,7 @@
 					previewParser:			false,
 					previewParserPath:		'',
 					previewParserVar:		'data',
+					previewParserAjaxType:	'POST',
 					resizeHandle:			true,
 					beforeInsert:			'',
 					afterInsert:			'',
@@ -59,7 +61,7 @@
 		// compute markItUp! path
 		if (!options.root) {
 			$('script').each(function(a, tag) {
-				miuScript = $(tag).get(0).src.match(/(.*)jquery\.markitup(\.pack)?\.js$/);
+				var miuScript = $(tag).get(0).src.match(/(.*)jquery\.markitup(\.pack)?\.js$/);
 				if (miuScript !== null) {
 					options.root = miuScript[1];
 				}
@@ -132,7 +134,7 @@
 
 			// init and build editor
 			function init() {
-				id = ''; nameSpace = '';
+				var id = '', nameSpace = '';
 				if (options.id) {
 					id = 'id="'+options.id+'"';
 				} else if ($$.attr("id")) {
@@ -156,7 +158,7 @@
 
 				// add the resize handle after textarea
 				if (options.resizeHandle === true && browser.safari !== true) {
-					resizeHandle = $('<div class="markItUpResizeHandle"></div>')
+					var resizeHandle = $('<div class="markItUpResizeHandle"></div>')
 						.insertAfter($$)
 						.bind("mousedown.markItUp", function(e) {
 							var h = $$.height(), y = e.clientY, mouseMove, mouseUp;
@@ -201,7 +203,7 @@
 				var ul = $('<ul></ul>'), i = 0;
 				$('li:hover > ul', ul).css('display', 'block');
 				$.each(markupSet, function() {
-					var button = this, t = '', title, li, j;
+					var button = this, t = '', title, key, li, j;
 					title = (button.key) ? (button.name||'')+' [Ctrl+'+button.key+']' : (button.name||'');
 					key   = (button.key) ? 'accesskey="'+button.key+'"' : '';
 					if (button.separator) {
@@ -218,9 +220,9 @@
 							e.preventDefault();
 						}).bind("focusin.markItUp", function(){
                             $$.focus();
-						}).bind('mouseup', function() {
+						}).bind('mouseup', function(e) {
 							if (button.call) {
-								eval(button.call)();
+								eval(button.call)(e); // Pass the mouseup event to custom delegate
 							}
 							setTimeout(function() { markup(button) },1);
 							return false;
@@ -264,7 +266,7 @@
 							if (abort === true) {
 								return false;
 							}
-							value = prompt(b[0], (b[1]) ? b[1] : '');
+							var value = prompt(b[0], (b[1]) ? b[1] : '');
 							if (value === null) {
 								abort = true;
 							}
@@ -293,13 +295,13 @@
 				var openBlockWith 		= prepare(clicked.openBlockWith);
 				var closeBlockWith 		= prepare(clicked.closeBlockWith);
 				var multiline 			= clicked.multiline;
-				
+				var block;
 				if (replaceWith !== "") {
 					block = openWith + replaceWith + closeWith;
-				} else if (selection === '' && placeHolder !== '') {
+				} else if (get() === '' && placeHolder !== '') {
 					block = openWith + placeHolder + closeWith;
 				} else {
-					string = string || selection;
+					string = string || get();
 
 					var lines = [string], blocks = [];
 					
@@ -308,7 +310,7 @@
 					}
 					
 					for (var l = 0; l < lines.length; l++) {
-						line = lines[l];
+						var line = lines[l];
 						var trailingSpaces;
 						if (trailingSpaces = line.match(/ *$/)) {
 							blocks.push(openWith + line.replace(/ *$/g, '') + closeWith + trailingSpaces);
@@ -334,9 +336,9 @@
 
 			// define markup to insert
 			function markup(button) {
-				var len, j, n, i;
+				var len, j, n, i, string, start;
 				hash = clicked = button;
-				get();
+				var selection = get();
 				$.extend(hash, {	line:"", 
 						 			root:options.root,
 									textarea:textarea, 
@@ -356,7 +358,7 @@
 				$.extend(hash, { line:1 });
 
 				if ((ctrlKey === true && shiftKey === true)) {
-					lines = selection.split(/\r?\n/);
+					var lines = selection.split(/\r?\n/);
 					for (j = 0, n = lines.length, i = 0; i < n; i++) {
 						if ($.trim(lines[i]) !== '') {
 							$.extend(hash, { line:++j, selection:lines[i] } );
@@ -418,6 +420,9 @@
 				if (previewWindow && options.previewAutoRefresh) {
 					refreshPreview(); 
 				}
+
+				// Triggers an input event to allow other scripts to react.
+				textarea.dispatchEvent(new Event('input'));
 																									
 				// reinit keyevent
 				shiftKey = altKey = ctrlKey = abort = false;
@@ -444,6 +449,7 @@
 					var newSelection = document.selection.createRange();
 					newSelection.text = block;
 				} else {
+					var selection = get();
 					textarea.value =  textarea.value.substring(0, caretPosition)  + block + textarea.value.substring(caretPosition + selection.length, textarea.value.length);
 				}
 			}
@@ -455,7 +461,7 @@
 					if (browser.opera && browser.version >= 9.5 && len == 0) {
 						return false;
 					}
-					range = textarea.createTextRange();
+					var range = textarea.createTextRange();
 					range.collapse(true);
 					range.moveStart('character', start); 
 					range.moveEnd('character', len); 
@@ -469,8 +475,8 @@
 
 			// get the selection
 			function get() {
+				var selection;
 				textarea.focus();
-
 				scrollPosition = textarea.scrollTop;
 				if (document.selection) {
 					selection = document.selection.createRange().text;
@@ -512,7 +518,7 @@
 						} else {
 							iFrame.insertBefore(header);
 						}	
-						previewWindow = iFrame[iFrame.length - 1].contentWindow || frame[iFrame.length - 1];
+						previewWindow = iFrame[iFrame.length - 1].contentWindow || iFrame[iFrame.length - 1];
 					}
 				} else if (altKey === true) {
 					if (iFrame) {
@@ -537,18 +543,19 @@
 
 			function renderPreview() {
 				var phtml;
+				var parsedData = $$.val();
+				if (options.previewParser && typeof options.previewParser === 'function') {
+					parsedData = options.previewParser(parsedData); 
+				}
 				if (options.previewHandler && typeof options.previewHandler === 'function') {
-					options.previewHandler( $$.val() );
-				} else if (options.previewParser && typeof options.previewParser === 'function') {
-					var data = options.previewParser( $$.val() );
-					writeInPreview(localize(data, 1) ); 
+					options.previewHandler(parsedData);
 				} else if (options.previewParserPath !== '') {
 					$.ajax({
-						type: 'POST',
+						type: options.previewParserAjaxType,
 						dataType: 'text',
 						global: false,
 						url: options.previewParserPath,
-						data: options.previewParserVar+'='+encodeURIComponent($$.val()),
+						data: options.previewParserVar+'='+encodeURIComponent(parsedData),
 						success: function(data) {
 							writeInPreview( localize(data, 1) ); 
 						}
@@ -560,7 +567,7 @@
 							dataType: 'text',
 							global: false,
 							success: function(data) {
-								writeInPreview( localize(data, 1).replace(/<!-- content -->/g, $$.val()) );
+								writeInPreview( localize(data, 1).replace(/<!-- content -->/g, parsedData) );
 							}
 						});
 					}
@@ -572,6 +579,7 @@
 				if (options.previewInElement) {
 					$(options.previewInElement).html(data);
 				} else if (previewWindow && previewWindow.document) {			
+					var sp;
 					try {
 						sp = previewWindow.document.documentElement.scrollTop
 					} catch(e) {
@@ -592,7 +600,7 @@
 
 				if (e.type === 'keydown') {
 					if (ctrlKey === true) {
-						li = $('a[accesskey="'+((e.keyCode == 13) ? '\\n' : String.fromCharCode(e.keyCode))+'"]', header).parent('li');
+						var li = $('a[accesskey="'+((e.keyCode == 13) ? '\\n' : String.fromCharCode(e.keyCode))+'"]', header).parent('li');
 						if (li.length !== 0) {
 							ctrlKey = false;
 							setTimeout(function() {
@@ -636,6 +644,12 @@
 			function remove() {
 				$$.unbind(".markItUp").removeClass('markItUpEditor');
 				$$.parent('div').parent('div.markItUp').parent('div').replaceWith($$);
+
+				var relativeRef = $$.parent('div').parent('div.markItUp').parent('div');
+				if (relativeRef.length) {
+				    relativeRef.replaceWith($$);
+				}
+				
 				$$.data('markItUp', null);
 			}
 

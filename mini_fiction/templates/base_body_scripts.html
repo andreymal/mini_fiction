@@ -1,11 +1,3 @@
-    <!-- Third-party libraries -->
-    <script src="{{ url_for('static', filename='js/lib/jquery-2.2.4.min.js') }}"></script>
-    <script src="{{ url_for('static', filename='js/lib/jquery-ui-custom.min.js') }}"></script>
-    <script src="{{ url_for('static', filename='js/lib/jquery.markitup.js') }}"></script>
-    <script src="{{ url_for('static', filename='js/lib/jquery.slides.3.0.4.min.js') }}"></script>
-    <script src="{{ url_for('static', filename='js/lib/bootstrap.min.js') }}"></script>
-
-    <!-- mini_fiction stuff -->
     {% set vendor_js, index_js, story_js = webpack_asset('vendor.js'), webpack_asset('index.js'), webpack_asset('story.js') %}
     {# NOTE: Vendor bundle remains synchronous as long as it depends on jQuery crap #}
     {# TODO: Fix it and pull up to head_js block #}

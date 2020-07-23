@@ -1,5 +1,12 @@
 import 'whatwg-fetch'; // init polyfill for IE11
 
+// Init bootstrap and other legacy stuff
+import 'expose-loader?exposes[]=$&exposes[]=jQuery!jquery';
+import './legacy/lib/jquery-ui-custom.min.js';
+import './legacy/lib/jquery.markitup.js';
+import './legacy/lib/jquery.slides.3.0.4.min.js';
+import './legacy/lib/bootstrap.min.js';
+
 import core from './legacy/core';
 import common from './legacy/common';
 import comments from './legacy/comments';

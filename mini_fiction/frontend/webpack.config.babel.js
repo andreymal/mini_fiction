@@ -31,7 +31,11 @@ const postCSSLoaderOptions = {
       preserve: false,
       warnings: true,
     }),
-  ].concat(isDev ? [] : [postCSSNano({ preset: 'advanced' })]),
+    postCSSNano({preset: ['default', {
+      discardComments: !isDev,
+      normalizeWhitespace: !isDev,
+    }]}),
+  ],
 };
 
 const cssLoaderOptions = {

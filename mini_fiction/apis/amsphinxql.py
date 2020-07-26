@@ -4,10 +4,12 @@
 from queue import Queue
 from threading import local
 
-import MySQLdb
 
-
-Error = MySQLdb.Error
+match_operators_list = [
+    "\\", "(", ")", "|", "-", "!", "@", "~", '"', "&", "/", "^", "$", "=", "<",
+    "OR", "NOT", "MAYBE", "NEAR", "NOTNEAR", "SENTENCE", "PARAGRAPH", "ZONE",
+    "ZONESPAN",
+]
 
 
 class SphinxError(Exception):
@@ -21,10 +23,12 @@ class SphinxConnection:
         'gt': '`%s` > %%s',
         'gte': '`%s` >= %%s',
         'eq': '`%s` = %%s',
-        'ne': '`%s` <> %%s'
+        'ne': '`%s` <> %%s',
     }
 
     def __init__(self, conn):
+        # Ленивая загрузка MySQLdb ради поддержки pymysql.install_as_MySQLdb()
+        import MySQLdb
         self.mysql_conn = MySQLdb.connect(**conn)
         self.mysql_conn.ping(True)
         self.execute('set autocommit=0')
@@ -40,6 +44,9 @@ class SphinxConnection:
         self._with_level -= 1
         if self._with_level == 0:
             if exc:
+                from MySQLdb import Error
+                # 2002 - Can't connect to local MySQL server
+                # 2013 - Lost connection to MySQL server during query
                 if not isinstance(exc, Error) or exc.args[0] not in (2002, 2013):
                     self.rollback()
             else:
@@ -69,17 +76,25 @@ class SphinxConnection:
 
             f, action = f.rsplit('__', 1)
 
-            if action == 'in':
+            if action in ('in', 'in_any'):
                 if x:
-                    q, l = self.prepare_list(x)
+                    q, l = self.prepare_sql_list(x)
                     if sql:
                         sql += ' and '
                     sql += '`%s` in %s' % (f, q)
                     args.extend(l)
 
+            elif action == 'in_all':
+                if x:
+                    for v in x:
+                        if sql:
+                            sql += ' and '
+                        sql += '`%s` = %%s' % f
+                        args.append(v)
+
             elif action == 'not_in':
                 if x:
-                    q, l = self.prepare_list(x)
+                    q, l = self.prepare_sql_list(x)
                     if sql:
                         sql += ' and '
                     sql += '`%s` not in %s' % (f, q)
@@ -97,46 +112,53 @@ class SphinxConnection:
         return sql, args
 
     @classmethod
-    def prepare_list(cls, l):
+    def prepare_sql_list(cls, l):
         if not l:
             return '()', ()
         q = '(' + ('%s, ' * (len(l) - 1)) + '%s)'
         return q, l
 
     @classmethod
-    def escape_sphinxql(cls, s):
+    def escape_match(cls, s):
         s = str(s)
-        toreplace = [
-            '\\', '(', ')', '|', '-', '!', '@', '~', '"', '&', '/', '^', '$', '=', '<',
-            'OR', 'NOT', 'MAYBE', 'NEAR', 'SENTENCE', 'PARAGRAPH', 'ZONE', 'ZONESPAN',
-        ]
-
-        for c in toreplace:
+        for c in match_operators_list:
             s = s.replace(c, '\\' + c)
 
         return s
 
-    def search(
-            self, index, query, fields=('id',), raw_fields=('WEIGHT() AS weight',),
-            sort_by=None, limit=None, options=None, weights=None, extended_syntax=True,
-            **filters
+    def build_search_sql(
+            self,
+            index,  # type: str
+            query,  # type: str
+            fields=('id',),  # type: Iterable[str]
+            raw_fields=('WEIGHT() AS weight',),  # type: Iterable[str]
+            sort_by=None,  # type: Optional[str]
+            limit=None,  # type: Union[None, int, Tuple[int, int]]
+            options=None,  # type: Optional[Dict[str, Any]]
+            weights=None,  # type: Optional[Dict[str, Any]]
+            extended_syntax=True,  # type: bool
+            **filters  # type: Any
         ):
-        # SELECT
-        rfields = ', '.join('`%s`' % x for x in fields)
-        if raw_fields:
-            rfields = rfields + ', ' + ', '.join(raw_fields)
-        sql = 'select %s from `%s` where match(%%s)' % (rfields, index)
+        # type: (...) -> Tuple[str, Tuple[Any, ...]]
 
-        args = [self.escape_sphinxql(query) if not extended_syntax else str(query)]
+        # SELECT
+        sql_fields = ['`%s`' % x for x in fields]
+        if raw_fields:
+            sql_fields.extend(raw_fields)
+        sql = 'select %s from `%s` where match(%%s)' % (', '.join(sql_fields) or '1', index)
+
+        query = self.escape_match(query) if not extended_syntax else str(query)
+        args = [query]
 
         # WHERE
-        wsql = ''
-        wargs = []
+        if 'filters' in filters:
+            # support filters={'field__eq': '...'}
+            filters = filters['filters']
         if filters:
             wsql, wargs = self.build_where(filters)
-        if wsql:
-            sql += ' and ' + wsql
-            args.extend(wargs)
+            if wsql:
+                sql += ' and ' + wsql
+                args.extend(wargs)
 
         # ORDER
         if sort_by is not None:
@@ -164,11 +186,35 @@ class SphinxConnection:
         if weights:
             sql += 'field_weights=(%s)' % ', '.join('%s=%s' % (k, str(v)) for k, v in weights.items())
 
+        return sql, tuple(args)
+
+    def search(
+            self,
+            index,  # type: str
+            query,  # type: str
+            fields=('id',),  # type: Iterable[str]
+            raw_fields=('WEIGHT() AS weight',),  # type: Iterable[str]
+            sort_by=None,  # type: Optional[str]
+            limit=None,  # type: Union[None, int, Tuple[int, int]]
+            options=None,  # type: Optional[Dict[str, Any]]
+            weights=None,  # type: Optional[Dict[str, Any]]
+            extended_syntax=True,  # type: bool
+            **filters  # type: Any
+        ):
+        # type: (...) -> Dict[str, Any]
+
+        from MySQLdb import ProgrammingError
+
+        sql, args = self.build_search_sql(
+            index, query, fields, raw_fields, sort_by, limit, options, weights,
+            extended_syntax, **filters
+        )
+
         # execute
         try:
             cur = self.execute(sql, tuple(args))
-        except MySQLdb.ProgrammingError as exc:
-            if exc.args[0] != 1064:
+        except ProgrammingError as exc:
+            if exc.args[0] != 1064:  # error in SQL syntax
                 raise
             raise SphinxError(exc.args[1])
         result_fields = [x[0] for x in cur.description]
@@ -181,13 +227,15 @@ class SphinxConnection:
 
     def call_snippets(self, index, texts, query, **options):
         if isinstance(texts, str):
-            texts = (texts,)
+            texts = [texts]
+        else:
+            texts = list(texts)
         if not texts:
             return []
         sql = 'call snippets(('
         sql += ', '.join('%s' for _ in range(len(texts)))
         sql += '), %s, %s'
-        args = list(texts) + [index, query]
+        args = texts + [index, query]
 
         for opt, value in options.items():
             sql += ', %%s as `%s`' % opt
@@ -208,10 +256,11 @@ class SphinxConnection:
         ]
         return result
 
-    def add(self, index, items, replace=True):
+    def build_add_sql(self, index, items, replace=True):
         if not items:
-            return
-        fields = tuple(k for k, _ in items[0].items())
+            return '', ()
+
+        fields = tuple(x[0] for x in items[0].items())
         sfields = ', '.join('`%s`' % x for x in fields)
         sql = [
             'replace' if replace else 'insert',
@@ -236,7 +285,7 @@ class SphinxConnection:
                     isql += ', '
 
                 f = item[fk]
-                if isinstance(f, (tuple, list)):
+                if isinstance(f, (tuple, list, set, frozenset)):
                     # rt_attr_multi
                     args.extend(f)
                     isql += '(' + ', '.join('%s' for _ in range(len(f))) + ')'
@@ -246,9 +295,14 @@ class SphinxConnection:
 
             sql.append(isql + ')')
 
-        self.execute(''.join(sql), tuple(args))
+        return ''.join(sql), tuple(args)
 
-    def update(self, index, fields, **filters):
+    def add(self, index, items, replace=True):
+        sql, args = self.build_add_sql(index, items, replace=replace)
+        if sql:
+            self.execute(sql, args)
+
+    def build_update_sql(self, index, fields, **filters):
         sql = 'update `%s` set ' % index
         fields_list = tuple(fields.keys())
         if not fields_list:
@@ -256,28 +310,38 @@ class SphinxConnection:
         sql += ', '.join(('`%s` = %%s' % f) for f in fields_list)
         args = list(fields[f] for f in fields_list)
 
-        wsql = ''
-        wargs = []
+        if 'filters' in filters:
+            # support filters={'field__eq': '...'}
+            filters = filters['filters']
         if filters:
             wsql, wargs = self.build_where(filters)
-        if wsql:
-            sql += ' where ' + wsql
-            args.extend(wargs)
+            if wsql:
+                sql += ' where ' + wsql
+                args.extend(wargs)
 
+        return sql, tuple(args)
+
+    def update(self, index, fields, **filters):
+        sql, args = self.build_update_sql(index, fields, **filters)
         self.execute(sql, args)
 
-    def delete(self, index, **filters):
+    def build_delete_sql(self, index, **filters):
         sql = 'delete from `%s`' % index
         args = []
 
-        wsql = ''
-        wargs = []
+        if 'filters' in filters:
+            # support filters={'field__eq': '...'}
+            filters = filters['filters']
         if filters:
             wsql, wargs = self.build_where(filters)
-        if wsql:
-            sql += ' where ' + wsql
-            args.extend(wargs)
+            if wsql:
+                sql += ' where ' + wsql
+                args.extend(wargs)
 
+        return sql, tuple(args)
+
+    def delete(self, index, **filters):
+        sql, args = self.build_delete_sql(index, **filters)
         self.execute(sql, args)
 
     def begin(self):

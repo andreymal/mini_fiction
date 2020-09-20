@@ -1514,6 +1514,31 @@ p.meta .chapter-controls {
     padding-left: 0px;
 }
 
+.search-tags-mode-widget,
+.search-characters-mode-widget {
+    list-style: none;
+    margin: 0;
+    padding: 0 0 16px 10px;
+}
+
+.search-tags-mode-widget > li,
+.search-characters-mode-widget > li {
+    display: inline-block;
+    margin-right: 10px;
+}
+
+.search-tags-mode-widget input,
+.search-characters-mode-widget input {
+    margin: 0;
+}
+
+.search-tags-mode-widget label,
+.search-characters-mode-widget label {
+    display: inline-block;
+    vertical-align: middle;
+    margin: 0;
+}
+
 .search-results {
     margin-bottom: 100px;
     overflow: visible;

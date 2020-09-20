@@ -979,9 +979,15 @@ class StoryBL(BaseBL, Commentable):
         #     if filters.get(ofilter):
         #         sphinx_filters[ofilter + '__in'] = [x.id for x in filters[ofilter]]
 
-        for ifilter in ('original', 'finished', 'freezed', 'character', 'rating_id'):
+        for ifilter in ('original', 'finished', 'freezed', 'rating_id'):
             if filters.get(ifilter):
                 sphinx_filters[ifilter + '__in'] = [int(x) for x in filters[ifilter]]
+
+        if filters.get('character'):
+            if filters.get('character_mode') == 'any':
+                sphinx_filters['character__in_any'] = filters['character']
+            else:
+                sphinx_filters['character__in_all'] = filters['character']
 
         tags = filters.get('tags') or None
         if tags:
@@ -990,7 +996,11 @@ class StoryBL(BaseBL, Commentable):
                 return raw_result, []
             tags = [x.id for x in tags_info['tags']]
         if tags:
-            sphinx_filters['tag__in'] = tags
+            if filters.get('tags_mode') == 'any':
+                sphinx_filters['tag__in_any'] = tags
+            else:
+                sphinx_filters['tag__in_all'] = tags
+
 
         exclude_tags = filters.get('exclude_tags') or None
         if exclude_tags:
@@ -2169,9 +2179,15 @@ class ChapterBL(BaseBL):
             sphinx_filters['draft'] = 0
             sphinx_filters['approved'] = 1
 
-        for ifilter in ('original', 'finished', 'freezed', 'character', 'rating_id'):
+        for ifilter in ('original', 'finished', 'freezed', 'rating_id'):
             if filters.get(ifilter):
                 sphinx_filters[ifilter + '__in'] = [int(x) for x in filters[ifilter]]
+
+        if filters.get('character'):
+            if filters.get('character_mode') == 'any':
+                sphinx_filters['character__in_any'] = filters['character']
+            else:
+                sphinx_filters['character__in_all'] = filters['character']
 
         tags = filters.get('tags') or None
         if tags:
@@ -2180,7 +2196,10 @@ class ChapterBL(BaseBL):
                 return raw_result, []
             tags = [x.id for x in tags_info['tags']]
         if tags:
-            sphinx_filters['tag__in'] = tags
+            if filters.get('tags_mode') == 'any':
+                sphinx_filters['tag__in_any'] = tags
+            else:
+                sphinx_filters['tag__in_all'] = tags
 
         exclude_tags = filters.get('exclude_tags') or None
         if exclude_tags:

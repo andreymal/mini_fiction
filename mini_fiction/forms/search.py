@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 from wtforms import Form
-from wtforms import SelectField, SelectMultipleField, TextField, BooleanField, IntegerField, validators
+from wtforms import SelectField, SelectMultipleField, TextField, BooleanField, IntegerField, RadioField, validators
 from pony import orm
 
 from mini_fiction.models import Category, Character, Rating, Classifier
@@ -96,6 +96,15 @@ class SearchForm(Form):
         widget=TagsInput(),
     )
 
+    tags_mode = RadioField(
+        'Режим поиска тегов',
+        choices=[
+            ('all', 'Рассказы со всеми тегами'),
+            ('any', 'Рассказы с любым из тегов'),
+        ],
+        default='all',
+    )
+
     exclude_tags = TextField(
         'Исключить рассказы с этими тегами',
         render_kw=dict(attrs_tags_dict, maxlength=512, placeholder='Теги разделяются запятой, например: Флафф, Повседневность, Зарисовка'),
@@ -112,6 +121,15 @@ class SearchForm(Form):
         group_by_field='group',
         render_kw=img_attrs,
         widget=StoriesCharacterSelect(multiple=True),
+    )
+
+    char_mode = RadioField(
+        'Режим поиска персонажей',
+        choices=[
+            ('all', 'Рассказы со всеми персонажами'),
+            ('any', 'Рассказы с любым из персонажей'),
+        ],
+        default='all',
     )
 
     # Оригинал/перевод

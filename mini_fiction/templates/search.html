@@ -48,6 +48,9 @@
                             data-bazooka="storyTags">{{ form.tags }}
                         </span>
                     </p>
+
+                    {{ form.tags_mode(class_='search-tags-mode-widget') }}
+
                     <h4>Исключить рассказы с этими тегами</h4>
                     <p>
                         <span
@@ -59,6 +62,7 @@
                     {% if form.char.choices %}
                     <h4>Персонажи</h4>
                     <div class="characters-select" >{{ form.char }}</div>
+                    {{ form.char_mode(class_='search-characters-mode-widget') }}
                     {% endif %}
                 </div>
                 <!-- Конец спойлера -->

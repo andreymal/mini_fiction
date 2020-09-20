@@ -10,6 +10,7 @@ from mini_fiction.captcha import CaptchaError
 from mini_fiction.validation import ValidationError
 from mini_fiction.utils.misc import calc_maxdepth
 from mini_fiction.validation.utils import safe_string_multiline_coerce
+from mini_fiction.ratelimit import RateLimitExceeded
 
 
 def build_comment_tree_response(comment, target_attr, target):
@@ -304,6 +305,16 @@ def vote(target_attr, comment):
     except ValidationError as exc:
         errors = sum(exc.errors.values(), [])
         return jsonify({'success': False, 'error': '; '.join(str(x) for x in errors)})
+    except RateLimitExceeded as exc:
+        resp = jsonify({
+            'success': False,
+            'error': 'Плюсомёт перегрелся' if value >= 0 else 'Минусомёт перегрелся',
+        })
+        resp.status_code = 429
+        resp.headers['Retry-After'] = str(exc.ttl)
+        return resp
+
+
     return jsonify({
         'success': True,
         'vote_total': comment.vote_total,

@@ -443,6 +443,20 @@ class StoryCommentBL(BaseCommentBL):
 
         return comment
 
+    def vote(self, author, value):
+        try:
+            if author and author.is_authenticated and not author.is_staff:
+                current_app.rate_limiter.limit('comment_vote_plus' if value >= 0 else 'comment_vote_minus', target=author.id)
+        except RateLimitExceeded as exc:
+            current_app.logger.warning(
+                'User %s reached comment voting limit (%s)',
+                author.username if author else 'N/A',
+                exc.summary(),
+            )
+            raise
+
+        return super().vote(author, value)
+
     def select_by_story_author(self, user):
         from mini_fiction.models import StoryContributor
 
@@ -581,3 +595,17 @@ class NewsCommentBL(BaseCommentBL):
         comment = super().create(target, author, ip, data)
         later(current_app.tasks['notify_news_comment'].delay, comment.id)
         return comment
+
+    def vote(self, author, value):
+        try:
+            if author and author.is_authenticated and not author.is_staff:
+                current_app.rate_limiter.limit('comment_vote_plus' if value >= 0 else 'comment_vote_minus', target=author.id)
+        except RateLimitExceeded as exc:
+            current_app.logger.warning(
+                'User %s reached comment voting limit (%s)',
+                author.username if author else 'N/A',
+                exc.summary(),
+            )
+            raise
+
+        return super().vote(author, value)

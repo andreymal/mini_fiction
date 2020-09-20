@@ -395,8 +395,12 @@ var comments = {
                 if (core.handleResponse(data, href)) {
                     return;
                 }
-                voteArea.innerHTML = data.html;
-                core.notify('Ваш голос учтён');
+                if (data.success) {
+                    voteArea.innerHTML = data.html;
+                    core.notify('Ваш голос учтён');
+                } else {
+                    core.notifyError(data.error || 'Не удалось проголосовать');
+                }
             }).then(null, core.handleError).then(function() {
                 voteArea.classList.remove('voting');
             });

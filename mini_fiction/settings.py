@@ -70,6 +70,9 @@ class Config(object):
         'comment': (20, 3600),
         # max 30 comments per hour from single ip
         'comment_ip': (30, 3600),
+        # max 5 comment votes per hour
+        'comment_vote_plus': (5, 3600),
+        'comment_vote_minus': (5, 3600),
         # max 5 stories per day
         'story': (5, 3600 * 24),
         # max 100 chapters per hour

@@ -11,7 +11,7 @@ unidecode
 python-memcached
 redis>=3.2.1,<4.0
 celery>=4.3.0,<4.4.0
-pony==0.7.11
+pony==0.7.13
 lxml<4.4.0
 pytz
 python-dotenv

@@ -16,6 +16,7 @@ from pathlib import Path
 import jinja2
 from celery import Celery
 from werkzeug.urls import iri_to_uri
+from werkzeug.utils import import_string
 from werkzeug.contrib import cache
 from werkzeug.contrib.fixers import ProxyFix
 from werkzeug.exceptions import HTTPException
@@ -50,16 +51,17 @@ class LazySecureCookieSessionInterface(flask_sessions.SecureCookieSessionInterfa
 
 def create_app():
     select_default_settings()
+    config_obj = import_string(os.environ.get('MINIFICTION_SETTINGS'))
 
-    app = Flask(__name__)
-    app.config.from_object(os.environ.get('MINIFICTION_SETTINGS'))
+    app = Flask(
+        __name__,
+        static_folder=config_obj.STATIC_ROOT,
+        static_url_path=config_obj.STATIC_URL,
+    )
+    app.config.from_object(config_obj)
 
     default_handler.setLevel(app.config['LOGLEVEL'])
     logging.basicConfig(level=app.config['LOGLEVEL'], format=app.config['LOGFORMAT'])
-
-    app.static_folder = app.config['STATIC_ROOT']
-    app.extra_css = []
-    app.extra_js = []
 
     app.session_interface = LazySecureCookieSessionInterface()
 
@@ -85,6 +87,7 @@ def create_app():
     configure_error_handlers(app)
     configure_views(app)
     configure_admin_views(app)
+    configure_staticfiles(app)
     configure_ajax(app)
     configure_errorpages(app)
     configure_templates(app)
@@ -318,24 +321,6 @@ def configure_views(app):
     app.register_blueprint(tags.bp)
 
     app.add_url_rule('/dump/', 'dump', misc.dump)
-    app.add_url_rule('/media/<path:filename>', 'media', misc.media)
-    if app.config['LOCALSTATIC_ROOT']:
-        app.add_url_rule('/localstatic/<path:filename>', 'localstatic', misc.localstatic)
-
-    # Static invalidation
-    app.static_v = None
-    if app.config.get('STATIC_V'):
-        app.static_v = app.config['STATIC_V']
-    elif app.config.get('STATIC_ROOT') and app.config.get('STATIC_VERSION_FILE'):
-        version_file_path = os.path.join(app.config['STATIC_ROOT'], app.config['STATIC_VERSION_FILE'])
-        if os.path.isfile(version_file_path):
-            with open(version_file_path, 'r', encoding='utf-8') as fp:
-                app.static_v = fp.read().strip()
-
-    @app.url_defaults
-    def static_postfix(endpoint, values):
-        if endpoint in ('static', 'localstatic') and 'v' not in values and not values['filename'].startswith('build/') and app.static_v:
-            values['v'] = app.static_v
 
 
 def configure_admin_views(app):
@@ -358,6 +343,32 @@ def configure_admin_views(app):
     app.register_blueprint(registrations.bp, url_prefix='/admin/registrations')
     app.register_blueprint(tag_categories.bp, url_prefix='/admin/tag_categories')
     app.register_blueprint(tags.bp, url_prefix='/admin/tags')
+
+
+def configure_staticfiles(app):
+    from mini_fiction.views import misc
+
+    app.extra_css = []
+    app.extra_js = []
+
+    app.add_url_rule('/{}/<path:filename>'.format(app.config['MEDIA_URL'].strip('/')), 'media', misc.media)
+    if app.config['LOCALSTATIC_ROOT']:
+        app.add_url_rule('/{}/<path:filename>'.format(app.config['LOCALSTATIC_URL'].strip('/')), 'localstatic', misc.localstatic)
+
+    # Static invalidation
+    app.static_v = None
+    if app.config.get('STATIC_V'):
+        app.static_v = app.config['STATIC_V']
+    elif app.config.get('STATIC_ROOT') and app.config.get('STATIC_VERSION_FILE'):
+        version_file_path = os.path.join(app.config['STATIC_ROOT'], app.config['STATIC_VERSION_FILE'])
+        if os.path.isfile(version_file_path):
+            with open(version_file_path, 'r', encoding='utf-8') as fp:
+                app.static_v = fp.read().strip()
+
+    @app.url_defaults
+    def static_postfix(endpoint, values):
+        if endpoint in ('static', 'localstatic') and 'v' not in values and not values['filename'].startswith('build/') and app.static_v:
+            values['v'] = app.static_v
 
 
 def configure_ajax(app):

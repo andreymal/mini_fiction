@@ -152,17 +152,23 @@ class Config(object):
     FAVICON_URL = None
     SESSION_COOKIE_DOMAIN = False
 
-    MEDIA_ROOT = os.path.join(os.getcwd(), 'media')
+    # Static files configuration
 
     STATIC_ROOT = os.path.join(os.path.dirname(__file__), 'static')
+    STATIC_URL = '/static'
     STATIC_VERSION_FILE = 'VERSION'
     STATIC_VERSION_TYPE = 'date'  # or 'hash'
     STATIC_V = None
 
     LOCALSTATIC_ROOT = None
-    LOCALTEMPLATES = None
+    LOCALSTATIC_URL = '/localstatic'
+
+    MEDIA_ROOT = os.path.join(os.getcwd(), 'media')
+    MEDIA_URL = '/media'
 
     FRONTEND_MANIFEST_PATH = os.path.join(os.path.dirname(__file__), 'static/build/manifest.json')
+
+    LOCALTEMPLATES = None
 
     SPHINX_DISABLED = False
     SPHINX_ROOT = os.path.join(os.getcwd(), 'sphinx')

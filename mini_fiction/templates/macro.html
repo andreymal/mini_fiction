@@ -220,19 +220,32 @@
         </li>
         {%- endif %}
 
-        {% if current_user.is_superuser -%}
-        <li>
-            <a href="{{ url_for('admin_authors.update', pk=author.id) }}">
-                Админка
-            </a>
-        </li>
-        {%- endif %}
-
         <li>
             <a href="{{ url_for('feeds.accounts', user_id=author.id) }}" title="Новые рассказы автора" data-noajax="1">
                 RSS
             </a>
         </li>
+
+        {% if current_user.is_superuser -%}
+        <li><hr style="margin: 13px 0;"/></li>
+        <li>
+            <a href="{{ url_for('admin_authors.update', pk=author.id) }}">
+                Админка
+            </a>
+        </li>
+        {% if current_user.id != author.id %}
+        <li>
+            <a href="{{ url_for('author.edit_general', user_id=author.id) }}">
+                Настройки
+            </a>
+        </li>
+        {% endif %}
+        <li>
+            <a href="{{ url_for('admin_votes.index', username=author.username) }}">
+                Оценки рассказов
+            </a>
+        </li>
+        {%- endif %}
     </ul>
 {%- endmacro %}
 

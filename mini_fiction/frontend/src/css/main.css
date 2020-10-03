@@ -613,7 +613,7 @@ a.authorlink:hover,a.edit-link:hover {
 }
 
 .author-profile-links {
-    margin: 0;
+    margin: 0 0 13px 0;
     padding: 0;
     list-style: none;
 }

@@ -8,6 +8,7 @@
 
     <div class="admin-index">
         <form method="POST" action="{{ url_for('admin_votes.manyupdate') }}">
+        <div class="admin-index-table-container">
         <table class="admin-index-table">
         <thead><tr>
             <th>&nbsp;</th>
@@ -55,6 +56,7 @@
         </td></tr></tfoot>
         {% endif %}
         </table>
+        </div><!-- /admin-index-table-container -->
 
         </form>
 

@@ -8,6 +8,7 @@
 
     <div class="admin-index">
         <form method="POST" action="{{ url_for('admin_abuse_reports.manyupdate') }}">
+        <div class="admin-index-table-container">
         <table class="admin-index-table">
         <thead><tr>
             <th>&nbsp;</th>
@@ -73,6 +74,7 @@
             <button type="submit" class="btn btn-primary">Изменить</button>
         </td></tr></tfoot>
         </table>
+        </div><!-- /admin-index-table-container -->
 
         </form>
 

@@ -2492,16 +2492,15 @@ ul.editlog .editlog-item:nth-child(2n+1) {
 }
 
 .admin-index {
-    min-width: 460px;
+    /* nothing */
 }
 
-.admin-index-table {
+.admin-index-table-container {
     width: 75%;
     float: left;
 }
 
-.admin-index-table.full {
-    float: none;
+.admin-index-table {
     width: 100%;
 }
 
@@ -2644,9 +2643,11 @@ ul.editlog .editlog-item:nth-child(2n+1) {
 }
 
 @media (max-width: 840px) {
-    .admin-index-table {
+    .admin-index-table-container {
         float: none;
         width: 100%;
+        overflow-x: scroll;
+        padding-bottom: 16px;
     }
 
     .admin-index-filters {

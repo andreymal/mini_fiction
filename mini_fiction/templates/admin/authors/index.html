@@ -7,6 +7,7 @@
     <h1>{{ page_title }}</h1>
 
     <div class="admin-index">
+        <div class="admin-index-table-container">
         <table class="admin-index-table">
         <thead><tr>
             <th class="col-user-id-title">{{ admin_sorting_link('ID', 'id', view_args=args) }}</th>
@@ -58,6 +59,7 @@
         </tr>{% endfor -%}
         </tbody>
         </table>
+        </div><!-- /admin-index-table-container -->
 
         <div class="admin-index-filters">
             <form action="{{ url_for('admin_authors.index') }}" method="GET">

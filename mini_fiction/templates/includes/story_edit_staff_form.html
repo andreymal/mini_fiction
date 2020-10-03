@@ -62,6 +62,10 @@
                     Всегда (даже в черновиках)
                 </label>
                 <label>
+                    <input type="radio" name="direct_access" value="allguest"{% if story.direct_access == 'allguest' %} checked{% endif %} />
+                    Всегда (даже в черновиках), в том числе для гостей
+                </label>
+                <label>
                     <input type="radio" name="direct_access" value="none"{% if story.direct_access == 'none' %} checked{% endif %} />
                     Никогда
                 </label>

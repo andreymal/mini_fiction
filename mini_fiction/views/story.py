@@ -543,7 +543,7 @@ def edit(pk):
         story.robots_noindex = request.form.get('robots_noindex') == '1'
         if request.form.get('comments_mode') in {'', 'on', 'off', 'pub', 'nodraft'}:
             story.comments_mode = request.form.get('comments_mode')
-        if request.form.get('direct_access') in {'', 'all', 'none', 'nodraft', 'anodraft'}:
+        if request.form.get('direct_access') in {'', 'all', 'allguest', 'none', 'nodraft', 'anodraft'}:
             story.direct_access = request.form.get('direct_access')
         data['staff_saved'] = True
 

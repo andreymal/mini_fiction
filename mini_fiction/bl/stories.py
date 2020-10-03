@@ -813,7 +813,7 @@ class StoryBL(BaseBL, Commentable):
         # публичных выборок) и зависит от настроек
         direct_access = story.direct_access or current_app.config['STORY_DIRECT_ACCESS']
 
-        if direct_access == 'all':
+        if direct_access in ('all', 'allguest'):
             # Доступ всегда, даже черновику
             allowed = True
         elif direct_access == 'none':
@@ -825,13 +825,13 @@ class StoryBL(BaseBL, Commentable):
             allowed = not story.draft
         else:
             # Админ глупенький
-            raise ValueError('Incorrect settings: STORY_DIRECT_ACCESS can be all, none, nodraft or anodraft (got {!r})'.format(direct_access))
+            raise ValueError('Incorrect settings: STORY_DIRECT_ACCESS can be all, allguest, none, nodraft or anodraft (got {!r})'.format(direct_access))
 
         if not allowed:
             return False
 
-        # anodraft означает доступ по прямой ссылке в том числе гостям
-        if direct_access == 'anodraft':
+        # allguest и anodraft означают доступ по прямой ссылке в том числе гостям
+        if direct_access in ('allguest', 'anodraft'):
             return True
 
         # Если не anodraft, то доступ гостей проверяется по настройкам

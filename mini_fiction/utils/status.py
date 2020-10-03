@@ -345,7 +345,7 @@ class ProjectStatus(Status):
 
     def story_direct_access(self):
         m = self.app.config['STORY_DIRECT_ACCESS']
-        if m == 'all':
+        if m in ('all', 'allguest'):
             return self._ok('story_direct_access', 'Always by default')
         elif m == 'none':
             return self._ok('story_direct_access', 'Never by default')

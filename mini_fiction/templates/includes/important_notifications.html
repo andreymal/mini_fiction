@@ -9,6 +9,6 @@
 {%- if current_user.is_authenticated and not current_user.email %}
     <div class="alert alert-warning" style="margin-top: 20px">
         <a href="#" class="close" id="close-email-notice" data-dismiss="alert" aria-label="close" style="text-decoration: none" title="close">×</a>
-        У вас не указана электронная почта. Рекомендуем указать её в <a href="{{ url_for('author.edit') }}#mail">настройках</a> для большей безопасности.
+        У вас не указана электронная почта. Рекомендуем указать её в <a href="{{ url_for('author.edit_mail') }}">настройках</a> для большей безопасности.
     </div>
 {%- endif -%}

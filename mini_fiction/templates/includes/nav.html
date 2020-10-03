@@ -29,8 +29,8 @@
         {{ nav_item(_('Read later'), url_for('object_lists.bookmarks'), 'object_lists.bookmarks') }}
         {{ nav_item(
             _('Settings'),
-            url_for('author.edit'),
-            matched=is_current_endpoint('author.edit'),
+            url_for('author.edit_general'),
+            matched=is_current_endpoint('author.edit_general'),
         ) }}
         {{ nav_item(
             _('My profile'),

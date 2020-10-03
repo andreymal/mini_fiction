@@ -1,0 +1,49 @@
+{% extends base %}
+{% from 'macro.html' import breadcrumbs with context %}
+{% block content %}
+
+<div class="row">
+<div class="span12">
+    {{- breadcrumbs([[
+        url_for('author.info', user_id=user.id),
+        ('Автор: ' if user.published_stories_count > 0 else 'Читатель: ') + user.username,
+    ]], current='Настройки') }}
+</div>
+
+<div class="span12">
+    <h1>
+        {%- if user_is_current -%}
+            Настройки
+        {%- else -%}
+            Настройки пользователя {{ user.username }}
+        {%- endif -%}
+    </h1>
+
+    <ul class="nav nav-pills nav-simple">
+        <li{% if settings_tab == 'general' %} class="active"{% endif %}>
+            <a href="{{ url_for('author.edit_general', user_id=None if user_is_current else user.id) }}">Основное</a>
+        </li>
+        <li{% if settings_tab == 'mail' %} class="active"{% endif %}>
+            <a href="{{ url_for('author.edit_mail', user_id=None if user_is_current else user.id) }}">Почта</a>
+        </li>
+        <li{% if settings_tab == 'security' %} class="active"{% endif %}>
+            <a href="{{ url_for('author.edit_security', user_id=None if user_is_current else user.id) }}">Безопасность</a>
+        </li>
+        <li{% if settings_tab == 'personal' %} class="active"{% endif %}>
+            <a href="{{ url_for('author.edit_personal', user_id=None if user_is_current else user.id) }}">Внешний вид</a>
+        </li>
+        <li{% if settings_tab == 'subscriptions' %} class="active"{% endif %}>
+            <a href="{{ url_for('author.edit_subscriptions', user_id=None if user_is_current else user.id) }}">Уведомления</a>
+        </li>
+    </ul>
+
+    {% block settings_content %}{% endblock %}
+
+<div class="span12">
+    {{- breadcrumbs([[
+        url_for('author.info', user_id=user.id),
+        ('Автор: ' if user.published_stories_count > 0 else 'Читатель: ') + user.username,
+    ]], current='Настройки') }}
+</div>
+</div>
+{% endblock %}

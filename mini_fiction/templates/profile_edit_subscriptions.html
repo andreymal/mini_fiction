@@ -1,0 +1,68 @@
+{% extends 'profile_edit_base.html' %}
+
+{% block settings_content %}
+<form id="subscriptions" method="POST" enctype="multipart/form-data" class="form-horizontal">
+    {% if saved -%}
+        <div class="alert-mini green">Настройки уведомлений сохранены</div>
+    {% endif -%}
+
+    <div class="control-group"><div class="controls">
+        <em>Выберите, где какие уведомления вы желаете получать</em><br/><br/>
+
+        <p{% if not current_user.is_staff %} style="display: none;"{% endif %}>
+            <strong>Жалобы от пользователей:</strong>
+            <label style="display: inline-block;">{{ form.email_abuse_report }} почта</label>
+        </p>
+        <p{% if not current_user.is_staff %} style="display: none;"{% endif %}>
+            <strong>Запрос на публикацию рассказа:</strong>
+            <label style="display: inline-block;">{{ form.email_story_pubrequest }} почта</label>
+        </p>
+        <p{% if not current_user.is_staff %} style="display: none;"{% endif %}>
+            <strong>Публикация рассказа без премодерации:</strong>
+            <label style="display: inline-block;">{{ form.email_story_publish_noappr }} почта</label>
+        </p>
+        <p{% if not current_user.is_staff %} style="display: none;"{% endif %}>
+            <strong>Удаление опубликованного рассказа:</strong>
+            <label style="display: inline-block;">{{ form.email_story_delete }} почта</label>
+        </p>
+        <p>
+            <strong>Публикация вашего рассказа:</strong>
+            <label style="display: inline-block;">{{ form.email_story_publish }} почта</label>
+            <label style="display: inline-block;">{{ form.tracker_story_publish }} сайт</label>
+        </p>
+        <p>
+            <strong>Отправка в черновики вашего рассказа:</strong>
+            <label style="display: inline-block;">{{ form.email_story_draft }} почта</label>
+            <label style="display: inline-block;">{{ form.tracker_story_draft }} сайт</label>
+        </p>
+        <p>
+            <strong>Ответ на ваш комментарий к рассказу:</strong>
+            <label style="display: inline-block;">{{ form.email_story_reply }} почта</label>
+            <label style="display: inline-block;">{{ form.tracker_story_reply }} сайт</label>
+        </p>
+        <p>
+            <strong>Ответ на ваш комментарий в редакторской:</strong>
+            <label style="display: inline-block;">{{ form.email_story_lreply }} почта</label>
+            <label style="display: inline-block;">{{ form.tracker_story_lreply }} сайт</label>
+        </p>
+        <p>
+            <strong>Ответ на ваш комментарий к новости:</strong>
+            <label style="display: inline-block;">{{ form.email_news_reply }} почта</label>
+            <label style="display: inline-block;">{{ form.tracker_news_reply }} сайт</label>
+        </p>
+
+    </div></div>
+
+    {% if non_field_errors %}
+        <div class="control-group error">
+            {% for error in non_field_errors %}
+                <span class="help-inline">{{ error }}</span>
+            {% endfor %}
+        </div>
+    {% endif %}
+
+    <div class="form-actions">
+        <button class="btn btn-primary" type="submit">{{ _('Save') }}</button>
+    </div>
+</form>
+{% endblock %}

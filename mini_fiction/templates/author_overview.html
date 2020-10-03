@@ -30,7 +30,7 @@
                 {% endif %}
             {% endif %}
             {% if current_user.is_authenticated and current_user.id == author.id %}
-                <sup><a class="edit-link" href="{{ url_for('author.edit') }}">Редактировать профиль</a></sup>
+                <sup><a class="edit-link" href="{{ url_for('author.edit_general') }}">Редактировать профиль</a></sup>
             {% endif %}
         </h1>
             <div class="author-description">{{ author.bio_as_html }}</div>

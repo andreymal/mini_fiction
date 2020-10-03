@@ -1,0 +1,72 @@
+{% extends 'profile_edit_base.html' %}
+
+{% block settings_content %}
+<form id="personal" method="POST" enctype="multipart/form-data" class="form-horizontal">
+    {% if saved -%}
+        <div class="alert-mini green">Личные настройки сохранены</div>
+    {% endif -%}
+
+    {#
+    <div class="padded bootstrap checkbox">
+        <label>Скрыть жанры из поиска:</label>
+        {{ form.excluded_categories }}
+    </div>
+    #}
+    <div class="padded bootstrap radio">
+        <label>Показать рассказ в списках:</label>
+        {{ form.detail_view }}
+    </div>
+    <div class="padded bootstrap radio">
+        <label>NSFW-предупреждения:</label>
+        {{ form.nsfw }}
+    </div>
+    <div class="padded bootstrap radio">
+        <label>Сколько комментариев первого уровня показывать на одной странице:</label>
+        {{ form.comments_per_page }}
+        {% if form.comments_per_page.errors %}
+            <div class="control-group error">
+            {% for error in form.comments_per_page.errors %}
+                <span class="help-inline">{{ error }}</span>
+            {% endfor %}
+            </div>
+        {% endif %}
+    </div>
+    <div class="padded bootstrap radio">
+        <label>Скрывать ветки комментариев с данной глубиной (1 - скрывать все ветки, 0 - ничего не скрывать):</label>
+        {{ form.comments_maxdepth }}
+        {% if form.comments_maxdepth.errors %}
+            <div class="control-group error">
+            {% for error in form.comments_maxdepth.errors %}
+                <span class="help-inline">{{ error }}</span>
+            {% endfor %}
+            </div>
+        {% endif %}
+    </div>
+    <div class="padded bootstrap radio">
+        <label>Скрывать под спойлером комментарии с данным рейтингом и ниже:</label>
+        {{ form.comment_spoiler_threshold }}
+        {% if form.comment_spoiler_threshold.errors %}
+            <div class="control-group error">
+            {% for error in form.comment_spoiler_threshold.errors %}
+                <span class="help-inline">{{ error }}</span>
+            {% endfor %}
+            </div>
+        {% endif %}
+    </div>
+    <div class="padded bootstrap radio">
+        <label>Картинка в шапке:</label>
+        {{ form.header_mode }}
+    </div>
+    {% if non_field_errors %}
+        <div class="control-group error">
+            {% for error in non_field_errors %}
+                <span class="help-inline">{{ error }}</span>
+            {% endfor %}
+        </div>
+    {% endif %}
+
+    <div class="form-actions">
+        <button class="btn btn-primary" type="submit">Сохранить личные настройки</button>
+    </div>
+</form>
+{% endblock %}

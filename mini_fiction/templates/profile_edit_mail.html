@@ -1,0 +1,49 @@
+{% extends 'profile_edit_base.html' %}
+
+{% block settings_content %}
+<form id="mail" method="POST" enctype="multipart/form-data" class="form-horizontal">
+    {% if email_changed -%}
+        <div class="alert-mini green">На новый адрес электронной почты отправлена ссылка с кодом. Перейдите по ней для сохранения нового адреса.</div>
+    {% elif saved -%}
+        <div class="alert-mini green">Адрес электронной почты успешно обновлён</div>
+    {% elif not user_is_current -%}
+        <div class="alert alert-warning">
+            Для смены чужой почты используйте <a href="{{ url_for('admin_authors.update', pk=user.id) }}">страницу администрирования</a>.
+        </div>
+    {% endif -%}
+
+    {% for field in form %}
+        {% if field.widget.input_type == 'hidden' %}{{ field(id="email_form_" + field.id) }}{% else %}
+        <div class="control-group{% if field.errors %} error{% endif %}">
+            <label class="control-label">{{ field.label.text }}</label>
+            <div class="controls">
+                {{ field(id="email_form_" + field.id) }}
+                {% if field.errors %}
+                    {% for error in field.errors %}
+                        <span class="help-inline">{{ error }}</span>
+                    {% endfor %}
+                {% else %}
+                    <span class="help-inline small">
+                    {% if field.name == 'email' and new_email -%}
+                        Ожидает подтверждения. Сохраните ещё раз, чтобы повторить отправку ссылки
+                    {%- else -%}
+                        {{- field.description -}}
+                    {%- endif %}</span>
+                {% endif %}
+            </div>
+        </div>
+    {% endif %}{% endfor %}
+
+    {% if non_field_errors %}
+        <div class="control-group error">
+            {% for error in non_field_errors %}
+                <span class="help-inline">{{ error }}</span>
+            {% endfor %}
+        </div>
+    {% endif %}
+
+    <div class="form-actions">
+        <button class="btn btn-primary" type="submit">Сменить e-mail</button>
+    </div>
+</form>
+{% endblock %}

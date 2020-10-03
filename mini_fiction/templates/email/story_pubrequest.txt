@@ -1,9 +1,32 @@
 {%- extends 'email/base.txt' -%}
+{%- import 'email/macro.html' as macro with context -%}
 
 {%- block content -%}
 {%- autoescape false -%}
-Пользователь {{ author.username }} на сайте {{ url_for('index.index', _external=True) }} опубликовал рассказ «{{ story.title }}», но он ещё не был одобрен модераторами. Перейдите к рассказу и одобрите его или отправьте обратно в черновики.
+Пользователь {{ author.username }} опубликовал рассказ, но он ещё не был одобрен модераторами. Перейдите к рассказу и одобрите его или отправьте обратно в черновики.
 
-{{ url_for('story.view', pk=story.id, _external=True) }}
+{{ macro.story_info_plain(story) }}
+
+{%- if story.notes %}
+
+Заметки к рассказу:
+
+{{ story.notes|striptags }}
+{%- endif %}
+
+-------
+
+Информация об авторе:
+
+Дата регистрации: {{ author.date_joined|datetimeformat(DEFAULT_DATETIME_FORMAT) }}
+
+{%- if author_stories %}
+Опубликованные рассказы автора:
+{%- for story_id, story_title in author_stories %}
+- «{{ story_title }}» {{ url_for('story.view', pk=story_id, _external=True) }}
+{%- endfor %}
+{%- else %}
+У автора нет опубликованных рассказов.
+{% endif %}
 {%- endautoescape -%}
 {%- endblock -%}

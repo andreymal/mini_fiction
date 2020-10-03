@@ -2,5 +2,27 @@
 {% import 'email/macro.html' as macro with context %}
 
 {% block body %}
-Пользователь {{ macro.userlink(author.id, author.username) }} опубликовал рассказ {{ macro.storylink(story.id, story.title) }}, но он ещё не был одобрен модераторами. Перейдите к рассказу и одобрите его или отправьте обратно в черновики.
+Пользователь {{ macro.userlink(author.id, author.username) }} опубликовал рассказ, но он ещё не был одобрен модераторами. Перейдите к рассказу и одобрите его или отправьте обратно в черновики.
+<br>
+<br>
+{{ macro.story_info_html(story) }}
+{% if story.notes %}
+<p>Заметки к рассказу:</p>
+{{ story.notes_as_html }}
+{% endif %}
+
+<hr>
+
+<p><em>Информация об авторе:</em></p>
+<p>Дата регистрации: {{ author.date_joined|datetimeformat(DEFAULT_DATETIME_FORMAT) }}</p>
+{% if author_stories %}
+    <p>Опубликованные рассказы автора:</p>
+    <ul>
+    {%- for story_id, story_title in author_stories %}
+        <li>{{ macro.storylink(story_id, story_title) }}</li>
+    {%- endfor %}
+    </ul>
+{%- else %}
+    <p>У автора нет опубликованных рассказов.</p>
+{%- endif %}
 {% endblock %}

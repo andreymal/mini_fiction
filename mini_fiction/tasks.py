@@ -7,6 +7,7 @@ import os
 import json
 import time
 from flask import current_app, url_for
+from pony import orm
 from pony.orm import db_session
 
 from mini_fiction import models
@@ -172,9 +173,17 @@ def notify_story_pubrequest(story_id, author_id):
     if not author:
         return
 
+    ctx = {
+        'story': story,
+        'author': author,
+        'author_stories': list(orm.select(
+            (x.id, x.title) for x in Story.bl.select_by_author(author)
+        )),
+    }
+
     staff = models.Author.select(lambda x: x.is_staff)
     recipients = [u.email for u in staff if u.email and 'story_pubrequest' not in u.silent_email_list]
-    _sendmail_notify(recipients, 'story_pubrequest', {'story': story, 'author': author})
+    _sendmail_notify(recipients, 'story_pubrequest', ctx)
 
 
 @task()

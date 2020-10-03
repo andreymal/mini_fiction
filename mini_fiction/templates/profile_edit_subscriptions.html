@@ -7,21 +7,23 @@
     {% endif -%}
 
     <div class="control-group"><div class="controls">
-        <em>Выберите, где какие уведомления вы желаете получать</em><br/><br/>
+        {% if user_is_current -%}
+            <em>Выберите, где какие уведомления вы желаете получать</em><br/><br/>
+        {% endif -%}
 
-        <p{% if not current_user.is_staff %} style="display: none;"{% endif %}>
+        <p{% if not user.is_staff %} style="display: none;"{% endif %}>
             <strong>Жалобы от пользователей:</strong>
             <label style="display: inline-block;">{{ form.email_abuse_report }} почта</label>
         </p>
-        <p{% if not current_user.is_staff %} style="display: none;"{% endif %}>
+        <p{% if not user.is_staff %} style="display: none;"{% endif %}>
             <strong>Запрос на публикацию рассказа:</strong>
             <label style="display: inline-block;">{{ form.email_story_pubrequest }} почта</label>
         </p>
-        <p{% if not current_user.is_staff %} style="display: none;"{% endif %}>
+        <p{% if not user.is_staff %} style="display: none;"{% endif %}>
             <strong>Публикация рассказа без премодерации:</strong>
             <label style="display: inline-block;">{{ form.email_story_publish_noappr }} почта</label>
         </p>
-        <p{% if not current_user.is_staff %} style="display: none;"{% endif %}>
+        <p{% if not user.is_staff %} style="display: none;"{% endif %}>
             <strong>Удаление опубликованного рассказа:</strong>
             <label style="display: inline-block;">{{ form.email_story_delete }} почта</label>
         </p>

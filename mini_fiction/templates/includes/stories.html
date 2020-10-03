@@ -1,6 +1,10 @@
 {% for story in stories %}
     <div id="story_{{ story.id }}" class="story-item">
-        {% include 'includes/story_control_buttons.html' with context %}
+        {% if story.bl.editable_by(current_user) and story.bl.is_editor(current_user) %}
+            <div class="story-control-btn btn-group js-story-list-control-{{ story.id }}">
+                <a class="btn btn-warning btn-mini" href="{{ url_for('story.edit', pk=story.id) }}">{{ pgettext('story_control_buttons', 'Edit') }}</a>
+            </div>
+        {% endif %}
         <h3>
             <a href="{{ url_for('story.view', pk=story.id) }}">{{ story.title }}</a>
             {% if story.pinned -%}

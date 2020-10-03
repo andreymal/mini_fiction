@@ -159,7 +159,11 @@ def edit_general(user_id=None):
     if request.method == 'POST':
         if form.validate_on_submit():
             try:
-                user.bl.update(form.data)
+                user.bl.update(
+                    form.data,
+                    modified_by_user=current_user._get_current_object(),
+                    fill_admin_log=user.id != current_user.id,
+                )
             except ValidationError as exc:
                 form.set_errors(exc.errors)
             else:
@@ -294,7 +298,11 @@ def edit_personal(user_id=None):
                 prefs_data['header_mode'] = 'ls'
             else:
                 prefs_data.pop('header_mode', None)
-            user.bl.update(prefs_data)
+            user.bl.update(
+                    prefs_data,
+                    modified_by_user=current_user._get_current_object(),
+                    fill_admin_log=user.id != current_user.id,
+                )
             ctx['saved'] = True
 
     return render_template('profile_edit_personal.html', **ctx)
@@ -354,14 +362,14 @@ def edit_subscriptions(user_id=None):
                 'story_reply': form.email_story_reply.data,
                 'story_lreply': form.email_story_lreply.data,
                 'news_reply': form.email_news_reply.data,
-            })
+            }, modified_by_user=current_user._get_current_object(), fill_admin_log=user.id != current_user.id)
             user.bl.update_tracker_subscriptions({
                 'story_publish': form.tracker_story_publish.data,
                 'story_draft': form.tracker_story_draft.data,
                 'story_reply': form.tracker_story_reply.data,
                 'story_lreply': form.tracker_story_lreply.data,
                 'news_reply': form.tracker_news_reply.data,
-            })
+            }, modified_by_user=current_user._get_current_object(), fill_admin_log=user.id != current_user.id)
             ctx['saved'] = True
 
     return render_template('profile_edit_subscriptions.html', **ctx)

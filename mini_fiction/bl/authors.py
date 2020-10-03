@@ -235,7 +235,7 @@ class AuthorBL(BaseBL):
 
         return changed_fields
 
-    def update_email_subscriptions(self, subs):
+    def update_email_subscriptions(self, subs, modified_by_user=None, fill_admin_log=False):
         user = self.model
 
         silent = user.silent_email_list
@@ -256,9 +256,19 @@ class AuthorBL(BaseBL):
 
         if modified:
             user.silent_email = ','.join(silent)
+
+        if modified_by_user and fill_admin_log and modified:
+            from mini_fiction.models import AdminLog
+            AdminLog.bl.create(
+                user=modified_by_user,
+                obj=user,
+                action=AdminLog.CHANGE,
+                change_message='Изменены настройки уведомлений на e-mail ({})'.format(', '.join(modified)),
+            )
+
         return modified
 
-    def update_tracker_subscriptions(self, subs):
+    def update_tracker_subscriptions(self, subs, modified_by_user=None, fill_admin_log=False):
         user = self.model
 
         silent = user.silent_tracker_list
@@ -279,6 +289,16 @@ class AuthorBL(BaseBL):
 
         if modified:
             user.silent_tracker = ','.join(silent)
+
+        if modified_by_user and fill_admin_log and modified:
+            from mini_fiction.models import AdminLog
+            AdminLog.bl.create(
+                user=modified_by_user,
+                obj=user,
+                action=AdminLog.CHANGE,
+                change_message='Изменены настройки уведомлений в трекере ({})'.format(', '.join(modified)),
+            )
+
         return modified
 
     def update_email_with_confirmation(self, email):

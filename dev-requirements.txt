@@ -1,7 +1,5 @@
 Flask-DebugToolbar
 setuptools-lint
 setuptools>=38.6.0
-twine>=1.11.0,<2.0
-wheel>=0.31
-# py34 pin
-readme-renderer<25.0
+twine>=3.0,<4.0
+wheel

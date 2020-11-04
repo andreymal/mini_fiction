@@ -1,6 +1,6 @@
 bcrypt
 scrypt
-mysqlclient>=1.3.14,<1.4.0
+mysqlclient>=2.0,<3.0
 Pillow
 diff_match_patch_python
 captcha

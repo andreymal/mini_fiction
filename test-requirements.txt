@@ -1,17 +1,8 @@
 factory-boy
 pytest-runner
 pytest-selenium
-pytest-flask>=0.15,<1.0
-pytest-cov>=2.5.1
-pytest-metadata>=1.5.1,<1.8.1
-pytest>=4.6.0,<5.0
-tox<3.14.1
-# Required by tox
-importlib-metadata<1,>=0.12
-pluggy>=0.12,<0.14
-# Travis CI
-py>=1.4.29
-# py34 pin
-faker<2.0.4
-requests<2.22
-idna>=2.5,<2.9
+pytest-flask>=1.0,<2.0
+pytest-cov
+pytest-metadata>=1.9.0
+pytest>=6.1,<7.0
+tox

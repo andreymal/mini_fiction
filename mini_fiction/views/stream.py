@@ -86,7 +86,15 @@ def comments(page):
     else:
         objects = objects.filter(lambda x: not x.deleted).order_by(StoryComment.id.desc())
 
-    page_obj = Paginator(page, objects.count(), per_page=current_app.config['COMMENTS_COUNT']['stream'])
+    view_args = dict(request.view_args)
+    if filter_deleted:
+        view_args['deleted'] = '1'
+    page_obj = Paginator(
+        page,
+        objects.count(),
+        per_page=current_app.config['COMMENTS_COUNT']['stream'],
+        view_args=view_args,
+    )
     objects = [('story', x) for x in page_obj.slice_or_404(objects)]
 
     comment_votes_cache = Story.bl.select_comment_votes(
@@ -123,7 +131,15 @@ def storylocalcomments(page):
     else:
         objects = objects.filter(lambda x: not x.deleted).order_by(StoryLocalComment.id.desc())
 
-    page_obj = Paginator(page, objects.count(), per_page=current_app.config['COMMENTS_COUNT']['stream'])
+    view_args = dict(request.view_args)
+    if filter_deleted:
+        view_args['deleted'] = '1'
+    page_obj = Paginator(
+        page,
+        objects.count(),
+        per_page=current_app.config['COMMENTS_COUNT']['stream'],
+        view_args=view_args,
+    )
     objects = [('local', x) for x in page_obj.slice_or_404(objects)]
 
     comment_votes_cache = {}  # FIXME: здесь пересечение айдишников с айдшниками комментов к рассказам
@@ -153,7 +169,15 @@ def newscomments(page):
     else:
         objects = objects.filter(lambda x: not x.deleted).order_by(NewsComment.id.desc())
 
-    page_obj = Paginator(page, objects.count(), per_page=current_app.config['COMMENTS_COUNT']['stream'])
+    view_args = dict(request.view_args)
+    if filter_deleted:
+        view_args['deleted'] = '1'
+    page_obj = Paginator(
+        page,
+        objects.count(),
+        per_page=current_app.config['COMMENTS_COUNT']['stream'],
+        view_args=view_args,
+    )
     objects = [('news', x) for x in page_obj.slice_or_404(objects)]
 
     comment_votes_cache = {}  # FIXME: здесь пересечение айдишников с айдшниками комментов к рассказам

@@ -33,7 +33,7 @@ def favorites(user_id, page):
     else:
         page_title = 'Избранное автора %s' % user.username
 
-    page_obj = Paginator(page, objects.count(), per_page=10)
+    page_obj = Paginator(page, objects.count(), per_page=current_app.config['STORIES_COUNT']['lists'])
     stories = page_obj.slice_or_404(objects)
 
     data = dict(
@@ -55,7 +55,7 @@ def submitted(page):
     if not current_user.is_staff:
         abort(403)
     objects = Story.select_submitted()
-    page_obj = Paginator(page, objects.count(), per_page=10)
+    page_obj = Paginator(page, objects.count(), per_page=current_app.config['STORIES_COUNT']['lists'])
     stories = page_obj.slice_or_404(objects)
 
     data = dict(
@@ -75,7 +75,7 @@ def submitted(page):
 @login_required
 def bookmarks(page):
     objects = select(x.story for x in Bookmark if x.author.id == current_user.id).without_distinct().order_by('-x.id')
-    page_obj = Paginator(page, objects.count(), per_page=10)
+    page_obj = Paginator(page, objects.count(), per_page=current_app.config['STORIES_COUNT']['lists'])
     stories = page_obj.slice_or_404(objects)
 
     data = dict(
@@ -100,7 +100,7 @@ def viewed(page):
     views = views.prefetch(StoryView.story, Story.characters, Story.contributors, StoryContributor.user, Story.tags, StoryTag.tag, Tag.category)
     views = views.order_by(-2)
 
-    page_obj = Paginator(page, views.count(), per_page=10)
+    page_obj = Paginator(page, views.count(), per_page=current_app.config['STORIES_COUNT']['lists'])
 
     stories = [x[0] for x in page_obj.slice_or_404(views)]
 
@@ -131,7 +131,7 @@ def top(page):
     page_obj = Paginator(
         page,
         objects.count(),
-        per_page=current_app.config['STORIES_COUNT']['stream'],
+        per_page=current_app.config['STORIES_COUNT']['lists'],
         view_args={'period': period} if period > 0 else None,
     )
 

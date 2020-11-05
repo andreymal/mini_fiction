@@ -215,7 +215,7 @@ class Config(object):
         'stream': 50,
         'author_page': 10
     }
-    STORIES_COUNT = {'stream': 20}
+    STORIES_COUNT = {'stream': 20, 'tags': 20, 'lists': 20}
     CHAPTERS_COUNT = {'main': 10, 'stream': 20}
     COMMENTS_ORPHANS = 5
     COMMENT_MIN_LENGTH = 1

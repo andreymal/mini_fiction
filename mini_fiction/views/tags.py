@@ -47,7 +47,7 @@ def tag_index(tag_name, page):
     objects = objects.prefetch(Story.characters, Story.contributors, StoryContributor.user, Story.tags, StoryTag.tag, Tag.category)
     objects = objects.order_by(Story.first_published_at.desc(), Story.id.desc())
 
-    page_obj = Paginator(page, objects.count(), per_page=current_app.config['STORIES_COUNT']['stream'])
+    page_obj = Paginator(page, objects.count(), per_page=current_app.config['STORIES_COUNT']['tags'])
     objects = page_obj.slice_or_404(objects)
 
     return render_template(

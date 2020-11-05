@@ -2,40 +2,66 @@
 # -*- coding: utf-8 -*-
 from datetime import datetime, timedelta
 
-from flask import Blueprint, Markup, current_app, url_for, request, abort
+import pytz
+from flask import Blueprint, Markup, Response, current_app, url_for, request, abort
 from flask_babel import gettext, ngettext
-from werkzeug.contrib.atom import AtomFeed
+from feedgen.feed import FeedGenerator
 from pony.orm import select, db_session
 
 from mini_fiction.models import Story, Chapter, Author
 from mini_fiction.utils.misc import sitename
 
+
 bp = Blueprint('feeds', __name__)
+
+
+def _add_story_entry(feed, story, order='append'):
+    entry = feed.add_entry(order=order)
+    entry.id(url_for('story.view', pk=story.id, _external=True))
+    entry.link(href=url_for('story.view', pk=story.id, _external=True))
+    entry.title(story.title)
+    entry.content(Markup(story.summary).striptags())
+    entry.author([
+        {'name': author.username, 'uri': url_for('author.info', user_id=author.id, _external=True)}
+        for author in story.bl.get_authors()
+    ])
+    entry.published(pytz.UTC.fromutc(story.first_published_at or story.date))
+    entry.updated(pytz.UTC.fromutc(
+        max(story.first_published_at or story.date, story.updated)
+    ))
+
+    return entry
+
+
+def _add_stories_to_feed(feed, stories):
+    last_update = datetime(1970, 1, 1, 0)
+
+    for story in stories:
+        _add_story_entry(feed, story)
+        last_update = max(
+            last_update,
+            story.first_published_at or story.date,
+            story.updated,
+        )
+
+    return last_update
 
 
 @bp.route('/stories/', endpoint='stories')
 @db_session
 def feed_stories():
-    feed = AtomFeed(
-        title='Новые рассказы — {}'.format(sitename()),
-        subtitle='Новые фанфики',
-        feed_url=request.url,
-        url=request.url_root
-    )
+    feed = FeedGenerator()
+    feed.title('Новые рассказы — {}'.format(sitename()))
+    feed.subtitle('Новые фанфики')
+    feed.id(request.url)
+    feed.link(href=request.url, rel='self')
+
     count = current_app.config['RSS'].get('stories', 20)
     stories = Story.select_published().order_by(Story.first_published_at.desc(), Story.id.desc())[:count]
-    for story in stories:
-        author = story.authors[0]
-        feed.add(
-            story.title,
-            Markup(story.summary).striptags(),
-            content_type='text',
-            author=author.username,
-            url=url_for('story.view', pk=story.id, _external=True),
-            updated=story.updated,
-            published=story.first_published_at or story.date
-        )
-    return feed.get_response()
+    last_update = _add_stories_to_feed(feed, stories)
+
+    feed.updated(pytz.UTC.fromutc(last_update))
+    return Response(feed.atom_str(pretty=True), mimetype='application/atom+xml')
 
 
 @bp.route('/stories/top/', endpoint='top')
@@ -58,27 +84,18 @@ def feed_stories_top():
     else:
         title = ngettext('Top stories in %(num)d day', 'Top stories in %(num)d days', period)
 
-    feed = AtomFeed(
-        title='{} — {}'.format(title, sitename()),
-        subtitle='Топ рассказов',
-        feed_url=request.url,
-        url=request.url_root
-    )
+    feed = FeedGenerator()
+    feed.title('{} — {}'.format(title, sitename()))
+    feed.subtitle('Топ рассказов')
+    feed.id(request.url)
+    feed.link(href=request.url, rel='self')
 
     count = current_app.config['RSS'].get('stories', 20)
     stories = Story.bl.select_top(period)[:count]
-    for story in stories:
-        author = story.authors[0]
-        feed.add(
-            story.title,
-            Markup(story.summary).striptags(),
-            content_type='text',
-            author=author.username,
-            url=url_for('story.view', pk=story.id, _external=True),
-            updated=story.updated,
-            published=story.first_published_at or story.date
-        )
-    return feed.get_response()
+    last_update = _add_stories_to_feed(feed, stories)
+
+    feed.updated(pytz.UTC.fromutc(last_update))
+    return Response(feed.atom_str(pretty=True), mimetype='application/atom+xml')
 
 
 @bp.route('/accounts/<int:user_id>/', endpoint='accounts')
@@ -88,36 +105,29 @@ def feed_accounts(user_id):
     if not author:
         abort(404)
 
-    feed = AtomFeed(
-        title='Новые рассказы автора {} — {}'.format(author.username, sitename()),
-        subtitle='Новые фанфики',
-        feed_url=request.url,
-        url=request.url_root
-    )
+    feed = FeedGenerator()
+    feed.title('Новые рассказы автора {} — {}'.format(author.username, sitename()))
+    feed.subtitle('Новые фанфики')
+    feed.id(request.url)
+    feed.link(href=request.url, rel='self')
+
     count = current_app.config['RSS'].get('accounts', 10)
     stories = Story.bl.select_by_author(author).order_by(Story.first_published_at.desc(), Story.id.desc())[:count]
-    for story in stories:
-        feed.add(
-            story.title,
-            Markup(story.summary).striptags(),
-            content_type='text',
-            author=author.username,
-            url=url_for('story.view', pk=story.id, _external=True),
-            updated=story.updated,
-            published=story.first_published_at or story.date
-        )
-    return feed.get_response()
+    last_update = _add_stories_to_feed(feed, stories)
+
+    feed.updated(pytz.UTC.fromutc(last_update))
+    return Response(feed.atom_str(pretty=True), mimetype='application/atom+xml')
 
 
 @bp.route('/chapters/', endpoint='chapters')
 @db_session
 def feed_chapters():
-    feed = AtomFeed(
-        title='Обновления глав — {}'.format(sitename()),
-        subtitle='Новые главы рассказов',
-        feed_url=request.url,
-        url=request.url_root
-    )
+    feed = FeedGenerator()
+    feed.title('Обновления глав — {}'.format(sitename()))
+    feed.subtitle('Новые главы рассказов')
+    feed.id(request.url)
+    feed.link(href=request.url, rel='self')
+    last_update = datetime(1970, 1, 1, 0)
 
     chapters = select(c for c in Chapter if not c.draft and c.story_published)
     chapters = chapters.order_by(Chapter.first_published_at.desc(), Chapter.order.desc())
@@ -126,18 +136,24 @@ def feed_chapters():
 
     for chapter in chapters:
         story = chapter.story
-        author = story.authors[0]
         data = chapter.text_preview
-        feed.add(
-            '{} : {}'.format(chapter.autotitle, story.title),
-            data,
-            content_type='text',
-            author=author.username,
-            url=url_for('chapter.view', story_id=story.id, chapter_order=chapter.order, _external=True),
-            updated=chapter.updated,
-            published=chapter.date,
-        )
-    return feed.get_response()
+        chapter_url = url_for('chapter.view', story_id=story.id, chapter_order=chapter.order, _external=True)
+
+        entry = feed.add_entry(order='append')
+        entry.id(chapter_url)
+        entry.link(href=chapter_url)
+        entry.title('{} : {}'.format(chapter.autotitle, story.title))
+        entry.content(data)
+        entry.author([
+            {'name': author.username, 'uri': url_for('author.info', user_id=author.id, _external=True)}
+            for author in story.bl.get_authors()
+        ])
+        entry.published(pytz.UTC.fromutc(chapter.date))
+        entry.updated(pytz.UTC.fromutc(chapter.updated))
+        last_update = max(last_update, chapter.updated)
+
+    feed.updated(pytz.UTC.fromutc(last_update))
+    return Response(feed.atom_str(pretty=True), mimetype='application/atom+xml')
 
 
 @bp.route('/story/<int:story_id>/', endpoint='story')
@@ -147,11 +163,11 @@ def feed_story(story_id):
     if not story:
         abort(404)
 
-    feed = AtomFeed(
-        title=story.title,
-        feed_url=request.url,
-        url=request.url_root
-    )
+    feed = FeedGenerator()
+    feed.title(story.title)
+    feed.id(request.url)
+    feed.link(href=request.url, rel='self')
+    last_update = datetime(1970, 1, 1, 0)
 
     chapters = [c for c in story.chapters if not c.draft]
     for c in chapters:
@@ -160,12 +176,16 @@ def feed_story(story_id):
 
     for chapter in chapters:
         data = chapter.text_preview
-        feed.add(
-            chapter.autotitle,
-            data,
-            content_type='text',
-            url=url_for('chapter.view', story_id=story.id, chapter_order=chapter.order, _external=True),
-            updated=chapter.updated,
-            published=chapter.date,
-        )
-    return feed.get_response()
+        chapter_url = url_for('chapter.view', story_id=story.id, chapter_order=chapter.order, _external=True)
+
+        entry = feed.add_entry(order='append')
+        entry.id(chapter_url)
+        entry.link(href=chapter_url)
+        entry.title(chapter.autotitle)
+        entry.content(data)
+        entry.published(pytz.UTC.fromutc(chapter.date))
+        entry.updated(pytz.UTC.fromutc(chapter.updated))
+        last_update = max(last_update, chapter.updated)
+
+    feed.updated(pytz.UTC.fromutc(last_update))
+    return Response(feed.atom_str(pretty=True), mimetype='application/atom+xml')

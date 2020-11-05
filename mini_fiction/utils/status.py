@@ -112,7 +112,7 @@ class ProjectStatus(Status):
         return self._ok('cache', self.app.config['CACHE_TYPE'])
 
     def cache_working(self):
-        if self.app.config['CACHE_TYPE'] == 'null':
+        if self.app.config['CACHE_TYPE'] in ('null', 'cachelib.base.NullCache'):
             return self._ok('cache_working', 'disabled')
 
         k = ''.join(random.choice('abcdefghijklmnopqrstuvwxyz') for _ in range(10))

@@ -14,10 +14,10 @@ from logging.handlers import SMTPHandler
 from pathlib import Path
 
 import jinja2
+import cachelib
 from celery import Celery
 from werkzeug.urls import iri_to_uri
 from werkzeug.utils import import_string
-from werkzeug.contrib import cache
 from werkzeug.contrib.fixers import ProxyFix
 from werkzeug.exceptions import HTTPException
 from flask import Flask, current_app, request, g, jsonify
@@ -194,37 +194,27 @@ def configure_i18n(app):
 
 
 def configure_cache(app):
-    if app.config['CACHE_TYPE'] == 'memcached':
-        app.cache = cache.MemcachedCache(
-            app.config['CACHE_MEMCACHED_SERVERS'],
-            key_prefix=app.config.get('CACHE_KEY_PREFIX') or '',
-        )
+    kwargs = dict(app.config['CACHE_PARAMS'])
 
-    elif app.config['CACHE_TYPE'] == 'redis':
-        kwargs = {
-            'host': app.config['CACHE_REDIS_HOST'],
-            'port': app.config['CACHE_REDIS_PORT'],
-        }
+    cache_class = 'cachelib.base.NullCache'
+    cache_type = app.config['CACHE_TYPE']
 
-        if app.config['CACHE_REDIS_PASSWORD']:
-            kwargs['password'] = app.config['CACHE_REDIS_PASSWORD']
+    if cache_type == 'memcached':
+        cache_class = 'cachelib.memcached.MemcachedCache'
+    elif cache_type == 'redis':
+        cache_class = 'cachelib.redis.RedisCache'
+    elif cache_type == 'filesystem':
+        cache_class = 'cachelib.file.FileSystemCache'
+    elif cache_type == 'uwsgi':
+        cache_class = 'cachelib.uwsgi.UWSGICache'
+    elif cache_type == 'simple':
+        cache_class = 'cachelib.simple.SimpleCache'
+    elif '.' in cache_type:
+        cache_class = cache_type
+    elif cache_type != 'null':
+        raise ValueError(f'Unknown cache type: {cache_type!r}')
 
-        if app.config['CACHE_REDIS_DB'] is not None:
-            kwargs['db'] = app.config['CACHE_REDIS_DB']
-
-        if app.config['CACHE_KEY_PREFIX']:
-            kwargs['key_prefix'] = app.config['CACHE_KEY_PREFIX']
-
-        app.cache = cache.RedisCache(**kwargs)
-
-    elif app.config['CACHE_TYPE'] == 'filesystem':
-        app.cache = cache.FileSystemCache(app.config['CACHE_DIR'])
-
-    elif app.config['CACHE_TYPE'] == 'null':
-        app.cache = cache.NullCache()
-
-    else:
-        raise ValueError('Unknown cache type: {}'.format(app.config['CACHE_TYPE']))
+    app.cache = import_string(cache_class)(**kwargs)
 
 
 def configure_rate_limit(app):

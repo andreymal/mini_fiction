@@ -61,6 +61,29 @@ class Local(Development):
     # Example that allows only english usernames
     # USERNAME_REGEX = r'^[A-Za-z0-9_-]+$'
 
+    # cache - memcached (pip install python-memcached)
+    # CACHE_TYPE = 'memcached'
+    # CACHE_PARAMS = {
+    #     'servers': ['127.0.0.1:11211'],
+    #     'key_prefix': 'mfc_',
+    # }
+
+    # cache - redis
+    # CACHE_TYPE = 'redis'
+    # CACHE_PARAMS = {
+    #     'host': '127.0.0.1',
+    #     'port': 6379,
+    #     'password': None,
+    #     'db': 0,
+    #     'key_prefix': 'mfc_',
+    # }
+
+    # cache - filesystem
+    # CACHE_TYPE = 'filesystem'
+    # CACHE_PARAMS = {
+    #     'cache_dir': os.path.join(os.getcwd(), 'cache'),
+    # }
+
 
 class Test(BaseTest):
     # This config will be used with `python setup.py test` command

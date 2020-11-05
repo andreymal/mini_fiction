@@ -39,20 +39,8 @@ class Config(object):
     SQL_DEBUG = False
 
     # cache config
-    CACHE_TYPE = 'memcached'  # 'null', 'redis', 'filesystem'
-    CACHE_KEY_PREFIX = 'mfc_'
-
-    # memcached
-    CACHE_MEMCACHED_SERVERS = ['127.0.0.1:11211']
-
-    # redis
-    CACHE_REDIS_HOST = '127.0.0.1'
-    CACHE_REDIS_PORT = 6379
-    CACHE_REDIS_PASSWORD = None
-    CACHE_REDIS_DB = None
-
-    # filesystem
-    CACHE_DIR = os.path.join(os.getcwd(), 'cache')
+    CACHE_TYPE = 'null'  # 'memcached', 'redis', 'filesystem', 'uwsgi', 'simple'
+    CACHE_PARAMS = {}
 
     # Rate limiter
     RATE_LIMIT_BACKEND = None

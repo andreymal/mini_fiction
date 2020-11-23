@@ -1,0 +1,40 @@
+{% extends base %}
+{% from 'macro.html' import breadcrumbs with context %}
+{% block content %}
+<div class="row">
+    <div class="span12">
+        {{- breadcrumbs([[url_for('author.info'), 'Кабинет автора']]) }}
+    </div>
+
+    <div class="span12"{% if not story_add %} id="story_{{ story.id }}"{% endif %}>
+        {% include 'includes/story_control_buttons.html' %}
+        <h1>Редактирование <a class="invisible-link" href="{{ url_for('story.view', pk=story.id, _external=True) }}">«{{ story.title }}»</a></h1>
+
+        <ul class="nav nav-pills nav-simple">
+            <li{% if story_tab == 'general' %} class="active"{% endif %}>
+                <a href="{{ url_for('story.edit', pk=story.id) }}">Основное</a>
+            </li>
+            <li{% if story_tab == 'chapters' %} class="active"{% endif %}>
+                <a href="{{ url_for('story.edit_chapters', pk=story.id) }}">Главы</a>
+            </li>
+            {% if story.bl.can_edit_contributors(current_user) -%}
+                <li{% if story_tab == 'contributors' %} class="active"{% endif %}>
+                    <a href="{{ url_for('story.edit_contributors', pk=story.id) }}">Авторы и доступ</a>
+                </li>
+            {% endif -%}
+            {% if current_user.is_staff -%}
+                <li{% if story_tab == 'staff' %} class="active"{% endif %}>
+                    <a href="{{ url_for('story.edit_staff', pk=story.id) }}">Администрирование</a>
+                </li>
+            {% endif -%}
+        </ul>
+
+    </div>
+
+    {% block story_edit_content %}{% endblock %}
+
+    <div class="span12">
+        {{- breadcrumbs([[url_for('author.info'), 'Кабинет автора']]) }}
+    </div>
+</div>
+{% endblock %}

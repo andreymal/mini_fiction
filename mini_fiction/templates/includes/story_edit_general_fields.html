@@ -1,0 +1,161 @@
+<!-- Название -->
+<div class="control-group{% if form.title.errors %} error{% endif %}">
+    {{ form.title.label(class_='control-label') }}
+    <div class="controls">{{ form.title }}
+        {% if form.title.errors %}
+            {% for error in form.title.errors %}
+        <span class="help-inline">{{ error }}</span>
+            {% endfor %}
+        {% else %}
+            <span class="help-inline small">{{ form.title.description }}</span>
+        {% endif %}
+      </div>
+</div>
+
+<!-- Теги -->
+<div class="control-group{% if form.tags.errors %} error{% endif %}">
+    {{ form.tags.label(class_='control-label') }}
+    <div class="controls">
+        <div data-ti-autocomplete-url="{{ url_for('tags.autocomplete') }}"
+             data-ti-holder-name="tags"
+             data-ti-synthetic-tags
+             data-bazooka="storyTags">{{ form.tags }}</div>
+        {% if form.tags.errors %}
+            {% for error in form.tags.errors %}
+            {% if not loop.first %}<br/>{% endif %}
+        <span class="help-inline">{{ error }}</span>
+            {% endfor %}
+        {% else %}
+            <span class="help-inline small">{{ form.tags.description }}</span>
+        {% endif %}
+      </div>
+</div>
+
+<!-- Персонажи -->
+{% if form.characters.choices %}
+<div class="control-group{% if form.characters.errors %} error{% endif %}">
+    {{ form.characters.label(class_='control-label', for=False) }}
+    <div class="controls characters-select">
+        {% if form.characters.errors %}
+            {% for error in form.characters.errors %}
+        <span class="help-block">{{ error }}</span>
+            {% endfor %}
+        {% else %}
+            <span class="help-block small">{{ form.characters.description }}</span>
+        {% endif %}
+          {{ form.characters }}
+      </div>
+</div>
+{% endif %}
+
+<!-- Общее описание -->
+<div class="control-group{% if form.summary.errors %} error{% endif %}">
+    {{ form.summary.label(class_='control-label') }}
+    <div class="controls">{{ form.summary }}
+        {% if form.summary.errors %}
+            {% for error in form.summary.errors %}
+            <span class="help-inline">{{ error }}</span>
+            {% endfor %}
+        {% else %}
+            <span class="help-inline small">{{ form.summary.description }}</span>
+        {% endif %}
+      </div>
+</div>
+
+<!-- Заметки к рассказу -->
+<div class="control-group{% if form.notes.errors %} error{% endif %}">
+    {{ form.notes.label(class_='control-label', for='id_notes') }}
+    <div class="controls">{{ form.notes }}
+        {% if form.notes.errors %}
+            {% for error in form.notes.errors %}
+                <span class="help-inline">{{ error }}</span>
+            {% endfor %}
+        {% else %}
+            <span class="help-inline small">{{ form.notes.description }}</span>
+        {% endif %}
+      </div>
+</div>
+
+<!-- Оригинал -->
+<div class="control-group{% if form.original_url.errors %} error{% endif %}">
+    {{ form.original_url.label(class_='control-label') }}
+    <div class="controls">{{ form.original_url }}
+        {% if form.original_url.errors %}
+            {% for error in form.original_url.errors %}
+        <span class="help-inline">{{ error }}</span>
+            {% endfor %}
+        {% else %}
+            <span class="help-inline small">{{ form.original_url.description }}</span>
+        {% endif %}
+      </div>
+</div>
+
+<!-- Заголовок в оригинале -->
+<div class="control-group{% if form.original_title.errors %} error{% endif %}">
+    {{ form.original_title.label(class_='control-label') }}
+    <div class="controls">{{ form.original_title }}
+        {% if form.original_title.errors %}
+            {% for error in form.original_title.errors %}
+        <span class="help-inline">{{ error }}</span>
+            {% endfor %}
+        {% else %}
+            <span class="help-inline small">{{ form.original_title.description }}</span>
+        {% endif %}
+      </div>
+</div>
+
+<!-- Автор оригинала -->
+<div class="control-group{% if form.original_author.errors %} error{% endif %}">
+    {{ form.original_author.label(class_='control-label') }}
+    <div class="controls">{{ form.original_author }}
+        {% if form.original_author.errors %}
+            {% for error in form.original_author.errors %}
+        <span class="help-inline">{{ error }}</span>
+            {% endfor %}
+        {% else %}
+            <span class="help-inline small">{{ form.original_author.description }}</span>
+        {% endif %}
+      </div>
+</div>
+
+<!-- Рейтинг -->
+<div class="control-group{% if form.rating.errors %} error{% endif %}">
+    {{ form.rating.label(class_='control-label', for=False) }}
+    <div class="controls bootstrap radio">{{ form.rating }}
+        {% if form.rating.errors %}
+            {% for error in form.rating.errors %}
+                <span class="help-inline">{{ error }}</span>
+            {% endfor %}
+        {% else %}
+            <span class="help-inline small">{{ form.rating.description }}</span>
+        {% endif %}
+      </div>
+</div>
+
+<!-- Оригинал/перевод -->
+<div class="control-group{% if form.original.errors %} error{% endif %}">
+    {{ form.original.label(class_='control-label', for=False) }}
+    <div class="controls bootstrap radio">{{ form.original }}
+        {% if form.original.errors %}
+            {% for error in form.original.errors %}
+                <span class="help-inline">{{ error }}</span>
+            {% endfor %}
+        {% else %}
+            <span class="help-inline small">{{ form.original.description }}</span>
+        {% endif %}
+      </div>
+</div>
+
+<!-- Не завершен/завершен/заморожен -->
+<div class="control-group{% if form.status.errors %} error{% endif %}">
+    {{ form.status.label(class_='control-label', for=False) }}
+    <div class="controls bootstrap radio">{{ form.status }}
+        {% if form.status.errors %}
+            {% for error in form.status.errors %}
+                <span class="help-inline">{{ error }}</span>
+            {% endfor %}
+        {% else %}
+            <span class="help-inline small">{{ form.status.description }}</span>
+        {% endif %}
+      </div>
+</div>

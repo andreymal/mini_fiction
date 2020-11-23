@@ -1,20 +1,14 @@
 
-<form action="{{ url_for('story.edit', pk=story.id) }}" data-ajaxaction="{{ url_for('story.edit', pk=story.id) }}?short=1" method="POST" enctype="multipart/form-data" class="form-horizontal" id="story-edit-contributors-form">
+<form action="{{ url_for('story.edit_contributors', pk=story.id) }}" data-ajaxaction="{{ url_for('story.edit_contributors', pk=story.id) }}?short=1" method="POST" enctype="multipart/form-data" class="form-horizontal" id="story-edit-contributors-form">
     <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
 
     <fieldset>
-        <legend>Доступ к рассказу</legend>
-
         <div class="control-group{% if contr_error %} error{% endif %}">
         <div class="controls controls-contributors">
 
         {% if contr_saved -%}
             <div class="alert-mini green">Изменения сохранены</div>
         {% endif -%}
-
-        <div class="help-block">
-            Здесь вы можете добавить пользователей, которые смогут читать и комментировать (и редактировать, если разрешите) даже неопубликованный рассказ.
-        </div>
 
         {% for contributor in story.bl.get_contributors() %}<div class="controls-contributors-item">
             <span class="controls-contributors-user">

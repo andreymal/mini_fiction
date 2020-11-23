@@ -367,7 +367,7 @@ def add():
     rating = Rating.select().order_by(Rating.id.desc()).first()
     form = StoryForm(data={'status': 0, 'original': 1, 'rating': rating.id if rating else 1})
 
-    data = {
+    ctx = {
         'page_title': gettext('New story'),
         'form': form,
         'story_add': True,
@@ -391,11 +391,11 @@ def add():
             story = Story.bl.create([user], formdata)
         except ValidationError as exc:
             form.set_errors(exc.errors)
-            data['not_saved'] = True
+            ctx['not_saved'] = True
         else:
-            return redirect(url_for('story.edit', pk=story.id))
+            return redirect(url_for('story.edit_chapters', pk=story.id))
 
-    return render_template('story_work.html', **data)
+    return render_template('story_add.html', **ctx)
 
 
 @bp.route('/<int:pk>/edit/', methods=('GET', 'POST'))
@@ -412,19 +412,9 @@ def edit(pk):
     if not story.bl.editable_by(user):
         abort(403)
 
-    data = {
-        'story_edit': True,
-        'chapters': list(story.chapters.select().order_by(Chapter.order, Chapter.id)),
-        'saved': False,
-        'not_saved': False,
-        'story': story
-    }
-
     story_data = {
-        # 'categories': [x.id for x in story.categories],  # TODO: optimize
         'tags': ', '.join(x.tag.name for x in story.bl.get_tags_list()),
         'characters': [x.id for x in story.characters],
-        # 'classifications': [x.id for x in story.classifications],
         'rating': story.rating.id,
         'original_url': story.original_url,
         'original_title': story.original_title,
@@ -440,19 +430,18 @@ def edit(pk):
     else:
         story_data['status'] = 0
 
-    action = request.form.get('act') if request.method == 'POST' else None
+    form = StoryForm(data=story_data)
 
-    if action == 'save_story':
-        form = StoryForm(data=story_data)  # formdata по умолчанию request.form
-    else:
-        form = StoryForm(formdata=None, data=story_data)  # отключаем formdata, чтобы не конфликтовать с другими формами
+    ctx = {
+        'saved': False,
+        'not_saved': False,
+        'story': story,
+        'page_title': 'Редактирование «{}»'.format(story.title),
+        'form': form,
+        'story_tab': 'general',
+    }
 
-    data['form'] = form
-    data['contr_error'] = None
-    data['contr_saved'] = False
-    data['page_title'] = 'Редактирование «{}»'.format(story.title)
-
-    if action == 'save_story':
+    if request.method == 'POST':
         if form.validate_on_submit():
             formdata = dict(form.data)
             if formdata['status'] == 0:
@@ -471,18 +460,64 @@ def edit(pk):
                 story = story.bl.update(user, formdata, minor=minor)
             except ValidationError as exc:
                 form.set_errors(exc.errors)
-                data['not_saved'] = True
+                ctx['not_saved'] = True
             else:
-                data['saved'] = True
+                ctx['saved'] = True
                 # Заголовок могли изменить, обновляем
-                data['page_title'] = 'Редактирование «{}»'.format(story.title)
+                ctx['page_title'] = 'Редактирование «{}»'.format(story.title)
                 # Приводим теги к нормализованному виду
                 form.tags.data = ', '.join(x.tag.name for x in story.bl.get_tags_list())
 
-    elif action == 'save_access':
-        if not story.bl.can_edit_contributors(user):
-            abort(403)
+    return render_template('story_edit_general.html', **ctx)
 
+
+@bp.route('/<int:pk>/edit/chapters/', methods=('GET', 'POST'))
+@db_session
+@login_required
+def edit_chapters(pk):
+    user = current_user._get_current_object()
+    if request.method == 'POST':
+        story = Story.get_for_update(id=pk)
+    else:
+        story = Story.get(id=pk)
+    if not story:
+        abort(404)
+    if not story.bl.editable_by(user):
+        abort(403)
+
+    ctx = {
+        'story': story,
+        'page_title': 'Редактирование глав «{}»'.format(story.title),
+        'story_tab': 'chapters',
+        'chapters': list(story.chapters.select().order_by(Chapter.order, Chapter.id)),
+    }
+
+    return render_template('story_edit_chapters.html', **ctx)
+
+
+@bp.route('/<int:pk>/edit/contributors/', methods=('GET', 'POST'))
+@db_session
+@login_required
+def edit_contributors(pk):
+    user = current_user._get_current_object()
+    if request.method == 'POST':
+        story = Story.get_for_update(id=pk)
+    else:
+        story = Story.get(id=pk)
+    if not story:
+        abort(404)
+    if not story.bl.can_edit_contributors(user):
+        abort(403)
+
+    ctx = {
+        'story': story,
+        'page_title': 'Редактирование авторов «{}»'.format(story.title),
+        'story_tab': 'contributors',
+        'contr_saved': False,
+        'contr_error': None,
+    }
+
+    if request.method == 'POST':
         error = None
         access = {}
         for k, v in request.form.items():
@@ -524,30 +559,54 @@ def edit(pk):
                 break
 
         if error:
-            data['contr_error'] = error
+            ctx['contr_error'] = error
             if g.is_ajax:
                 page_title = 'Ошибка редактирования доступа'
                 html = render_template('includes/ajax/story_edit_contributors_error.html', page_title=page_title, contr_error=error)
                 return jsonify({'page_content': {'modal': html, 'title': page_title}})
-            return render_template('story_work.html', **data)
 
         else:
             story.bl.edit_contributors(user, access)
-            data['contr_saved'] = True
-            if request.args.get('short') == '1':
-                html = render_template('includes/story_edit_contributors_form.html', **data)
-                return jsonify({'success': True, 'form': html})
+            ctx['contr_saved'] = True
 
-    elif action == 'save_staff' and user.is_staff:
+        if request.args.get('short') == '1':
+            html = render_template('includes/story_edit_contributors_form.html', **ctx)
+            return jsonify({'success': True, 'form': html})
+
+    return render_template('story_edit_contributors.html', **ctx)
+
+
+@bp.route('/<int:pk>/edit/staff/', methods=('GET', 'POST'))
+@db_session
+@login_required
+def edit_staff(pk):
+    user = current_user._get_current_object()
+    if request.method == 'POST':
+        story = Story.get_for_update(id=pk)
+    else:
+        story = Story.get(id=pk)
+    if not story:
+        abort(404)
+    if not user.is_staff or not story.bl.editable_by(user):
+        abort(403)
+
+    ctx = {
+        'story': story,
+        'page_title': 'Администрирование рассказа «{}»'.format(story.title),
+        'story_tab': 'staff',
+        'staff_saved': False,
+    }
+
+    if request.method == 'POST':
         # TODO: bl
         story.robots_noindex = request.form.get('robots_noindex') == '1'
         if request.form.get('comments_mode') in {'', 'on', 'off', 'pub', 'nodraft'}:
             story.comments_mode = request.form.get('comments_mode')
         if request.form.get('direct_access') in {'', 'all', 'allguest', 'none', 'nodraft', 'anodraft'}:
             story.direct_access = request.form.get('direct_access')
-        data['staff_saved'] = True
+        ctx['staff_saved'] = True
 
-    return render_template('story_work.html', **data)
+    return render_template('story_edit_staff.html', **ctx)
 
 
 @bp.route('/<int:pk>/delete/', methods=('GET', 'POST'))

@@ -1,0 +1,40 @@
+{% extends 'story_edit_base.html' %}
+{% block story_edit_content %}
+
+<div class="span12">
+
+    {% if saved %}<div class="alert-mini green">Изменения сохранены</div>{% endif %}
+    {% if not_saved %}<div class="alert-mini alert-error">Изменения не сохранены, проверьте форму</div>{% endif %}
+
+    <form method="POST" enctype="multipart/form-data" class="form-horizontal">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+        <fieldset>
+            {% include 'includes/story_edit_general_fields.html' %}
+
+            {% if current_user.is_staff -%}
+                <div class="control-group">
+                    <div class="controls">
+                        <label class="checkbox">
+                            {{ form.minor }} Малое изменение (не обновлять дату последнего изменения рассказа)
+                        </label>
+                    </div>
+                </div>
+            {%- endif %}
+
+                <div class="control-group">
+                    <div class="controls">
+                        <div class="help-block">
+                            Для добавления и изменения глав рассказа перейдите на вкладку <a href="{{ url_for('story.edit_chapters', pk=story.id) }}">«Главы»</a>.
+                        </div>
+                    </div>
+                </div>
+
+            <div class="form-actions">
+                <button type="submit" class="btn btn-primary" name="act" value="save_story">Сохранить рассказ</button>
+            </div>
+
+          </fieldset>
+    </form>
+</div>
+
+{% endblock %}

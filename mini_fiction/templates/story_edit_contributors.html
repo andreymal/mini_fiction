@@ -1,0 +1,9 @@
+{% extends 'story_edit_base.html' %}
+{% block story_edit_content %}
+
+<div class="span12">
+{{- html_block('story_edit_contributors') -}}
+{% include 'includes/story_edit_contributors_form.html' with context %}
+</div>
+
+{% endblock %}

@@ -5,7 +5,7 @@
     <div class="span12">
         {{- breadcrumbs([
             [url_for('author.info'), 'Кабинет автора'],
-            [url_for('story.edit', pk=(story or chapter.story).id), 'Редактирование «{}»'.format((story or chapter.story).title)]
+            [url_for('story.edit_chapters', pk=(story or chapter.story).id), 'Редактирование глав «{}»'.format((story or chapter.story).title)]
         ]) }}
     </div>
     <div class="span12">
@@ -102,7 +102,7 @@
     <div class="span12">
         {{- breadcrumbs([
             [url_for('author.info'), 'Кабинет автора'],
-            [url_for('story.edit', pk=(story or chapter.story).id), 'Редактирование «{}»'.format((story or chapter.story).title)]
+            [url_for('story.edit_chapters', pk=(story or chapter.story).id), 'Редактирование глав «{}»'.format((story or chapter.story).title)]
         ]) }}
     </div>
 </div>

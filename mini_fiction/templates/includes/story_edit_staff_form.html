@@ -1,9 +1,7 @@
-<form action="{{ url_for('story.edit', pk=story.id) }}" data-ajaxaction="{{ url_for('story.edit', pk=story.id) }}?short=1" method="POST" enctype="multipart/form-data" class="form-horizontal" id="story-edit-staff-form">
+<form action="{{ url_for('story.edit_staff', pk=story.id) }}" method="POST" enctype="multipart/form-data" class="form-horizontal">
     <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
 
     <fieldset>
-        <legend>Администрирование рассказа</legend>
-
         <div class="control-group{% if staff_error %} error{% endif %}"><div class="controls">
             {% if staff_saved -%}
                 <div class="alert-mini green">Изменения сохранены</div>

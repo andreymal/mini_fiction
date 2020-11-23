@@ -1,0 +1,37 @@
+{% extends 'story_edit_base.html' %}
+{% block story_edit_content %}
+
+<div class="span12">
+    {{- html_block('story_edit_chapters') -}}
+
+    <div class="form-horizontal">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+          <fieldset>
+                <div class="control-group">
+                    <div class="controls events">
+                        {% if chapters %}
+                        <ul id="sortable_chapters" class="chapters-control" data-story="{{ story.id }}">
+                            {% for chapter in chapters %}
+                                  <li id="chapter_{{ chapter.id }}" data-chapter="{{ chapter.id }}" class="btn btn-large">
+                                    {{ chapter.autotitle }}
+                                    <div class="btn-group">
+                                        <a class="btn btn-mini publish-chapter-btn js-btn-publish-chapter{% if chapter.draft %} btn-primary{% endif %}" href="{{ url_for('chapter.publish', pk=chapter.id) }}">
+                                            {{ 'опубликовать' if chapter.draft else 'в черновики' }}
+                                        </a>
+                                        <a class="btn btn-warning btn-mini" href="{{ url_for('chapter.edit', pk=chapter.id) }}">править</a>
+                                        <a class="btn btn-danger btn-mini chapter_delete" href="{{ url_for('chapter.delete', pk=chapter.id) }}">удалить</a>
+                                    </div>
+                                </li>
+                            {% endfor %}
+                        </ul>
+                        {% else %}
+                            <p><em>Кажется, у рассказа ещё нет ни одной главы!</em></p>
+                        {% endif %}
+                        <a href="{{ url_for('chapter.add', story_id=story.id) }}" class="btn btn-success">Добавить главу</a>
+                    </div>
+                </div>
+          </fieldset>
+    </div>
+</div>
+
+{% endblock %}

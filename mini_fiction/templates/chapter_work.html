@@ -74,11 +74,27 @@
                                 {{ _('Add and publish') }}
                             {%- endif -%}
                         </button>
-                        <button type="submit" name="act" value="draft" class="btn">{{ _('Add as draft') }}</button>
+                        <button type="submit" name="act" value="draft" class="btn btn-success">{{ _('Add as draft') }}</button>
                     {% endif %}
 
                 {%- else %}
-                    <button type="submit" name="act" value="save" class="btn btn-primary">{{ _('Save changes') }}</button>
+                    {% if chapter.draft %}
+                        <button type="submit" name="act" value="save" class="btn btn-primary">{{ _('Save as draft') }}</button>
+                        {% if story.published %}
+                            <button type="submit" name="act" value="publish" class="btn btn-success">
+                                {%- if unpublished_chapters_count > 1 -%}
+                                    {{- ngettext('Save and publish %(num)s chapter', 'Save and publish %(num)s chapters', unpublished_chapters_count) -}}
+                                {%- else -%}
+                                    {{ _('Save and publish') }}
+                                {%- endif -%}
+                            </button>
+                        {% endif %}
+                    {% else %}
+                        <button type="submit" name="act" value="save" class="btn btn-primary">{{ _('Save changes') }}</button>
+                        {% if story.published %}
+                            <button type="submit" name="act" value="draft" class="btn btn-success">{{ _('Save and move to drafts') }}</button>
+                        {% endif %}
+                    {% endif %}
                 {%- endif %}
 
                 <button type="submit" name="act" value="preview" class="btn" id="chapter-preview-btn">{{ _('Preview') }}</button>

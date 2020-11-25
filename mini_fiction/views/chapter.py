@@ -245,6 +245,12 @@ def edit(pk):
                     'text': form.text.data,
                 }
             )
+
+            if request.form.get('act') == 'publish':
+                chapter.story.bl.publish_all_chapters(user)
+            elif request.form.get('act') == 'draft' and not chapter.draft:
+                chapter.bl.publish(user, published=False)
+
             saved = True
         else:
             form.text.errors.append(

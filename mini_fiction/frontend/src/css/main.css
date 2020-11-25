@@ -890,24 +890,33 @@ p.meta .gen.more-tags-btn {
     margin-bottom: 60px;
 }
 
-.green,.complete {
+.green {
     color: green;
 }
 
-.on-moderation {
+.story-mark {
+    white-space: nowrap;
+}
+
+.story-mark.complete {
+    color: green;
+}
+
+.story-mark.on-moderation {
     color: #ff7700;
 }
 
-.incomplete, .draft {
+.story-mark.incomplete,
+.story-mark.draft {
     color: #f2c200;
 }
 
-.suspended {
+.story-mark.suspended {
     color: red;
 }
 
-.translation {
-    color: #aaa;
+.story-mark.translation {
+    color: #999;
 }
 
 .story-chapters {

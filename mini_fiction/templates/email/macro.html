@@ -44,15 +44,15 @@
 <h3 style="font-family: 'Trebuchet MS', Arial, sans-serif; font-weight: 400; font-size: 20px; line-height: 20px; margin: 0 0 5px;">
     <a href="{{ url_for('story.view', pk=story.id, _external=True) }}" style="color: #0086e5;">{{ story.title }}</a>
     {% if not story.original -%}
-        <sup style="color: #aaa; font-size: 12px;">перевод</sup>
+        <sup style="color: #999; font-size: 12px; white-space: nowrap;">перевод</sup>
     {%- endif %}
     {%- set status = story.status_string %}
     {% if status == 'finished' -%}
-        <sup style="color: green; font-size: 12px;">завершен</sup>
+        <sup style="color: green; font-size: 12px; white-space: nowrap;">завершен</sup>
     {%- elif status == 'freezed' -%}
-        <sup style="color: red; font-size: 12px;">заморожен</sup>
+        <sup style="color: red; font-size: 12px; white-space: nowrap;">заморожен</sup>
     {%- else -%}
-        <sup style="color: #f2c200; font-size: 12px;">не&nbsp;завершен</sup>
+        <sup style="color: #f2c200; font-size: 12px; white-space: nowrap;">не завершен</sup>
     {% endif %}
 </h3>
 

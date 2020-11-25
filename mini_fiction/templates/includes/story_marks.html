@@ -1,16 +1,16 @@
 {% if story.draft -%}
-    <sup class="story-mark draft">черновик</sup>
+    <sup class="story-mark draft">{{ pgettext('story_mark', 'draft') }}</sup>
 {% elif not story.approved -%}
-    <sup class="story-mark on-moderation">на модерации</sup>
+    <sup class="story-mark on-moderation">{{ pgettext('story_mark', 'on moderation') }}</sup>
 {%- endif %}
 {% if not story.original -%}
-    <sup class="story-mark translation">перевод</sup>
+    <sup class="story-mark translation">{{ pgettext('story_mark', 'translation') }}</sup>
 {%- endif %}
 {%- set status = story.status_string %}
 {% if status == 'finished' -%}
-    <sup class="story-mark complete">завершен</sup>
+    <sup class="story-mark complete">{{ pgettext('story_mark', 'complete') }}</sup>
 {%- elif status == 'freezed' -%}
-    <sup class="story-mark suspended">заморожен</sup>
+    <sup class="story-mark suspended">{{ pgettext('story_mark', 'freezed') }}</sup>
 {%- else -%}
-    <sup class="story-mark incomplete">не завершен</sup>
+    <sup class="story-mark incomplete">{{ pgettext('story_mark', 'incomplete') }}</sup>
 {% endif %}

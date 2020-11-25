@@ -18,16 +18,16 @@
                                         <a class="btn btn-mini publish-chapter-btn js-btn-publish-chapter{% if chapter.draft %} btn-primary{% endif %}" href="{{ url_for('chapter.publish', pk=chapter.id) }}">
                                             {{ 'опубликовать' if chapter.draft else 'в черновики' }}
                                         </a>
-                                        <a class="btn btn-warning btn-mini" href="{{ url_for('chapter.edit', pk=chapter.id) }}">править</a>
-                                        <a class="btn btn-danger btn-mini chapter_delete" href="{{ url_for('chapter.delete', pk=chapter.id) }}">удалить</a>
+                                        <a class="btn btn-warning btn-mini" href="{{ url_for('chapter.edit', pk=chapter.id) }}">{{ pgettext('chapter_edit_short', 'edit') }}</a>
+                                        <a class="btn btn-danger btn-mini chapter_delete" href="{{ url_for('chapter.delete', pk=chapter.id) }}">{{ pgettext('chapter_delete_short', 'delete') }}</a>
                                     </div>
                                 </li>
                             {% endfor %}
                         </ul>
                         {% else %}
-                            <p><em>Кажется, у рассказа ещё нет ни одной главы!</em></p>
+                            <p><em>{{ _("It seems this story doesn't yet have any chapters!") }}</em></p>
                         {% endif %}
-                        <a href="{{ url_for('chapter.add', story_id=story.id) }}" class="btn btn-success">Добавить главу</a>
+                        <a href="{{ url_for('chapter.add', story_id=story.id) }}" class="btn btn-success">{{ _('Add chapter') }}</a>
                     </div>
                 </div>
           </fieldset>

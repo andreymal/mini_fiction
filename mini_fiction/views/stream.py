@@ -4,6 +4,7 @@
 from pony import orm
 from pony.orm import db_session
 from flask import Blueprint, current_app, render_template, abort, request
+from flask_babel import gettext
 from flask_login import current_user
 
 from mini_fiction.models import Story, Chapter, StoryContributor, StoryComment, StoryLocalComment, NewsComment, StoryTag, Tag
@@ -66,7 +67,7 @@ def chapters(page):
 
     return render_template(
         'stream/chapters.html',
-        page_title='Лента обновлений',
+        page_title=gettext('Updates feed'),
         chapters=objects,
         page_obj=page_obj,
         robots_noindex=True,
@@ -104,7 +105,7 @@ def comments(page):
 
     return render_template(
         'stream/comments.html',
-        page_title='Лента комментариев',
+        page_title=gettext('Comments feed'),
         tab='story',
         comments=objects,
         filter_deleted=filter_deleted,
@@ -146,7 +147,7 @@ def storylocalcomments(page):
 
     return render_template(
         'stream/comments.html',
-        page_title='Лента комментариев',
+        page_title=gettext('Comments feed'),
         tab='local',
         comments=objects,
         filter_deleted=filter_deleted,
@@ -184,7 +185,7 @@ def newscomments(page):
 
     return render_template(
         'stream/comments.html',
-        page_title='Лента комментариев',
+        page_title=gettext('Comments feed'),
         tab='news',
         comments=objects,
         filter_deleted=filter_deleted,

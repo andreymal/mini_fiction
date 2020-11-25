@@ -12,7 +12,7 @@
                 </a>
             {% endif %}
             {% if not current_user.is_staff and not story_edit %}
-                <a class="btn btn-warning btn-mini" href="{{ url_for('story.edit', pk=story.id) }}">Редактировать</a>
+                <a class="btn btn-warning btn-mini" href="{{ url_for('story.edit', pk=story.id) }}">{{ pgettext('edit_story', 'Edit') }}</a>
             {% endif %}
 
             <button class="btn btn-mini dropdown-toggle" type="button" id="storyDropdownMenu{{ story.id }}" data-toggle="dropdown" aria-expanded="true">
@@ -21,13 +21,13 @@
 
             <ul class="dropdown-menu btn-mini" role="menu">
             {% if not story_edit and current_user.is_staff -%}
-                <li><a href="{{ url_for('story.edit', pk=story.id) }}">Редактировать</a></li>
+                <li><a href="{{ url_for('story.edit', pk=story.id) }}">{{ pgettext('edit_story', 'Edit') }}</a></li>
             {% endif -%}
             {% if current_user.is_staff -%}
                 <li><a href="{{ url_for('story.pin', pk=story.id) }}" class="story_pin">{{ 'Открепить' if story.pinned else 'Закрепить на главной' }}</a></li>
             {% endif -%}
             {% if story.bl.deletable_by(current_user) -%}
-                <li><a class="story_delete" href="{{ url_for('story.delete', pk=story.id) }}">Удалить</a></li>
+                <li><a class="story_delete" href="{{ url_for('story.delete', pk=story.id) }}">{{ pgettext('delete_story', 'Delete') }}</a></li>
             {% endif -%}
             {% if story.bl.can_view_editlog(current_user) -%}
                 <li><a href="{{ url_for('story.edit_log', pk=story.id) }}">{{ _('Edit log') }}</a></li>

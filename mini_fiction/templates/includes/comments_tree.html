@@ -17,11 +17,11 @@
 
     {% if comment.answers_count > 0 and not has_next_tree %}
         <div class="comment-tree-loader" id="comment_tree_{{ comment.local_id }}" style="margin-left: {{ comment.tree_depth + 1 }}%" data-ajax-href="{{ comment.bl.get_tree_link() }}{{ '?last_comment={}'.format(last_viewed_comment) if last_viewed_comment else '' }}">
-            <a href="?fulltree=1#{{ comment.local_id }}" data-for="{{ comment.local_id }}" class="comment-tree-loader-link">Загрузить ветку ({{ nested_cnt }}{% if new_nested_cnt > 0 %}+{{ new_nested_cnt }}{% endif %})</a>
+            <a href="?fulltree=1#{{ comment.local_id }}" data-for="{{ comment.local_id }}" class="comment-tree-loader-link">{{ pgettext('load_comments_tree_link', 'Load tree') }} ({{ nested_cnt }}{% if new_nested_cnt > 0 %}+{{ new_nested_cnt }}{% endif %})</a>
         </div>
     {% endif %}
 {% else %}
     <div>
-        <h3>Здесь пока ничего нет</h3>
+        <h3>{{ _('There is nothing here yet') }}</h3>
     </div>
 {% endfor -%}

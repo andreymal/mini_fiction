@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version:  0.0.4\n"
 "Report-Msgid-Bugs-To: andriyano-31@mail.ru\n"
-"POT-Creation-Date: 2020-10-03 21:34+0300\n"
+"POT-Creation-Date: 2020-11-25 20:54+0300\n"
 "Last-Translator: andreymal <andriyano-31@mail.ru>\n"
 "Language: ru\n"
 "Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && "
@@ -16,14 +16,14 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Generated-By: Babel 2.8.0\n"
+"Generated-By: Babel 2.9.0\n"
 
 #: mini_fiction/models.py:674 mini_fiction/models.py:941
 msgid "Chapter {}"
 msgstr "Глава {}"
 
 #: mini_fiction/bl/tags.py:220 mini_fiction/bl/tags.py:291
-#: mini_fiction/settings.py:142
+#: mini_fiction/settings.py:130
 msgid "Empty tag"
 msgstr "Пустой тег"
 
@@ -35,7 +35,7 @@ msgstr "Добавить новый"
 msgid "User already exists"
 msgstr "Пользователь уже существует"
 
-#: mini_fiction/bl/authors.py:52 mini_fiction/bl/authors.py:299
+#: mini_fiction/bl/authors.py:52 mini_fiction/bl/authors.py:319
 msgid "Email address is already in use"
 msgstr "Электропочта уже используется"
 
@@ -48,7 +48,7 @@ msgid "Please set only password or password hash"
 msgstr "Укажите только пароль или хэш пароля"
 
 #: mini_fiction/bl/authors.py:64 mini_fiction/views/auth.py:167
-#: mini_fiction/views/author.py:235
+#: mini_fiction/views/author.py:239
 msgid "Password is too bad, please change it"
 msgstr "Пароль слишком плохой, поменяйте его"
 
@@ -64,19 +64,19 @@ msgstr "Слишком большой аватар; надо {value} КиБ ил
 msgid "Cannot read avatar"
 msgstr "Не получилось прочитать аватар"
 
-#: mini_fiction/bl/authors.py:392
+#: mini_fiction/bl/authors.py:412
 msgid "Too small avatar; must be {w}x{h} or bigger"
 msgstr "Слишком маленький аватар; надо {w}x{h} или больше"
 
-#: mini_fiction/bl/authors.py:394
+#: mini_fiction/bl/authors.py:414
 msgid "Too big avatar; must be {w}x{h} or smaller"
 msgstr "Слишком большой аватар; надо {w}x{h} или меньше"
 
-#: mini_fiction/bl/authors.py:712
+#: mini_fiction/bl/authors.py:732
 msgid "Please enter a correct username and password."
 msgstr "Пожалуйста, введите правильные имя пользователя и пароль."
 
-#: mini_fiction/bl/authors.py:718
+#: mini_fiction/bl/authors.py:738
 msgid "Account is disabled"
 msgstr "Аккаунт отключен"
 
@@ -223,13 +223,13 @@ msgid "Passwords do not match"
 msgstr "Пароли не совпадают"
 
 #: mini_fiction/forms/login.py:11
-#: mini_fiction/templates/admin/abuse_reports/index.html:15
-#: mini_fiction/templates/admin/abuse_reports/index.html:96
-#: mini_fiction/templates/admin/authors/index.html:13
-#: mini_fiction/templates/admin/authors/index.html:68
+#: mini_fiction/templates/admin/abuse_reports/index.html:16
+#: mini_fiction/templates/admin/abuse_reports/index.html:98
+#: mini_fiction/templates/admin/authors/index.html:14
+#: mini_fiction/templates/admin/authors/index.html:70
 #: mini_fiction/templates/admin/registrations/work.html:16
-#: mini_fiction/templates/admin/votes/index.html:15
-#: mini_fiction/templates/admin/votes/index.html:70
+#: mini_fiction/templates/admin/votes/index.html:16
+#: mini_fiction/templates/admin/votes/index.html:72
 msgid "Username"
 msgstr "Имя пользователя"
 
@@ -242,8 +242,8 @@ msgid "Email"
 msgstr "Электропочта"
 
 #: mini_fiction/forms/admin/authors.py:21
-#: mini_fiction/templates/admin/authors/index.html:14
-#: mini_fiction/templates/admin/authors/index.html:74
+#: mini_fiction/templates/admin/authors/index.html:15
+#: mini_fiction/templates/admin/authors/index.html:76
 msgid "Is active"
 msgstr "Активен"
 
@@ -252,7 +252,7 @@ msgid "Only active accounts can log in"
 msgstr "Только активные аккаунты могут входить"
 
 #: mini_fiction/forms/admin/authors.py:27
-#: mini_fiction/templates/admin/authors/index.html:81
+#: mini_fiction/templates/admin/authors/index.html:83
 msgid "Is staff"
 msgstr "Персонал"
 
@@ -261,7 +261,7 @@ msgid "Staff can approve stories and partially administer the site"
 msgstr "Персонал может подтверждать рассказы и частично администрировать сайт"
 
 #: mini_fiction/forms/admin/authors.py:33
-#: mini_fiction/templates/admin/authors/index.html:88
+#: mini_fiction/templates/admin/authors/index.html:90
 msgid "Is superuser"
 msgstr "Суперпользователь"
 
@@ -270,22 +270,22 @@ msgid "Superuser can fully administer the site"
 msgstr "Суперпользователь может целиком администрировать сайт"
 
 #: mini_fiction/forms/admin/authors.py:39
-#: mini_fiction/templates/admin/authors/index.html:95
+#: mini_fiction/templates/admin/authors/index.html:97
 msgid "Premoderation mode"
 msgstr "Режим премодерации"
 
 #: mini_fiction/forms/admin/authors.py:41
-#: mini_fiction/templates/admin/authors/index.html:98
+#: mini_fiction/templates/admin/authors/index.html:100
 msgid "Default"
 msgstr "По умолчанию"
 
 #: mini_fiction/forms/admin/authors.py:42
-#: mini_fiction/templates/admin/authors/index.html:99
+#: mini_fiction/templates/admin/authors/index.html:101
 msgid "Enable premoderation"
 msgstr "Включить премодерацию"
 
 #: mini_fiction/forms/admin/authors.py:43
-#: mini_fiction/templates/admin/authors/index.html:100
+#: mini_fiction/templates/admin/authors/index.html:102
 msgid "Disable premoration (verified author)"
 msgstr "Отключить премодерацию (проверенный автор)"
 
@@ -454,16 +454,36 @@ msgstr "Добавить и опубликовать"
 msgid "Add as draft"
 msgstr "Добавить как черновик"
 
-#: mini_fiction/templates/chapter_work.html:81
+#: mini_fiction/templates/chapter_work.html:82
+msgid "Save as draft"
+msgstr "Сохранить как черновик"
+
+#: mini_fiction/templates/chapter_work.html:86
+#, python-format
+msgid "Save and publish %(num)s chapter"
+msgid_plural "Save and publish %(num)s chapters"
+msgstr[0] "Сохранить и опубликовать %(num)s главу"
+msgstr[1] "Сохранить и опубликовать %(num)s главы"
+msgstr[2] "Сохранить и опубликовать %(num)s глав"
+
+#: mini_fiction/templates/chapter_work.html:88
+msgid "Save and publish"
+msgstr "Сохранить и опубликовать"
+
+#: mini_fiction/templates/chapter_work.html:93
 msgid "Save changes"
 msgstr "Сохранить изменения"
 
-#: mini_fiction/templates/chapter_work.html:84
+#: mini_fiction/templates/chapter_work.html:95
+msgid "Save and move to drafts"
+msgstr "Сохранить и убрать в черновики"
+
+#: mini_fiction/templates/chapter_work.html:100
 #: mini_fiction/templates/macro.html:85
 msgid "Preview"
 msgstr "Предпросмотр"
 
-#: mini_fiction/templates/chapter_work.html:85
+#: mini_fiction/templates/chapter_work.html:101
 msgid "Preview selected"
 msgstr "Предпросмотр выделенного"
 
@@ -514,7 +534,8 @@ msgstr "Показать более старые"
 #: mini_fiction/templates/admin/tag_categories/work.html:23
 #: mini_fiction/templates/admin/tags/work.html:105
 #: mini_fiction/templates/profile_edit_general.html:35
-#: mini_fiction/templates/profile_edit_subscriptions.html:65
+#: mini_fiction/templates/profile_edit_subscriptions.html:67
+#: mini_fiction/templates/story_view.html:149
 msgid "Save"
 msgstr "Сохранить"
 
@@ -534,6 +555,23 @@ msgstr[0] "Всего нашли %(num)d главу"
 msgstr[1] "Всего нашли %(num)d главы"
 msgstr[2] "Всего нашли %(num)d глав"
 
+#: mini_fiction/templates/includes/comments_list.html:28
+#: mini_fiction/templates/includes/comments_tree.html:25
+#: mini_fiction/templates/includes/notifications.html:4
+#: mini_fiction/templates/includes/stories.html:82
+#: mini_fiction/templates/includes/story_comments_list.html:16
+#: mini_fiction/templates/search.html:147
+msgid "There is nothing here yet"
+msgstr "Здесь пока ничего нет"
+
+#: mini_fiction/templates/includes/chapters_excerpts.html:9
+#: mini_fiction/templates/includes/chapters_short.html:7
+#: mini_fiction/templates/includes/stories.html:28
+#: mini_fiction/templates/search.html:152
+msgctxt "story_by"
+msgid "by"
+msgstr "от"
+
 #: mini_fiction/templates/story_confirm_delete.html:19
 #, python-format
 msgid "it was viewed by %(num)d user"
@@ -551,6 +589,24 @@ msgstr[0] "%(num)d голос"
 msgstr[1] "%(num)d голоса"
 msgstr[2] "%(num)d голосов"
 
+#: mini_fiction/templates/story_edit_chapters.html:21
+msgctxt "chapter_edit_short"
+msgid "edit"
+msgstr "править"
+
+#: mini_fiction/templates/story_edit_chapters.html:22
+msgctxt "chapter_delete_short"
+msgid "delete"
+msgstr "удалить"
+
+#: mini_fiction/templates/story_edit_chapters.html:28
+msgid "It seems this story doesn't yet have any chapters!"
+msgstr "Кажется, у рассказа ещё нет ни одной главы!"
+
+#: mini_fiction/templates/story_edit_chapters.html:30
+msgid "Add chapter"
+msgstr "Добавить главу"
+
 #: mini_fiction/templates/story_favorites.html:10
 #: mini_fiction/templates/story_view.html:135
 #, python-format
@@ -559,6 +615,36 @@ msgid_plural "Added to favorites by %(num)d users"
 msgstr[0] "В избранном у %(num)d пользователя"
 msgstr[1] "В избранном у %(num)d пользователей"
 msgstr[2] "В избранном у %(num)d пользователей"
+
+#: mini_fiction/templates/story_view.html:79
+msgctxt "story_written_by"
+msgid "Written by:"
+msgstr "Написал:"
+
+#: mini_fiction/templates/story_view.html:81
+msgctxt "story_info"
+msgid "Editors:"
+msgstr "Редакторы:"
+
+#: mini_fiction/templates/story_view.html:86
+msgctxt "story_info"
+msgid "Beta readers:"
+msgstr "Бета-читатели:"
+
+#: mini_fiction/templates/story_view.html:94
+msgctxt "story_info"
+msgid "Story notes:"
+msgstr "Заметки к рассказу:"
+
+#: mini_fiction/templates/story_view.html:99
+msgctxt "story_info"
+msgid "Details and statistics"
+msgstr "Подробности и статистика"
+
+#: mini_fiction/templates/story_view.html:111
+msgctxt "story_info"
+msgid "Rating"
+msgstr "Рейтинг"
 
 #: mini_fiction/templates/email/author_story.html:9
 #: mini_fiction/templates/email/macro.html:33
@@ -591,6 +677,22 @@ msgstr[0] "%(num)d просмотр"
 msgstr[1] "%(num)d просмотра"
 msgstr[2] "%(num)d просмотров"
 
+#: mini_fiction/templates/story_view.html:119
+msgctxt "story_info"
+msgid "Created at:"
+msgstr "Создан:"
+
+#: mini_fiction/templates/story_view.html:122
+#: mini_fiction/templates/story_view.html:129
+msgctxt "story_info"
+msgid "last update"
+msgstr "последнее изменение"
+
+#: mini_fiction/templates/story_view.html:127
+msgctxt "story_info"
+msgid "Published at:"
+msgstr "Опубликован:"
+
 #: mini_fiction/templates/story_view.html:140
 #, python-format
 msgid "%(num)d user waiting for the continuation"
@@ -599,11 +701,37 @@ msgstr[0] "%(num)d пользователь ждёт продолжение"
 msgstr[1] "%(num)d пользователя ждут продолжение"
 msgstr[2] "%(num)d пользователей ждут продолжение"
 
+#: mini_fiction/templates/story_view.html:146
+msgid "Subscribe to new chapters"
+msgstr "Подписаться на новые главы"
+
+#: mini_fiction/templates/story_view.html:147
+msgctxt "notification_target"
+msgid "email"
+msgstr "почта"
+
+#: mini_fiction/templates/story_view.html:148
+msgctxt "notification_target"
+msgid "website"
+msgstr "сайт"
+
+#: mini_fiction/templates/story_view.html:157
+msgctxt "story_contents"
+msgid "Contents"
+msgstr "Содержание"
+
 #: mini_fiction/templates/includes/chapter_single.html:5
-#: mini_fiction/templates/includes/stories.html:62
+#: mini_fiction/templates/includes/story_marks.html:2
 #: mini_fiction/templates/story_view.html:168
-msgid "Draft"
-msgstr "Черновик"
+msgctxt "story_mark"
+msgid "draft"
+msgstr "черновик"
+
+#: mini_fiction/templates/includes/stories.html:64
+#: mini_fiction/templates/story_view.html:169
+msgctxt "chapter_edit"
+msgid "Edit"
+msgstr "Редактировать"
 
 #: mini_fiction/templates/admin/index.html:17
 #, python-format
@@ -734,11 +862,11 @@ msgid "(nothing)"
 msgstr "(ничего)"
 
 #: mini_fiction/templates/admin/abuse_reports/index.html:6
-#: mini_fiction/templates/admin/abuse_reports/index.html:117
+#: mini_fiction/templates/admin/abuse_reports/index.html:119
 #: mini_fiction/templates/admin/abuse_reports/show.html:9
 #: mini_fiction/templates/admin/abuse_reports/show.html:86
 #: mini_fiction/templates/admin/authors/index.html:6
-#: mini_fiction/templates/admin/authors/index.html:112
+#: mini_fiction/templates/admin/authors/index.html:114
 #: mini_fiction/templates/admin/authors/update.html:10
 #: mini_fiction/templates/admin/authors/update.html:126
 #: mini_fiction/templates/admin/categories/delete.html:7
@@ -802,34 +930,34 @@ msgstr "(ничего)"
 #: mini_fiction/templates/admin/tag_categories/work.html:9
 #: mini_fiction/templates/admin/tag_categories/work.html:33
 #: mini_fiction/templates/admin/tags/index.html:6
-#: mini_fiction/templates/admin/tags/index.html:122
+#: mini_fiction/templates/admin/tags/index.html:124
 #: mini_fiction/templates/admin/tags/work.html:9
 #: mini_fiction/templates/admin/tags/work.html:110
 #: mini_fiction/templates/admin/votes/index.html:6
-#: mini_fiction/templates/admin/votes/index.html:92
+#: mini_fiction/templates/admin/votes/index.html:94
 #: mini_fiction/templates/includes/nav.html:47
 #: mini_fiction/views/admin/index.py:25
 msgid "Administration"
 msgstr "Администрирование"
 
-#: mini_fiction/templates/admin/abuse_reports/index.html:87
-#: mini_fiction/templates/admin/abuse_reports/index.html:101
-#: mini_fiction/templates/admin/authors/index.html:76
-#: mini_fiction/templates/admin/authors/index.html:83
-#: mini_fiction/templates/admin/authors/index.html:90
-#: mini_fiction/templates/admin/authors/index.html:97
-#: mini_fiction/templates/admin/tags/index.html:83
-#: mini_fiction/templates/admin/tags/index.html:92
-#: mini_fiction/templates/admin/tags/index.html:99
-#: mini_fiction/templates/admin/tags/index.html:106
-#: mini_fiction/templates/admin/votes/index.html:78
+#: mini_fiction/templates/admin/abuse_reports/index.html:89
+#: mini_fiction/templates/admin/abuse_reports/index.html:103
+#: mini_fiction/templates/admin/authors/index.html:78
+#: mini_fiction/templates/admin/authors/index.html:85
+#: mini_fiction/templates/admin/authors/index.html:92
+#: mini_fiction/templates/admin/authors/index.html:99
+#: mini_fiction/templates/admin/tags/index.html:85
+#: mini_fiction/templates/admin/tags/index.html:94
+#: mini_fiction/templates/admin/tags/index.html:101
+#: mini_fiction/templates/admin/tags/index.html:108
+#: mini_fiction/templates/admin/votes/index.html:80
 msgid "All"
 msgstr "Все"
 
-#: mini_fiction/templates/admin/abuse_reports/index.html:108
-#: mini_fiction/templates/admin/authors/index.html:103
-#: mini_fiction/templates/admin/tags/index.html:111
-#: mini_fiction/templates/admin/votes/index.html:83
+#: mini_fiction/templates/admin/abuse_reports/index.html:110
+#: mini_fiction/templates/admin/authors/index.html:105
+#: mini_fiction/templates/admin/tags/index.html:113
+#: mini_fiction/templates/admin/votes/index.html:85
 #: mini_fiction/templates/includes/nav.html:67
 msgid "Search"
 msgstr "Поиск"
@@ -849,41 +977,41 @@ msgstr "Поиск"
 msgid "Saved!"
 msgstr "Сохранено!"
 
-#: mini_fiction/templates/admin/authors/index.html:15
+#: mini_fiction/templates/admin/authors/index.html:16
 #: mini_fiction/templates/admin/authors/update.html:31
 msgid "Registered at"
 msgstr "Зарегистрирован"
 
-#: mini_fiction/templates/admin/authors/index.html:16
+#: mini_fiction/templates/admin/authors/index.html:17
 #: mini_fiction/templates/admin/authors/update.html:40
 msgid "Last visit"
 msgstr "Последний визит"
 
-#: mini_fiction/templates/admin/authors/index.html:28
+#: mini_fiction/templates/admin/authors/index.html:29
 #: mini_fiction/templates/admin/authors/update.html:23
 msgid "(it's you)"
 msgstr "(это вы)"
 
-#: mini_fiction/templates/admin/authors/index.html:71
+#: mini_fiction/templates/admin/authors/index.html:73
 #: mini_fiction/templates/admin/registrations/work.html:23
 msgid "E-mail"
 msgstr "E-mail"
 
-#: mini_fiction/templates/admin/authors/index.html:77
-#: mini_fiction/templates/admin/authors/index.html:84
-#: mini_fiction/templates/admin/authors/index.html:91
-#: mini_fiction/templates/admin/tags/index.html:93
-#: mini_fiction/templates/admin/tags/index.html:100
-#: mini_fiction/templates/admin/tags/index.html:107
+#: mini_fiction/templates/admin/authors/index.html:79
+#: mini_fiction/templates/admin/authors/index.html:86
+#: mini_fiction/templates/admin/authors/index.html:93
+#: mini_fiction/templates/admin/tags/index.html:95
+#: mini_fiction/templates/admin/tags/index.html:102
+#: mini_fiction/templates/admin/tags/index.html:109
 msgid "Yes"
 msgstr "Да"
 
-#: mini_fiction/templates/admin/authors/index.html:78
-#: mini_fiction/templates/admin/authors/index.html:85
-#: mini_fiction/templates/admin/authors/index.html:92
-#: mini_fiction/templates/admin/tags/index.html:94
-#: mini_fiction/templates/admin/tags/index.html:101
-#: mini_fiction/templates/admin/tags/index.html:108
+#: mini_fiction/templates/admin/authors/index.html:80
+#: mini_fiction/templates/admin/authors/index.html:87
+#: mini_fiction/templates/admin/authors/index.html:94
+#: mini_fiction/templates/admin/tags/index.html:96
+#: mini_fiction/templates/admin/tags/index.html:103
+#: mini_fiction/templates/admin/tags/index.html:110
 msgid "No"
 msgstr "Нет"
 
@@ -972,7 +1100,7 @@ msgstr "Удалить"
 #: mini_fiction/templates/admin/news/index.html:18
 #: mini_fiction/templates/admin/staticpages/index.html:18
 #: mini_fiction/templates/admin/tag_categories/index.html:18
-#: mini_fiction/templates/admin/tags/index.html:120
+#: mini_fiction/templates/admin/tags/index.html:122
 #: mini_fiction/views/admin/categories.py:52
 #: mini_fiction/views/admin/charactergroups.py:52
 #: mini_fiction/views/admin/characters.py:52
@@ -1039,6 +1167,30 @@ msgstr "Удалить эту статическую страницу?"
 msgid "Delete this tag category?"
 msgstr "Удалить эту категорию тегов?"
 
+#: mini_fiction/templates/email/macro.html:47
+#: mini_fiction/templates/includes/story_marks.html:7
+msgctxt "story_mark"
+msgid "translation"
+msgstr "перевод"
+
+#: mini_fiction/templates/email/macro.html:51
+#: mini_fiction/templates/includes/story_marks.html:11
+msgctxt "story_mark"
+msgid "complete"
+msgstr "завершен"
+
+#: mini_fiction/templates/email/macro.html:53
+#: mini_fiction/templates/includes/story_marks.html:13
+msgctxt "story_mark"
+msgid "freezed"
+msgstr "заморожен"
+
+#: mini_fiction/templates/email/macro.html:55
+#: mini_fiction/templates/includes/story_marks.html:15
+msgctxt "story_mark"
+msgid "incomplete"
+msgstr "не завершен"
+
 #: mini_fiction/templates/email/story_chapter.html:6
 #, python-format
 msgid "%(num)d chapter was published"
@@ -1079,6 +1231,12 @@ msgstr "Читать далее"
 msgid "To be continued..."
 msgstr "Продолжение следует..."
 
+#: mini_fiction/templates/includes/chapters_excerpts.html:6
+#: mini_fiction/templates/includes/chapters_short.html:5
+#: mini_fiction/templates/includes/stories.html:37
+msgid "Unread chapters count"
+msgstr "Число непрочитанных глав"
+
 #: mini_fiction/templates/includes/comment_controls.html:3
 msgctxt "comment_controls"
 msgid "Edit"
@@ -1093,6 +1251,17 @@ msgstr "Восстановить"
 msgctxt "comment_controls"
 msgid "Delete"
 msgstr "Удалить"
+
+#: mini_fiction/templates/includes/comments_list.html:10
+#: mini_fiction/templates/includes/stories.html:45
+#: mini_fiction/templates/includes/story_comments_list.html:9
+msgid "Unread comments count"
+msgstr "Число непрочитанных комментариев"
+
+#: mini_fiction/templates/includes/comments_tree.html:20
+msgctxt "load_comments_tree_link"
+msgid "Load tree"
+msgstr "Загрузить ветку"
 
 #: mini_fiction/templates/includes/edit_log_item.html:46
 msgctxt "story_edit_log"
@@ -1184,6 +1353,36 @@ msgstr[0] "Показать %(num)d главу"
 msgstr[1] "Показать %(num)d главы"
 msgstr[2] "Показать %(num)d глав"
 
+#: mini_fiction/templates/includes/stories.html:62
+msgid "Draft"
+msgstr "Черновик"
+
+#: mini_fiction/templates/includes/story_authors_list.html:6
+msgctxt "story_in_collaboration_with"
+msgid "in collaboration with"
+msgstr "в соавторстве с"
+
+#: mini_fiction/templates/includes/story_authors_list.html:9
+msgctxt "story_in_collaboration_with"
+msgid " and"
+msgstr " и"
+
+#: mini_fiction/templates/includes/story_control_buttons.html:15
+#: mini_fiction/templates/includes/story_control_buttons.html:24
+msgctxt "edit_story"
+msgid "Edit"
+msgstr "Редактировать"
+
+#: mini_fiction/templates/includes/story_control_buttons.html:30
+msgctxt "delete_story"
+msgid "Delete"
+msgstr "Удалить"
+
+#: mini_fiction/templates/includes/story_marks.html:4
+msgctxt "story_mark"
+msgid "on moderation"
+msgstr "на модерации"
+
 #: mini_fiction/templates/includes/ajax/story_ajax_publish_approved.html:10
 #: mini_fiction/templates/includes/ajax/story_ajax_publish_unapproved.html:10
 #, python-format
@@ -1207,6 +1406,33 @@ msgstr[2] ""
 #: mini_fiction/templates/news/show.html:11
 msgid "Edit"
 msgstr "Редактировать"
+
+#: mini_fiction/templates/sidebar/chapters_updates.html:2
+msgid "Updated stories"
+msgstr "Обновившиеся рассказы"
+
+#: mini_fiction/templates/sidebar/chapters_updates.html:4
+#: mini_fiction/views/stream.py:70
+msgid "Updates feed"
+msgstr "Лента обновлений"
+
+#: mini_fiction/templates/sidebar/comments_updates.html:2
+msgid "Latest comments"
+msgstr "Последние комментарии"
+
+#: mini_fiction/templates/sidebar/comments_updates.html:4
+#: mini_fiction/views/stream.py:108 mini_fiction/views/stream.py:150
+#: mini_fiction/views/stream.py:188
+msgid "Comments feed"
+msgstr "Лента комментариев"
+
+#: mini_fiction/templates/sidebar/news.html:2
+msgid "Latest news"
+msgstr "Последние новости"
+
+#: mini_fiction/templates/sidebar/news.html:12
+msgid "All news"
+msgstr "Все новости"
 
 #: mini_fiction/utils/debugtoolbar.py:98
 msgid "Pony ORM"
@@ -1508,11 +1734,11 @@ msgstr "Мой кабинет"
 msgid "Author: {author}"
 msgstr "Автор: {author}"
 
-#: mini_fiction/views/author.py:199
+#: mini_fiction/views/author.py:203
 msgid "Password is incorrect"
 msgstr "Неверный пароль"
 
-#: mini_fiction/views/author.py:233
+#: mini_fiction/views/author.py:237
 msgid "Old password is incorrect"
 msgstr "Старый пароль неверный"
 
@@ -1536,23 +1762,23 @@ msgstr "Подтверждение удаления комментария"
 msgid "Confirm restore comment"
 msgstr "Подтверждение восстановления комментария"
 
-#: mini_fiction/views/feeds.py:51 mini_fiction/views/object_lists.py:141
+#: mini_fiction/views/feeds.py:77 mini_fiction/views/object_lists.py:141
 msgid "Top stories for the week"
 msgstr "Топ рассказов за неделю"
 
-#: mini_fiction/views/feeds.py:53 mini_fiction/views/object_lists.py:143
+#: mini_fiction/views/feeds.py:79 mini_fiction/views/object_lists.py:143
 msgid "Top stories for the month"
 msgstr "Топ рассказов за месяц"
 
-#: mini_fiction/views/feeds.py:55 mini_fiction/views/object_lists.py:145
+#: mini_fiction/views/feeds.py:81 mini_fiction/views/object_lists.py:145
 msgid "Top stories for the year"
 msgstr "Топ рассказов за год"
 
-#: mini_fiction/views/feeds.py:57 mini_fiction/views/object_lists.py:147
+#: mini_fiction/views/feeds.py:83 mini_fiction/views/object_lists.py:147
 msgid "Top stories for all time"
 msgstr "Топ рассказов за всё время"
 
-#: mini_fiction/views/feeds.py:59 mini_fiction/views/object_lists.py:149
+#: mini_fiction/views/feeds.py:85 mini_fiction/views/object_lists.py:149
 #, python-format
 msgid "Top stories in %(num)d day"
 msgid_plural "Top stories in %(num)d days"

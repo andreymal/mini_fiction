@@ -1,5 +1,5 @@
 <div>
-    <h2>Последние комментарии</h2>
+    <h2>{{ _('Latest comments') }}</h2>
     {{ comments_html|safe }}
-    <p class="more"><a href="{{ url_for('stream.comments') }}">Лента комментариев</a></p>
+    <p class="more"><a href="{{ url_for('stream.comments') }}">{{ _('Comments feed') }}</a></p>
 </div>

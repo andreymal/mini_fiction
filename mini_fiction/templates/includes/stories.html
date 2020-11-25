@@ -25,7 +25,7 @@
                 <span class="category-list">
                     {%- include 'includes/story_main_tags.html' -%}
                 </span>
-                {{ ngettext("%(num)d word", "%(num)d words", story.words) }} от {% include 'includes/story_authors_list.html' %}
+                {{ ngettext("%(num)d word", "%(num)d words", story.words) }} {{ pgettext('story_by', 'by') }} {% include 'includes/story_authors_list.html' %}
                 <br/>
                 <span>
                 {{ ngettext("%(num)d view", "%(num)d views", story.views) -}}
@@ -34,7 +34,7 @@
                     {%- if current_user.is_authenticated -%}
                         {%- set delta = unread_chapters_count.get(story.id, 0) -%}
                         {%- if delta > 0 %}
-                        (<span class="green" title="Число непрочитанных глав">+{{ delta }}</span>)
+                        (<span class="green" title="{{ _('Unread chapters count') }}">+{{ delta }}</span>)
                         {%- endif -%}
                     {%- endif -%}
                 {%- endif -%}
@@ -42,7 +42,7 @@
                 {%- if current_user.is_authenticated -%}
                     {%- set delta = unread_comments_count.get(story.id, 0) -%}
                     {%- if delta > 0 %}
-                        (<span class="green" title="Число непрочитанных комментариев">+{{ delta }}</span>)
+                        (<span class="green" title="{{ _('Unread comments count') }}">+{{ delta }}</span>)
                     {%- endif -%}
                 {%- endif %}
                 </span>
@@ -61,7 +61,7 @@
                             {%- if viewed_at %} <i class="chapter-viewed-icon" title="Вы просматривали эту главу {{ viewed_at|datetimeformat(DEFAULT_DATETIME_FORMAT) }}"></i>{% endif %}
                             {%- if chapter.draft %} <sup class="draft">{{ _('Draft') }}</sup>{% endif %}
                             {% if story.bl.editable_by(current_user) -%}
-                                <sup><a class="edit-link" href="{{ url_for('chapter.edit', pk=chapter.id) }}">Редактировать</a></sup>
+                                <sup><a class="edit-link" href="{{ url_for('chapter.edit', pk=chapter.id) }}">{{ pgettext('chapter_edit', 'Edit') }}</a></sup>
                             {%- endif -%}
                             <br/>
                             {{ ngettext("%(num)d word", "%(num)d words", chapter.words) }}, {{ ngettext("%(num)d view", "%(num)d views", chapter.views) -}}
@@ -79,5 +79,5 @@
         </p>
     </div><!-- /story_{{ story.id }} -->
 {% else %}
-    <h3>Здесь пока ничего нет</h3>
+    <h3>{{ _('There is nothing here yet') }}</h3>
 {% endfor %}

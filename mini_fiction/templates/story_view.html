@@ -76,14 +76,14 @@
                 {%- endfor -%}
             </p>
 
-        <p>Написал: {% include 'includes/story_authors_list_microdata.html' %}</p>
+        <p>{{ pgettext('story_written_by', 'Written by:') }} {% include 'includes/story_authors_list_microdata.html' %}</p>
         {% if contributors.editors -%}
-            <p>Редакторы: {% for u in contributors.editors -%}
+            <p>{{ pgettext('story_info', 'Editors:') }} {% for u in contributors.editors -%}
                 <a class="authorlink" href="{{ url_for('author.info', user_id=u.id) }}">{{ u.username }}</a>{% if not loop.last %}, {% endif -%}
             {% endfor %}</p>
         {%- endif %}
         {% if contributors.betas -%}
-            <p>Бета-читатели: {% for u in contributors.betas -%}
+            <p>{{ pgettext('story_info', 'Beta readers:') }} {% for u in contributors.betas -%}
                 <a class="authorlink" href="{{ url_for('author.info', user_id=u.id) }}">{{ u.username }}</a>{% if not loop.last %}, {% endif -%}
             {% endfor %}</p>
         {%- endif %}
@@ -91,12 +91,12 @@
         <div class="story-summary" itemprop="description">{{ story.summary_as_html }}</div>
 
         {% if story.notes %}
-            <div>Заметки к рассказу:</div>
+            <div>{{ pgettext('story_info', 'Story notes:') }}</div>
             <div class="story-notes">{{ story.notes_as_html }}</div>
         {% endif %}
 
         <blockquote class="more-info">
-            <p><strong>Подробности и статистика</strong></p>
+            <p><strong>{{ pgettext('story_info', 'Details and statistics') }}</strong></p>
 
             {% if story.original_url -%}
                 <p class="story-source">
@@ -108,7 +108,7 @@
             {%- endif %}
 
             <p>
-                Рейтинг — <a href="{{ url_for('search.simple', search_type='rating', search_id=story.rating.id) }}">{{ story.rating.name }}</a><br/>
+                {{ pgettext('story_info', 'Rating') }} — <a href="{{ url_for('search.simple', search_type='rating', search_id=story.rating.id) }}">{{ story.rating.name }}</a><br/>
 
                 {#-
                 События: {% for classifier in story.classifications.order_by('c.id') %}<a href="{{ url_for('search.simple', search_type='classifier', search_id=classifier.id) }}">{{ classifier.name }}</a>{% if not loop.last %}, {% endif %}{% endfor %}<br/>
@@ -116,17 +116,17 @@
                 {{ ngettext("%(num)d word", "%(num)d words", story.words) }}, {{ ngettext("%(num)d view", "%(num)d views", story.views) }}<br/>
 
                 {% if not story.first_published_at or current_user.is_staff or story.bl.is_contributor(current_user) %}
-                    Создан: <time datetime="{{ story.date.strftime('%Y-%m-%dT%H:%M:%SZ') }}">
+                    {{ pgettext('story_info', 'Created at:') }} <time datetime="{{ story.date.strftime('%Y-%m-%dT%H:%M:%SZ') }}">
                         {{- story.date|datetimeformat(DEFAULT_DATE_FORMAT) -}}
                     </time>
-                    {%- if not story.first_published_at %}, последнее изменение – <time datetime="{{ story.updated.strftime('%Y-%m-%dT%H:%M:%SZ') }}" title="{{ story.updated|datetimeformat(DEFAULT_DATETIME_FORMAT) }}">
+                    {%- if not story.first_published_at %}, {{ pgettext('story_info', 'last update') }} – <time datetime="{{ story.updated.strftime('%Y-%m-%dT%H:%M:%SZ') }}" title="{{ story.updated|datetimeformat(DEFAULT_DATETIME_FORMAT) }}">
                         {{- story.updated|timesince }}
                     </time>{% endif %}<br/>
                 {% endif %}
                 {% if story.first_published_at %}
-                    Опубликован: <time itemprop="datePublished" datetime="{{ story.first_published_at.strftime('%Y-%m-%dT%H:%M:%SZ') }}">
+                    {{ pgettext('story_info', 'Published at:') }} <time itemprop="datePublished" datetime="{{ story.first_published_at.strftime('%Y-%m-%dT%H:%M:%SZ') }}">
                         {{- story.first_published_at|datetimeformat(DEFAULT_DATE_FORMAT) -}}
-                    </time>, последнее изменение – <time itemprop="dateModified" datetime="{{ story.updated.strftime('%Y-%m-%dT%H:%M:%SZ') }}" title="{{ story.updated|datetimeformat(DEFAULT_DATETIME_FORMAT) }}">
+                    </time>, {{ pgettext('story_info', 'last update') }} – <time itemprop="dateModified" datetime="{{ story.updated.strftime('%Y-%m-%dT%H:%M:%SZ') }}" title="{{ story.updated|datetimeformat(DEFAULT_DATETIME_FORMAT) }}">
                         {{- story.updated|timesince }}
                     </time><br/>
                 {%- endif -%}
@@ -143,10 +143,10 @@
             {% if current_user.is_authenticated -%}
             <form method="POST" action="{{ url_for('story.subscribe', pk=story.id) }}" class="subscription-form js-subscription-form">
                 <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
-                Подписаться на новые главы:
-                <label><input type="checkbox" name="email" value="1"{% if sub.email %} checked{% endif %} /> почта</label>
-                <label><input type="checkbox" name="tracker" value="1"{% if sub.tracker %} checked{% endif %} /> сайт</label>
-                <button type="submit" class="btn btn-mini js-subscription-form-submit">Сохранить</button>
+                {{ _('Subscribe to new chapters') }}:
+                <label><input type="checkbox" name="email" value="1"{% if sub.email %} checked{% endif %} /> {{ pgettext('notification_target', 'email') }}</label>
+                <label><input type="checkbox" name="tracker" value="1"{% if sub.tracker %} checked{% endif %} /> {{ pgettext('notification_target', 'website') }}</label>
+                <button type="submit" class="btn btn-mini js-subscription-form-submit">{{ _('Save') }}</button>
             </form>
             {%- endif %}
         </blockquote>
@@ -154,7 +154,7 @@
 
         <div class="story-chapters">
             {% if not show_first_chapter and chapters|length > 0 %}
-                <h2>Содержание</h2>
+                <h2>{{ pgettext('story_contents', 'Contents') }}</h2>
                 {% include "includes/story_panel.html" %}
                 <ul class="story-chapters-list">
                 {%- for chapter in chapters %}
@@ -165,8 +165,8 @@
                             </a>
                             {%- set viewed_at = chapter.bl.is_viewed_by(current_user) -%}
                             {%- if viewed_at %} <i class="chapter-viewed-icon" title="Вы просматривали эту главу {{ viewed_at|datetimeformat(DEFAULT_DATETIME_FORMAT) }}"></i>{% endif %}
-                            {%- if chapter.draft %} <sup class="story-mark draft">{{ _('Draft') }}</sup>{% endif %}
-                            {% if story.bl.editable_by(current_user) %}<sup><a class="edit-link" href="{{ url_for('chapter.edit', pk=chapter.id) }}">Редактировать</a></sup>{% endif %}
+                            {%- if chapter.draft %} <sup class="story-mark draft">{{ pgettext('story_mark', 'draft') }}</sup>{% endif %}
+                            {% if story.bl.editable_by(current_user) %}<sup><a class="edit-link" href="{{ url_for('chapter.edit', pk=chapter.id) }}">{{ pgettext('chapter_edit', 'Edit') }}</a></sup>{% endif %}
                         </h4>
 
                       {%- if chapter.first_published_at %}

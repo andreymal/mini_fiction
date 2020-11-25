@@ -2,9 +2,9 @@
     <div class="story-item">
         <h3><a href="{{ url_for('chapter.view', story_id=chapter.story.id, chapter_order=chapter.order) }}">{{ chapter.autotitle }}</a></h3>
           <p><a href="{{ url_for('story.view', pk=chapter.story.id) }}">{{ chapter.story.title }}</a>
-          {%- if chapter.story.id in unread_chapters_count and unread_chapters_count[chapter.story.id] > 0 %} (<span class="green" title="Число непрочитанных глав">+
+          {%- if chapter.story.id in unread_chapters_count and unread_chapters_count[chapter.story.id] > 0 %} (<span class="green" title="{{ _('Unread chapters count') }}">+
             {{- unread_chapters_count[chapter.story.id] -}}
-          </span>){% endif %} от <a class="authorlink" href="{{ url_for('author.info', user_id=chapter.story.authors[0].id) }}">{{ chapter.story.authors[0].username }}</a>
+          </span>){% endif %} {{ pgettext('story_by', 'by') }} <a class="authorlink" href="{{ url_for('author.info', user_id=chapter.story.authors[0].id) }}">{{ chapter.story.authors[0].username }}</a>
           {%- if chapter.first_published_at %} <time datetime="{{ chapter.first_published_at.strftime('%Y-%m-%dT%H:%M:%SZ') }}" title="{{ chapter.first_published_at|datetimeformat(DEFAULT_DATETIME_FORMAT) }}">{{ chapter.first_published_at|timesince }}</time>
           {%- endif -%}
           </p>

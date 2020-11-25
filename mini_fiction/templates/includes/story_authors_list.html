@@ -3,10 +3,10 @@
     {{- author.username -}}
   </a>
   {%- if loop.first %}
-    {%- if not loop.last %} (в соавторстве с {% endif -%}
+    {%- if not loop.last %} ({{ pgettext('story_in_collaboration_with', 'in collaboration with') }} {% endif -%}
   {% else %}
     {%- if loop.revindex0 > 1 %}, {% endif -%}
-    {%- if loop.revindex0 == 1 %} и {% endif -%}
+    {%- if loop.revindex0 == 1 %}{{ pgettext('story_in_collaboration_with', ' and') }} {% endif -%}
     {%- if loop.last %}){% endif -%}
   {%- endif -%}
 {% endfor -%}

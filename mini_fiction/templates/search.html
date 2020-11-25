@@ -144,12 +144,12 @@
             <!-- Рассказы: конец вывода -->
         {% else %}
             <!-- Главы: начало вывода -->
-            {% if result %}<div class="story-item"><h3>{{ ngettext("Found %(num)d chapter", "Found %(num)d chapters", total) }}</h3></div>{% else %}<h3>Здесь пока ничего нет</h3>{% endif %}
+            {% if result %}<div class="story-item"><h3>{{ ngettext("Found %(num)d chapter", "Found %(num)d chapters", total) }}</h3></div>{% else %}<h3>{{ _('There is nothing here yet') }}</h3>{% endif %}
             {% for chapter, excerpt in result %}
                 <div class="story-item">
                     <h3><a href="{{ url_for('chapter.view', story_id=chapter.story.id, chapter_order=chapter.order) }}">{{ chapter.autotitle }}</a></h3>
                     <p>{{ excerpt|safe }}</p>
-                      <p class="meta">Глава из рассказа <b><a href="{{ url_for('story.view', pk=chapter.story.id) }}">{{ chapter.story.title }}</a></b> от {% with story=chapter.story %}{% include 'includes/story_authors_list.html' %}{% endwith %}</p>
+                      <p class="meta">Глава из рассказа <b><a href="{{ url_for('story.view', pk=chapter.story.id) }}">{{ chapter.story.title }}</a></b> {{ pgettext('story_by', 'by') }} {% with story=chapter.story %}{% include 'includes/story_authors_list.html' %}{% endwith %}</p>
                 </div>
             {% endfor %}
             <!-- Главы: конец вывода -->

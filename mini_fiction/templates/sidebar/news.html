@@ -1,5 +1,5 @@
 <div>
-    <h2>Последние новости</h2>
+    <h2>{{ _('Latest news') }}</h2>
 
     <div class="news-list news-list-short">{% for newsitem in news %}
         <div class="newsitem newsitem-listitem" id="newsitem_{{ newsitem.id }}">
@@ -9,5 +9,5 @@
             </time>
         </div>
     {% endfor %}</div>
-    <p class="more"><a href="{{ url_for('news.index') }}">Все новости</a></p>
+    <p class="more"><a href="{{ url_for('news.index') }}">{{ _('All news') }}</a></p>
 </div>

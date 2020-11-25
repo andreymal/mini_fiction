@@ -1,5 +1,5 @@
 <div>
-    <h2>Обновившиеся рассказы</h2>
+    <h2>{{ _('Updated stories') }}</h2>
     {% include "includes/chapters_short.html" %}
-    <p class="more"><a href="{{ url_for('stream.chapters') }}">Лента обновлений</a> | <a href="{{ url_for('feeds.chapters') }}" data-noajax="1">RSS</a></p>
+    <p class="more"><a href="{{ url_for('stream.chapters') }}">{{ _('Updates feed') }}</a> | <a href="{{ url_for('feeds.chapters') }}" data-noajax="1">RSS</a></p>
 </div>

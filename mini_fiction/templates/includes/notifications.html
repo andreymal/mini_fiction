@@ -1,7 +1,7 @@
 {%- import 'includes/notification_comment.html' as nc with context -%}
 
 {% if not notifications -%}
-    <h3>Здесь пока ничего нет</h3>
+    <h3>{{ _('There is nothing here yet') }}</h3>
 {%- endif -%}
 
 {% for item in notifications -%}

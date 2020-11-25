@@ -350,7 +350,7 @@ def delete(pk):
 
     if request.method == 'POST':
         chapter.bl.delete(editor=user)
-        return redirect(url_for('story.edit', pk=story.id))
+        return redirect(url_for('story.edit_chapters', pk=story.id))
 
     page_title = 'Подтверждение удаления главы'
     data = {

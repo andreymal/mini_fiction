@@ -389,6 +389,7 @@ ul.nav-main-links {
     margin: 0 0.25em;
     display: inline-block;
     vertical-align: middle;
+    overflow: hidden;
 }
 .user-avatar-placeholder {
     background: url(../images/userpic.png) no-repeat center / contain;

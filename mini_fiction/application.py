@@ -24,10 +24,11 @@ from flask import Flask, current_app, request, g, jsonify
 from flask import json as flask_json
 from flask import sessions as flask_sessions
 import flask_babel
-from flask_login import LoginManager
+from flask_login import LoginManager, current_user
 from flask.logging import default_handler
 from flask_wtf.csrf import CSRFProtect, CSRFError
 from flask_cors import CORS
+from pony.flask import Pony
 
 from mini_fiction import models  # pylint: disable=unused-import
 from mini_fiction import database, tasks, context_processors, ratelimit
@@ -75,6 +76,8 @@ def create_app():
             os.makedirs(app.config['TESTING_DIRECTORY'])
         elif os.listdir(app.config['TESTING_DIRECTORY']):
             raise RuntimeError('Testing directory %r is not empty' % app.config['TESTING_DIRECTORY'])
+
+    Pony(app)  # binds db_session to before_request/teardown_request
 
     init_bl()
 
@@ -264,7 +267,6 @@ def configure_error_handlers(app):
     class RequestErrorFormatter(logging.Formatter):
         def format(self, record):
             from pony.orm import db_session
-            from flask_login import current_user
 
             record.remote_addr = request.remote_addr
             with db_session:
@@ -388,7 +390,6 @@ def configure_ajax(app):
 
 def configure_errorpages(app):
     from flask import render_template
-    from pony.orm import db_session
 
     def _error_common(template, template_modal, code, e):
         # g.is_ajax здесь не всегда присутствует, так что так
@@ -427,12 +428,12 @@ def configure_errorpages(app):
             return e
         return _error_common('error.html', 'error_modal.html', e.code or 500, e)
 
-    app.errorhandler(403)(db_session(_page403))
-    app.errorhandler(404)(db_session(_page404))
-    app.errorhandler(500)(db_session(_page500))
-    app.errorhandler(ratelimit.RateLimitExceeded)(db_session(_page_rate_limit))
-    app.errorhandler(CSRFError)(db_session(_pagecsrf))
-    app.errorhandler(HTTPException)(db_session(_pageall))
+    app.errorhandler(403)(_page403)
+    app.errorhandler(404)(_page404)
+    app.errorhandler(500)(_page500)
+    app.errorhandler(ratelimit.RateLimitExceeded)(_page_rate_limit)
+    app.errorhandler(CSRFError)(_pagecsrf)
+    app.errorhandler(HTTPException)(_pageall)
 
 
 def configure_templates(app):

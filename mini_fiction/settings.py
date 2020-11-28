@@ -22,6 +22,9 @@ class Config(object):
     CHAPTER_LINTER = 'mini_fiction.linters.DefaultChapterLinter'
     PLUGINS = []
 
+    # Required for Pony ORM when FLASK_ENV=development
+    PRESERVE_CONTEXT_ON_EXCEPTION = False
+
     # logging
     LOGLEVEL = logging.INFO
     LOGFORMAT = '[%(asctime)s] [%(levelname)s] %(message)s'

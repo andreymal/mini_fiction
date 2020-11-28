@@ -10,6 +10,7 @@ from io import BytesIO
 from hashlib import md5
 from datetime import datetime, timedelta
 
+import pytz
 from flask import current_app, url_for, render_template
 from flask_babel import lazy_gettext
 
@@ -77,6 +78,7 @@ class AuthorBL(BaseBL):
             activated_at=data.get('activated_at', None),
             session_token=utils_random.random_string(32),
             password=data.get('password_hash') or '',
+            timezone=current_app.config['BABEL_DEFAULT_TIMEZONE'],
         )
         user.flush()  # for user.id
         if data.get('password'):
@@ -88,6 +90,12 @@ class AuthorBL(BaseBL):
 
         user = self.model
         changed_fields = set()
+
+        if 'timezone' in data and data['timezone'] != user.timezone:
+            if data['timezone'] not in pytz.all_timezones_set:
+                raise ValidationError({'timezone': [lazy_gettext('Incorrect timezone')]})
+            user.timezone = data['timezone']
+            changed_fields |= {'timezone',}
 
         if 'email' in data and data['email'] != user.email:
             user.email = data['email']

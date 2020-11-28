@@ -2672,6 +2672,12 @@ ul.editlog .editlog-item:nth-child(2n+1) {
     }
 }
 
+/* etc */
+
+.timezone-select {
+    width: auto;
+}
+
 
 /* === Adaptive overrides === */
 

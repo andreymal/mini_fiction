@@ -6,6 +6,27 @@
         <div class="alert-mini green">Личные настройки сохранены</div>
     {% endif -%}
 
+    <div class="padded bootstrap radio">
+        <label>Часовой пояс:</label>
+        <select name="timezone" class="timezone-select" autocomplete="off">
+            {% for tz, category_name, tz_name, offset, offset_str in get_timezone_infos() -%}
+                <option value="{{ tz }}"{% if form.timezone.data == tz %} selected{% endif %} data-offset="{{ offset }}">[{{ offset_str }}] {% if tz != 'UTC' %}{{ category_name }}, {% endif %}{{ tz_name }}</option>
+            {% endfor -%}
+        </select>
+        {% if user_is_current %}
+            <div class="control-group">
+                <span class="help-inline">Сейчас {{ date_now|datetimeformat(DEFAULT_DATETIME_FORMAT) }}</span>
+            </div>
+        {% endif %}
+        {% if form.timezone.errors %}
+            <div class="control-group error">
+            {% for error in form.timezone.errors %}
+                <span class="help-inline">{{ error }}</span>
+            {% endfor %}
+            </div>
+        {% endif %}
+    </div>
+
     {#
     <div class="padded bootstrap checkbox">
         <label>Скрыть жанры из поиска:</label>

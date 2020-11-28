@@ -46,6 +46,7 @@ class AnonymousUser(AnonymousUserMixin):
     comments_maxdepth = None
     comment_spoiler_threshold = None
     header_mode = ''
+    timezone = ''
 
 
 class Author(db.Entity, UserMixin):
@@ -77,6 +78,7 @@ class Author(db.Entity, UserMixin):
     comments_maxdepth = orm.Optional(int, size=16, unsigned=True, nullable=True, default=None)
     comment_spoiler_threshold = orm.Optional(int, size=16, nullable=True, default=None)
     header_mode = orm.Optional(str, 8, py_check=lambda x: x in {'', 'off', 'l', 'ls'})
+    timezone = orm.Optional(str, 48, optimistic=False)
 
     published_stories_count = orm.Required(int, unsigned=True, default=0, optimistic=False)
     all_story_comments_count = orm.Required(int, unsigned=True, default=0, optimistic=False)  # С учётом удалённых

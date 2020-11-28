@@ -191,9 +191,18 @@ def configure_i18n(app):
             return locale
         return request.accept_languages.best_match(locales)
 
+    @babel.timezoneselector
+    def get_timezone():
+        if not request:
+            if hasattr(g, 'timezone'):
+                return g.timezone
+            raise RuntimeError('Babel is used outside of request context, please set g.timezone')
+        return current_user.timezone or None
+
     @app.before_request
     def before_request():
         g.locale = flask_babel.get_locale()
+        g.timezone = flask_babel.get_timezone()
 
 
 def configure_cache(app):

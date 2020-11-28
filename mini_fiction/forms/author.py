@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
+import pytz
 from pony import orm
 from flask import current_app, g
 from flask_babel import lazy_gettext
@@ -82,6 +83,13 @@ class AuthorEditPrefsForm(Form):
     #     widget=StoriesButtons(multiple=True),
     #     render_kw=checkbox_attrs,
     # )
+
+    timezone = SelectField(
+        'Часовой пояс',
+        [],
+        choices=[(t, t) for t in pytz.all_timezones],
+        # widget is not used
+    )
 
     detail_view = SelectField(
         '',

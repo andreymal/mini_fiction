@@ -1,7 +1,10 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
+from datetime import datetime
+
 from flask import Blueprint, current_app, request, render_template, abort, redirect, url_for, jsonify
+import flask_babel
 from flask_babel import gettext
 from flask_login import current_user, login_required, logout_user
 from pony.orm import db_session
@@ -256,6 +259,7 @@ def edit_personal(user_id=None):
 
     form = AuthorEditPrefsForm(data={
         # 'excluded_categories': user.excluded_categories_list,
+        'timezone': user.timezone or current_app.config['BABEL_DEFAULT_TIMEZONE'],
         'detail_view': user.detail_view,
         'nsfw': user.nsfw,
         'comments_per_page': (
@@ -285,6 +289,7 @@ def edit_personal(user_id=None):
         'form': form,
         'non_field_errors': non_field_errors,
         'saved': False,
+        'date_now': datetime.utcnow(),
     }
 
     if request.method == 'POST':
@@ -303,6 +308,8 @@ def edit_personal(user_id=None):
                     modified_by_user=current_user._get_current_object(),
                     fill_admin_log=user.id != current_user.id,
                 )
+            if user.id == current_user.id:
+                flask_babel.refresh()  # update timezone
             ctx['saved'] = True
 
     return render_template('profile_edit_personal.html', **ctx)

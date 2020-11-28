@@ -1581,6 +1581,61 @@ msgstr[0] "%(num)d минуту"
 msgstr[1] "%(num)d минуты"
 msgstr[2] "%(num)d минут"
 
+#: mini_fiction/utils/timezone.py:31
+msgctxt "tz_category"
+msgid "Africa"
+msgstr "Африка"
+
+#: mini_fiction/utils/timezone.py:32
+msgctxt "tz_category"
+msgid "America"
+msgstr "Америка"
+
+#: mini_fiction/utils/timezone.py:33
+msgctxt "tz_category"
+msgid "Antarctica"
+msgstr "Антарктика"
+
+#: mini_fiction/utils/timezone.py:34
+msgctxt "tz_category"
+msgid "Arctic"
+msgstr "Арктика"
+
+#: mini_fiction/utils/timezone.py:35
+msgctxt "tz_category"
+msgid "Asia"
+msgstr "Азия"
+
+#: mini_fiction/utils/timezone.py:36
+msgctxt "tz_category"
+msgid "Atlantic"
+msgstr "Атлантический океан"
+
+#: mini_fiction/utils/timezone.py:37
+msgctxt "tz_category"
+msgid "Australia"
+msgstr "Австралия"
+
+#: mini_fiction/utils/timezone.py:38
+msgctxt "tz_category"
+msgid "Europe"
+msgstr "Европа"
+
+#: mini_fiction/utils/timezone.py:39
+msgctxt "tz_category"
+msgid "Indian"
+msgstr "Индийский океан"
+
+#: mini_fiction/utils/timezone.py:40
+msgctxt "tz_category"
+msgid "Pacific"
+msgstr "Тихий океан"
+
+#: mini_fiction/utils/timezone.py:41
+msgctxt "tz_category"
+msgid "UTC"
+msgstr "UTC"
+
 #: mini_fiction/validation/__init__.py:49
 msgid "Required field"
 msgstr "Обязательное поле"

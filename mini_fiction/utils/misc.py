@@ -315,6 +315,8 @@ def render_nonrequest_template(*args, **kwargs):
     '''
     if not hasattr(g, 'locale'):
         g.locale = current_app.extensions['babel'].default_locale
+    if not hasattr(g, 'timezone'):
+        g.timezone = current_app.extensions['babel'].default_timezone
     if not hasattr(g, 'is_ajax'):
         g.is_ajax = False
     if not hasattr(g, 'current_user'):

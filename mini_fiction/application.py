@@ -77,6 +77,11 @@ def create_app():
         elif os.listdir(app.config['TESTING_DIRECTORY']):
             raise RuntimeError('Testing directory %r is not empty' % app.config['TESTING_DIRECTORY'])
 
+    # Flask's after_request/teardown_request hooks are executed in the reversed
+    # order of their declaration. after_request_callbacks must be executed
+    # outside of the db_session context (after commit), so attach it before Pony ORM
+    configure_after_request_callbacks(app)
+
     Pony(app)  # binds db_session to before_request/teardown_request
 
     init_bl()
@@ -131,6 +136,16 @@ def select_default_settings():
 
     else:
         os.environ.setdefault('MINIFICTION_SETTINGS', 'mini_fiction.settings.Config')
+
+
+def configure_after_request_callbacks(app):
+    # We have to use teardown_request instead of after_request because Pony ORM uses it
+    @app.teardown_request
+    def call_after_request_callbacks(exc=None):
+        if exc is not None:
+            return
+        for f, args, kwargs in getattr(g, 'after_request_callbacks', ()):
+            f(*args, **kwargs)
 
 
 def configure_user_agent(app):
@@ -524,13 +539,10 @@ def configure_story_voting(app):
 
 def configure_misc(app):
     @app.after_request
-    def after_request(response):
+    def disable_cache(response):
         if not getattr(response, 'cache_control_exempt', False):
             response.cache_control.max_age = 0
             response.cache_control.private = True
-
-        for f, args, kwargs in getattr(g, 'after_request_callbacks', ()):
-            f(*args, **kwargs)
         return response
 
     # Pass proxies for correct request_addr

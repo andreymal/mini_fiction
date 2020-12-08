@@ -1,8 +1,8 @@
 import path from 'path';
 import AssetsManifestPlugin from 'webpack-assets-manifest';
 import MiniCssExtractPlugin from 'mini-css-extract-plugin';
-import { CleanWebpackPlugin } from 'clean-webpack-plugin';
-import HashedModuleIdsPlugin from 'webpack/lib/HashedModuleIdsPlugin';
+import TerserPlugin from 'terser-webpack-plugin';
+// not yet ported to Webpack 5: import { CleanWebpackPlugin } from 'clean-webpack-plugin';
 
 import postCSSAutoPrefixer from 'autoprefixer';
 import postCSSNesting from 'postcss-nesting';
@@ -22,8 +22,8 @@ const reactAliases = {
   'react-dom': 'preact/compat',
 };
 
-const postCSSLoaderOptions = {
-  plugins: () => [
+const postCSSOptions = {
+  plugins: [
     postCSSAutoPrefixer(),
     postCSSMixins(),
     postCSSNesting(),
@@ -46,12 +46,6 @@ const cssLoaderOptions = {
 
 const extractLoaderOptions = {
   publicPath: './',
-};
-
-const urlLoaderOptions = {
-  fallback: 'file-loader',
-  limit: 8192,
-  name: `${outputName}.[ext]`,
 };
 
 module.exports = {
@@ -99,19 +93,27 @@ module.exports = {
         use: [
           { loader: MiniCssExtractPlugin.loader, options: extractLoaderOptions },
           { loader: 'css-loader', options: cssLoaderOptions },
-          { loader: 'postcss-loader', options: postCSSLoaderOptions },
+          { loader: 'postcss-loader', options: {postcssOptions: postCSSOptions } },
         ],
       },
       {
         test: /\.(png|jpg|gif|svg|eot|ttf|woff|woff2)$/,
-        use: [
-          { loader: 'url-loader', options: urlLoaderOptions },
-        ],
+        type: 'asset',
+        parser: {
+          dataUrlCondition: {
+            maxSize: 8192,
+          },
+        },
       },
     ],
   },
   optimization: {
     minimize: !isDev,
+    minimizer: [
+      new TerserPlugin({
+        extractComments: false,
+      }),
+    ],
     splitChunks: {
       cacheGroups: {
         vendor: {
@@ -127,24 +129,21 @@ module.exports = {
       filename: `${outputName}.css`,
       chunkFilename: '[id].css',
     }),
-    new CleanWebpackPlugin(),
+    // new CleanWebpackPlugin(),
     new AssetsManifestPlugin({
       output: 'manifest.json',
       integrity: true,
       integrityHashes: ['sha256'],
       customize: (_, original) => original,
     }),
-  ].concat(isDev ? [] : new HashedModuleIdsPlugin()),
+  ],
 
   stats: { colors: true },
 
   node: {
     global: true,
-    process: false,
-    Buffer: false,
     __filename: false,
     __dirname: false,
-    setImmediate: false,
   },
 
   devtool: 'source-map',

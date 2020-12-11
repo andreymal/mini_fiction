@@ -22,6 +22,32 @@ def normalize_html(doc, block_elements=default_block_elements, **kw):
     for e in doc.xpath('//' + '|//'.join(block_elements)):
         e.attrib['block-element'] = 'true'
 
+    # prevent adding extra <br/>
+    for e in doc.xpath('//p|//br|//' + '|//'.join(block_elements)):
+        # before block elements
+        prev_e = e.getprevious()
+        if prev_e is not None and prev_e.tail:
+            # use case: "foo<br/>foo\n\nbar\n\n<ul><li>baz</li></ul>"
+            prev_e.tail = re.sub(r'\n\s*$', '', prev_e.tail)
+        elif prev_e is None:
+            # use case: "<body>foo\n\n<p>bar</p>\n\nbaz</body>"
+            parent = e.getparent()
+            if parent is not None and parent.tail:
+                parent.tail = re.sub(r'\n\s*$', '', parent.tail)
+
+        # inside block elements
+        if e.text:
+            # use case: "<p>\n\nfoo\n\n</p>"
+            e.text = re.sub(r'^\s*\n', '', e.text)
+            # have in mind: "<body>\n\nfoo\n\n<img/>\n\n</body>"
+            if len(e.getchildren()) == 0:
+                e.text = re.sub(r'\n\s*$', '', e.text)
+
+        # and after block elements
+        if e.tail:
+            # use case: "<p>foo</p>\n\nbar"
+            e.tail = re.sub(r'^\s*\n', '', e.tail)
+
     doc = pre_normalize_html(doc, **kw)
     doc = split_elements(
         doc,

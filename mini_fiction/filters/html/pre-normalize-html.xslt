@@ -8,7 +8,7 @@
     <xsl:param name="convert_linebreaks" select="false()"/>
     <xsl:param name="br_to_p" select="false()"/>
     
-<xsl:template match="*[@block-element]">
+<xsl:template match="*[@block-element]" priority="2">
     <p-splitter/>
     <xsl:copy>
         <xsl:apply-templates select="@*"/>
@@ -25,15 +25,19 @@
     <p-splitter/>
 </xsl:template>
 
-<xsl:template match="text()">
+<xsl:template match="text()" priority="2">
     <xsl:choose>
 
         <xsl:when test="$convert_linebreaks">
-            <xsl:variable name="text" select="re:replace(., '\n\s*\n', 'g', ' \n\n ')"/>
-            
+            <!--
+                We have to use some fake character (U+E000 was chosen here)
+                to prevent collapsing lines in cases like <em>p1</em>\n\n<em>p2</em>
+            -->
+            <xsl:variable name="text" select="re:replace(., '\n\s*\n', 'g', '&#xe000;\n\n&#xe000;')"/>
             <xsl:for-each select="str:split($text, '&#10;&#10;')">
-                <xsl:for-each select="str:split(., '&#10;')">
-                    <text><xsl:value-of select="."/></text>
+                <xsl:variable name="text_fix_br" select="re:replace(., '\n', 'g', '&#xe000;\n&#xe000;')"/>
+                <xsl:for-each select="str:split($text_fix_br, '&#10;')">
+                    <text><xsl:value-of select="re:replace(., '&#xe000;', 'g', '')"/></text>
                     <xsl:if test="following-sibling::*">
                         <xsl:choose>
                             <xsl:when test="$br_to_p">
@@ -58,7 +62,7 @@
     </xsl:choose>
 </xsl:template>
 
-<xsl:template match="br">
+<xsl:template match="br" priority="2">
     <xsl:choose>
 
         <xsl:when test="$br_to_p">

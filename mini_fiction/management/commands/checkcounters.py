@@ -190,12 +190,10 @@ def check_chapter_views_count(verbosity=0, dry_run=False):
 
 
 @cli.command(short_help='Recalculates counters', help='Recalculates some cached counters (stories count, chapters count, views etc.)')
-@click.option('-m', 'only_modified', help='Print only modified values (less verbose output)', is_flag=True)
 @click.option('-d', '--dry-run', 'dry_run', help='Only print log with no changes made', is_flag=True)
-def checkcounters(only_modified, dry_run):
+@click.option("-v", "--verbose", "verbosity", count=True, help='Verbosity: -v prints changed items, -vv prints all items.')
+def checkcounters(dry_run, verbosity=0):
     orm.sql_debug(False)
-
-    verbosity = 1 if only_modified else 2
 
     check_author_counters(verbosity=verbosity, dry_run=dry_run)
     if verbosity:

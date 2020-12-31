@@ -9,58 +9,62 @@ from mini_fiction.management.manager import cli
 from mini_fiction.models import Story, Chapter
 
 
-def story_check_words_count(story, verbose=True):
+def story_check_words_count(story, verbosity=0):
     if isinstance(story, int):
         story = Story.get(id=story)
     if not story:
         return
+
+    chapters_changed = 0
 
     chapters = list(story.chapters)
     chapters.sort(key=lambda c: c.order)
 
     all_words = 0
     for chapter in chapters:
-        if verbose:
-            print('Chapter {}/{} ({}):'.format(chapter.story.id, chapter.order, chapter.id), end=' ', flush=True)
-
         old_words, new_words = Chapter.bl.update_words_count(chapter, update_story_words=False)
-        if verbose:
-            print('{} -> {}'.format(old_words, new_words), end='', flush=True)
+        chapter_changed = old_words != new_words
+
+        if verbosity >= 2 or (verbosity and chapter_changed):
+            print(
+                f'Chapter {chapter.story.id}/{chapter.order} ({chapter.id}):',
+                f'{old_words} -> {new_words}{" (changed)" if chapter_changed else ""}',
+            )
+
         if not chapter.draft:
             all_words += new_words
 
-        if old_words != new_words:
-            if verbose:
-                print(' (changed)', end='', flush=True)
+        if chapter_changed:
+            chapters_changed += 1
             orm.commit()
             current_app.tasks['sphinx_update_chapter'].delay(chapter.id, update_story_words=False)
 
-        if verbose:
-            print()
+    story_changed = story.words != all_words
 
-    if verbose:
-        print('Story {}: {} -> {}'.format(story.id, story.words, all_words), end='', flush=True)
+    if verbosity >= 2 or (verbosity and story_changed):
+        print(
+            f'Story {story.id}:',
+            f'{story.words} -> {all_words}{" (changed)" if story_changed else ""}',
+        )
 
-    if story.words != all_words:
-        if verbose:
-            print(' (changed)', end='', flush=True)
+    if story_changed:
         story.words = all_words
         orm.commit()
         current_app.tasks['sphinx_update_story'].delay(story.id, ('words',))
 
-    if verbose:
-        print()
+    return story_changed, chapters_changed
 
 
 @cli.command(short_help='Recalculates words count.', help='Relalculates words count cache of stories and chapters.')
 @click.argument('story_ids', nargs=-1, type=int)
-def checkwordscount(story_ids):
+@click.option("-v", "--verbose", "verbosity", count=True, help='Verbosity: -v prints changed items, -vv prints all items.')
+def checkwordscount(story_ids, verbosity=0):
     orm.sql_debug(False)
 
     if story_ids:
         for story_id in story_ids:
             with orm.db_session:
-                story_check_words_count(int(story_id))
+                story_check_words_count(int(story_id), verbosity=verbosity)
         return
 
     with orm.db_session:
@@ -72,5 +76,5 @@ def checkwordscount(story_ids):
             story = Story.select(lambda x: x.id >= story_id).first()
             if not story:
                 break
-            story_check_words_count(story)
+            story_check_words_count(story, verbosity=verbosity)
             story_id = story.id + 1

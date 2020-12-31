@@ -26,7 +26,8 @@ def story_check_words_count(story, verbose=True):
         old_words, new_words = Chapter.bl.update_words_count(chapter, update_story_words=False)
         if verbose:
             print('{} -> {}'.format(old_words, new_words), end='', flush=True)
-        all_words += new_words
+        if not chapter.draft:
+            all_words += new_words
 
         if old_words != new_words:
             if verbose:

@@ -32,7 +32,7 @@
 
 <xsl:template match="body|footnote|annotation" mode="section-content">
     <xsl:apply-templates select="annotation" mode="notes"/>
-    <xsl:apply-templates select="p|blockquote|h3|h4|h5" mode="paragraphs"/>
+    <xsl:apply-templates select="p|blockquote|h3|h4|h5|ul|ol" mode="paragraphs"/>
 </xsl:template>
 
 <xsl:template match="p" mode="paragraphs">
@@ -104,6 +104,28 @@
         </xsl:choose>
         <xsl:text>]</xsl:text>
     </a>
+</xsl:template>
+
+<!-- top-level lists -->
+<xsl:template match="ul|ol" mode="paragraphs">
+    <xsl:apply-templates select="node()" mode="paragraphs"/>
+</xsl:template>
+
+<xsl:template match="li" mode="paragraphs">
+    <p>
+        <xsl:text>- </xsl:text>
+        <xsl:apply-templates select="node()" mode="body"/>
+    </p>
+</xsl:template>
+
+<!-- lists inside lists -->
+<xsl:template match="ul|ol" mode="body">
+    <xsl:apply-templates select="node()" mode="body"/>
+</xsl:template>
+
+<xsl:template match="li" mode="body">
+    <xsl:text>&#10;-- </xsl:text>
+    <xsl:apply-templates select="node()" mode="body"/>
 </xsl:template>
 
 <xsl:template match="footnote" mode="body"/>

@@ -11,13 +11,11 @@ export default {
         {name: 'H3', className:'edit-h3', openWith:'<h3>', closeWith:'</h3>'},
         {name: 'H4', className:'edit-h4', openWith:'<h4>', closeWith:'</h4>'},
         {name: 'H5', className:'edit-h5', openWith:'<h5>', closeWith:'</h5>'},
+        {name: 'Разделитель', className:'edit-hr', replaceWith:'<hr>'},
         {separator: '---------------'},
         {name: 'По левому краю', className:'edit-alignment-left', openWith:'<p align="left">', closeWith:'</p>'},
         {name: 'По центру', className:'edit-alignment-center', openWith:'<p align="center">', closeWith:'</p>'},
         {name: 'По правому краю', className:'edit-alignment-right', openWith:'<p align="right">', closeWith:'</p>'},
-        {separator: '---------------'},
-        {name: 'Новая строка', className:'edit-br', replaceWith:'<br>'},
-        {name: 'Разделитель', className:'edit-hr', replaceWith:'<hr>'},
         {separator: '---------------'},
         {name: 'Добавить изображение', className:'edit-image', replaceWith:'<img src="[!['+'Введите адрес изображения:'+':!:http://]!]" />' },
         {name: 'Добавить ссылку', className:'edit-anchor', key:'L', openWith:'<a href="[!['+'Введите url адрес:'+':!:http://]!]"(!( title="[![Title]!]")!)>', closeWith:'</a>', placeHolder:'Введите адрес ссылки...' },
@@ -33,6 +31,15 @@ export default {
         {name: 'Уменьшить размер', className:'edit-small', openWith:'<small>', closeWith:'</small>'},
         {name: 'Lite-спойлер', className:'edit-spoiler-gray', openWith:'<span class="spoiler-gray">', closeWith:'</span>'},
         {separator: '---------------'},
-        {name: 'Очистка от тегов', className:'edit-tag', replaceWith: function(markitup) {return markitup.selection.replace(/<(.*?)>/g, "")}},
+        {name: 'Конвертация c фикбука', className:'edit-ficbook', replaceWith: function(markitup) {
+            markitup.textarea.value = markitup.textarea.value
+                .replace(/<center>/g, '<p align="center">')
+                .replace(/<\/center>/g, '</p>')
+                .replace(/<right>/g, '<p align="right">')
+                .replace(/<\/right>/g, '</p>')
+                .replace(/<tab>/g, '\n\n')
+                .replace(/\n{2,}/g, '\n\n')
+                .replace(/\n\n\s*/g, '\n\n');
+            }},
     ]
 };

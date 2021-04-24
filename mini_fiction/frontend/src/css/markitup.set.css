@@ -65,9 +65,6 @@
   & .edit-small a {
     background-image: url(../images/markitup/edit-small.png);
   }
-  & .edit-tag a {
-    background-image: url(../images/markitup/edit-tag.png);
-  }
   & .edit-spoiler-gray a {
     background-image: url(../images/markitup/edit-shade.png);
   }

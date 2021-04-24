@@ -31,6 +31,15 @@ export default {
         {name: 'Уменьшить размер', className:'edit-small', openWith:'<small>', closeWith:'</small>'},
         {name: 'Lite-спойлер', className:'edit-spoiler-gray', openWith:'<span class="spoiler-gray">', closeWith:'</span>'},
         {separator: '---------------'},
-        {name: 'Очистка от тегов', className:'edit-tag', replaceWith: function(markitup) {return markitup.selection.replace(/<(.*?)>/g, "")}},
+        {name: 'Конвертация c фикбука', className:'edit-ficbook', replaceWith: function(markitup) {
+            markitup.textarea.value = markitup.textarea.value
+                .replace(/<center>/g, '<p align="center">')
+                .replace(/<\/center>/g, '</p>')
+                .replace(/<right>/g, '<p align="right">')
+                .replace(/<\/right>/g, '</p>')
+                .replace(/<tab>/g, '\n\n')
+                .replace(/\n{2,}/g, '\n\n')
+                .replace(/\n\n\s*/g, '\n\n');
+            }},
     ]
 };

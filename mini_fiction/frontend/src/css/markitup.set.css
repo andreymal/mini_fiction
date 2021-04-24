@@ -68,4 +68,7 @@
   & .edit-spoiler-gray a {
     background-image: url(../images/markitup/edit-shade.png);
   }
+  & .edit-ficbook a {
+    background-image: url(../images/markitup/edit-ficbook.png);
+  }
 }

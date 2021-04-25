@@ -1,12 +1,28 @@
+{%- from 'macro.html' import tag_link with context -%}
+
+{% set extreme_tags = story.bl.get_extreme_tags() %}
+{%- if extreme_tags %}
+    {% set nsfw_block = html_block('nsfw_extreme_warning') %}
+{%- else %}
+    {% set nsfw_block = html_block('nsfw_warning') %}
+{%- endif -%}
+
 <div class="modal-header">
     <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
-    <h3 id="myModalLabel">Предупреждение</h3>
+    <h3 id="myModalLabel">{{ nsfw_block.title }}</h3>
 </div>
 <div class="modal-body">
-    <p>В этом фанфике могут быть: постельные сцены, описания пыток, убийства, жестокость, неприличные выражения, а иногда всё сразу.</p>
-    <p>Вас это устраивает и вы готовы читать дальше?</p>
+    {{ nsfw_block }}
+
+    {%- if extreme_tags %}
+    <p>
+    {%- for st in extreme_tags %}
+        {{ tag_link(st.tag) }}
+    {%- endfor %}
+    </p>
+    {%- endif %}
 </div>
 <div class="modal-footer">
-    <button class="btn btn-danger" data-dismiss="modal" aria-hidden="true">Читать дальше</button>
-    <button class="btn" onclick="window.history.back()">Вернуться назад</button>
+    <button class="btn" data-dismiss="modal" aria-hidden="true">Читать дальше</button>
+    <button class="btn btn-success" onclick="window.history.back()">Вернуться назад</button>
 </div>

@@ -55,6 +55,12 @@ class TagForm(Form):
         description='Не показывать в списке синонимов на странице тега, чтобы не смущать пользователей',
     )
 
+    is_extreme_tag = BooleanField(
+        'Экстремальный тег',
+        render_kw=attrs_dict,
+        description='Этим тегом обозначается что-то совсем жёсткое',
+    )
+
     reason_to_blacklist = TextField(
         'Блокировка тега',
         render_kw=dict(attrs_dict, maxlength=256),

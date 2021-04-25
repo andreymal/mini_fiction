@@ -64,6 +64,13 @@ def index(page):
         args['is_main_tag'] = '1'
         objects = objects.filter(lambda x: x.is_main_tag)
 
+    if request.args.get('is_extreme_tag') == '0':
+        args['is_extreme_tag'] = '0'
+        objects = objects.filter(lambda x: not x.is_extreme_tag)
+    elif request.args.get('is_extreme_tag') == '1':
+        args['is_extreme_tag'] = '1'
+        objects = objects.filter(lambda x: x.is_extreme_tag)
+
     objects = objects.prefetch(Tag.is_alias_for, Tag.created_by, Tag.category)
 
     objects = admin_sort(args['sorting'], objects, {
@@ -136,6 +143,7 @@ def update(pk):
         'is_main_tag': tag.is_main_tag,
         'is_alias_for': tag.is_alias_for.name if tag.is_alias_for else '',
         'is_hidden_alias': tag.is_hidden_alias,
+        'is_extreme_tag': tag.is_extreme_tag,
         'reason_to_blacklist': tag.reason_to_blacklist,
     })
 

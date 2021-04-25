@@ -1290,6 +1290,9 @@ class StoryBL(BaseBL, Commentable):
     def get_more_tags(self, sort=False):
         return [x for x in self.get_tags_list(sort=sort) if not x.tag.is_main_tag]
 
+    def get_extreme_tags(self, sort=False):
+        return [x for x in self.get_tags_list(sort=sort) if x.tag.is_extreme_tag]
+
     def add_tag(self, user, tag, check_blacklist=True, log=True, update_search=True):
         from mini_fiction.models import Tag, StoryTag, StoryTagLog
 

@@ -49,6 +49,10 @@ TAG = {
         'type': 'boolean',
         'coerce': bool_coerce,
     },
+    'is_extreme_tag': {
+        'type': 'boolean',
+        'coerce': bool_coerce,
+    },
     'reason_to_blacklist': {
         'type': 'string',
         'coerce': (safe_string_coerce, 'strip'),

@@ -61,7 +61,7 @@
 
         <div class="admin-index-filters">
             <form action="{{ url_for('admin_tags.index') }}" method="GET">
-                {% for k, v in args.items() if k not in ['page', 'name', 'category', 'is_blacklisted', 'is_alias', 'is_main_tag'] %}
+                {% for k, v in args.items() if k not in ['page', 'name', 'category', 'is_blacklisted', 'is_alias', 'is_main_tag', 'is_extreme_tag'] %}
                     <input type="hidden" name="{{ k }}" value="{{ v }}" />
                 {%- endfor %}
 
@@ -96,6 +96,13 @@
                     <option value="">{{ _('All') }}</option>
                     <option value="1"{% if args.is_main_tag == "1" %} selected{% endif %}>{{ _('Yes') }}</option>
                     <option value="0"{% if args.is_main_tag == "0" %} selected{% endif %}>{{ _('No') }}</option>
+                </select><br/>
+
+                <label for="is_extreme_tag">Экстремальный тег:</label>
+                <select name="is_extreme_tag" id="is_extreme_tag" class="admin-input-select-full">
+                    <option value="">{{ _('All') }}</option>
+                    <option value="1"{% if args.is_extreme_tag == "1" %} selected{% endif %}>{{ _('Yes') }}</option>
+                    <option value="0"{% if args.is_extreme_tag == "0" %} selected{% endif %}>{{ _('No') }}</option>
                 </select><br/>
 
                 <button type="submit" class="btn btn-primary">{{ _('Search') }}</button>

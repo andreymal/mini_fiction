@@ -321,6 +321,7 @@ class Tag(db.Entity):
     published_stories_count = orm.Required(int, unsigned=True, default=0)
     is_alias_for = orm.Optional('Tag')
     is_hidden_alias = orm.Required(bool, default=False)
+    is_extreme_tag = orm.Required(bool, default=False)
     reason_to_blacklist = orm.Optional(str, 255)
 
     aliases = orm.Set('Tag', reverse='is_alias_for')

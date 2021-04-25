@@ -114,7 +114,7 @@ zip_dump_params = {
         'include': (
             'id', 'name', 'iname', 'category', 'color', 'description',
             'is_main_tag', 'created_at', 'updated_at', 'is_alias_for',
-            'is_hidden_alias', 'reason_to_blacklist',
+            'is_hidden_alias', 'is_extreme_tag', 'reason_to_blacklist',
         ),
         'exclude': (
             'created_by', 'stories_count', 'published_stories_count',

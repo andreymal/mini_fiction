@@ -62,6 +62,8 @@ def update(name, lang):
         'name': htmlblock.name,
         'lang': htmlblock.lang,
         'is_template': htmlblock.is_template,
+        'cache_time': htmlblock.cache_time,
+        'title': htmlblock.title,
         'content': htmlblock.content,
     })
 

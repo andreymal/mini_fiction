@@ -1072,8 +1072,10 @@ class StaticPage(db.Entity):
 class HtmlBlock(db.Entity):
     name = orm.Required(str, 64)
     lang = orm.Required(str, 6, default='none')
+    title = orm.Optional(orm.LongStr)
     content = orm.Optional(orm.LongStr, autostrip=False)
     is_template = orm.Required(bool, default=False)
+    cache_time = orm.Required(int, default=0, unsigned=True)
     date = orm.Required(datetime, 6, default=datetime.utcnow)
     updated = orm.Required(datetime, 6, default=datetime.utcnow)
 

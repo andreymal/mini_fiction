@@ -130,7 +130,7 @@ zip_dump_params = {
         'datekey': 'updated',
     },
     'htmlblock': {
-        'include': ('name', 'lang', 'content', 'is_template', 'date', 'updated'),
+        'include': ('name', 'lang', 'title', 'content', 'is_template', 'cache_time', 'date', 'updated'),
         'datekey': 'updated',
     },
     'adminlogtype': {

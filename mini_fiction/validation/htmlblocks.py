@@ -20,6 +20,13 @@ HTML_BLOCK = {
         'maxlength': 6,
         'default': 'none',
     },
+    'title': {
+        'type': 'string',
+        'coerce': safe_string_coerce,
+        'required': False,
+        'default': '',
+        'maxlength': 255,
+    },
     'content': {
         'type': 'string',
         'coerce': safe_string_multiline_coerce,
@@ -33,4 +40,12 @@ HTML_BLOCK = {
         'required': False,
         'default': False,
     },
+    'cache_time': {
+        'type': 'integer',
+        'coerce': int,
+        'required': False,
+        'default': 0,
+        'min': 0,
+        'max': 259200,
+    }
 }

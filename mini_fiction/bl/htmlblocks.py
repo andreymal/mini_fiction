@@ -1,9 +1,9 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
 # pylint: disable=unexpected-keyword-arg,no-value-for-parameter
 
-from flask import current_app, render_template
+from flask import Markup, current_app, render_template
 from flask_babel import lazy_gettext
 
 from mini_fiction.bl.utils import BaseBL
@@ -103,16 +103,80 @@ class HtmlBlockBL(BaseBL):
 
         from mini_fiction.models import AnonymousUser
 
+        context = self._render_context()
+
         try:
-            render_template(template, htmlblock_name=name, current_user=AnonymousUser())
+            context['current_user'] = AnonymousUser()
+            render_template(template, **context)
         except Exception as exc:
             raise ValidationError({'content': [
                 lazy_gettext('Cannot render htmlblock "{0}" for anonymous: {1}').format(name, str(exc))
             ]})
 
         try:
-            render_template(template, htmlblock_name=name, current_user=author)
+            context['current_user'] = author
+            render_template(template, **context)
         except Exception as exc:
             raise ValidationError({'content': [
                 lazy_gettext('Cannot render htmlblock "{0}" for you: {1}').format(name, str(exc))
             ]})
+
+    def render(self) -> 'RenderedHtmlBlock':
+        htmlblock = self.model
+
+        rendered_block = RenderedHtmlBlock(
+            name=htmlblock.name,
+            lang=htmlblock.lang,
+            title=htmlblock.title,
+            content=htmlblock.content,
+        )
+        if not htmlblock.is_template:
+            return rendered_block
+
+        template = current_app.jinja_env.from_string(htmlblock.content)
+        template.name = 'db/htmlblocks/{}.html'.format(htmlblock.name)
+        rendered_block.content = render_template(template, **self._render_context())
+
+        return rendered_block
+
+    def _render_context(self):
+        htmlblock = self.model
+        return {
+            'htmlblock_name': htmlblock.name,
+            'htmlblock_title': htmlblock.title,
+        }
+
+
+class RenderedHtmlBlock:
+    def __init__(self, name: str, lang: str, title: str, content: str):
+        self.name = name
+        self.lang = lang
+        self.title = title
+        self.content = content
+
+    @staticmethod
+    def empty() -> 'RenderedHtmlBlock':
+        return RenderedHtmlBlock(
+            name='',
+            lang='none',
+            title='',
+            content='',
+        )
+
+    @staticmethod
+    def error() -> 'RenderedHtmlBlock':
+        return RenderedHtmlBlock(
+            name='',
+            lang='none',
+            title='',
+            content='<span style="color: red; font-size: 1.5em; display: inline-block;">[ERROR]</span>',
+        )
+
+    def __repr__(self):
+        return f"<RenderedHtmlBlock name={self.name!r} lang={self.lang!r}>"
+
+    def __str__(self):
+        return self.content
+
+    def __html__(self):
+        return Markup(self.content)

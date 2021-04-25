@@ -1,6 +1,5 @@
 {% extends base %}
-{% from 'macro.html' import breadcrumbs with context %}
-{% from 'macro.html' import form_fields with context %}
+{% from 'macro.html' import breadcrumbs, form_fields, tag_link, admin_tag_link with context %}
 {% block content %}
 
 <div class="row">
@@ -9,27 +8,19 @@
             [url_for('admin_index.index'), _('Administration')],
             [url_for('admin_tags.index'), _('Tags')]
         ]) }}
-        <h1>{{ page_title }}</h1>
+        <h1>
+            {%- if tag.is_blacklisted %}<s>{% endif -%}
+            {{ tag.name }}
+            {%- if tag.is_blacklisted %}</s>{% endif -%}
+        </h1>
 
         {% if saved %}<div class="alert-mini green">{{ _('Saved!') }}</div>{% endif %}
 
         {% if edit %}
-            <a class="gen"{% if tag.get_color() %} style="background-color:
-                {{- tag.get_color() -}}
-            "{%- endif %} href="{{ url_for('tags.tag_index', tag_name=tag.iname) }}">
-                {%- if tag.is_blacklisted -%}<s>{%- endif -%}
-                {{ tag.name }}
-                {%- if tag.is_blacklisted -%}</s>{%- endif -%}
-            </a>
+            {{ tag_link(tag) }}
             {% if tag.is_alias %}
                 →
-                <a class="gen"{% if tag.is_alias_for.get_color() %} style="background-color:
-                    {{- tag.is_alias_for.get_color() -}}
-                "{%- endif %} href="{{ url_for('tags.tag_index', tag_name=tag.is_alias_for.iname) }}">
-                    {%- if tag.is_alias_for.is_blacklisted -%}<s>{%- endif -%}
-                    {{ tag.is_alias_for.name }}
-                    {%- if tag.is_alias_for.is_blacklisted -%}</s>{%- endif -%}
-                </a>
+                {{ admin_tag_link(tag.is_alias_for) }}
             {% endif %}
         {% endif %}
 
@@ -75,9 +66,7 @@
             <div class="controls">
                 <span style="display: inline-block; padding-top: 5px;">
                     {% for alias in visible_tag_aliases -%}
-                        <a class="gen"{% if alias.get_color() %} style="background-color:
-                            {{- alias.get_color() -}}
-                        "{%- endif %} href="{{ url_for('admin_tags.update', pk=alias.id) }}">{{ alias.name }}</a>
+                        {{ admin_tag_link(alias) }}
                     {% endfor %}
                 </span>
             </div>
@@ -90,9 +79,7 @@
             <div class="controls">
                 <span style="display: inline-block; padding-top: 5px;">
                     {% for alias in hidden_tag_aliases -%}
-                        <a class="gen"{% if alias.get_color() %} style="background-color:
-                            {{- alias.get_color() -}}
-                        "{%- endif %} href="{{ url_for('admin_tags.update', pk=alias.id) }}">{{ alias.name }}</a>
+                        {{ admin_tag_link(alias) }}
                     {% endfor %}
                 </span>
             </div>

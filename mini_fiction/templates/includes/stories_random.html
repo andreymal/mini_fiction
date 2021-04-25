@@ -1,3 +1,5 @@
+{%- from 'macro.html' import tag_link with context -%}
+
 {% for random_story in random_stories %}
     <div class="story-item">
         <h3><a href="{{ url_for('story.view', pk=random_story.id) }}">{{ random_story.title }}</a></h3>
@@ -8,18 +10,8 @@
                     <a title="Прочитать позже" href="{{ url_for('story.bookmark', pk=random_story.id, action='delete' if bookmarked else 'add') }}" class="story_bookmark js-story-bookmark-{{ random_story.id }} scon bookmark{% if bookmarked %} bookmarked{% endif %}"></a>
                 </span>
                 {%- endif -%}
-
-                {#-
-                <span class="category-list">
-                    {%- for category in random_story.categories|sort(attribute='id') -%}
-                        <a class="gen" style="background-color: {{ category.color }}" href="{{ url_for('search.simple', search_type='category', search_id=category.id) }}">{{ category.name }}</a>
-                    {%- endfor -%}
-                </span>
-                #}
-                <span class="category-list">{%- for st in random_story.bl.get_tags_list(sort=True) %}{% if st.tag.is_main_tag %}
-                    <a class="gen"{% if st.tag.get_color() %} style="background-color:
-                        {{- st.tag.get_color() -}}
-                    "{%- endif %} href="{{ url_for('tags.tag_index', tag_name=st.tag.iname) }}">{{ st.tag.name }}</a>
+                <span class="story-tags-list">{%- for st in random_story.bl.get_tags_list(sort=True) %}{% if st.tag.is_main_tag %}
+                    {{ tag_link(st.tag) -}}
                 {% endif %}{% endfor -%}
                 </span>
         </p>

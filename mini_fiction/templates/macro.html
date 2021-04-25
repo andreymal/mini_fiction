@@ -40,6 +40,27 @@
     {% endfor %}
 {% endmacro %}
 
+
+{% macro tag_link(tag) -%}
+    <a class="story-tag"
+        {%- if tag.get_color() %} style="background-color: {{- tag.get_color() -}}"{%- endif %}
+        href="{{ url_for('tags.tag_index', tag_name=tag.iname) }}">
+        {{- tag.name -}}
+    </a>
+{%- endmacro %}
+
+
+{% macro admin_tag_link(tag) -%}
+    <a class="story-tag"
+        {%- if tag.get_color() %} style="background-color: {{- tag.get_color() -}}"{%- endif %}
+        href="{{ url_for('admin_tags.update', pk=tag.id) }}">
+        {%- if tag.is_blacklisted %}<s>{% endif -%}
+        {{ tag.name }}
+        {%- if tag.is_blacklisted %}</s>{% endif -%}
+    </a>
+{%- endmacro %}
+
+
 {% macro user_avatar(user) -%}
     {%- set avatar = user.bl.get_avatar_url() -%}
     <div class="user-avatar-container {% if not avatar %}user-avatar-placeholder{% endif %}">

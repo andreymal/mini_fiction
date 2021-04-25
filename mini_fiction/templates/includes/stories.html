@@ -15,14 +15,7 @@
         </h3>
         <p class="meta">
             {% include 'includes/story_reader_buttons.html' with context %}
-                {#-
-                <span class="category-list">
-                    {%- for category in story.categories|sort(attribute='id') -%}
-                        <a class="gen" style="background-color: {{ category.color }}" href="{{ url_for('search.simple', search_type='category', search_id=category.id) }}">{{ category.name }}</a>
-                    {%- endfor -%}
-                </span>
-                #}
-                <span class="category-list">
+                <span class="story-tags-list">
                     {%- include 'includes/story_main_tags.html' -%}
                 </span>
                 {{ ngettext("%(num)d word", "%(num)d words", story.words) }} {{ pgettext('story_by', 'by') }} {% include 'includes/story_authors_list.html' %}

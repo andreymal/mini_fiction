@@ -98,11 +98,11 @@ a {
     margin: 0px!important;
     box-sizing: border-box;
 }
-.stories-carousel p.meta .gen {
+.stories-carousel .story-item .meta .story-tag {
     margin-bottom: 4px;
 }
 
-.stories-carousel p.meta {
+.stories-carousel .story-item .meta {
     margin-bottom: 0;
 }
 
@@ -788,8 +788,10 @@ h1 .alert {
     padding-right: 23px;
 }
 
+/* Story tags */
+
 /* Genra */
-.gen {
+.story-tag {
     padding: 4px 9px;
     border-radius: 5px;
     color: #fff;
@@ -800,36 +802,24 @@ h1 .alert {
     background-color: #35B450;
 }
 
-.error .gen {
-    color: #ffffff !important;
+.story-tag:hover {
+    color: #fff;
 }
 
-p.meta .gen {
+.story-item .meta .story-tag {
     padding: 2px 7px;
     margin: 0 4px 2px 0;
 }
 
-a.gen:hover {
-    color: #fff;
-}
-
-label.gen {
-    min-height: 18px;
-}
-
-label.gen input {
-    margin: 2px 4px 0 0 !important;
-}
-
-.gen.more-tags-btn {
+.story-tag.more-tags-btn {
   background-color: #ddd;
 }
 
-.gen.more-tags-btn:hover {
+.story-tag.more-tags-btn:hover {
   background-color: #bbb;
 }
 
-p.meta .gen.more-tags-btn {
+.story-item .meta .story-tag.more-tags-btn {
   padding: 2px 4px;
 }
 
@@ -2931,7 +2921,7 @@ ul.editlog .editlog-item:nth-child(2n+1) {
         padding: 4px;
         font-size: 13px;
     }
-    .gen {
+    .story-tag {
         font-size: 12px;
         line-height: 14px;
         padding: 4px 5px;

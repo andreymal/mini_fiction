@@ -12,7 +12,7 @@
         <h1>{{ page_title }}</h1>
 
         {% if edit %}
-            <div><a class="gen" style="background-color: {{ category.color }}" href="{{ url_for('search.simple', search_type='category', search_id=category.id) }}">{{ category.name }}</a></div>
+            <div><a class="story-tag" style="background-color: {{ category.color }}" href="{{ url_for('search.simple', search_type='category', search_id=category.id) }}">{{ category.name }}</a></div>
         {% endif %}
 
         {% if saved %}<div class="alert-mini green">{{ _('Saved!') }}</div>{% endif %}

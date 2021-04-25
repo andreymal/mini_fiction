@@ -1,5 +1,5 @@
 {% extends base %}
-{% from 'macro.html' import paginator, breadcrumbs with context %}
+{% from 'macro.html' import paginator, breadcrumbs, tag_link with context %}
 
 {% block content %}
 <div class="row">
@@ -10,9 +10,7 @@
 
 <div class="row"><div class="span8">
     <div class="tag-page">
-        <a class="gen" href="{{ url_for('tags.tag_index', tag_name=tag.iname) }}"{% if tag.get_color() %} style="background-color: {{ tag.get_color() }}"{% endif %}>
-            {{- tag.name -}}
-        </a>
+        {{ tag_link(tag) }}
         {%- if current_user.is_staff %}
             <a href="{{ url_for('admin_tags.update', pk=tag.id) }}">(админка)</a>
         {% endif -%}

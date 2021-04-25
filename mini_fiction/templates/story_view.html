@@ -1,5 +1,5 @@
 {% extends base %}
-{% from 'macro.html' import breadcrumbs with context %}
+{% from 'macro.html' import breadcrumbs, tag_link with context %}
 
 {% block extrahead %}
     {{- super() }}
@@ -42,31 +42,16 @@
                 </span>
                 {% endif %}
             </p>
-            {#
-            <p class="story-genres">
-                {%- for category in story.categories.order_by('c.id') -%}
-                    <a class="gen" style="background-color: {{ category.color }}" href="{{ url_for('search.simple', search_type='category', search_id=category.id) }}">{{ category.name }}</a>
-                {%- endfor -%}
-            </p>
-            #}
             <p class="story-genres">
                 {%- set main_tags = story.bl.get_main_tags(sort=True) -%}
                 {%- set more_tags = story.bl.get_more_tags(sort=True) -%}
                 {% for st in main_tags %}
-                    <a class="gen"
-                        {%- if st.tag.get_color() %} style="background-color: {{- st.tag.get_color() -}}"{%- endif %}
-                        href="{{ url_for('tags.tag_index', tag_name=st.tag.iname) }}">
-                        {{- st.tag.name -}}
-                    </a>
+                    {{ tag_link(st.tag) -}}
                 {% endfor %}
                 {% if more_tags -%}
                     <a href="#" class="show-more-tags-link js-show-more-tags">показать все теги</a>
                     <span class="js-story-more-tags" style="display: none;">{% for st in more_tags %}
-                        <a class="gen"
-                            {%- if st.tag.get_color() %} style="background-color: {{- st.tag.get_color() -}}"{%- endif %}
-                            href="{{ url_for('tags.tag_index', tag_name=st.tag.iname) }}">
-                            {{- st.tag.name -}}
-                        </a>
+                        {{ tag_link(st.tag) -}}
                     {% endfor %}</span>
                 {%- endif %}
             </p>

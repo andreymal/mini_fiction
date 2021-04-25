@@ -1,5 +1,5 @@
 {% extends base %}
-{% from 'macro.html' import breadcrumbs, paginator with context %}
+{% from 'macro.html' import breadcrumbs, paginator, admin_tag_link with context %}
 {% block content %}
 
 <div class="row"><div class="span12">
@@ -20,22 +20,10 @@
         <tbody>
         {%- for tag in tags %}<tr>
             <td class="col-tag-iname">
-                <a class="gen"{% if tag.get_color() %} style="background-color:
-                    {{- tag.get_color() -}}
-                "{%- endif %} href="{{ url_for('admin_tags.update', pk=tag.id) }}">
-                    {%- if tag.is_blacklisted -%}<s>{%- endif -%}
-                    {{ tag.name }}
-                    {%- if tag.is_blacklisted -%}</s>{%- endif -%}
-                </a>
+                {{ admin_tag_link(tag) }}
                 {% if tag.is_alias %}
                     →
-                    <a class="gen"{% if tag.is_alias_for.get_color() %} style="background-color:
-                        {{- tag.is_alias_for.get_color() -}}
-                    "{%- endif %} href="{{ url_for('admin_tags.update', pk=tag.is_alias_for.id) }}">
-                        {%- if tag.is_alias_for.is_blacklisted -%}<s>{%- endif -%}
-                        {{ tag.is_alias_for.name }}
-                        {%- if tag.is_alias_for.is_blacklisted -%}</s>{%- endif -%}
-                    </a>
+                    {{ admin_tag_link(tag.is_alias_for) }}
                 {% endif %}
             </td>
 

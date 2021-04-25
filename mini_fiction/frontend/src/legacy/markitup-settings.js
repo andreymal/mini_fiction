@@ -37,6 +37,10 @@ export default {
                 .replace(/<\/center>/g, '</p>')
                 .replace(/<right>/g, '<p align="right">')
                 .replace(/<\/right>/g, '</p>')
+                .replace(/<i>/g, '<em>')
+                .replace(/<\/i>/g, '</em>')
+                .replace(/<b>/g, '<strong>')
+                .replace(/<\/b>/g, '</strong>')
                 .replace(/<tab>/g, '\n\n')
                 .replace(/\n{2,}/g, '\n\n')
                 .replace(/\n\n\s*/g, '\n\n');

@@ -64,11 +64,9 @@ def search_action(postform):
                 extended_syntax=postform.data.get('extsyntax'),
                 character=postform.data['char'],
                 character_mode=postform.data['char_mode'],
-                # classifier=postform.data['cls'],
                 tags=smart_split(postform.data.get('tags', '')),
                 tags_mode=postform.data['tags_mode'],
                 exclude_tags=smart_split(postform.data.get('exclude_tags', '')),
-                # category=postform.data['genre'],
                 rating_id=postform.data['rating'],
                 original=postform.data['original'],
                 finished=postform.data['finished'],
@@ -95,11 +93,9 @@ def search_action(postform):
                 extended_syntax=postform.data.get('extsyntax'),
                 character=postform.data['char'],
                 character_mode=postform.data['char_mode'],
-                # lassifier=postform.data['cls'],
                 tags=smart_split(postform.data.get('tags', '')),
                 tags_mode=postform.data['tags_mode'],
                 exclude_tags=smart_split(postform.data.get('exclude_tags', '')),
-                # category=postform.data['genre'],
                 rating_id=postform.data['rating'],
                 original=postform.data['original'],
                 finished=postform.data['finished'],
@@ -139,10 +135,6 @@ def simple(search_type, search_id):
     bound_data = {'type': '0', 'sort': '1'}
     if search_type == 'character':
         bound_data['char'] = [search_id]
-    # elif search_type == 'category':
-    #     bound_data['genre'] = [search_id]
-    # elif search_type == 'classifier':
-    #     bound_data['cls'] = [search_id]
     elif search_type == 'rating':
         bound_data['rating'] = [search_id]
     else:

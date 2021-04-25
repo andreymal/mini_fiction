@@ -54,14 +54,10 @@ def get_adminlog_object_url(typ, pk):
         return url_for('admin_abuse_reports.show', abuse_id=pk)
     if typ == 'author':
         return url_for('admin_authors.update', pk=pk)
-    if typ == 'category':
-        return url_for('admin_categories.update', pk=pk)
     if typ == 'character':
         return url_for('admin_characters.update', pk=pk)
     if typ == 'charactergroup':
         return url_for('admin_charactergroups.update', pk=pk)
-    if typ == 'classifier':
-        return url_for('admin_classifications.update', pk=pk)
     if typ == 'htmlblock':
         return url_for('admin_htmlblocks.update', name=pk[0], lang=pk[1])
     if typ == 'logopic':

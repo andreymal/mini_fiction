@@ -42,7 +42,7 @@
 
 
 {% macro tag_link(tag) -%}
-    <a class="story-tag"
+    <a class="story-tag{% if tag.is_extreme_tag %} extreme-tag{% endif %}"
         {%- if tag.get_color() %} style="background-color: {{- tag.get_color() -}}"{%- endif %}
         href="{{ url_for('tags.tag_index', tag_name=tag.iname) }}">
         {{- tag.name -}}
@@ -51,7 +51,7 @@
 
 
 {% macro admin_tag_link(tag) -%}
-    <a class="story-tag"
+    <a class="story-tag{% if tag.is_extreme_tag %} extreme-tag{% endif %}"
         {%- if tag.get_color() %} style="background-color: {{- tag.get_color() -}}"{%- endif %}
         href="{{ url_for('admin_tags.update', pk=tag.id) }}">
         {%- if tag.is_blacklisted %}<s>{% endif -%}

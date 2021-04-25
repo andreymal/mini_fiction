@@ -340,17 +340,15 @@ def configure_views(app):
 
 
 def configure_admin_views(app):
-    from mini_fiction.views.admin import index, categories, characters, charactergroups, classifications
+    from mini_fiction.views.admin import index, characters, charactergroups
     from mini_fiction.views.admin import logopics, htmlblocks, staticpages, news, abuse_reports, votes
     from mini_fiction.views.admin import authors, registrations, tag_categories, tags
 
     app.register_blueprint(index.bp, url_prefix='/admin')
     app.register_blueprint(logopics.bp, url_prefix='/admin/logopics')
     app.register_blueprint(htmlblocks.bp, url_prefix='/admin/htmlblocks')
-    # app.register_blueprint(categories.bp, url_prefix='/admin/categories')
     app.register_blueprint(characters.bp, url_prefix='/admin/characters')
     app.register_blueprint(charactergroups.bp, url_prefix='/admin/charactergroups')
-    # app.register_blueprint(classifications.bp, url_prefix='/admin/classifications')
     app.register_blueprint(staticpages.bp, url_prefix='/admin/staticpages')
     app.register_blueprint(news.bp, url_prefix='/admin/news')
     app.register_blueprint(abuse_reports.bp, url_prefix='/admin/abuse_reports')

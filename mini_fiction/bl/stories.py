@@ -66,7 +66,7 @@ class StoryBL(BaseBL, Commentable):
         return tags_info['tags']
 
     def create(self, authors, data):
-        from mini_fiction.models import Category, Character, Classifier, StoryContributor, Tag
+        from mini_fiction.models import Character, StoryContributor, Tag
 
         if not authors:
             raise ValueError('Authors are required')
@@ -110,9 +110,7 @@ class StoryBL(BaseBL, Commentable):
             vote_extra=current_app.story_voting.get_default_vote_extra() if current_app.story_voting else '{}',
         )
         story.flush()  # получаем id у базы данных
-        # story.categories.add(list(Category.select(lambda x: x.id in data['categories'])))
         story.characters.add(list(Character.select(lambda x: x.id in data['characters'])))
-        # story.classifications.add(list(Classifier.select(lambda x: x.id in data['classifications'])))
         story.bl.set_tags(authors[0], tags, update_search=False)
         for author in authors:
             StoryContributor(
@@ -150,7 +148,7 @@ class StoryBL(BaseBL, Commentable):
         return sl
 
     def update(self, editor, data, minor=False):
-        from mini_fiction.models import Category, Character, Classifier, Rating, Tag, StoryTag
+        from mini_fiction.models import Character, Rating, Tag, StoryTag
 
         if minor and (not editor or not editor.is_staff):
             minor = False
@@ -192,16 +190,6 @@ class StoryBL(BaseBL, Commentable):
             story.rating = Rating.get(id=data['rating'])
             changed_sphinx_fields.add('rating_id')
 
-        # TODO: refactor
-        # if 'categories' in data:
-        #     old_value = sorted(x.id for x in story.categories)
-        #     new_value = sorted(data['categories'])
-        #     if set(old_value) != set(new_value):
-        #         edited_data['categories'] = [old_value, new_value]
-        #         story.categories.clear()
-        #         story.categories.add(list(Category.select(lambda x: x.id in data['categories'])))
-        #         changed_sphinx_fields.add('category')
-
         if 'characters' in data:
             old_value = sorted(x.id for x in story.characters)
             new_value = sorted(data['characters'])
@@ -210,15 +198,6 @@ class StoryBL(BaseBL, Commentable):
                 story.characters.clear()
                 story.characters.add(list(Character.select(lambda x: x.id in data['characters'])))
                 changed_sphinx_fields.add('character')
-
-        # if 'classifications' in data:
-        #     old_value = sorted(x.id for x in story.classifications)
-        #     new_value = sorted(data['classifications'])
-        #     if set(old_value) != set(new_value):
-        #         edited_data['classifications'] = [old_value, new_value]
-        #         story.classifications.clear()
-        #         story.classifications.add(list(Classifier.select(lambda x: x.id in data['classifications'])))
-        #         changed_sphinx_fields.add('classifier')
 
         add_tags, rm_tags = self.set_tags(editor, tags, update_search=False)  # у тегов отдельный лог изменений, если что
         if add_tags or rm_tags:
@@ -945,10 +924,6 @@ class StoryBL(BaseBL, Commentable):
 
         if f is None or 'character' in f:
             common_fields['character'] = [x.id for x in story.characters]  # TODO: check performance
-        # if f is None or 'category' in f:
-        #     common_fields['category'] = [x.id for x in story.categories]
-        # if f is None or 'classifier' in f:
-        #     common_fields['classifier'] = [x.id for x in story.classifications]
         if f is None or 'tag' in f:
             common_fields['tag'] = [x.tag.id for x in story.tags]
         if f is None or 'author' in f:
@@ -973,11 +948,6 @@ class StoryBL(BaseBL, Commentable):
             sphinx_filters['approved'] = 1
 
         query = normalize_text_for_search_query(query, query_mode="extended" if extended_syntax else "none")
-
-        # TODO: unused, remove it?
-        # for ofilter in ('character', 'classifier', 'category', 'rating_id'):
-        #     if filters.get(ofilter):
-        #         sphinx_filters[ofilter + '__in'] = [x.id for x in filters[ofilter]]
 
         for ifilter in ('original', 'finished', 'freezed', 'rating_id'):
             if filters.get(ifilter):
@@ -1075,10 +1045,6 @@ class StoryBL(BaseBL, Commentable):
         if dump_collections:
             for x in sorted(story.characters, key=lambda c: c.id):
                 yield mdf.obj2json(x, 'character')
-            # for x in sorted(story.categories, key=lambda c: c.id):
-            #     yield mdf.obj2json(x, 'category')
-            # for x in sorted(story.classifications, key=lambda c: c.id):
-            #     yield mdf.obj2json(x, 'classifier')
             for x in sorted(self.get_tags_list(), key=lambda c: c.id):
                 yield mdf.obj2json(x, 'storytag')
         for x in sorted(story.favorites, key=lambda c: c.id):
@@ -1182,7 +1148,7 @@ class StoryBL(BaseBL, Commentable):
         # В зависимости от состояния рассказа определяем поля, считающиеся
         # публичными
         only = [
-            'id', 'title', 'characters', # 'categories', 'classifications',
+            'id', 'title', 'characters',
             'date', 'first_published_at', 'draft', 'approved', 'finished',
             'freezed', 'notes', 'original', 'rating', 'summary', 'updated',
             'words', 'vote_total', 'vote_value', 'vote_extra', 'original_url',

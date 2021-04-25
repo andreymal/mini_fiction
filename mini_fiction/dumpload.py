@@ -51,15 +51,9 @@ dumpdb_params = {
     'newscomment': {'exclude': (
         'answers', 'edits', 'votes',
     )},
-    #'category': {'exclude': (
-    #    'stories',
-    #)},
     'character': {'exclude': (
         'stories',
     )},
-    #'classifier': {'exclude': (
-    #    'stories',
-    #)},
     'tagcategory': {'exclude': (
         'tags',
     )},
@@ -98,14 +92,6 @@ zip_dump_params = {
         'exclude': ('stories',),
         'media': ('picture',),
     },
-    #'category': {
-    #    'include': ('id', 'name', 'description', 'color'),
-    #    'exclude': ('stories',),
-    #},
-    #'classifier': {
-    #    'include': ('id', 'name', 'description'),
-    #    'exclude': ('stories',),
-    #},
     'tagcategory': {
         'include': ('id', 'name', 'color', 'description', 'created_at', 'updated_at'),
         'exclude': ('tags',),

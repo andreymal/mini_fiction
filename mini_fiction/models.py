@@ -255,8 +255,6 @@ class Category(db.Entity):
 
     stories = orm.Set('Story')
 
-    bl = Resource('bl.category')
-
     def __str__(self):
         return self.name
 
@@ -268,8 +266,6 @@ class Classifier(db.Entity):
     name = orm.Required(str, 256)
 
     stories = orm.Set('Story')
-
-    bl = Resource('bl.classifier')
 
     def __str__(self):
         return self.name

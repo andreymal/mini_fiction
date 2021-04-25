@@ -95,9 +95,6 @@
             <p>
                 {{ pgettext('story_info', 'Rating') }} — <a href="{{ url_for('search.simple', search_type='rating', search_id=story.rating.id) }}">{{ story.rating.name }}</a><br/>
 
-                {#-
-                События: {% for classifier in story.classifications.order_by('c.id') %}<a href="{{ url_for('search.simple', search_type='classifier', search_id=classifier.id) }}">{{ classifier.name }}</a>{% if not loop.last %}, {% endif %}{% endfor %}<br/>
-                #}
                 {{ ngettext("%(num)d word", "%(num)d words", story.words) }}, {{ ngettext("%(num)d view", "%(num)d views", story.views) }}<br/>
 
                 {% if not story.first_published_at or current_user.is_staff or story.bl.is_contributor(current_user) %}

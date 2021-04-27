@@ -62,39 +62,44 @@
                         {% endif %}
                       </div>
                 </div>
+
+                <div class="control-group">
+                    <label class="control-label">{{ pgettext('chapter_edit', 'Publication') }}</label>
+                    <div class="controls">
+                        <label class="radio">
+                            <input type="radio" name="publication_status" value="publish"{% if publication_status == 'publish' %} checked{% endif %} />
+                            {% if not edit or chapter.draft %}
+                                {{- pgettext('chapter_edit', 'Publish chapter now') -}}
+                            {% else %}
+                                {{- pgettext('chapter_edit', 'Leave chapter published') -}}
+                            {% endif %}
+                        </label>
+
+                        {% if unpublished_chapters_count > 0 %}
+                        <label class="radio">
+                            <input type="radio" name="publication_status" value="publish_all"{% if publication_status == 'publish_all' %} checked{% endif %} />
+                            {{ ngettext('Publish this and other %(num)s chapter', 'Publish this and other %(num)s chapters', unpublished_chapters_count) }}
+                        </label>
+                        {% endif %}
+
+                        <label class="radio">
+                            <input type="radio" name="publication_status" value="draft"{% if publication_status == 'draft' %} checked{% endif %} />
+                            {% if not edit %}
+                                {{- pgettext('chapter_edit', 'Save chapter to drafts') -}}
+                            {% elif not chapter.draft %}
+                                {{- pgettext('chapter_edit', 'Move chapter to drafts') -}}
+                            {% else %}
+                                {{- pgettext('chapter_edit', 'Leave chapter in drafts') -}}
+                            {% endif %}
+                        </label>
+                    </div>
+                </div>
+
                 <div class="form-actions notop">
                 {%- if not edit %}
-                    {% if not story.published %}
-                        <button type="submit" name="act" value="publish" class="btn btn-primary">{{ _('Add') }}</button>
-                    {% else %}
-                        <button type="submit" name="act" value="publish" class="btn btn-primary">
-                            {%- if unpublished_chapters_count > 0 -%}
-                                {{- ngettext('Add and publish %(num)s chapter', 'Add and publish %(num)s chapters', unpublished_chapters_count + 1) -}}
-                            {%- else -%}
-                                {{ _('Add and publish') }}
-                            {%- endif -%}
-                        </button>
-                        <button type="submit" name="act" value="draft" class="btn btn-success">{{ _('Add as draft') }}</button>
-                    {% endif %}
-
+                    <button type="submit" name="act" value="publish" class="btn btn-primary">{{ _('Add') }}</button>
                 {%- else %}
-                    {% if chapter.draft %}
-                        <button type="submit" name="act" value="save" class="btn btn-primary">{{ _('Save as draft') }}</button>
-                        {% if story.published %}
-                            <button type="submit" name="act" value="publish" class="btn btn-success">
-                                {%- if unpublished_chapters_count > 1 -%}
-                                    {{- ngettext('Save and publish %(num)s chapter', 'Save and publish %(num)s chapters', unpublished_chapters_count) -}}
-                                {%- else -%}
-                                    {{ _('Save and publish') }}
-                                {%- endif -%}
-                            </button>
-                        {% endif %}
-                    {% else %}
-                        <button type="submit" name="act" value="save" class="btn btn-primary">{{ _('Save changes') }}</button>
-                        {% if story.published %}
-                            <button type="submit" name="act" value="draft" class="btn btn-success">{{ _('Save and move to drafts') }}</button>
-                        {% endif %}
-                    {% endif %}
+                    <button type="submit" name="act" value="save" class="btn btn-primary">{{ _('Save changes') }}</button>
                 {%- endif %}
 
                 <button type="submit" name="act" value="preview" class="btn" id="chapter-preview-btn">{{ _('Preview') }}</button>

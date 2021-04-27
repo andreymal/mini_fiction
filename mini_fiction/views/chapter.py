@@ -95,6 +95,22 @@ def _gen_preview(form, only_selected=False):
     }
 
 
+def _update_publication_status(chapter, user, formdata):
+    story = chapter.story
+    status = formdata.get('publication_status')
+
+    if status == 'publish_all':
+        story.bl.publish_all_chapters(user)
+
+    elif status == 'publish':
+        if chapter.draft:
+            chapter.bl.publish(user, published=True)
+
+    elif status == 'draft':
+        if not chapter.draft:
+            chapter.bl.publish(user, published=False)
+
+
 @bp.route('/story/<int:story_id>/chapter/add/', methods=('GET', 'POST'))
 @db_session
 @login_required
@@ -139,8 +155,7 @@ def add(story_id):
                 'text': form.text.data,
             },
         )
-        if request.form.get('act') == 'publish':
-            story.bl.publish_all_chapters(user)
+        _update_publication_status(chapter, user, request.form)
 
         redir_url = url_for('chapter.edit', pk=chapter.id)
 
@@ -165,6 +180,7 @@ def add(story_id):
         'story': story,
         'chapter': None,
         'form': form,
+        'publication_status': 'publish',
         'saved': False,
         'not_saved': not_saved,
         'unpublished_chapters_count': Chapter.select(lambda x: x.story == story and x.draft).count(),
@@ -245,11 +261,7 @@ def edit(pk):
                     'text': form.text.data,
                 }
             )
-
-            if request.form.get('act') == 'publish':
-                chapter.story.bl.publish_all_chapters(user)
-            elif request.form.get('act') == 'draft' and not chapter.draft:
-                chapter.bl.publish(user, published=False)
+            _update_publication_status(chapter, user, request.form)
 
             saved = True
         else:
@@ -282,17 +294,34 @@ def edit(pk):
         else:
             user.bl.set_extra('shown_chapter_linter_errors', list(error_codes | old_error_codes))
 
+    # Радиокнопки выбора статуса публикации генерируются динамически
+    # в зависимости от текущего состояния рассказа
+    publication_status = request.form.get('publication_status')
+    if publication_status not in ('publish', 'publish_all', 'draft'):
+        publication_status = None
+
+    if not publication_status:
+        publication_status = 'draft' if chapter.draft else 'publish'
+
+    unpublished_chapters_count = Chapter.select(
+        lambda x: x.story == chapter.story and x.draft and x.id != pk
+    ).count()
+
+    if unpublished_chapters_count == 0 and publication_status == 'publish_all':
+        publication_status = 'publish'
+
     data = {
         'page_title': 'Редактирование главы «%s»' % chapter.autotitle,
         'story': chapter.story,
         'chapter': chapter,
         'form': form,
+        'publication_status': publication_status,
         'edit': True,
         'saved': saved,
         'not_saved': not_saved,
         'chapter_text_diff': chapter_text_diff,
         'diff_html': diff2html(older_text, chapter_text_diff) if chapter_text_diff else None,
-        'unpublished_chapters_count': Chapter.select(lambda x: x.story == chapter.story and x.draft).count(),
+        'unpublished_chapters_count': unpublished_chapters_count,
         'linter_error_messages': linter_error_messages,
         'lint_ok': lint_ok,
         'linter_allow_hide': linter_allow_hide,

@@ -535,21 +535,39 @@ var common = {
 // Настройки для конвертера HTML-кода, вставленного из буфера обмена,
 // в HTML-код, пригодный для сайта
 common.allowedTags = {
-    i: {_rename: 'em', _nonested: ['i', 'em']},
+    i: {_rename: 'em', _nonested: ['i', 'em'], _merge: true},
+    cite: {_rename: 'em', _nonested: ['i', 'em'], _merge: true}, // word-specific
     strong: {}, em: {_nonested: ['i', 'em']}, s: {_nonested: true}, u: {_nonested: true},
     h3: {_nonested: ['h3', 'h4', 'h5']},
     h4: {_nonested: ['h3', 'h4', 'h5']},
     h5: {_nonested: ['h3', 'h4', 'h5']},
     span: {}, hr: {_nocollapse: true, _nokids: true}, // TODO: footnote?
     img: {src: null, alt: null, title: null, _nocollapse: true, _nokids: true},
-    a: {href: null, rel: null, title: null, target: null, _nonested: true},
     ul: {}, ol: {}, li: {_nocollapse: true},
     blockquote: {}, sup: {}, sub: {}, pre: {_nonested: true}, small: {}, tt: {_nonested: true},
 
     // Этими управляют функции ниже:
+    a: {},
     p: {},
-    b: {},
+    div: {},
     br: {},
+    span: {},
+    b: {},
+};
+
+
+common.allowedTags.a = function(node) {
+    // Если href отсутствует, то такая ссылка не нужна, просто копируем потомков
+    if (!node.getAttribute('href')) {
+        this.push(Array.prototype.slice.call(node.childNodes), null);
+        return;
+    }
+
+    // Если href присутствует, то обрабатываем стандартным способом
+    this.processElement(
+        node,
+        {href: null, rel: null, title: null, target: null, _nonested: true, _merge: true}
+    );
 };
 
 
@@ -592,6 +610,7 @@ common.allowedTags.p = common.allowedTags.div = function(node) {
         }
         this.current.appendChild(cleanNode);
         this.push(Array.prototype.slice.call(node.childNodes), cleanNode);
+
         if (this.options.fancyNewlines) {
             this.requireNewlines(1, true);
         }
@@ -612,13 +631,15 @@ common.allowedTags.br = function() {
 common.allowedTags.span = function(node) {
     // Всякие гуглодоки вместо HTML-тегов юзают span со стилями, здесь вот
     // конвертируем эти стили в HTML-теги
+    // (а всякие ворды вкладывают span внутрь b, поэтому проверяем содержимое
+    // стека во избежание ситуаций вида <strong><strong></strong></strong>)
     var cont = this.current;
-    var cont2;
+    var cont2 = null;
     var style = getComputedStyle(node);
 
     // font-weight → <strong>
     var bolds = ['bold', 'bolder', '500', '600', '700', '800', '900'];
-    if (bolds.indexOf(style.fontWeight) >= 0) {
+    if (bolds.indexOf(style.fontWeight) >= 0 && !this.isTagInStack('strong')) {
         cont2 = document.createElement('strong');
         cont.appendChild(cont2);
         cont = cont2;
@@ -626,7 +647,7 @@ common.allowedTags.span = function(node) {
 
     // font-style → <em>
     var italics = ['italic', 'oblique'];
-    if (italics.indexOf(style.fontStyle) >= 0) {
+    if (italics.indexOf(style.fontStyle) >= 0 && !this.isTagInStack('em')) {
         cont2 = document.createElement('em');
         cont.appendChild(cont2);
         cont = cont2;
@@ -636,17 +657,15 @@ common.allowedTags.span = function(node) {
     decor = decor.split(' ');
 
     // text-decoration: underline → <u>
-    // Но только если родитель не ссылка
-    if (decor.indexOf('underline') >= 0) {
-        if (!node.parentNode || node.parentNode.tagName.toLowerCase() != 'a') {
-            cont2 = document.createElement('u');
-            cont.appendChild(cont2);
-            cont = cont2;
-        }
+    // Но только если среди родителей нет ссылки
+    if (decor.indexOf('underline') >= 0  && !this.isTagInStack(['a', 'u'])) {
+        cont2 = document.createElement('u');
+        cont.appendChild(cont2);
+        cont = cont2;
     }
 
     // text-decoration: line-through → <s>
-    if (decor.indexOf('line-through') >= 0) {
+    if (decor.indexOf('line-through') >= 0 && !this.isTagInStack('s')) {
         cont2 = document.createElement('s');
         cont.appendChild(cont2);
         cont = cont2;
@@ -664,6 +683,15 @@ common.allowedTags.span = function(node) {
         cont2 = document.createElement('sub');
         cont.appendChild(cont2);
         cont = cont2;
+    }
+
+    // Если сосед слева такой же, то объединяем
+    // (не сработает при глубокой вложенности, ну да ладно)
+    if (cont !== this.current) {
+        var merged = this.merge(cont);
+        if (merged !== null) {
+            cont = merged;
+        }
     }
 
     this.push(Array.prototype.slice.call(node.childNodes), cont !== this.current ? cont : null);
@@ -686,6 +714,13 @@ common.allowedTags.b = function(node) {
     if (cont) {
         this.current.appendChild(cont);
     }
+
+    // Если сосед слева тоже strong, то объединяем
+    var merged = this.merge(cont);
+    if (merged !== null) {
+        cont = merged;
+    }
+
     this.push(Array.prototype.slice.call(node.childNodes), cont);
 };
 

@@ -178,6 +178,29 @@ HTMLSanitizer.prototype.requireNewlines = function(n, collapsed) {
     return this.newlines;
 };
 
+
+/**
+ * Проверяет, есть ли тег с указанным именем в текущем стеке тегов,
+ * и возвращает true, если тег действительно есть. Если передать массив,
+ * то возвращает true, если будет найден любой из перечисленных тегов.
+ * Используется для предотвращения вложения запрещённых тегов друг в друга
+ * (например, <a> внутрь другого <a>). Название тега должно быть в нижнем
+ * регистре.
+ */
+HTMLSanitizer.prototype.isTagInStack = function(tags) {
+    if (typeof tags === "string") {
+        return this.stackNames.indexOf(tags) >= 0;
+    }
+
+    for (var i = 0; i < tags.length; i++) {
+        if (this.stackNames.indexOf(tags[i]) >= 0) {
+            return true;
+        }
+    }
+
+    return false;
+}
+
 /**
  * Обрабатывает указанный кусок HTML. Возвращает корень результата
  * для удобства.
@@ -328,6 +351,47 @@ HTMLSanitizer.prototype.pushNode = function(node) {
 
 
 /**
+ * Сравнивает указанный элемент с соседом слева и, если полностью совпадают
+ * имена и атрибуты, объединяет их в один тег. Полезно для объединения
+ * соседствующих strong или em. При успешном объединении возвращает новый старый
+ * объединённый тег, при неуспешном ничего не делает и возвращает null.
+ */
+HTMLSanitizer.prototype.merge = function(node) {
+    if (node.previousSibling instanceof Text && node.previousSibling.textContent) {
+        // Если слева есть текст или даже просто пробелы, то объединять нельзя
+        return null;
+    }
+
+    var prev = node.previousElementSibling;
+    if (!prev || prev.tagName !== node.tagName) {
+        // Обединяться не с чем
+        return null;
+    }
+
+    if (node.attributes.length !== prev.attributes.length) {
+        // Атрибуты очевидно разные, не объединяем
+        return null;
+    }
+
+    // Сравниваем атрибуты
+    for (var i = 0; i < node.attributes.length; i++) {
+        var attr = node.attributes[i];
+        if (prev.getAttribute(attr.name) !== attr.value) {
+            return null;
+        }
+    }
+
+    // Атрибуты совпадают — можно объединять
+    var kids = Array.prototype.slice.call(node.childNodes);
+    for (var i = 0; i < kids.length; i++) {
+        prev.appendChild(kids[i]);
+    }
+    node.parentNode.removeChild(node);
+    return prev;
+}
+
+
+/**
  * Стандартный обработчик добавления тега, срабатывающий, если не установлен
  * сторонний (через `_process`).
  */
@@ -337,14 +401,12 @@ HTMLSanitizer.prototype.processElement = function(node, copyAttrs) {
     // Проверяем, что этот тег можно вкладывать
     if (copyAttrs._nonested) {
         var nonested = copyAttrs._nonested === true ? [node.tagName.toLowerCase()] : copyAttrs._nonested;
-        for (var i = 0; i < nonested.length; i++) {
-            if (this.stackNames.indexOf(nonested[i]) >= 0) {
-                // Вкладывать нельзя, обрабатываем потомков и всё
-                if (!copyAttrs._nokids) {
-                    this.push(Array.prototype.slice.call(node.childNodes), null);
-                }
-                return;
+        if (this.isTagInStack(nonested)) {
+            // Вкладывать нельзя, обрабатываем потомков и всё
+            if (!copyAttrs._nokids) {
+                this.push(Array.prototype.slice.call(node.childNodes), null);
             }
+            return;
         }
         // Попали сюда — значит вкладывать можно, продолжаем дальше
     }
@@ -359,6 +421,16 @@ HTMLSanitizer.prototype.processElement = function(node, copyAttrs) {
 
     // Запихиваем в результат
     this.current.appendChild(cleanNode);
+
+    // Пробуем объединить с предыдущим тегом
+    // (FIXME: это не очень оптимально, лучше объединять без создания реального
+    // DOM-элемента, но для этого нужно весь код рефакторить)
+    if (copyAttrs._merge) {
+        var merged = this.merge(cleanNode);
+        if (merged !== null) {
+            cleanNode = merged;
+        }
+    }
 
     // Копируем все внутренности
     // push сделает this.setNewlines(0) сам

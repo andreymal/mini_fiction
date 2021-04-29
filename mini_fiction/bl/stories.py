@@ -25,6 +25,7 @@ from mini_fiction.utils.misc import normalize_text_for_search_index, normalize_t
 from mini_fiction.utils import diff as utils_diff
 from mini_fiction.validation import Validator, ValidationError
 from mini_fiction.validation.stories import STORY
+from mini_fiction.validation.chapters import CHAPTER
 from mini_fiction.filters import filter_html
 from mini_fiction.filters.base import html_doc_to_string
 from mini_fiction.filters.html import footnotes_to_html
@@ -1623,7 +1624,6 @@ class ChapterBL(BaseBL):
 
     def create(self, story, editor, data):
         from mini_fiction.models import Chapter
-        from mini_fiction.validation.utils import safe_string_coerce, safe_string_multiline_coerce
 
         if not editor.is_staff:
             try:
@@ -1637,16 +1637,14 @@ class ChapterBL(BaseBL):
                 raise
 
         new_order = orm.select(orm.max(x.order) for x in Chapter if x.story == story).first()
-
-        text = safe_string_multiline_coerce(data['text']).strip()
-        assert '\r' not in text
+        data = Validator(CHAPTER).validated(data)
 
         chapter = self.model(
             story=story,
-            title=safe_string_coerce(data['title']).strip(),
-            notes=safe_string_multiline_coerce(data['notes']).strip(),
-            text=text,
-            text_md5=md5(text.encode('utf-8')).hexdigest(),
+            title=data['title'],
+            notes=data['notes'],
+            text=data['text'],
+            text_md5=md5(data['text'].encode('utf-8')).hexdigest(),
             draft=True,
             story_published=story.published,
         )
@@ -1689,17 +1687,7 @@ class ChapterBL(BaseBL):
         return sl
 
     def update(self, editor, data):
-        from mini_fiction.validation.utils import safe_string_coerce, safe_string_multiline_coerce
-
-        # TODO: move validation to Cerberus
-        data = dict(data)
-        if 'title' in data:
-            data['title'] = safe_string_coerce(data['title']).strip()
-        if 'notes' in data:
-            data['notes'] = safe_string_multiline_coerce(data['notes']).strip()
-        if 'text' in data:
-            data['text'] = safe_string_multiline_coerce(data['text']).strip()
-            assert '\r' not in data['text']
+        data = Validator(CHAPTER).validated(data, update=True)
 
         chapter = self.model
         edited_data = {}

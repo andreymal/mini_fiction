@@ -9,10 +9,12 @@ from flask_login import current_user, login_required
 from flask_babel import gettext
 from pony.orm import db_session
 
-from mini_fiction.forms.chapter import ChapterForm
 from mini_fiction.models import Story, Chapter
 from mini_fiction.utils.misc import diff2html, words_count
 from mini_fiction.linters import create_chapter_linter
+from mini_fiction.validation import Validator, ValidationError
+from mini_fiction.validation.chapters import CHAPTER_FORM
+
 from .story import get_story
 
 bp = Blueprint('chapter', __name__)
@@ -125,11 +127,19 @@ def add(story_id):
     if not story.bl.editable_by(user):
         abort(403)
 
-    not_saved = False
-
     preview_data = {'preview_title': None, 'preview_html': None, 'notes_preview_html': None}
 
-    form = ChapterForm()
+    form = {
+        'saved': False,
+        'not_saved': False,
+        'data': {
+            'title': request.form.get('title') or '',
+            'notes': request.form.get('notes') or '',
+            'text': request.form.get('text') or '',
+            'publication_status': request.form.get('publication_status') or 'publish',
+        },
+        'errors': {},
+    }
 
     if request.form.get('act') in ('preview', 'preview_selected'):
         preview_data = _gen_preview(request.form, only_selected=request.form.get('act') == 'preview_selected')
@@ -145,49 +155,51 @@ def add(story_id):
                 )
             )
 
-    elif form.validate_on_submit():
-        chapter = Chapter.bl.create(
-            story=story,
-            editor=user,
-            data={
-                'title': form.title.data,
-                'notes': form.notes.data,
-                'text': form.text.data,
-            },
-        )
-        _update_publication_status(chapter, user, request.form)
-
-        redir_url = url_for('chapter.edit', pk=chapter.id)
-
-        # Запускаем поиск распространённых ошибок в тексте главы
-        linter = create_chapter_linter(chapter.text)
-        error_codes = set(linter.lint() if linter else [])
-
-        # Те ошибки, которые пользователь просил не показывать, не показываем
-        error_codes = error_codes - set(user.bl.get_extra('hidden_chapter_linter_errors') or [])
-
-        if error_codes:
-            redir_url += '?lint={}'.format(_encode_linter_codes(error_codes))
-        result = redirect(redir_url)
-        result.set_cookie('formsaving_clear', 'chapter', max_age=None)
-        return result
-
     elif request.method == 'POST':
-        not_saved = True
+        try:
+            data = Validator(CHAPTER_FORM).validated(form['data'].copy())
+            chapter = Chapter.bl.create(
+                story=story,
+                editor=user,
+                data={
+                    'title': data['title'],
+                    'notes': data['notes'],
+                    'text': data['text'],
+                },
+            )
 
-    data = {
+        except ValidationError as exc:
+            form['errors'] = exc.errors
+            form['not_saved'] = True
+
+        else:
+            _update_publication_status(chapter, user, data)
+
+            redir_url = url_for('chapter.edit', pk=chapter.id)
+
+            # Запускаем поиск распространённых ошибок в тексте главы
+            linter = create_chapter_linter(chapter.text)
+            error_codes = set(linter.lint() if linter else [])
+
+            # Те ошибки, которые пользователь просил не показывать, не показываем
+            error_codes = error_codes - set(user.bl.get_extra('hidden_chapter_linter_errors') or [])
+
+            if error_codes:
+                redir_url += '?lint={}'.format(_encode_linter_codes(error_codes))
+            result = redirect(redir_url)
+            result.set_cookie('formsaving_clear', 'chapter', max_age=None)
+            return result
+
+    ctx = {
         'page_title': 'Добавление новой главы',
         'story': story,
         'chapter': None,
         'form': form,
-        'publication_status': 'publish',
-        'saved': False,
-        'not_saved': not_saved,
         'unpublished_chapters_count': Chapter.select(lambda x: x.story == story and x.draft).count(),
     }
-    data.update(preview_data)
+    ctx.update(preview_data)
 
-    return render_template('chapter_work.html', **data)
+    return render_template('chapter_work.html', **ctx)
 
 
 @bp.route('/chapter/<int:pk>/edit/', methods=('GET', 'POST'))
@@ -220,20 +232,22 @@ def edit(pk):
             return redirect(redir_url)
         lint_ok = linter is not None
 
-    chapter_data = {
-        'title': chapter.title,
-        'notes': chapter.notes,
-        'text': chapter.text,
-    }
-
-    saved = False
-    not_saved = False
     older_text = None
     chapter_text_diff = []
 
     preview_data = {'preview_title': None, 'preview_html': None, 'notes_preview_html': None}
 
-    form = ChapterForm(data=chapter_data)
+    form = {
+        'saved': False,
+        'not_saved': False,
+        'data': {
+            'title': request.form.get('title', chapter.title),
+            'notes': request.form.get('notes', chapter.notes),
+            'text': request.form.get('text', chapter.text),
+            'publication_status': request.form.get('publication_status', 'publish'),
+        },
+        'errors': {},
+    }
 
     if request.form.get('act') in ('preview', 'preview_selected'):
         preview_data = _gen_preview(request.form, only_selected=request.form.get('act') == 'preview_selected')
@@ -249,30 +263,37 @@ def edit(pk):
                 )
             )
 
-    elif form.validate_on_submit():
-        if request.form.get('older_md5'):
-            older_text, chapter_text_diff = chapter.bl.get_diff_from_older_version(request.form['older_md5'])
-        if not chapter_text_diff:
-            chapter.bl.update(
-                editor=user,
-                data={
-                    'title': form.title.data,
-                    'notes': form.notes.data,
-                    'text': form.text.data,
-                }
-            )
-            _update_publication_status(chapter, user, request.form)
-
-            saved = True
-        else:
-            form.text.errors.append(
-                'Пока вы редактировали главу, её отредактировал кто-то другой. Ниже представлен '
-                'список изменений, которые вы пропустили. Перенесите их в свой текст и сохраните '
-                'главу ещё раз.'
-            )
-            not_saved = True
     elif request.method == 'POST':
-        not_saved = True
+
+        try:
+            data = Validator(CHAPTER_FORM).validated(form['data'].copy())
+        except ValidationError as exc:
+            form['errors'] = exc.errors
+
+        if not form['errors'] and request.form.get('older_md5'):
+            older_text, chapter_text_diff = chapter.bl.get_diff_from_older_version(request.form['older_md5'])
+
+            if chapter_text_diff:
+                form['errors']['text'] = [
+                    'Пока вы редактировали главу, её отредактировал кто-то другой. Ниже представлен '
+                    'список изменений, которые вы пропустили. Перенесите их в свой текст и сохраните '
+                    'главу ещё раз.'
+                ]
+
+        if not form['errors']:
+            try:
+                chapter.bl.update(
+                    editor=user,
+                    data=data,
+                )
+            except ValidationError as exc:
+                form['errors'] = exc.errors
+
+        if not form['errors']:
+            _update_publication_status(chapter, user, data)
+            form['saved'] = True
+        else:
+            form['not_saved'] = True
 
     # Если мы дошли сюда, значит рисуем форму редактирования главы.
     # В параметре lint могли запросить описание ошибок линтера,
@@ -310,15 +331,14 @@ def edit(pk):
     if unpublished_chapters_count == 0 and publication_status == 'publish_all':
         publication_status = 'publish'
 
-    data = {
+    form['data']['publication_status'] = publication_status
+
+    ctx = {
         'page_title': 'Редактирование главы «%s»' % chapter.autotitle,
         'story': chapter.story,
         'chapter': chapter,
         'form': form,
-        'publication_status': publication_status,
         'edit': True,
-        'saved': saved,
-        'not_saved': not_saved,
         'chapter_text_diff': chapter_text_diff,
         'diff_html': diff2html(older_text, chapter_text_diff) if chapter_text_diff else None,
         'unpublished_chapters_count': unpublished_chapters_count,
@@ -326,10 +346,10 @@ def edit(pk):
         'lint_ok': lint_ok,
         'linter_allow_hide': linter_allow_hide,
     }
-    data.update(preview_data)
+    ctx.update(preview_data)
 
-    result = current_app.make_response(render_template('chapter_work.html', **data))
-    if saved:
+    result = current_app.make_response(render_template('chapter_work.html', **ctx))
+    if form['saved']:
         result.set_cookie('formsaving_clear', 'chapter', max_age=None)
     return result
 

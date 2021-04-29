@@ -14,48 +14,74 @@
         {%- else -%}
             <h1>{{ page_title }}</h1>
         {%- endif %}
-        <form method="POST" enctype="multipart/form-data" name="search" id="searchform" class="form-horizontal">
+        <form method="POST" enctype="multipart/form-data" name="search" id="chapter-form" class="form-horizontal">
             <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
             <input type="hidden" name="older_md5" value="{{ chapter.text_md5 }}" />
-            {% if saved %}<div class="alert-mini green">Изменения сохранены</div><br/>{% endif %}
-            {% if not_saved %}<div class="alert-mini alert-error">Изменения не сохранены, проверьте форму</div><br/>{% endif %}
+
+            {% if form.saved %}<div class="alert-mini green">Изменения сохранены</div><br/>{% endif %}
+            {% if form.not_saved %}<div class="alert-mini alert-error">Изменения не сохранены, проверьте форму</div><br/>{% endif %}
+
             <fieldset>
-                <!-- Название -->
-                <div class="control-group{% if form.title.errors %} error{% endif %}">
-                    {{ form.title.label(class_='control-label') }}
-                    <div class="controls">{{ form.title }}
-                        {% if form.title.errors %}
-                            {% for error in form.title.errors %}
+                <div class="control-group{% if form.errors.title %} error{% endif %}">
+                    <label class="control-label" for="id_title">{{ pgettext('chapter_edit', 'Name') }}</label>
+                    <div class="controls">
+                        <input
+                            type="text"
+                            name="title"
+                            id="id_title"
+                            maxlength="512"
+                            class="input-xxxlarge js-form-saving"
+                            data-formgroup="chapter"
+                            data-formsaving="chapter_title"
+                            placeholder="{{ _('Chapter title (optional)') }}"
+                            value="{{form.data.title }}" />
+
+                        {% if form.errors.title %}
+                            {% for error in form.errors.title %}
                             <span class="help-inline">{{ error }}</span>
                             {% endfor %}
-                        {% else %}
-                            <span class="help-inline small">{{ form.title.description }}</span>
                         {% endif %}
                       </div>
                 </div>
-                <!-- Заметки к главе -->
-                <div class="control-group{% if form.notes.errors %} error{% endif %}">
-                    {{ form.notes.label(class_='control-label', for='id_text') }}
-                    <div class="controls">{{ form.notes }}
-                        {% if form.notes.errors %}
-                            {% for error in form.notes.errors %}
+
+                <div class="control-group{% if form.errors.notes %} error{% endif %}">
+                    <label class="control-label" for="id_notes">{{ pgettext('chapter_edit', 'Notes') }}</label>
+                    <div class="controls">
+                        <textarea
+                            name="notes"
+                            id="id_notes"
+                            cols="40" rows="4"
+                            maxlength="4096"
+                            class="input-xxxlarge chapter-textarea with-markitup js-form-saving"
+                            data-formgroup="chapter"
+                            data-formsaving="chapter_notes"
+                            placeholder="{{ _('Chapter notes') }}">{{ form.data.notes }}</textarea>
+
+                        {% if form.errors.notes %}
+                            {% for error in form.errors.notes %}
                             <span class="help-inline">{{ error }}</span>
                             {% endfor %}
                         {% else %}
-                            <span class="help-inline small">{{ form.notes.description }}</span>
+                            <span class="help-inline small">{{ _("Author's notes for chapter") }}</span>
                         {% endif %}
                       </div>
                 </div>
-                <!-- Текст главы -->
-                <div class="control-group{% if form.text.errors %} error{% endif %}">
-                    {{ form.text.label(class_='control-label', for='id_text') }}
-                    <div class="controls">{{ form.text }}
-                        {% if form.text.errors %}
-                            {% for error in form.text.errors %}
+
+                <div class="control-group{% if form.errors.text %} error{% endif %}">
+                    <label class="control-label" for="id_text">{{ pgettext('chapter_edit', 'Chapter text') }}</label>
+                    <div class="controls">
+                        <textarea
+                            name="text"
+                            id="id_text"
+                            cols="40" rows="10"
+                            maxlength="1000000"
+                            class="input-xxxlarge chapter-textarea with-markitup js-form-saving"
+                            data-formgroup="chapter"
+                            data-formsaving="chapter_text">{{ form.data.text }}</textarea>
+                        {% if form.errors.text %}
+                            {% for error in form.errors.text %}
                             <span class="help-inline">{{ error }}</span>
                             {% endfor %}
-                        {% else %}
-                            <!--<span class="help-inline small">-->{{ form.text.description }}<!--</span>-->
                         {% endif %}
                         {% if diff_html %}
                             <pre class="editlog-chapter-diff">{{ diff_html|safe }}</pre>
@@ -67,7 +93,7 @@
                     <label class="control-label">{{ pgettext('chapter_edit', 'Publication') }}</label>
                     <div class="controls">
                         <label class="radio">
-                            <input type="radio" name="publication_status" value="publish"{% if publication_status == 'publish' %} checked{% endif %} />
+                            <input type="radio" name="publication_status" value="publish"{% if form.data.publication_status == 'publish' %} checked{% endif %} />
                             {% if not edit or chapter.draft %}
                                 {{- pgettext('chapter_edit', 'Publish chapter now') -}}
                             {% else %}
@@ -77,13 +103,13 @@
 
                         {% if unpublished_chapters_count > 0 %}
                         <label class="radio">
-                            <input type="radio" name="publication_status" value="publish_all"{% if publication_status == 'publish_all' %} checked{% endif %} />
+                            <input type="radio" name="publication_status" value="publish_all"{% if form.data.publication_status == 'publish_all' %} checked{% endif %} />
                             {{ ngettext('Publish this and other %(num)s chapter', 'Publish this and other %(num)s chapters', unpublished_chapters_count) }}
                         </label>
                         {% endif %}
 
                         <label class="radio">
-                            <input type="radio" name="publication_status" value="draft"{% if publication_status == 'draft' %} checked{% endif %} />
+                            <input type="radio" name="publication_status" value="draft"{% if form.data.publication_status == 'draft' %} checked{% endif %} />
                             {% if not edit %}
                                 {{- pgettext('chapter_edit', 'Save chapter to drafts') -}}
                             {% elif not chapter.draft %}

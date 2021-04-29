@@ -84,7 +84,7 @@
     {% endif %}
 
     {{ nav_item(
-        'Справка',
+        pgettext('help_page', 'Help'),
         url_for('staticpages.index', name='help'),
         matched=is_current_endpoint('staticpages.index', name='help')
     ) }}

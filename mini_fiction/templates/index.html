@@ -15,15 +15,15 @@
     {% if site_description -%}
         <meta name="description" content="{{ site_description }}" />
     {%- endif -%}
-    <link rel="alternate" type="application/rss+xml" title="Новые рассказы &mdash; {{ SITE_NAME }}" href="{{ url_for('feeds.stories') }}" />
+    <link rel="alternate" type="application/rss+xml" title="{{ _('New stories') }} &mdash; {{ SITE_NAME }}" href="{{ url_for('feeds.stories') }}" />
 {% endblock %}
 
 {% block content %}
 <div class="row welcome-box">
   <div class="span12 genra">
     <ul class="mininav">
-        <li class="mininav-item"><a href="{{ url_for('object_lists.top') }}">Лучшее</a></li>
-        <li class="mininav-item"><a href="{{ url_for('tags.index') }}">Теги</a></li>
+        <li class="mininav-item"><a href="{{ url_for('object_lists.top') }}">{{ pgettext('best_stories', 'Best') }}</a></li>
+        <li class="mininav-item"><a href="{{ url_for('tags.index') }}">{{ _('Tags') }}</a></li>
         {% if current_user.is_staff -%}
             <li class="mininav-item"><a href="{{ url_for('editlog.index', all='1', staff='1') }}">{{ _('Moderation log') }}</a></li>
         {% elif current_user.is_authenticated -%}
@@ -36,7 +36,7 @@
 
 <div class="row">
     <div class="span8 top-list">
-        <h2>Новые рассказы</h2>
+        <h2>{{ _('New stories') }}</h2>
         {% include "includes/stories.html" %}
         {% if stories %}{{ paginator(page_obj) }}{% endif %}
     </div>

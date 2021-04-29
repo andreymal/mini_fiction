@@ -3,7 +3,7 @@
 {% block content %}
 <div class="row">
     <div class="span12">
-        {{- breadcrumbs([[url_for('author.info'), 'Кабинет автора']]) }}
+        {{- breadcrumbs([[url_for('author.info'), _("Author's cabinet")]]) }}
     </div>
 
     <div class="span12"{% if not story_add %} id="story_{{ story.id }}"{% endif %}>
@@ -12,19 +12,19 @@
 
         <ul class="nav nav-pills nav-simple">
             <li{% if story_tab == 'general' %} class="active"{% endif %}>
-                <a href="{{ url_for('story.edit', pk=story.id) }}">Основное</a>
+                <a href="{{ url_for('story.edit', pk=story.id) }}">{{ pgettext('story_edit_tab', 'General') }}</a>
             </li>
             <li{% if story_tab == 'chapters' %} class="active"{% endif %}>
-                <a href="{{ url_for('story.edit_chapters', pk=story.id) }}">Главы</a>
+                <a href="{{ url_for('story.edit_chapters', pk=story.id) }}">{{ pgettext('story_edit_tab', 'Chapters') }}</a>
             </li>
             {% if story.bl.can_edit_contributors(current_user) -%}
                 <li{% if story_tab == 'contributors' %} class="active"{% endif %}>
-                    <a href="{{ url_for('story.edit_contributors', pk=story.id) }}">Авторы и доступ</a>
+                    <a href="{{ url_for('story.edit_contributors', pk=story.id) }}">{{ pgettext('story_edit_tab', 'Authors and access') }}</a>
                 </li>
             {% endif -%}
             {% if current_user.is_staff -%}
                 <li{% if story_tab == 'staff' %} class="active"{% endif %}>
-                    <a href="{{ url_for('story.edit_staff', pk=story.id) }}">Администрирование</a>
+                    <a href="{{ url_for('story.edit_staff', pk=story.id) }}">{{ pgettext('story_edit_tab', 'Administration') }}</a>
                 </li>
             {% endif -%}
         </ul>
@@ -34,7 +34,7 @@
     {% block story_edit_content %}{% endblock %}
 
     <div class="span12">
-        {{- breadcrumbs([[url_for('author.info'), 'Кабинет автора']]) }}
+        {{- breadcrumbs([[url_for('author.info'), _("Author's cabinet")]]) }}
     </div>
 </div>
 {% endblock %}

@@ -4,7 +4,7 @@
 <div class="row">
     <div class="span12">
         {{- breadcrumbs([
-            [url_for('author.info'), 'Кабинет автора'],
+            [url_for('author.info'), _("Author's cabinet")],
             [url_for('story.edit_chapters', pk=(story or chapter.story).id), 'Редактирование глав «{}»'.format((story or chapter.story).title)]
         ]) }}
     </div>
@@ -18,8 +18,8 @@
             <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
             <input type="hidden" name="older_md5" value="{{ chapter.text_md5 }}" />
 
-            {% if form.saved %}<div class="alert-mini green">Изменения сохранены</div><br/>{% endif %}
-            {% if form.not_saved %}<div class="alert-mini alert-error">Изменения не сохранены, проверьте форму</div><br/>{% endif %}
+            {% if form.saved %}<div class="alert-mini green">{{ _('Saved!') }}</div><br/>{% endif %}
+            {% if form.not_saved %}<div class="alert-mini alert-error">{{ _('Changes are not saved, check the form') }}</div><br/>{% endif %}
 
             <fieldset>
                 <div class="control-group{% if form.errors.title %} error{% endif %}">
@@ -148,7 +148,7 @@
 
     <div class="span12">
         {{- breadcrumbs([
-            [url_for('author.info'), 'Кабинет автора'],
+            [url_for('author.info'), _("Author's cabinet")],
             [url_for('story.edit_chapters', pk=(story or chapter.story).id), 'Редактирование глав «{}»'.format((story or chapter.story).title)]
         ]) }}
     </div>

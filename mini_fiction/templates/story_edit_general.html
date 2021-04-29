@@ -3,8 +3,8 @@
 
 <div class="span12">
 
-    {% if saved %}<div class="alert-mini green">Изменения сохранены</div>{% endif %}
-    {% if not_saved %}<div class="alert-mini alert-error">Изменения не сохранены, проверьте форму</div>{% endif %}
+    {% if saved %}<div class="alert-mini green">{{ _('Saved!') }}</div>{% endif %}
+    {% if not_saved %}<div class="alert-mini alert-error">{{ _('Changes are not saved, check the form') }}</div>{% endif %}
 
     <form method="POST" enctype="multipart/form-data" class="form-horizontal">
         <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
@@ -30,7 +30,7 @@
                 </div>
 
             <div class="form-actions">
-                <button type="submit" class="btn btn-primary" name="act" value="save_story">Сохранить рассказ</button>
+                <button type="submit" class="btn btn-primary" name="act" value="save_story">{{ _('Save story') }}</button>
             </div>
 
           </fieldset>

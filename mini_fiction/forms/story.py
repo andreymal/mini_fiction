@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
+from flask_babel import lazy_gettext, lazy_pgettext
 from wtforms import SelectField, TextField, TextAreaField, BooleanField
 from pony import orm
 
@@ -8,6 +9,9 @@ from mini_fiction.models import Category, Character, Rating, Classifier
 from mini_fiction.forms.fields import LazySelectField, LazySelectMultipleField, GroupedModelChoiceField
 from mini_fiction.widgets import StoriesCharacterSelect, StoriesCheckboxSelect, StoriesCategorySelect, StoriesButtons, TagsInput
 from mini_fiction.forms.form import Form
+
+
+pgettext = lazy_pgettext  # avoid pybabel extract problem
 
 
 class StoryForm(Form):
@@ -35,8 +39,8 @@ class StoryForm(Form):
     }
 
     title = TextField(
-        'Название',
-        render_kw=dict(attrs_dict, maxlength=512, placeholder='Заголовок нового рассказа')
+        lazy_gettext('Name'),
+        render_kw=dict(attrs_dict, maxlength=512, placeholder=lazy_gettext('Title of the new story'))
     )
 
     # categories = LazySelectMultipleField(
@@ -49,14 +53,17 @@ class StoryForm(Form):
     # )
 
     tags = TextField(
-        'Теги',
-        render_kw=dict(attrs_tags_dict, maxlength=512, placeholder='Теги разделяются запятой, например: Флафф, Повседневность, Зарисовка'),
-        description='Перечислите жанры и основные события рассказа. Вы можете создать новые теги, если существующих не хватает',
+        lazy_gettext('Tags'),
+        render_kw=dict(attrs_tags_dict, maxlength=512, placeholder=lazy_gettext('Tags are separated by commas, for example: Fluff, Daily, Sketch')),
+        description=lazy_gettext(
+            'List genres and main events of the story. You can create '
+            'new tags if there are not enough existing ones'
+        ),
         widget=TagsInput(),
     )
 
     characters = GroupedModelChoiceField(
-        'Персонажи',
+        lazy_gettext('Characters'),
         [],
         choices=lambda: list(Character.select().prefetch(Character.group).order_by(Character.group, Character.id)),
         choices_attrs=('id', 'name'),
@@ -64,37 +71,40 @@ class StoryForm(Form):
         group_by_field='group',
         render_kw=img_attrs,
         widget=StoriesCharacterSelect(multiple=True),
-        description='Следует выбрать персонажей, находящихся в гуще событий, а не всех упомянутых в произведении.',
+        description=lazy_gettext(
+            'You should choose characters who are in the thick of things, '
+            'not all those mentioned in the story.'
+        ),
     )
 
     summary = TextAreaField(
-        'Краткое описание рассказа',
-        render_kw=dict(attrs_dict, cols=40, rows=10, maxlength=4096, placeholder='Обязательное краткое описание рассказа'),
+        lazy_gettext('Short story description'),
+        render_kw=dict(attrs_dict, cols=40, rows=10, maxlength=4096, placeholder=lazy_gettext('Required short story description')),
     )
 
     notes = TextAreaField(
-        'Заметки',
-        render_kw=dict(attrs_markitup_dict, id='id_notes', cols=40, rows=10, maxlength=4096, placeholder='Заметки к рассказу'),
+        lazy_gettext('Notes'),
+        render_kw=dict(attrs_markitup_dict, id='id_notes', cols=40, rows=10, maxlength=4096, placeholder=lazy_gettext('Notes to the story')),
     )
 
     original_url = TextField(
-        'Ссылка на оригинал (если есть)',
+        lazy_gettext('Link to original (if any)'),
         render_kw=dict(attrs_dict, maxlength=255, placeholder='http://'),
-        description='Не забудьте указать, если вы не являетесь непосредственным автором произведения'
+        description=lazy_gettext("Don't forget to add it if you are not a direct author of the story"),
     )
 
     original_title = TextField(
-        'Название рассказа в оригинале',
+        lazy_gettext('Original title'),
         render_kw=dict(attrs_dict, maxlength=255),
     )
 
     original_author = TextField(
-        'Автор оригинала',
+        lazy_gettext('Original author'),
         render_kw=dict(attrs_dict, maxlength=255),
     )
 
     rating = LazySelectField(
-        'Рейтинг',
+        pgettext('story_info', 'Rating'),
         choices=lambda: list(orm.select((x.id, x.name) for x in Rating).order_by(-1)),
         coerce=int,
         widget=StoriesButtons(),
@@ -102,20 +112,27 @@ class StoryForm(Form):
     )
 
     original = SelectField(
-        'Происхождение',
-        choices=[(1, 'Оригинал'), (0, 'Перевод')],
+        pgettext('story_info', 'Origin'),
+        choices=[
+            (1, pgettext('story_origin', 'Original')),
+            (0, pgettext('story_origin', 'Translation')),
+        ],
         coerce=int,
         widget=StoriesButtons(),
         render_kw=radio_attrs,
     )
 
     status = SelectField(
-        'Состояние',
-        choices=[(0, 'Не завершен'), (1, 'Завершен'), (2, 'Заморожен')],
+        pgettext('story_info', 'Status'),
+        choices=[
+            (0, pgettext('story_info', 'Incomplete')),
+            (1, pgettext('story_info', 'Complete')),
+            (2, pgettext('story_info', 'Freezed')),
+        ],
         coerce=int,
         widget=StoriesButtons(),
         render_kw=radio_attrs,
-        description='Активность рассказа (пишется ли он сейчас)'
+        description=lazy_gettext('Activity of the story (is it being written now)'),
     )
 
     # classifications = LazySelectMultipleField(

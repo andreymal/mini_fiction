@@ -713,12 +713,12 @@ common.allowedTags.b = function(node) {
 
     if (cont) {
         this.current.appendChild(cont);
-    }
 
-    // Если сосед слева тоже strong, то объединяем
-    var merged = this.merge(cont);
-    if (merged !== null) {
-        cont = merged;
+        // Если сосед слева тоже strong, то объединяем
+        var merged = this.merge(cont);
+        if (merged !== null) {
+            cont = merged;
+        }
     }
 
     this.push(Array.prototype.slice.call(node.childNodes), cont);

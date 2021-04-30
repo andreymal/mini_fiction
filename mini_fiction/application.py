@@ -8,10 +8,8 @@ import re
 import sys
 import logging
 import importlib
-from collections import namedtuple
 from datetime import datetime
 from logging.handlers import SMTPHandler
-from pathlib import Path
 
 import jinja2
 import cachelib
@@ -33,6 +31,7 @@ from pony.flask import Pony
 from mini_fiction import models  # pylint: disable=unused-import
 from mini_fiction import database, tasks, context_processors, ratelimit
 from mini_fiction.bl import init_bl
+from mini_fiction.utils import frontend
 
 
 __all__ = ['create_app']
@@ -580,28 +579,8 @@ def configure_development(app):
 
 
 def configure_frontend(app: Flask):
-    Asset = namedtuple('Asset', ['src', 'integrity'])
-    default = Asset('', '')
-
-    try:
-        with Path(app.config['FRONTEND_MANIFEST_PATH']).open() as f:
-            manifest = {k: Asset(**v) for k, v in flask_json.load(f).items()}
-    except IOError as _:
-        if app.config['TESTING']:
-            app.logger.warn((
-                'In test environments frontend manifest is '
-                'intentionally skipped'
-            ))
-            manifest = {}
-        else:
-            app.logger.error((
-                'Unable to read frontend manifest; '
-                'did you install mini_fiction package via make install/develop?'
-            ))
-            exit(1)
-
     app.add_template_global(
-        lambda n: manifest.get(n, default),
+        frontend.webpack_asset,
         name='webpack_asset'
     )
 

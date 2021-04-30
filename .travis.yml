@@ -29,6 +29,7 @@ install:
   - make babel-compile
   - cd mini_fiction/frontend && npm install && cd ../..
   - make frontend-build
+  - ln -s ../frontend/build mini_fiction/static/build
 
 env:
   - PYTHONPATH=. MINIFICTION_SETTINGS=mini_fiction.settings.Test

@@ -1084,6 +1084,18 @@ h1 .alert {
     text-decoration: none;
 }
 
+.chapter-text > hr {
+    border: none !important;
+    font-size: larger;
+    font-weight: bold;
+    color: #333;
+    text-align: center;
+}
+
+.chapter-text > hr::after {
+    content: "* * *";
+}
+
 hr {
     border-top: 1px solid #aaa;
     border-bottom: 1px solid #ddd;

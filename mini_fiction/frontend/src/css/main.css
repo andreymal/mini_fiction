@@ -1101,6 +1101,12 @@ hr {
     border-bottom: 1px solid #ddd;
 }
 
+.chapter-text .footnote:first-of-type {
+    margin-top: 1rem;
+    border-top: 2px groove #ddd;
+    padding-top: 1rem;
+}
+
 .spoiler-gray {
     background-color: #ccc;
     color: #ccc;

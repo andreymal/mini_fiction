@@ -1090,6 +1090,7 @@ h1 .alert {
     font-weight: bold;
     color: #333;
     text-align: center;
+    text-align-last: center;
 }
 
 .chapter-text > hr::after {

@@ -121,6 +121,17 @@
                     </div>
                 </div>
 
+                {% if edit and current_user.is_staff -%}
+                    <div class="control-group">
+                        <div class="controls">
+                            <label class="checkbox">
+                                <input type="checkbox" name="minor" value="y"{% if form.data.minor %} checked{% endif %} />
+                                Малое изменение (не обновлять дату последнего изменения рассказа и главы)
+                            </label>
+                        </div>
+                    </div>
+                {%- endif %}
+
                 <div class="form-actions notop">
                 {%- if not edit %}
                     <button type="submit" name="act" value="publish" class="btn btn-primary">{{ _('Add') }}</button>

@@ -245,6 +245,7 @@ def edit(pk):
             'notes': request.form.get('notes', chapter.notes),
             'text': request.form.get('text', chapter.text),
             'publication_status': request.form.get('publication_status', 'publish'),
+            'minor': request.form.get('minor', '') == 'y',
         },
         'errors': {},
     }
@@ -281,10 +282,12 @@ def edit(pk):
                 ]
 
         if not form['errors']:
+            minor = data.pop('minor')
             try:
                 chapter.bl.update(
                     editor=user,
                     data=data,
+                    minor=minor,
                 )
             except ValidationError as exc:
                 form['errors'] = exc.errors

@@ -1686,7 +1686,10 @@ class ChapterBL(BaseBL):
 
         return sl
 
-    def update(self, editor, data):
+    def update(self, editor, data, minor=False):
+        if minor and (not editor or not editor.is_staff):
+            minor = False
+
         data = Validator(CHAPTER).validated(data, update=True)
 
         chapter = self.model
@@ -1721,8 +1724,9 @@ class ChapterBL(BaseBL):
             self.update_words_count(chapter)
 
         if edited_data or chapter_text_diff:
-            chapter.updated = datetime.utcnow()
-            chapter.story.updated = datetime.utcnow()
+            if not minor:
+                chapter.updated = datetime.utcnow()
+                chapter.story.updated = datetime.utcnow()
             chapter.bl.edit_log(editor, 'edit', edited_data, chapter_text_diff=chapter_text_diff, text_md5=chapter.text_md5)
 
         later(current_app.tasks['sphinx_update_chapter'].delay, chapter.id)

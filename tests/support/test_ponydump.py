@@ -58,7 +58,7 @@ class Many2(testdb.Entity):
     many1 = orm.Set(Many1)
 
 
-@pytest.yield_fixture(scope="function")
+@pytest.fixture(scope="function")
 def use_testdb():
     global testdb_started
     if not testdb_started:
@@ -82,7 +82,7 @@ def use_testdb():
             testdb.disconnect()
 
 
-@pytest.yield_fixture(scope="function")
+@pytest.fixture(scope="function")
 def dumpdir(app):
     path1 = os.path.join(app.config['TESTING_DIRECTORY'], 'dumpfoo')
     assert not os.path.exists(path1)

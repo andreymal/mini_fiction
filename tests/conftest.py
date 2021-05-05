@@ -16,7 +16,7 @@ from mini_fiction.application import create_app
 flask_app = None
 
 
-@pytest.yield_fixture(scope="session", autouse=True)
+@pytest.fixture(scope="session", autouse=True)
 def app():
     global flask_app
     os.environ.setdefault('FLASK_ENV', 'test')
@@ -75,7 +75,7 @@ def wait_ajax(selenium):
     return wait
 
 
-@pytest.yield_fixture(scope="function", autouse=True)
+@pytest.fixture(scope="function", autouse=True)
 def database_cleaner(request):
     from mini_fiction.models import AdminLog
 

@@ -16,7 +16,7 @@ import cachelib
 from celery import Celery
 from werkzeug.urls import iri_to_uri
 from werkzeug.utils import import_string
-from werkzeug.contrib.fixers import ProxyFix
+from werkzeug.middleware.proxy_fix import ProxyFix
 from werkzeug.exceptions import HTTPException
 from flask import Flask, current_app, request, g, jsonify
 from flask import json as flask_json
@@ -544,7 +544,11 @@ def configure_misc(app):
 
     # Pass proxies for correct request_addr
     if app.config['PROXIES_COUNT'] > 0:
-        app.wsgi_app = ProxyFix(app.wsgi_app, app.config['PROXIES_COUNT'])
+        app.wsgi_app = ProxyFix(
+            app.wsgi_app,
+            x_for=app.config['PROXIES_COUNT'],
+            x_proto=app.config['PROXIES_COUNT'],
+        )
 
 
 def configure_development(app):

@@ -1084,9 +1084,28 @@ h1 .alert {
     text-decoration: none;
 }
 
+.chapter-text > hr {
+    border: none !important;
+    font-size: larger;
+    font-weight: bold;
+    color: #333;
+    text-align: center;
+    text-align-last: center;
+}
+
+.chapter-text > hr::after {
+    content: "* * *";
+}
+
 hr {
     border-top: 1px solid #aaa;
     border-bottom: 1px solid #ddd;
+}
+
+.chapter-text .footnote:first-of-type {
+    margin-top: 1rem;
+    border-top: 2px groove #ddd;
+    padding-top: 1rem;
 }
 
 .spoiler-gray {

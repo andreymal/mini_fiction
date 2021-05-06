@@ -1,14 +1,14 @@
 <div class="chapter-text chapter-text-block js-story-formatting" id="chapter{{ chapter.id }}">
     {% if chapter.title or chapter.order != 1 -%}
-        <h1>
+        <h2>
             {% if chapter_edit_mode %}<a href="{{ url_for('chapter.view', story_id=story.id, chapter_order=chapter.order) }}">{% endif %}{{ chapter.autotitle }}{% if chapter_edit_mode %}</a>{% endif %}
             {% if chapter.draft %}<sup class="story-mark draft">{{ pgettext('story_mark', 'draft') }}</sup>{% endif %}
             {% if not chapter_edit_mode and story.bl.editable_by(current_user) %}
                 <a class="btn btn-warning btn-mini" href="{{ url_for('chapter.edit', pk=chapter.id) }}">{{ _('Edit chapter') }}</a>
             {% endif %}
-        </h1>
+        </h2>
     {%- elif not chapter_edit_mode and story.bl.editable_by(current_user) -%}
-        <h1><a class="btn btn-warning btn-mini" href="{{ url_for('chapter.edit', pk=chapter.id) }}">{{ _('Edit chapter') }}</a></h1>
+        <h2><a class="btn btn-warning btn-mini" href="{{ url_for('chapter.edit', pk=chapter.id) }}">{{ _('Edit chapter') }}</a></h2>
     {%- endif %}
     {%- set notes = chapter.notes_as_html -%}
     {% if notes %}

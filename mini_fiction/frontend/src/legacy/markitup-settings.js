@@ -8,9 +8,7 @@ export default {
         {name: 'Зачеркнуть', className:'edit-strike', key:'S', openWith:'<s>', closeWith:'</s>'},
         {name: 'Подчеркнуть', className:'edit-underline', key:'U', openWith:'<u>', closeWith:'</u>'},
         {separator: '---------------'},
-        {name: 'H3', className:'edit-h3', openWith:'<h3>', closeWith:'</h3>'},
-        {name: 'H4', className:'edit-h4', openWith:'<h4>', closeWith:'</h4>'},
-        {name: 'H5', className:'edit-h5', openWith:'<h5>', closeWith:'</h5>'},
+        {name: 'Подзаголовок', className:'edit-h', openWith:'<h3>', closeWith:'</h3>'},
         {name: 'Разделитель', className:'edit-hr', replaceWith:'<hr>'},
         {separator: '---------------'},
         {name: 'По левому краю', className:'edit-alignment-left', openWith:'<p align="left">', closeWith:'</p>'},
@@ -33,6 +31,7 @@ export default {
         {separator: '---------------'},
         {name: 'Конвертация c фикбука', className:'edit-ficbook', replaceWith: function(markitup) {
             markitup.textarea.value = markitup.textarea.value
+                .replace(/<center>\s*\*+\s*\*+\s*\*+\s*<\/center>/g, '<hr>')
                 .replace(/<center>/g, '<p align="center">')
                 .replace(/<\/center>/g, '</p>')
                 .replace(/<right>/g, '<p align="right">')

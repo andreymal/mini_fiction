@@ -538,10 +538,13 @@ common.allowedTags = {
     i: {_rename: 'em', _nonested: ['i', 'em'], _merge: true},
     cite: {_rename: 'em', _nonested: ['i', 'em'], _merge: true}, // word-specific
     strong: {}, em: {_nonested: ['i', 'em']}, s: {_nonested: true}, u: {_nonested: true},
-    h3: {_nonested: ['h3', 'h4', 'h5']},
-    h4: {_nonested: ['h3', 'h4', 'h5']},
-    h5: {_nonested: ['h3', 'h4', 'h5']},
-    span: {}, hr: {_nocollapse: true, _nokids: true}, // TODO: footnote?
+    h1: {_rename: 'h3', _nonested: ['h3']},
+    h2: {_rename: 'h3', _nonested: ['h3']},
+    h3: {_nonested: ['h3']},
+    h4: {_rename: 'h3', _nonested: ['h3']},
+    h5: {_rename: 'h3', _nonested: ['h3']},
+    h6: {_rename: 'h3', _nonested: ['h3']},
+    hr: {_nocollapse: true, _nokids: true}, // TODO: footnote?
     img: {src: null, alt: null, title: null, _nocollapse: true, _nokids: true},
     ul: {}, ol: {}, li: {_nocollapse: true},
     blockquote: {}, sup: {}, sub: {}, pre: {_nonested: true}, small: {}, tt: {_nonested: true},

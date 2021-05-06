@@ -20,9 +20,6 @@
   & .edit-h5 a {
     background-image: url(../images/markitup/edit-h5.png);
   }
-  & .edit-alignment-left a {
-    background-image: url(../images/markitup/edit-alignment-left.png);
-  }
   & .edit-alignment-center a {
     background-image: url(../images/markitup/edit-alignment-center.png);
   }

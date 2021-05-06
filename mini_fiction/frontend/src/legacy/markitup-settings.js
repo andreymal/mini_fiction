@@ -12,7 +12,6 @@ export default {
         {name: 'H5', className:'edit-h5', openWith:'<h5>', closeWith:'</h5>'},
         {name: 'Разделитель', className:'edit-hr', replaceWith:'<hr>'},
         {separator: '---------------'},
-        {name: 'По левому краю', className:'edit-alignment-left', openWith:'<p align="left">', closeWith:'</p>'},
         {name: 'По центру', className:'edit-alignment-center', openWith:'<p align="center">', closeWith:'</p>'},
         {name: 'По правому краю', className:'edit-alignment-right', openWith:'<p align="right">', closeWith:'</p>'},
         {separator: '---------------'},

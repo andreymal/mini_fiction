@@ -1,5 +1,5 @@
 <div class="chapter-text chapter-text-block">
-    <h1>{% if chapter %}<a href="{{ url_for('chapter.view', story_id=story.id, chapter_order=chapter.order) }}">{% endif %}{{ preview_title }}{% if chapter %}</a>{% endif %} {{ _('(preview)') }}</h1>
+    <h2>{% if chapter %}<a href="{{ url_for('chapter.view', story_id=story.id, chapter_order=chapter.order) }}">{% endif %}{{ preview_title }}{% if chapter %}</a>{% endif %} {{ _('(preview)') }}</h2>
 
     <blockquote><span style="font-size: 0.75em">{{ ngettext("%(num)d word", "%(num)d words", preview_words) }}</span></blockquote>
 

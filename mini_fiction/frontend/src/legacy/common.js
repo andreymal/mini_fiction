@@ -544,7 +544,7 @@ common.allowedTags = {
     h4: {_rename: 'h3', _nonested: ['h3']},
     h5: {_rename: 'h3', _nonested: ['h3']},
     h6: {_rename: 'h3', _nonested: ['h3']},
-    span: {}, hr: {_nocollapse: true, _nokids: true}, // TODO: footnote?
+    hr: {_nocollapse: true, _nokids: true}, // TODO: footnote?
     img: {src: null, alt: null, title: null, _nocollapse: true, _nokids: true},
     ul: {}, ol: {}, li: {_nocollapse: true},
     blockquote: {}, sup: {}, sub: {}, pre: {_nonested: true}, small: {}, tt: {_nonested: true},

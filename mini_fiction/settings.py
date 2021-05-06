@@ -270,11 +270,11 @@ class Config(object):
     WTF_CSRF_TIME_LIMIT = 3600 * 24 * 7  # 1 week
 
     ALLOWED_TAGS = [
-        'b', 'i', 'strong', 'em', 's', 'u',
+        'strong', 'em', 's', 'u',
         'p', 'span', 'br', 'hr',
         'img', 'a',
         'ul', 'ol', 'li',
-        'blockquote', 'sup', 'sub', 'pre', 'small', 'tt'
+        'blockquote', 'sup', 'sub', 'pre', 'small'
     ]
 
     ALLOWED_ATTRIBUTES = {
@@ -286,12 +286,12 @@ class Config(object):
     }
 
     CHAPTER_ALLOWED_TAGS = [
-        'b', 'i', 'strong', 'em', 's', 'u',
+        'strong', 'em', 's', 'u',
         'h3', 'h4', 'h5',
         'p', 'span', 'br', 'hr', 'footnote',
         'img', 'a',
         'ul', 'ol', 'li',
-        'blockquote', 'sup', 'sub', 'pre', 'small', 'tt', 'font',
+        'blockquote', 'sup', 'sub', 'pre', 'small', 'font',
     ]
 
     CHAPTER_ALLOWED_ATTRIBUTES = {

@@ -25,6 +25,7 @@
   }
   & .edit-hr a {
     background-image: url(../images/markitup/edit-hr.png);
+    width: 26px!important;
   }
   & .edit-image a {
     background-image: url(../images/markitup/edit-image.png);

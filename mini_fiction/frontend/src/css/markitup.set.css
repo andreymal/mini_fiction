@@ -14,9 +14,6 @@
   & .edit-h a {
     background-image: url(../images/markitup/edit-h.png);
   }
-  & .edit-alignment-left a {
-    background-image: url(../images/markitup/edit-alignment-left.png);
-  }
   & .edit-alignment-center a {
     background-image: url(../images/markitup/edit-alignment-center.png);
   }

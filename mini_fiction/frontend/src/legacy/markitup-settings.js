@@ -1,7 +1,6 @@
 export default {
     onShiftEnter:   {keepDefault: false, replaceWith: '<br />\n'},
     onCtrlEnter:    {keepDefault: false, openWith: '\n<p>', closeWith: '</p>\n'},
-    onTab: {keepDefault: false, replaceWith:'   '},
     markupSet: [
         {name: 'Жирный', className:'edit-bold', key:'B', openWith:'<strong>', closeWith:'</strong>'},
         {name: 'Курсив', className:'edit-italic', key:'I', openWith:'<em>', closeWith:'</em>'},
@@ -11,7 +10,6 @@ export default {
         {name: 'Подзаголовок', className:'edit-h', openWith:'<h3>', closeWith:'</h3>'},
         {name: 'Разделитель', className:'edit-hr', replaceWith:'<hr>'},
         {separator: '---------------'},
-        {name: 'По левому краю', className:'edit-alignment-left', openWith:'<p align="left">', closeWith:'</p>'},
         {name: 'По центру', className:'edit-alignment-center', openWith:'<p align="center">', closeWith:'</p>'},
         {name: 'По правому краю', className:'edit-alignment-right', openWith:'<p align="right">', closeWith:'</p>'},
         {separator: '---------------'},

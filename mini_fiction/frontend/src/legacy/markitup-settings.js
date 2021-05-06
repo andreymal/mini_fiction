@@ -8,7 +8,7 @@ export default {
         {name: 'Зачеркнуть', className:'edit-strike', key:'S', openWith:'<s>', closeWith:'</s>'},
         {name: 'Подчеркнуть', className:'edit-underline', key:'U', openWith:'<u>', closeWith:'</u>'},
         {separator: '---------------'},
-        {name: 'Подзаголовок', className:'edit-h4', openWith:'<h4>', closeWith:'</h4>'},
+        {name: 'Подзаголовок', className:'edit-h', openWith:'<h3>', closeWith:'</h3>'},
         {name: 'Разделитель', className:'edit-hr', replaceWith:'<hr>'},
         {separator: '---------------'},
         {name: 'По левому краю', className:'edit-alignment-left', openWith:'<p align="left">', closeWith:'</p>'},

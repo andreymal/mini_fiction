@@ -31,6 +31,7 @@ export default {
         {separator: '---------------'},
         {name: 'Конвертация c фикбука', className:'edit-ficbook', replaceWith: function(markitup) {
             markitup.textarea.value = markitup.textarea.value
+                .replace(/<center>\s*\*+\s*\*+\s*\*+\s*<\/center>/g, '<hr>')
                 .replace(/<center>/g, '<p align="center">')
                 .replace(/<\/center>/g, '</p>')
                 .replace(/<right>/g, '<p align="right">')

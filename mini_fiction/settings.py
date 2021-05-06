@@ -287,7 +287,7 @@ class Config(object):
 
     CHAPTER_ALLOWED_TAGS = [
         'b', 'i', 'strong', 'em', 's', 'u',
-        'h3', 'h4', 'h5',
+        'h4',
         'p', 'span', 'br', 'hr', 'footnote',
         'img', 'a',
         'ul', 'ol', 'li',

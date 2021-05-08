@@ -1,46 +1,70 @@
+import bold from 'images/markitup/bold.svg'
+import italic from 'images/markitup/italic.svg'
+import strike from 'images/markitup/strike.svg'
+import underline from 'images/markitup/underline.svg'
+import header from 'images/markitup/header-3.svg'
+import hr from 'images/markitup/more.svg'
+import center from 'images/markitup/float-center.svg'
+import right from 'images/markitup/float-right.svg'
+import image from 'images/markitup/image.svg'
+import attachment from 'images/markitup/link.svg'
+import bullet from 'images/markitup/list-bullet.svg'
+import ordered from 'images/markitup/list-ordered.svg'
+import item from 'images/markitup/single-item.svg'
+import blockquote from 'images/markitup/blockquote.svg'
+import subscript from 'images/markitup/subscript.svg'
+import superscript from 'images/markitup/superscript.svg'
+import code from 'images/markitup/code.svg'
+import decrease from 'images/markitup/size-decrease.svg'
+import background from 'images/markitup/background.svg'
+import ficbook from 'images/markitup/ficbook.svg'
+
+
+const ficbookConverter = markitup => {
+    markitup.textarea.value = markitup.textarea.value
+    .replace(/<center>\s*\*+\s*\*+\s*\*+\s*<\/center>/g, '<hr>')
+    .replace(/<center>/g, '<p align="center">')
+    .replace(/<\/center>/g, '</p>')
+    .replace(/<right>/g, '<p align="right">')
+    .replace(/<\/right>/g, '</p>')
+    .replace(/<i>/g, '<em>')
+    .replace(/<\/i>/g, '</em>')
+    .replace(/<b>/g, '<strong>')
+    .replace(/<\/b>/g, '</strong>')
+    .replace(/<tab>/g, '\n\n')
+    .replace(/\n{2,}/g, '\n\n')
+    .replace(/\n\n\s*/g, '\n\n');
+}
+
 export default {
     onShiftEnter:   {keepDefault: false, replaceWith: '<br />\n'},
     onCtrlEnter:    {keepDefault: false, openWith: '\n<p>', closeWith: '</p>\n'},
     markupSet: [
-        {name: 'Жирный', className:'edit-bold', key:'B', openWith:'<strong>', closeWith:'</strong>'},
-        {name: 'Курсив', className:'edit-italic', key:'I', openWith:'<em>', closeWith:'</em>'},
-        {name: 'Зачеркнуть', className:'edit-strike', key:'S', openWith:'<s>', closeWith:'</s>'},
-        {name: 'Подчеркнуть', className:'edit-underline', key:'U', openWith:'<u>', closeWith:'</u>'},
-        {separator: '---------------'},
-        {name: 'Подзаголовок', className:'edit-h', openWith:'<h3>', closeWith:'</h3>'},
-        {name: 'Разделитель', className:'edit-hr', replaceWith:'<hr>'},
-        {separator: '---------------'},
-        {name: 'По центру', className:'edit-alignment-center', openWith:'<p align="center">', closeWith:'</p>'},
-        {name: 'По правому краю', className:'edit-alignment-right', openWith:'<p align="right">', closeWith:'</p>'},
-        {separator: '---------------'},
-        {name: 'Добавить изображение', className:'edit-image', replaceWith:'<img src="[!['+'Введите адрес изображения:'+':!:http://]!]" />' },
-        {name: 'Добавить ссылку', className:'edit-anchor', key:'L', openWith:'<a href="[!['+'Введите url адрес:'+':!:http://]!]"(!( title="[![Title]!]")!)>', closeWith:'</a>', placeHolder:'Введите адрес ссылки...' },
-        {separator: '---------------'},
-        {name: 'Обычный список', className:'edit-list', openWith:'<li>', closeWith:'</li>', multiline: true, openBlockWith:'<ul>\n', closeBlockWith:'\n</ul>' },
-        {name: 'Нумерованный список', className:'edit-list-order', openWith:'<li>', closeWith:'</li>', multiline: true, openBlockWith:'<ol>\n', closeBlockWith:'\n</ol>' },
-        {name: 'Элемент списка', className:'edit-list-item', openWith:'<li>', closeWith:'</li>'},
-        {separator: '---------------'},
-        {name: 'Цитировать', className:'edit-quotation', key:'Q', replaceWith: function(m) { if (m.selectionOuter) return '<blockquote>'+m.selectionOuter+'</blockquote>'; else if (m.selection) return '<blockquote>'+m.selection+'</blockquote>'; else return '<blockquote></blockquote>'}},
-        {name: 'Верхний индекс', className:'edit-superscript', openWith:'<sup>', closeWith:'</sup>'},
-        {name: 'Нижний индекс', className:'edit-subscript', openWith:'<sub>', closeWith:'</sub>'},
-        {name: 'Код', className:'edit-code', openWith: '<pre>', closeWith:'</pre>'},
-        {name: 'Уменьшить размер', className:'edit-small', openWith:'<small>', closeWith:'</small>'},
-        {name: 'Lite-спойлер', className:'edit-spoiler-gray', openWith:'<span class="spoiler-gray">', closeWith:'</span>'},
-        {separator: '---------------'},
-        {name: 'Конвертация c фикбука', className:'edit-ficbook', replaceWith: function(markitup) {
-            markitup.textarea.value = markitup.textarea.value
-                .replace(/<center>\s*\*+\s*\*+\s*\*+\s*<\/center>/g, '<hr>')
-                .replace(/<center>/g, '<p align="center">')
-                .replace(/<\/center>/g, '</p>')
-                .replace(/<right>/g, '<p align="right">')
-                .replace(/<\/right>/g, '</p>')
-                .replace(/<i>/g, '<em>')
-                .replace(/<\/i>/g, '</em>')
-                .replace(/<b>/g, '<strong>')
-                .replace(/<\/b>/g, '</strong>')
-                .replace(/<tab>/g, '\n\n')
-                .replace(/\n{2,}/g, '\n\n')
-                .replace(/\n\n\s*/g, '\n\n');
-            }},
+        {name: 'Жирный', key:'B', openWith:'<strong>', closeWith:'</strong>', svg: bold},
+        {name: 'Курсив', key:'I', openWith:'<em>', closeWith:'</em>', svg: italic},
+        {name: 'Зачеркнуть', key:'S', openWith:'<s>', closeWith:'</s>', svg: strike},
+        {name: 'Подчеркнуть', key:'U', openWith:'<u>', closeWith:'</u>', svg: underline},
+        {separator: ' '},
+        {name: 'Подзаголовок', openWith:'<h3>', closeWith:'</h3>', svg: header},
+        {name: 'Разделитель', replaceWith:'<hr>', svg: hr},
+        {separator: ' '},
+        {name: 'По центру', openWith:'<p align="center">', closeWith:'</p>', svg: center},
+        {name: 'По правому краю', openWith:'<p align="right">', closeWith:'</p>', svg: right},
+        {separator: ' '},
+        {name: 'Добавить изображение', replaceWith:'<img src="[!['+'Введите адрес изображения:'+':!:https://]!]" />', svg: image},
+        {name: 'Добавить ссылку', key:'L', openWith:'<a href="[!['+'Адрес ссылки:'+':!:https://]!]"(!( title="[![Title]!]")!)>', closeWith:'</a>', placeHolder:'Название ссылки', svg: attachment},
+        {separator: ' '},
+        {name: 'Обычный список', openWith:'<li>', closeWith:'</li>', multiline: true, openBlockWith:'<ul>\n', closeBlockWith:'\n</ul>', svg: bullet},
+        {name: 'Нумерованный список', openWith:'<li>', closeWith:'</li>', multiline: true, openBlockWith:'<ol>\n', closeBlockWith:'\n</ol>', svg: ordered},
+        {name: 'Элемент списка', openWith:'<li>', closeWith:'</li>', svg: item},
+        {separator: ' '},
+        {name: 'Цитировать', key:'Q', replaceWith: function(m) { if (m.selectionOuter) return '<blockquote>'+m.selectionOuter+'</blockquote>'; else if (m.selection) return '<blockquote>'+m.selection+'</blockquote>'; else return '<blockquote></blockquote>'}, svg: blockquote},
+        {name: 'Верхний индекс', openWith:'<sup>', closeWith:'</sup>', svg: superscript},
+        {name: 'Нижний индекс', openWith:'<sub>', closeWith:'</sub>', svg: subscript},
+        {name: 'Код', openWith: '<pre>', closeWith:'</pre>', svg: code},
+        {name: 'Уменьшить размер', openWith:'<small>', closeWith:'</small>', svg: decrease},
+        {name: 'Lite-спойлер', openWith:'<span class="spoiler-gray">', closeWith:'</span>', svg: background},
+        {separator: ' '},
+        {name: 'Конвертация c фикбука', replaceWith: ficbookConverter, svg: ficbook},
     ]
 };

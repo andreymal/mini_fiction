@@ -97,7 +97,11 @@ module.exports = {
         ],
       },
       {
-        test: /\.(png|jpg|gif|svg|eot|ttf|woff|woff2)$/,
+        test: /images\/markitup/,
+        type: 'asset/source',
+      },
+      {
+        test: /\.(png|jpg|gif|eot|ttf|woff|woff2)$/,
         type: 'asset',
         parser: {
           dataUrlCondition: {

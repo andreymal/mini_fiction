@@ -9,21 +9,18 @@ CHAPTER = {
         'type': 'string',
         'coerce': (safe_string_coerce, 'strip'),
         'required': False,
-        'default': '',
         'maxlength': 512,
     },
     'notes': {
         'type': 'string',
         'coerce': (safe_string_multiline_coerce, 'strip'),
         'required': False,
-        'default': '',
         'maxlength': 4096,
     },
     'text': {
         'type': 'string',
         'coerce': (safe_string_multiline_coerce, 'strip'),
         'required': False,
-        'default': '',
         'maxlength': 1000000,
     },
 }

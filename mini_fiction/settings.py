@@ -231,6 +231,8 @@ class Config(object):
     COMMENT_SPOILER_THRESHOLD = -5
     COMMENTS_TREE_MAXDEPTH = 4
 
+    CHAPTER_MAX_LENGTH = 500000
+
     RSS = {
         'stories': 20,
         'accounts': 10,

@@ -82,12 +82,13 @@ def _gen_preview(form, only_selected=False):
     title = request.form.get('title') or gettext('Chapter')
     sel_start = request.form.get('sel_start') or ''
     sel_end = request.form.get('sel_end') or ''
-    notes_html = Chapter.bl.notes2html(request.form.get('notes', '')[:128000])
+    notes_html = Chapter.bl.notes2html(request.form.get('notes', '')[:4096])
 
+    text = request.form.get('text', '')[:current_app.config['CHAPTER_MAX_LENGTH']]
     if only_selected and sel_start.isdigit() and sel_end.isdigit():
-        html = Chapter.bl.text2html(request.form.get('text', '')[:128000], start=int(sel_start), end=int(sel_end))
+        html = Chapter.bl.text2html(text, start=int(sel_start), end=int(sel_end))
     else:
-        html = Chapter.bl.text2html(request.form.get('text', '')[:128000])
+        html = Chapter.bl.text2html(text)
 
     return {
         'preview_title': title,
@@ -196,6 +197,7 @@ def add(story_id):
         'chapter': None,
         'form': form,
         'unpublished_chapters_count': Chapter.select(lambda x: x.story == story and x.draft).count(),
+        'chapter_max_length': current_app.config['CHAPTER_MAX_LENGTH'],
     }
     ctx.update(preview_data)
 
@@ -345,6 +347,7 @@ def edit(pk):
         'chapter_text_diff': chapter_text_diff,
         'diff_html': diff2html(older_text, chapter_text_diff) if chapter_text_diff else None,
         'unpublished_chapters_count': unpublished_chapters_count,
+        'chapter_max_length': max(len(chapter.text), current_app.config['CHAPTER_MAX_LENGTH']),
         'linter_error_messages': linter_error_messages,
         'lint_ok': lint_ok,
         'linter_allow_hide': linter_allow_hide,

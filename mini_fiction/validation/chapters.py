@@ -21,7 +21,6 @@ CHAPTER = {
         'type': 'string',
         'coerce': (safe_string_multiline_coerce, 'strip'),
         'required': False,
-        'maxlength': 1000000,
     },
 }
 

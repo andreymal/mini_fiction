@@ -1639,6 +1639,11 @@ class ChapterBL(BaseBL):
         new_order = orm.select(orm.max(x.order) for x in Chapter if x.story == story).first()
         data = Validator(CHAPTER).validated(data)
 
+        if not editor.is_staff:
+            chapter_max_length = current_app.config['CHAPTER_MAX_LENGTH']
+            if len(data['text']) > chapter_max_length:
+                raise ValidationError({'text': ['Глава слишком длинная!']})
+
         chapter = self.model(
             story=story,
             title=data['title'],
@@ -1693,6 +1698,12 @@ class ChapterBL(BaseBL):
         data = Validator(CHAPTER).validated(data, update=True)
 
         chapter = self.model
+
+        if 'text' in data and (not editor or not editor.is_staff):
+            chapter_max_length = max(len(chapter.text), current_app.config['CHAPTER_MAX_LENGTH'])
+            if len(data['text']) > chapter_max_length:
+                raise ValidationError({'text': ['Глава слишком длинная!']})
+
         edited_data = {}
         chapter_text_diff = None
 

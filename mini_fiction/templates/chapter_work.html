@@ -74,7 +74,9 @@
                             name="text"
                             id="id_text"
                             cols="40" rows="10"
-                            maxlength="1000000"
+                            {% if not current_user.is_staff -%}
+                            maxlength="{{ chapter_max_length }}"
+                            {% endif -%}
                             class="input-xxxlarge chapter-textarea with-markitup js-form-saving"
                             data-formgroup="chapter"
                             data-formsaving="chapter_text">{{ form.data.text }}</textarea>

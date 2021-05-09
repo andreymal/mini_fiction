@@ -16,7 +16,6 @@ const isDev = ENV !== 'production';
 const outputPath = path.resolve(__dirname, 'build');
 const outputName = `[name].${isDev ? 'dev' : '[contenthash]'}`;
 
-
 const reactAliases = {
   react: 'preact/compat',
   'react-dom': 'preact/compat',
@@ -31,10 +30,12 @@ const postCSSOptions = {
       preserve: false,
       warnings: true,
     }),
-    postCSSNano({preset: ['default', {
-      discardComments: !isDev,
-      normalizeWhitespace: !isDev,
-    }]}),
+    postCSSNano({
+      preset: ['default', {
+        discardComments: !isDev,
+        normalizeWhitespace: !isDev,
+      }],
+    }),
   ],
 };
 
@@ -93,7 +94,7 @@ module.exports = {
         use: [
           { loader: MiniCssExtractPlugin.loader, options: extractLoaderOptions },
           { loader: 'css-loader', options: cssLoaderOptions },
-          { loader: 'postcss-loader', options: {postcssOptions: postCSSOptions } },
+          { loader: 'postcss-loader', options: { postcssOptions: postCSSOptions } },
         ],
       },
       {

@@ -1,5 +1,3 @@
-import 'whatwg-fetch';
-
 let isSettled = false;
 let resolver;
 const store = new Promise((res) => { resolver = res; });

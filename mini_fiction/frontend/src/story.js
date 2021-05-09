@@ -1,5 +1,3 @@
-import 'whatwg-fetch'; // init polyfill for IE11
-
 import Baz from 'bazooka';
 import storyTags from './story_tags/index';
 

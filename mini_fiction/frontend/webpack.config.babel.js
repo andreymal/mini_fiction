@@ -2,7 +2,7 @@ import path from 'path';
 import AssetsManifestPlugin from 'webpack-assets-manifest';
 import MiniCssExtractPlugin from 'mini-css-extract-plugin';
 import TerserPlugin from 'terser-webpack-plugin';
-// not yet ported to Webpack 5: import { CleanWebpackPlugin } from 'clean-webpack-plugin';
+import { CleanWebpackPlugin } from 'clean-webpack-plugin';
 
 import postCSSAutoPrefixer from 'autoprefixer';
 import postCSSNesting from 'postcss-nesting';
@@ -133,7 +133,7 @@ module.exports = {
       filename: `${outputName}.css`,
       chunkFilename: '[id].css',
     }),
-    // new CleanWebpackPlugin(),
+    new CleanWebpackPlugin(),
     new AssetsManifestPlugin({
       output: 'manifest.json',
       integrity: true,

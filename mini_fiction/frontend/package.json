@@ -24,8 +24,7 @@
     "jquery": "^2.2.4",
     "preact": "^10.5.13",
     "react-autosuggest": "^10.1.0",
-    "react-tagsinput": "^3.19.0",
-    "whatwg-fetch": "^3.6.2"
+    "react-tagsinput": "^3.19.0"
   },
   "devDependencies": {
     "@babel/core": "^7.14.0",

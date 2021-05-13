@@ -19,52 +19,84 @@ import decrease from 'images/markitup/size-decrease.svg'
 import background from 'images/markitup/background.svg'
 import ficbook from 'images/markitup/ficbook.svg'
 
+import core from "./core";
 
-const ficbookConverter = markitup => {
-    markitup.textarea.value = markitup.textarea.value
-    .replace(/<center>\s*\*+\s*\*+\s*\*+\s*<\/center>/g, '<hr>')
-    .replace(/<center>/g, '<p align="center">')
-    .replace(/<\/center>/g, '</p>')
-    .replace(/<right>/g, '<p align="right">')
-    .replace(/<\/right>/g, '</p>')
-    .replace(/<i>/g, '<em>')
-    .replace(/<\/i>/g, '</em>')
-    .replace(/<b>/g, '<strong>')
-    .replace(/<\/b>/g, '</strong>')
-    .replace(/<tab>/g, '\n\n')
-    .replace(/\n{2,}/g, '\n\n')
-    .replace(/\n\n\s*/g, '\n\n');
+const formattingConverter = markitup => {
+    core.ajax.post('/convert/', markitup.textarea.value)
+    .then((response) => response.json())
+    .then(({changed, text}) => {
+        let message;
+        if (changed) {
+            markitup.textarea.value = text;
+            message = 'Форматирование текста починено';
+        } else {
+            message = 'С форматированием уже всё хорошо';
+        }
+        core.notify(message);
+    })
+    .catch((ignored) => core.notify('Не удалось отформатировать текст'));
 }
 
 export default {
-    onShiftEnter:   {keepDefault: false, replaceWith: '<br />\n'},
-    onCtrlEnter:    {keepDefault: false, openWith: '\n<p>', closeWith: '</p>\n'},
+    onShiftEnter: {keepDefault: false, replaceWith: '<br />\n'},
+    onCtrlEnter: {keepDefault: false, openWith: '\n<p>', closeWith: '</p>\n'},
     markupSet: [
-        {name: 'Жирный', key:'B', openWith:'<strong>', closeWith:'</strong>', svg: bold},
-        {name: 'Курсив', key:'I', openWith:'<em>', closeWith:'</em>', svg: italic},
-        {name: 'Зачеркнуть', key:'S', openWith:'<s>', closeWith:'</s>', svg: strike},
-        {name: 'Подчеркнуть', key:'U', openWith:'<u>', closeWith:'</u>', svg: underline},
+        {name: 'Жирный', key: 'B', openWith: '<strong>', closeWith: '</strong>', svg: bold},
+        {name: 'Курсив', key: 'I', openWith: '<em>', closeWith: '</em>', svg: italic},
+        {name: 'Зачеркнуть', key: 'S', openWith: '<s>', closeWith: '</s>', svg: strike},
+        {name: 'Подчеркнуть', key: 'U', openWith: '<u>', closeWith: '</u>', svg: underline},
         {separator: ' '},
-        {name: 'Подзаголовок', openWith:'<h3>', closeWith:'</h3>', svg: header},
-        {name: 'Разделитель', replaceWith:'<hr>', svg: hr},
+        {name: 'Подзаголовок', openWith: '<h3>', closeWith: '</h3>', svg: header},
+        {name: 'Разделитель', replaceWith: '<hr>', svg: hr},
         {separator: ' '},
-        {name: 'По центру', openWith:'<p align="center">', closeWith:'</p>', svg: center},
-        {name: 'По правому краю', openWith:'<p align="right">', closeWith:'</p>', svg: right},
+        {name: 'По центру', openWith: '<p align="center">', closeWith: '</p>', svg: center},
+        {name: 'По правому краю', openWith: '<p align="right">', closeWith: '</p>', svg: right},
         {separator: ' '},
-        {name: 'Добавить изображение', replaceWith:'<img src="[!['+'Введите адрес изображения:'+':!:https://]!]" />', svg: image},
-        {name: 'Добавить ссылку', key:'L', openWith:'<a href="[!['+'Адрес ссылки:'+':!:https://]!]"(!( title="[![Title]!]")!)>', closeWith:'</a>', placeHolder:'Название ссылки', svg: attachment},
+        {
+            name: 'Добавить изображение',
+            replaceWith: '<img src="[![' + 'Введите адрес изображения:' + ':!:https://]!]" />',
+            svg: image
+        },
+        {
+            name: 'Добавить ссылку',
+            key: 'L',
+            openWith: '<a href="[![' + 'Адрес ссылки:' + ':!:https://]!]"(!( title="[![Title]!]")!)>',
+            closeWith: '</a>',
+            placeHolder: 'Название ссылки',
+            svg: attachment
+        },
         {separator: ' '},
-        {name: 'Обычный список', openWith:'<li>', closeWith:'</li>', multiline: true, openBlockWith:'<ul>\n', closeBlockWith:'\n</ul>', svg: bullet},
-        {name: 'Нумерованный список', openWith:'<li>', closeWith:'</li>', multiline: true, openBlockWith:'<ol>\n', closeBlockWith:'\n</ol>', svg: ordered},
-        {name: 'Элемент списка', openWith:'<li>', closeWith:'</li>', svg: item},
+        {
+            name: 'Обычный список',
+            openWith: '<li>',
+            closeWith: '</li>',
+            multiline: true,
+            openBlockWith: '<ul>\n',
+            closeBlockWith: '\n</ul>',
+            svg: bullet
+        },
+        {
+            name: 'Нумерованный список',
+            openWith: '<li>',
+            closeWith: '</li>',
+            multiline: true,
+            openBlockWith: '<ol>\n',
+            closeBlockWith: '\n</ol>',
+            svg: ordered
+        },
+        {name: 'Элемент списка', openWith: '<li>', closeWith: '</li>', svg: item},
         {separator: ' '},
-        {name: 'Цитировать', key:'Q', replaceWith: function(m) { if (m.selectionOuter) return '<blockquote>'+m.selectionOuter+'</blockquote>'; else if (m.selection) return '<blockquote>'+m.selection+'</blockquote>'; else return '<blockquote></blockquote>'}, svg: blockquote},
-        {name: 'Верхний индекс', openWith:'<sup>', closeWith:'</sup>', svg: superscript},
-        {name: 'Нижний индекс', openWith:'<sub>', closeWith:'</sub>', svg: subscript},
-        {name: 'Код', openWith: '<pre>', closeWith:'</pre>', svg: code},
-        {name: 'Уменьшить размер', openWith:'<small>', closeWith:'</small>', svg: decrease},
-        {name: 'Lite-спойлер', openWith:'<span class="spoiler-gray">', closeWith:'</span>', svg: background},
+        {
+            name: 'Цитировать', key: 'Q', replaceWith: function (m) {
+                if (m.selectionOuter) return '<blockquote>' + m.selectionOuter + '</blockquote>'; else if (m.selection) return '<blockquote>' + m.selection + '</blockquote>'; else return '<blockquote></blockquote>'
+            }, svg: blockquote
+        },
+        {name: 'Верхний индекс', openWith: '<sup>', closeWith: '</sup>', svg: superscript},
+        {name: 'Нижний индекс', openWith: '<sub>', closeWith: '</sub>', svg: subscript},
+        {name: 'Код', openWith: '<pre>', closeWith: '</pre>', svg: code},
+        {name: 'Уменьшить размер', openWith: '<small>', closeWith: '</small>', svg: decrease},
+        {name: 'Lite-спойлер', openWith: '<span class="spoiler-gray">', closeWith: '</span>', svg: background},
         {separator: ' '},
-        {name: 'Конвертация c фикбука', replaceWith: ficbookConverter, svg: ficbook},
+        {name: 'Исправить разметку', replaceWith: formattingConverter, svg: ficbook},
     ]
 };

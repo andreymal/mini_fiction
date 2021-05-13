@@ -17,3 +17,4 @@ lxml
 pytz
 python-dotenv
 email_validator
+dataclasses; python_version < '3.7'

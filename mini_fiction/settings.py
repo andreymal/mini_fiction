@@ -146,6 +146,10 @@ class Config(object):
     FAVICON_URL = None
     SESSION_COOKIE_DOMAIN = False
 
+    # used by the converter to replace absolute links to relative
+    # Example: SERVER_NAME_REGEX = r'(www\.)?example\.org|oldsite\.(ru|org|info)'
+    SERVER_NAME_REGEX = r'localhost:5000'
+
     # Static files configuration
 
     STATIC_ROOT = os.path.join(os.path.dirname(__file__), 'static')

@@ -1,10 +1,9 @@
 import re
 from dataclasses import dataclass
-from typing import Any, Optional, Set, List, Tuple
+from typing import Any, Optional, List, Callable
 from urllib.parse import parse_qs
 
-star_begin = r'\s*\n\s*(<(p|span)( align="?[a-z]+"?)?>|<strong>|<b>|<center>|<h[1-6]>)*(\s|&nbsp;)*'
-star_end = r"(\s|&nbsp;)*(</p>|</span>|</strong>|</b>|</center>|</h[1-6]>)*(</?br\s*/?>)?\s*\n\s*"
+from flask import current_app
 
 
 @dataclass
@@ -12,6 +11,10 @@ class TextContainer:
     changed: bool
     flags: List[str]
     text: Optional[str]
+
+
+star_begin = r'\s*\n\s*(<(p|span)( align="?[a-z]+"?)?>|<strong>|<b>|<em>|<i>|<center>|<h[1-6]>)*(\s|&nbsp;)*'
+star_end = r"(\s|&nbsp;)*(</p>|</span>|</strong>|</b>|</em>|</i>|</center>|</h[1-6]>)*(</?br\s*/?>)?\s*\n\s*"
 
 
 html_entities_table = {
@@ -49,51 +52,8 @@ html_entities_table = {
     "uuml": "ü",
 }
 
-http2https_hosts = [
-    r"vk\.com",
-    r"pp\.userapi\.com",
-    r"([^/]+\.)?imgur\.com",
-    r"([^/]+\.)?jenniverse\.com",
-    r"([^/]+\.)?darkpony\.space",
-    r"([^/]+\.)?upload\.wikimedia\.org",
-    r"([^/]+\.)?liveinternet\.ru",
-    r"([^/]+\.)?vfl\.ru",
-    r"([^/]+\.)?yandex\.ru",
-    r"([^/]+\.)?fimfiction\.net",
-    r"([^/]+\.)?deviantart\.(com|net)",
-    r"([^/]+\.)?radikal\.ru",
-    r"([^/]+\.)?photobucket\.com",
-    r"([^/]+\.)?hostingkartinok\.com",
-    r"([^/]+\.)?wlpcomics\.com",
-    r"([^/]+\.)?livejournal\.com",
-    r"([^/]+\.)?tumblr\.com",
-    r"([^/]+\.)?my\.mail\.ru",
-    r"([^/]+\.)?fastpic\.ru",
-    r"([^/]+\.)?piccy\.info",
-    r"([^/]+\.)?geekpic\.net",
-    r"([^/]+\.)?blogspot\.com",
-    r"([^/]+\.)?wikipedia\.org",
-    r"([^/]+\.)?youtube\.com",
-    r"([^/]+\.)?youtu\.be",
-    r"([^/]+\.)?everypony\.(ru|org|info)",
-    r"([^/]+\.)?playground\.ru",
-    r"([^/]+\.)?kinopoisk\.ru",
-    r"([^/]+\.)?ficbook\.net",
-    r"([^/]+\.)?google\.(com|ru)",
-    r"([^/]+\.)?yadi\.sk",
-    r"([^/]+\.)?bash\.im",
-    r"([^/]+\.)?habr\.com",
-    r"([^/]+\.)?hsto\.org",
-    r"([^/]+\.)?xkcd\.ru",
-]
 
-http2https_regex = re.compile(
-    r"\bhttp://((" + ")|(".join(http2https_hosts) + r"))/",
-    flags=re.I,
-)
-
-
-def repeat(func: Any, old_text: str, *args: Any, **kwargs: Any) -> str:
+def repeat(func: Callable[..., str], old_text: str, *args: Any, **kwargs: Any) -> str:
     """
     Повторяет указанную функцию несколько раз до тех пор, пока она
     не перестанет вносить новые изменения.
@@ -102,10 +62,8 @@ def repeat(func: Any, old_text: str, *args: Any, **kwargs: Any) -> str:
     old_new_text = old_text
     count = 0
     while count <= 100:
-        new_text: str = func(old_new_text, *args, **kwargs)
+        new_text = func(old_new_text, *args, **kwargs)
         if new_text == old_new_text:
-            if count > 1:
-                print(f"// Function {func.__name__} repeated {count} times")
             return new_text
         count += 1
         old_new_text = new_text
@@ -425,7 +383,7 @@ def fix_union_tags(old_text: str, flags: List[str]) -> str:
 
     new_text = re.sub(
         r"</(strong|em|sup|sub)>( *)<\1>",
-        "\\2",
+        r"\2",
         new_text,
         flags=re.I,
     )
@@ -459,13 +417,13 @@ def fix_tt2em(old_text: str, flags: List[str]) -> str:
     return new_text
 
 
-def fix_tab(old_text: str, flags: List[str]) -> str:
+def fix_leading_whitespace(old_text: str, flags: List[str]) -> str:
     """
-    Удаляет символы табуляции в начале строк, так как они всё равно бесполезны.
+    Удаляет пробельные символы в начале строк, так как они всё равно бесполезны.
     """
-    new_text = re.sub(r"\s*\n *\t+\s*", "\n\n", old_text, flags=re.I | re.M)
+    new_text = re.sub(r"\n[ \t]+", "\n", old_text, flags=re.I | re.M)
     if new_text != old_text:
-        flags.append("tab")
+        flags.append("leading_whitespace")
     return new_text
 
 
@@ -487,23 +445,6 @@ def fix_html_entities(old_text: str, flags: List[str]) -> str:
     return new_text
 
 
-def fix_weird_p(old_text: str, flags: List[str]) -> str:
-    """
-    Удаляет странный <p></p&gt, доставшийся в наследство со старого Сториза.
-    """
-    new_text = old_text
-    if new_text.endswith("<p></p&gt"):
-        new_text = new_text[:-9].rstrip()
-    if new_text.endswith("</p&gt"):
-        new_text = new_text[:-6] + "</p>"
-    new_text = new_text.replace("</p&gt <p>", "</p>\n<p>")  # И такое бывает посреди текста
-    new_text = new_text.replace("</p&gt <br", "</p>\n<br")  # И такое...
-
-    if new_text != old_text:
-        flags.append("weird_p")
-    return new_text
-
-
 def fix_trailing_br_p_and_spaces(old_text: str, flags: List[str]) -> str:
     """
     Убирает бесполезные пустые строки в конце текста.
@@ -513,7 +454,7 @@ def fix_trailing_br_p_and_spaces(old_text: str, flags: List[str]) -> str:
     part1 = old_text[:-200]
     old_part2 = old_text[-200:]
 
-    new_part2 = re.sub(r"(&nbsp;|\s|<br\s*/?>)+(</p>)?(\s|&nbsp;)*\Z", "\\2", old_part2, flags=re.I | re.M)
+    new_part2 = re.sub(r"(&nbsp;|\s|<br\s*/?>)+(</p>)?(\s|&nbsp;)*\Z", r"\2", old_part2, flags=re.I | re.M)
     new_part2 = re.sub(r"(\s|&nbsp;)*<p>(\s|&nbsp;)*</p>(\s|&nbsp;)*\Z", "", new_part2, flags=re.I | re.M)
     if new_part2 != old_part2:
         flags.append("trailing_br_p_and_spaces")
@@ -532,19 +473,6 @@ def fix_p_unwrap(old_text: str, flags: List[str]) -> str:
     new_text = re.sub(r'\A\s*<p>\s*(.+)\s*</p>\s*\Z', r'\1', old_text, flags=re.I | re.M | re.DOTALL)
     if new_text != old_text:
         flags.append("p_unwrap")
-    return new_text
-
-
-def fix_poniez_links(old_text: str, flags: List[str]) -> str:
-    """
-    Исправляет ссылки ponies.net на poniez_archive.
-    """
-    new_text = old_text.replace(
-        "http://poniez.net/images/",
-        "https://files.everypony.ru/poniez_archive/",
-    )
-    if new_text != old_text:
-        flags.append("poniez_links")
     return new_text
 
 
@@ -570,6 +498,14 @@ def fix_links(old_text: str, flags: List[str]) -> str:
         new_text2 = new_text2.replace(camo_link, uncamoed_link)
     if new_text2 != new_text:
         flags.append("links_camo_fimfiction")
+
+    new_text = new_text2
+    for camo_group in re.findall(r"(https?://(www\.)?vk\.com/away(\.php)?\?[A-Za-z0-9_%?&\=\.\+\_\-]+)", new_text2, flags=re.I):
+        camo_link = camo_group[0]
+        uncamoed_link = parse_qs(camo_link.split("?", 1)[1])["to"][0]
+        new_text2 = new_text2.replace(camo_link, uncamoed_link)
+    if new_text2 != new_text:
+        flags.append("links_vk_away")
 
     new_text = new_text2
     new_text2 = new_text.replace("http://pp.vk.me/", "https://pp.userapi.com/")
@@ -612,29 +548,6 @@ def fix_links(old_text: str, flags: List[str]) -> str:
     return new_text2
 
 
-def fix_https_links(old_text: str, flags: List[str]) -> str:
-    """
-    Исправляет некоторые http-ссылки на https.
-    """
-    new_flags: Set[str] = set()
-    new_text = old_text
-
-    new_text2 = http2https_regex.sub("https://\\1/", new_text)
-    if new_text2 != new_text:
-        new_flags.add("http2https")
-        new_text = new_text2
-
-    new_text2 = re.sub(r"http://lurkmo", "https://lurkmo", new_text, flags=re.I)
-    if new_text2 != new_text:
-        new_flags.add("http2https")
-        new_text = new_text2
-
-    for flag in new_flags:
-        flags.append(flag)
-
-    return new_text
-
-
 def fix_double_http(old_text: str, flags: List[str]) -> str:
     """
     Исправляет присутствие двух протоколов в ссылках, что встречается
@@ -656,18 +569,18 @@ def fix_double_http(old_text: str, flags: List[str]) -> str:
     return new_text
 
 
-def fix_stories_links(old_text: str, flags: List[str]) -> str:
+def fix_relative_links(old_text: str, flags: List[str]) -> str:
     """
-    Меняет абсолютные ссылки на Сториз на относительные.
+    Меняет абсолютные ссылки на текущий сайт на относительные.
     """
-    new_text = re.sub(
-        r'(href|src)=("?)(https?:)?//((stories\.everypony\.(ru|org|info))|ponyfiction\.org)/',
-        '\\1=\\2/',
+    new_text: str = re.sub(
+        r'(href|src)=("?)(https?:)?//(' + current_app.config['SERVER_NAME_REGEX'] + ')/',
+        r"\1=\2/",
         old_text,
         flags=re.I,
     )
     if new_text != old_text:
-        flags.append("stories_links")
+        flags.append("relative_links")
     return new_text
 
 
@@ -712,7 +625,6 @@ def convert(old_text: str) -> TextContainer:
 
     if has_hr:
         new_text_hr = fix_hr_wrapped(new_text_hr, flags)
-        # new_text_hr = fix_hr_empties(new_text_hr, flags)
         if new_hr_added:
             new_text_hr = fix_hr_spaces(new_text_hr, flags)
 
@@ -735,20 +647,15 @@ def convert(old_text: str) -> TextContainer:
         new_text = repeat(fix_double_tags, new_text, flags)
         new_text = repeat(fix_union_tags, new_text, flags)
 
-    if "\t" in new_text:
-        new_text = fix_tab(new_text, flags)
+    new_text = fix_leading_whitespace(new_text, flags)
     if has_html_entities:
         new_text = fix_html_entities(new_text, flags)
 
     if has_links:
-        new_text = fix_poniez_links(new_text, flags)
         new_text = fix_links(new_text, flags)
-        new_text = fix_stories_links(new_text, flags)
+        new_text = fix_relative_links(new_text, flags)
 
     new_text = new_text.strip()
-
-    if has_tags:
-        new_text = fix_weird_p(new_text, flags)
 
     new_text = repeat(fix_trailing_br_p_and_spaces, new_text, flags)
     new_text = fix_p_unwrap(new_text, flags)

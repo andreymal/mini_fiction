@@ -7,7 +7,7 @@ from pony import orm
 
 from mini_fiction.models import Category, Character, Rating, Classifier
 from mini_fiction.forms.fields import LazySelectField, LazySelectMultipleField, GroupedModelChoiceField
-from mini_fiction.widgets import StoriesCharacterSelect, StoriesCheckboxSelect, StoriesCategorySelect, StoriesButtons, TagsInput
+from mini_fiction.widgets import StoriesCharacterSelect, StoriesButtons, TagsInput
 from mini_fiction.forms.form import Form
 
 
@@ -42,15 +42,6 @@ class StoryForm(Form):
         lazy_gettext('Name'),
         render_kw=dict(attrs_dict, maxlength=512, placeholder=lazy_gettext('Title of the new story'))
     )
-
-    # categories = LazySelectMultipleField(
-    #     'Жанры',
-    #     choices=lambda: list(orm.select((x.id, x.name) for x in Category)),
-    #     widget=StoriesCategorySelect(multiple=True),
-    #     description='',
-    #     coerce=int,
-    #     render_kw={'label_attrs': ['checkbox', 'inline', 'gen']}
-    # )
 
     tags = TextField(
         lazy_gettext('Tags'),
@@ -134,14 +125,5 @@ class StoryForm(Form):
         render_kw=radio_attrs,
         description=lazy_gettext('Activity of the story (is it being written now)'),
     )
-
-    # classifications = LazySelectMultipleField(
-    #     'События',
-    #     choices=lambda: list(orm.select((x.id, x.name) for x in Classifier)),
-    #     widget=StoriesCheckboxSelect(multiple=True),
-    #     description='Ключевые события рассказа',
-    #     coerce=int,
-    #     render_kw={'label_attrs': ['checkbox', 'inline']}
-    # )
 
     minor = BooleanField('', default=False)

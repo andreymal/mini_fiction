@@ -7,7 +7,7 @@ from pony import orm
 
 from mini_fiction.models import Category, Character, Rating, Classifier
 from mini_fiction.forms.fields import LazySelectMultipleField, GroupedModelChoiceField
-from mini_fiction.widgets import StoriesCharacterSelect, StoriesCheckboxSelect, StoriesCategorySelect, StoriesButtons, ButtonWidget, TagsInput
+from mini_fiction.widgets import StoriesCharacterSelect, StoriesButtons, ButtonWidget, TagsInput
 
 
 class SearchForm(Form):
@@ -76,19 +76,6 @@ class SearchForm(Form):
             'type': 'number',
         }
     )
-
-    # Жанры
-    #genre = LazySelectMultipleField(
-    #    '',
-    #    [],
-    #    choices=lambda: list(orm.select((x.id, x.name) for x in Category)),
-    #    widget=StoriesCategorySelect(multiple=True),
-    #    description='',
-    #    coerce=int,
-    #    render_kw={
-    #        'label_attrs': ['checkbox', 'inline', 'gen'],
-    #    }
-    #)
 
     tags = TextField(
         'Теги',
@@ -171,16 +158,6 @@ class SearchForm(Form):
         widget=StoriesButtons(multiple=True),
         render_kw=checkbox_attrs,
     )
-
-    # События
-    #cls = LazySelectMultipleField(
-    #    '',
-    #    [],
-    #    choices=lambda: list(orm.select((x.id, x.name) for x in Classifier)),
-    #    widget=StoriesCheckboxSelect(multiple=True),
-    #    coerce=int,
-    #    render_kw={'label_attrs': ['checkbox', 'inline']}
-    #)
 
     # Кнопка "Развернуть тонкие настройки поиска"
     button_advanced = BooleanField(

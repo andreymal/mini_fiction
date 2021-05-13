@@ -25,37 +25,6 @@ class ServiceButtonWidget(Input):
         super().__init__('submit', *args, **kwargs)
 
 
-class StoriesCheckboxSelect(Select):
-    def __init__(self, multiple=False):
-        super().__init__(multiple=multiple)
-
-    def __call__(self, field, **kwargs):
-        attrs = dict(kwargs)
-        label_class = ' '.join(attrs.pop('label_attrs', ()))
-        output = []
-        for (option_value, option_label, selected) in field.iter_choices():
-            output.append(
-                self.render_custom_option(field, option_value, option_label, selected, label_class)
-            )
-        return '\n'.join(output)
-
-    def render_custom_option(self, field, value, label, selected, label_class):
-        cb = Input('checkbox' if self.multiple else 'radio')  # NOTE: CheckboxInput() is always checked if field.data is present
-        rendered_cb = cb(field, checked=selected, value=value, id='{}_{}'.format(field.id, value))
-        label_class_final = ' class="%s"' % (label_class,)
-        return '<label%s>%s %s</label>' % (label_class_final, rendered_cb, label)
-
-
-class StoriesCategorySelect(StoriesCheckboxSelect):
-    def render_custom_option(self, field, value, label, selected, label_class):
-        categories = dict(orm.select((c.id, c.color) for c in Category))  # NOTE: Pony ORM caches this
-        label_attrs = ' style="background-color: %s;"' % categories[value]
-        cb = Input('checkbox' if self.multiple else 'radio')  # NOTE: CheckboxInput() is always checked if field.data is present
-        rendered_cb = cb(field, checked=selected, value=value, id='{}_{}'.format(field.id, value))
-        label_class_final = ' class="%s"' % (label_class,)
-        return '<label%s%s>%s %s</label>' % (label_class_final, label_attrs, rendered_cb, label)
-
-
 # TODO: optimize
 class StoriesImgSelect(Select):
     def __init__(self, multiple=False):

@@ -336,6 +336,8 @@ def configure_views(app):
     app.register_blueprint(tags.bp)
 
     app.add_url_rule('/dump/', 'dump', misc.dump)
+    # Temporary converter
+    app.add_url_rule('/convert/', 'convert', misc.converter, methods=('POST',))
 
 
 def configure_admin_views(app):

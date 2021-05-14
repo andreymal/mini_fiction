@@ -6,7 +6,7 @@ from wtforms import SelectField, TextField, TextAreaField, BooleanField
 from pony import orm
 
 from mini_fiction.models import Category, Character, Rating, Classifier
-from mini_fiction.forms.fields import LazySelectField, LazySelectMultipleField, GroupedModelChoiceField
+from mini_fiction.forms.fields import LazySelectField, LazySelectMultipleField, GroupedModelChoiceField, StringListField
 from mini_fiction.widgets import StoriesCharacterSelect, StoriesButtons, TagsInput
 from mini_fiction.forms.form import Form
 
@@ -43,7 +43,7 @@ class StoryForm(Form):
         render_kw=dict(attrs_dict, maxlength=512, placeholder=lazy_gettext('Title of the new story'))
     )
 
-    tags = TextField(
+    tags = StringListField(
         lazy_gettext('Tags'),
         render_kw=dict(attrs_tags_dict, maxlength=512, placeholder=lazy_gettext('Tags are separated by commas, for example: Fluff, Daily, Sketch')),
         description=lazy_gettext(

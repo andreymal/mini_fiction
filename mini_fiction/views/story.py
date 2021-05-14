@@ -384,9 +384,6 @@ def add():
         elif formdata['status'] == 2:
             formdata['status'] = 'freezed'
 
-        formdata['tags'] = [x.strip() for x in formdata['tags'].split(',')]
-        formdata['tags'] = [x for x in formdata['tags'] if x]
-
         try:
             story = Story.bl.create([user], formdata)
         except ValidationError as exc:
@@ -413,7 +410,7 @@ def edit(pk):
         abort(403)
 
     story_data = {
-        'tags': ', '.join(x.tag.name for x in story.bl.get_tags_list()),
+        'tags': [x.tag.name for x in story.bl.get_tags_list()],
         'characters': [x.id for x in story.characters],
         'rating': story.rating.id,
         'original_url': story.original_url,
@@ -451,9 +448,6 @@ def edit(pk):
             elif formdata['status'] == 2:
                 formdata['status'] = 'freezed'
 
-            formdata['tags'] = [x.strip() for x in formdata['tags'].split(',')]
-            formdata['tags'] = [x for x in formdata['tags'] if x]
-
             minor = formdata.pop('minor', False)
 
             try:
@@ -466,7 +460,7 @@ def edit(pk):
                 # Заголовок могли изменить, обновляем
                 ctx['page_title'] = 'Редактирование «{}»'.format(story.title)
                 # Приводим теги к нормализованному виду
-                form.tags.data = ', '.join(x.tag.name for x in story.bl.get_tags_list())
+                form.tags.data = [x.tag.name for x in story.bl.get_tags_list()]
 
     return render_template('story_edit_general.html', **ctx)
 

@@ -10,7 +10,7 @@ from pony.orm import db_session
 from mini_fiction.utils.views import cached_lists
 from mini_fiction.forms.search import SearchForm
 from mini_fiction.models import Story, Chapter
-from mini_fiction.utils.misc import Paginator, smart_split
+from mini_fiction.utils.misc import Paginator
 
 bp = Blueprint('search', __name__)
 
@@ -64,9 +64,9 @@ def search_action(postform):
                 extended_syntax=postform.data.get('extsyntax'),
                 character=postform.data['char'],
                 character_mode=postform.data['char_mode'],
-                tags=smart_split(postform.data.get('tags', '')),
+                tags=postform.data.get('tags', []),
                 tags_mode=postform.data['tags_mode'],
-                exclude_tags=smart_split(postform.data.get('exclude_tags', '')),
+                exclude_tags=postform.data.get('exclude_tags', []),
                 rating_id=postform.data['rating'],
                 original=postform.data['original'],
                 finished=postform.data['finished'],
@@ -93,9 +93,9 @@ def search_action(postform):
                 extended_syntax=postform.data.get('extsyntax'),
                 character=postform.data['char'],
                 character_mode=postform.data['char_mode'],
-                tags=smart_split(postform.data.get('tags', '')),
+                tags=postform.data.get('tags', []),
                 tags_mode=postform.data['tags_mode'],
-                exclude_tags=smart_split(postform.data.get('exclude_tags', '')),
+                exclude_tags=postform.data.get('exclude_tags', []),
                 rating_id=postform.data['rating'],
                 original=postform.data['original'],
                 finished=postform.data['finished'],

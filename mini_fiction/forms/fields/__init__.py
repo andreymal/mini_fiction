@@ -2,8 +2,10 @@
 # -*- coding: utf-8 -*-
 
 from itertools import groupby
+from typing import List
 
-from wtforms import SelectField, SelectMultipleField
+from wtforms import Field, StringField, SelectField, SelectMultipleField
+from wtforms.widgets import TextInput
 
 
 class LazySelectField(SelectField):
@@ -88,3 +90,20 @@ class GroupedModelChoiceField(LazySelectMultipleField):
     @property
     def raw_choices_groups(self):
         return GroupedModelChoiceIterator(self.group_by_field, self.raw_choices, None)
+
+
+class StringListField(Field):
+    data: List[str]
+
+    widget = TextInput()
+
+    def process_formdata(self, valuelist: List[str]) -> None:
+        if not valuelist:
+            return
+        self.data = [x.strip() for x in valuelist[0].split(",")]
+        self.data = [x for x in self.data if x]
+
+    def _value(self) -> str:
+        if not self.data:
+            return ""
+        return ", ".join(self.data)

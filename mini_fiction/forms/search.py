@@ -6,7 +6,7 @@ from wtforms import SelectField, SelectMultipleField, TextField, BooleanField, I
 from pony import orm
 
 from mini_fiction.models import Category, Character, Rating, Classifier
-from mini_fiction.forms.fields import LazySelectMultipleField, GroupedModelChoiceField
+from mini_fiction.forms.fields import LazySelectMultipleField, GroupedModelChoiceField, StringListField
 from mini_fiction.widgets import StoriesCharacterSelect, StoriesButtons, ButtonWidget, TagsInput
 
 
@@ -77,7 +77,7 @@ class SearchForm(Form):
         }
     )
 
-    tags = TextField(
+    tags = StringListField(
         'Теги',
         render_kw=dict(attrs_tags_dict, maxlength=512, placeholder='Теги разделяются запятой, например: Флафф, Повседневность, Зарисовка'),
         widget=TagsInput(),
@@ -92,7 +92,7 @@ class SearchForm(Form):
         default='all',
     )
 
-    exclude_tags = TextField(
+    exclude_tags = StringListField(
         'Исключить рассказы с этими тегами',
         render_kw=dict(attrs_tags_dict, maxlength=512, placeholder='Теги разделяются запятой, например: Флафф, Повседневность, Зарисовка'),
         widget=TagsInput(),

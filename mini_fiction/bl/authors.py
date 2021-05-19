@@ -9,6 +9,7 @@ import time
 from io import BytesIO
 from hashlib import md5
 from datetime import datetime, timedelta
+from typing import Optional
 
 import pytz
 from flask import current_app, url_for, render_template
@@ -821,9 +822,13 @@ class AuthorBL(BaseBL):
         if self.model.avatar_large:
             return url_for('media', filename=self.model.avatar_large)
 
-    def get_unread_notifications_count(self):
+    def get_unread_notifications_count(self) -> int:
         user = self.model
         return self.model.notifications.filter(lambda x: x.id > user.last_viewed_notification_id).count()
+
+    def get_cached_unread_notifications_count(self) -> Optional[int]:
+        user = self.model
+        return current_app.cache.get(f'unread_count_{user.id}')
 
     def get_notifications(self, older=None, offset=0, count=50):
         from mini_fiction.models import Notification, Story, Chapter, StoryComment, StoryLocalThread, StoryLocalComment, NewsComment

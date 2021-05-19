@@ -28,10 +28,10 @@ from flask_wtf.csrf import CSRFProtect, CSRFError
 from flask_cors import CORS
 from pony.flask import Pony
 
-from event_bus import RedisEventBus, NullEventBus
 from mini_fiction import models  # pylint: disable=unused-import
 from mini_fiction import database, tasks, context_processors, ratelimit
 from mini_fiction.bl import init_bl
+from mini_fiction.event_bus import RedisEventBus, NullEventBus
 from mini_fiction.utils import frontend
 
 

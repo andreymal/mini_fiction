@@ -1,9 +1,12 @@
 import json
+import time
+from dataclasses import dataclass
 from enum import Enum, auto
 from typing import Union, Optional, Literal, TypedDict, Dict
 
 from flask import current_app
 
+from mini_fiction.event_bus import EventBus
 from mini_fiction.models import (
     Author,
     Chapter,
@@ -25,6 +28,17 @@ class Extras(TypedDict):
 
 
 MaybeExtras = Optional[Extras]
+
+
+@dataclass
+class UnreadCountMessage:
+    version: int
+    count: int
+    timestamp: int
+    user_id: int
+
+
+UNREAD_COUNT_VERSION = 1
 
 
 class AutoName(Enum):
@@ -83,7 +97,19 @@ def _notify(
         caused_by_user=by,
         extra=json.dumps(extra, ensure_ascii=False, sort_keys=True),
     )
-    current_app.cache.delete(f"bell_{to.id}")
+    unread_count = to.bl.get_unread_notifications_count()
+    current_app.cache.set(f"unread_count_{to.id}", unread_count)
+    event_bus: EventBus = current_app.event_bus
+
+    unread_count_message = UnreadCountMessage(
+        version=UNREAD_COUNT_VERSION,
+        user_id=to.id,
+        timestamp=int(time.time()),
+        count=unread_count,
+    )
+    # noinspection PyTypeChecker
+    event_bus.publish("unread_count", unread_count_message)  # NOTE: See https://github.com/python/mypy/issues/6568
+
     current_app.cache.delete(f"bell_content_{to.id}")
 
 

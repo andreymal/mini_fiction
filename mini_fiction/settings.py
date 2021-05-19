@@ -1,11 +1,15 @@
-#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
-
 import os
 import logging
+from typing import Optional, TypedDict
 
 from celery.schedules import crontab
 from flask_babel import lazy_gettext
+
+
+class RedisConf(TypedDict):
+    host: str
+    port: int
+    db: int
 
 
 class Config(object):
@@ -46,12 +50,7 @@ class Config(object):
     CACHE_PARAMS = {}
 
     # Rate limiter
-    RATE_LIMIT_BACKEND = None
-    # RATE_LIMIT_BACKEND = {
-    #     'host': 'localhost',
-    #     'port': 6379,
-    #     'db': 0,
-    # }
+    RATE_LIMIT_BACKEND: Optional[RedisConf] = None
     RATE_LIMIT_PREFIX = 'mf_rate_limit_'
 
     RATE_LIMITS = {
@@ -69,6 +68,8 @@ class Config(object):
         # max 100 chapters per hour
         'chapter': (100, 3600),
     }
+
+    EVENT_BUS: Optional[RedisConf] = None
 
     CHAPTER_NEW_HTML_BACKEND_CACHE_TIME = 3600 * 12  # seconds
     CHAPTER_OLD_HTML_BACKEND_CACHE_TIME = 1800  # seconds

@@ -28,6 +28,7 @@ from flask_wtf.csrf import CSRFProtect, CSRFError
 from flask_cors import CORS
 from pony.flask import Pony
 
+from event_bus import RedisEventBus, NullEventBus
 from mini_fiction import models  # pylint: disable=unused-import
 from mini_fiction import database, tasks, context_processors, ratelimit
 from mini_fiction.bl import init_bl
@@ -107,6 +108,7 @@ def create_app():
     configure_development(app)
     configure_frontend(app)
     configure_sidebar(app)
+    configure_event_bus(app)
 
     app.context_processor(templates_context)
 
@@ -600,6 +602,13 @@ def configure_sidebar(app: Flask):
         module = importlib.import_module(module_name)
         func = getattr(module, func_name)
         app.index_sidebar[block_name] = func
+
+
+def configure_event_bus(app: Flask) -> None:
+    if app.config['EVENT_BUS'] is not None:
+        app.event_bus = RedisEventBus(config=app.config['EVENT_BUS'])
+    else:
+        app.event_bus = NullEventBus()
 
 
 def init_plugins(app):

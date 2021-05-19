@@ -1,9 +1,7 @@
 from functools import wraps
 
 import os
-import json
 import time
-from typing import Union, Optional, Mapping
 
 from flask import current_app, url_for
 from pony import orm
@@ -12,7 +10,7 @@ from pony.orm import db_session
 from mini_fiction import models
 from mini_fiction.models import Story, Chapter
 from mini_fiction.utils.misc import render_nonrequest_template, ping_sitemap
-from mini_fiction.notifications import NotifyKind
+from mini_fiction.notifications import NotifyKind, notify_story, notify_chapter, notify_comment
 
 tasks = {}
 
@@ -119,24 +117,6 @@ def _sendmail_notify(to, typ, ctx):
     return current_app.tasks['sendmail'].delay(**kwargs)
 
 
-def _notify(
-    to: models.Author,
-    typ: NotifyKind,
-    target: Union[models.Story, models.Chapter, models.StoryComment],
-    by: Optional[models.Author] = None,
-    extra: Mapping[str, bool] = None
-) -> None:
-    models.Notification(
-        user=to,
-        type=typ.value,
-        target_id=target.id,
-        caused_by_user=by,
-        extra=json.dumps(extra or {}, ensure_ascii=False, sort_keys=True),
-    )
-    current_app.cache.delete(f"bell_{to.id}")
-    current_app.cache.delete(f"bell_content_{to.id}")
-
-
 @task()
 @db_session
 def notify_abuse_report(abuse_id):
@@ -239,7 +219,7 @@ def notify_story_publish_draft(story_id, staff_id, draft, fast=False):
 
     # TODO: Make author.silent_tracker_list strong-typed field instead string-typed one
     if typ.value not in author.silent_tracker_list:
-        _notify(author, typ, story, by=staff)
+        notify_story(to=author, kind=typ, story=story, by=staff)
 
     if not fast and author.email and typ not in author.silent_email_list:
         _sendmail_notify([author.email], typ, {'story': story, 'author': author, 'staff': staff})
@@ -273,7 +253,7 @@ def notify_author_story(story_id, publisher_user_id=None):
 
         # Если есть подписка на сайте, создаём уведомление
         if sub.to_tracker:
-            _notify(user, NotifyKind.AUTHOR_STORY, story)
+            notify_story(to=user, kind=NotifyKind.AUTHOR_STORY, story=story)
 
         # Если есть подписка на почту, забираем адрес для последующей отправки
         if sub.to_email and user.email:
@@ -314,7 +294,7 @@ def notify_story_chapters(chapter_ids, publisher_user_id=None):
         # Если есть подписка на сайте, создаём уведомление
         if sub.to_tracker:
             for c in chapters:
-                _notify(user, NotifyKind.STORY_CHAPTER, c)
+                notify_chapter(to=user, chapter=c)
 
         # Если есть подписка на почту, забираем адрес для последующей отправки
         if sub.to_email and user.email:
@@ -343,7 +323,7 @@ def notify_story_comment(comment_id):
         # Не забываем про проверку доступа
         if story.bl.has_access(parent.author):
             if 'story_reply' not in parent.author.silent_tracker_list:
-                _notify(parent.author, NotifyKind.STORY_REPLY, comment, by=comment.author)
+                notify_comment(to=parent.author, kind=NotifyKind.STORY_REPLY, comment=comment, by=comment.author)
                 reply_sent_tracker = True
 
             if 'story_reply' not in parent.author.silent_email_list and parent.author.email:
@@ -365,7 +345,7 @@ def notify_story_comment(comment_id):
 
         if sub.to_tracker:
             if not parent or not parent.author or parent.author.id != user.id or not reply_sent_tracker:
-                _notify(user, NotifyKind.STORY_COMMENT, comment, by=comment.author)
+                notify_comment(to=user, kind=NotifyKind.STORY_COMMENT, comment=comment, by=comment.author)
 
         if sub.to_email and user.email:
             if not parent or not parent.author or parent.author.id != user.id or not reply_sent_email:
@@ -403,7 +383,7 @@ def notify_story_lcomment(comment_id):
         # Не забываем про проверку доступа
         if parent.author.is_staff or story.bl.is_contributor(parent.author):
             if 'story_lreply' not in parent.author.silent_tracker_list:
-                _notify(parent.author, NotifyKind.STORY_LREPLY, comment, by=comment.author, extra=extra)
+                notify_comment(to=parent.author, kind=NotifyKind.STORY_LREPLY, comment=comment, by=comment.author, extra=extra)
                 reply_sent_tracker = True
 
             if 'story_lreply' not in parent.author.silent_email_list and parent.author.email:
@@ -425,7 +405,7 @@ def notify_story_lcomment(comment_id):
 
         if sub.to_tracker:
             if not parent or not parent.author or parent.author.id != user.id or not reply_sent_tracker:
-                _notify(user, NotifyKind.STORY_LCOMMENT, comment, by=comment.author, extra=extra)
+                notify_comment(to=user, kind=NotifyKind.STORY_LCOMMENT, comment=comment, by=comment.author, extra=extra)
 
         if sub.to_email and user.email:
             if not parent or not parent.author or parent.author.id != user.id or not reply_sent_email:
@@ -451,7 +431,7 @@ def notify_news_comment(comment_id):
     if parent and parent.author and (not comment.author or parent.author.id != comment.author.id):
         # Уведомляем автора родительского комментария, что ему ответили
         if 'news_reply' not in parent.author.silent_tracker_list:
-            _notify(parent.author, NotifyKind.NEWS_REPLY, comment, by=comment.author)
+            notify_comment(to=parent.author, kind=NotifyKind.NEWS_REPLY, comment=comment, by=comment.author)
             reply_sent_tracker = True
 
         if 'news_reply' not in parent.author.silent_email_list and parent.author.email:
@@ -469,7 +449,7 @@ def notify_news_comment(comment_id):
 
         if sub.to_tracker:
             if not parent or not parent.author or parent.author.id != user.id or not reply_sent_tracker:
-                _notify(user, NotifyKind.NEWS_COMMENT, comment, by=comment.author)
+                notify_comment(to=user, kind=NotifyKind.NEWS_COMMENT, comment=comment, by=comment.author)
 
         if sub.to_email and user.email:
             if not parent or not parent.author or parent.author.id != user.id or not reply_sent_email:

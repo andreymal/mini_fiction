@@ -18,3 +18,4 @@ pytz
 python-dotenv
 email_validator
 dataclasses; python_version < '3.7'
+typing_extensions; python_version < '3.8'

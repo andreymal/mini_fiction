@@ -1088,26 +1088,11 @@ class HtmlBlock(db.Entity):
 
 
 class Notification(db.Entity):
-    """Модель уведомления о каком-то событии на сайте.
-
-    Шпаргалка по ныне существующим событиям (в скобках тип, на который
-    указывает target_id):
-
-    - story_publish (Story): модератор опубликовал рассказ
-    - story_draft (Story): модератор отклонил рассказ
-    - author_story (Story): новый рассказ от интересующего автора
-    - story_chapter (Chapter): новая глава в рассказе
-    - story_reply (StoryComment): ответ на комментарий к рассказу
-    - story_comment (StoryComment): не ответ, просто новый комментарий
-    - story_lreply (StoryLocalComment): ответ на комментарий в редакторской
-    - story_lcomment (StoryLocalComment): новый комментарий в редакторской
-    - news_reply (NewsComment): ответ на комментарий к новости
-    - news_comment (NewsComment): просто новый комментарий
-    - custom (никуда): произвольный HTML-текст
-    """
+    """Модель уведомления о каком-то событии на сайте"""
     user = orm.Required(Author)
     created_at = orm.Required(datetime, 6, default=datetime.utcnow)
     type = orm.Required(str, 24, index=True)
+    """See: mini_fiction.notification.NotifyKind"""
     target_id = orm.Optional(int)
     caused_by_user = orm.Optional(Author)
     extra = orm.Required(orm.LongStr, lazy=False, default='{}')

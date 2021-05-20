@@ -7,6 +7,7 @@ import amajaxify from './lib/amajaxify';
 import core from './core';
 import common from './common';
 import { post } from '../utils/ajax';
+import { notify, notifyError } from '../utils/notifications';
 
 const hypher = new Hypher(ruHyphenation);
 
@@ -315,7 +316,7 @@ var story = {
             }
         }
 
-        core.notify(favorited ? 'Рассказ добавлен в избранное' : 'Рассказ удален из избранного');
+        notify(favorited ? 'Рассказ добавлен в избранное' : 'Рассказ удален из избранного');
         return true;
     },
 
@@ -338,7 +339,7 @@ var story = {
             }
         }
 
-        core.notify(bookmarked ? 'Рассказ добавлен в список' : 'Рассказ удален из списка');
+        notify(bookmarked ? 'Рассказ добавлен в список' : 'Рассказ удален из списка');
         return true;
     },
 
@@ -377,7 +378,7 @@ var story = {
 
     updateStoryVote: function(data) {
         if (!data.success) {
-            core.notifyError(data.error || 'Ошибка');
+            notifyError(data.error || 'Ошибка');
             return true;
         }
 
@@ -397,7 +398,7 @@ var story = {
             vote2Areas[i].innerHTML = data.vote_area_2_html;
         }
 
-        core.notify('Ваш голос учтен!');
+        notify('Ваш голос учтен!');
         return true;
     },
 

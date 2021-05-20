@@ -3,6 +3,7 @@ import captcha from './captcha';
 import core from './core';
 import common from './common';
 import { post, req } from '../utils/ajax';
+import { notify, notifyError } from '../utils/notifications';
 
 
 'use strict';
@@ -398,9 +399,9 @@ var comments = {
                 }
                 if (data.success) {
                     voteArea.innerHTML = data.html;
-                    core.notify('Ваш голос учтён');
+                    notify('Ваш голос учтён');
                 } else {
-                    core.notifyError(data.error || 'Не удалось проголосовать');
+                    notifyError(data.error || 'Не удалось проголосовать');
                 }
             }).then(null, core.handleError).then(function() {
                 voteArea.classList.remove('voting');

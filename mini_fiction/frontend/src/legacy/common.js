@@ -1,6 +1,7 @@
 import core from './core';
 import HTMLSanitizer from './lib/htmlsanitizer';
 import { post } from '../utils/ajax';
+import { notify, notifyError } from '../utils/notifications';
 
 'use strict';
 
@@ -147,11 +148,11 @@ var common = {
                 if (core.handleResponse(data, form.action)) {
                     return;
                 }
-                core.notify('Изменение подписки прошло успешно');
+                notify('Изменение подписки прошло успешно');
 
             }).then(null, function(err) {
                 console.error(err);
-                core.notifyError(err);
+                notifyError(err);
             });
 
         return false;

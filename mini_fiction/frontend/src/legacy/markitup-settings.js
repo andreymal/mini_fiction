@@ -20,6 +20,7 @@ import background from 'images/markitup/background.svg'
 import ficbook from 'images/markitup/ficbook.svg'
 
 import { post } from '../utils/ajax';
+import { notify, notifyError } from '../utils/notifications';
 
 const formattingConverter = markitup => {
     post('/convert/', markitup.textarea.value)
@@ -32,9 +33,9 @@ const formattingConverter = markitup => {
         } else {
             message = 'С форматированием уже всё хорошо';
         }
-        // core.notify(message);
+        notify(message);
     })
-    // .catch((ignored) => core.notify('Не удалось отформатировать текст'));
+    .catch((ignored) => notifyError('Не удалось отформатировать текст'));
 }
 
 export default {

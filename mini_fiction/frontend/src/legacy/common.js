@@ -173,7 +173,11 @@ var common = {
     },
 
     markitupDestroy: function(elem) {
-        common.jQuery('.with-markitup', elem).markItUpRemove();
+        // FIXME: Drop it with markitup
+        const markitupContainer = common.jQuery('.with-markitup', elem);
+        if (markitupContainer.hasOwnProperty('markItUpRemove')) {
+          markitupContainer.markItUpRemove();
+        }
 
         // Если у поля ввода был обработчик вставки, то отключаем его
         var areas = elem.getElementsByClassName('with-markitup');

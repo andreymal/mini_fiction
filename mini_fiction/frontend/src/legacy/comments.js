@@ -2,6 +2,7 @@ import amajaxify from './lib/amajaxify';
 import captcha from './captcha';
 import core from './core';
 import common from './common';
+import { post, req } from '../utils/ajax';
 
 
 'use strict';
@@ -160,7 +161,7 @@ var comments = {
 
         var formData = new FormData(form);
         formData.append('extra_ajax', '1');
-        core.ajax.post(form.action, formData)
+        post(form.action, formData)
             .then(function(response) {
                 return response.json();
             })
@@ -255,7 +256,7 @@ var comments = {
         var form = this.form; // this is button
         var formData = new FormData(form);
         formData.append('extra_ajax', '1');
-        core.ajax.post(form.action, formData)
+        post(form.action, formData)
             .then(function(response) {
                 return response.json();
             })
@@ -283,7 +284,7 @@ var comments = {
         var url = this.getAttribute('data-ajax-href');
         var pagination = document.getElementById('comments-pagination');
         pagination.classList.add('pagination-loading');
-        core.ajax.fetch(url)
+        req(url)
             .then(function(response) {
                 return response.json();
             })
@@ -340,7 +341,7 @@ var comments = {
         }
 
         linkBlock.classList.add('comment-tree-loading');
-        var p = core.ajax.fetch(href)
+        var p = req(href)
             .then(function(response) {
                 return response.json();
             }).then(function(data) {
@@ -388,7 +389,7 @@ var comments = {
 
         var href = voteArea.getAttribute('data-href');
         voteArea.classList.add('voting');
-        core.ajax.post(href, formData)
+        post(href, formData)
             .then(function(response) {
                 return response.json();
             }).then(function(data) {
@@ -420,7 +421,7 @@ var comments = {
         var loadingImg = document.getElementById('comment-preview-loading-img');
 
         var url = form.action || location.toString();
-        core.ajax.post(url, data)
+        post(url, data)
             .then(function(response) {
                 return response.json();
             })

@@ -1,4 +1,5 @@
 import amajaxify from './lib/amajaxify';
+import { req, setCsrfToken } from '../utils/ajax';
 
 'use strict';
 
@@ -53,7 +54,7 @@ var core = {
         this.initCallbacks = null;
 
         // Включение навигации через ajax
-        this.ajaxify(jQuery);
+        // this.ajaxify(jQuery);
 
         // Показываем предустановленное модальное окно
         if (this.modalElement.childNodes.length > 0) {
@@ -245,7 +246,7 @@ var core = {
         }
 
         var initOk = amajaxify.init({
-            customFetch: core.ajax.fetch.bind(core.ajax),
+            customFetch: req,
             withoutClickHandler: true,
             allowScriptTags: true,
             bindWithjQuery: true,
@@ -311,7 +312,7 @@ var core = {
         var i;
 
         if (event.detail.content.csrftoken) {
-            core.ajax.setCsrfToken(event.detail.content.csrftoken);
+            setCsrfToken(event.detail.content.csrftoken);
         }
 
         if (event.detail.toModal) {
@@ -367,60 +368,6 @@ var core = {
         }
         return false;
     },
-};
-
-
-core.ajax = {
-    csrfToken: null,
-
-    getCsrfToken: function() {
-        if (this.csrfToken === null) {
-            this.csrfToken = document.querySelector('meta[name=csrf-token]').content;
-        }
-        return this.csrfToken;
-    },
-
-    setCsrfToken: function(token) {
-        this.csrfToken = token;
-        document.querySelector('meta[name=csrf-token]').content = token;
-    },
-
-    fetch: function(input, init) {
-        var request;
-        if (Request.prototype.isPrototypeOf(input) && !init) {
-            request = input;
-        } else {
-            request = new Request(input, init);
-        }
-        request = new Request(request, {credentials: 'include'});
-        request.headers.set('Accept', 'application/json,*/*');
-        request.headers.set('X-AJAX', '1');
-        if (request.method != 'GET') {
-            request.headers.set('X-CSRFToken', this.getCsrfToken());
-        }
-
-        return fetch(request);
-    },
-
-    post: function(input, body, init) {
-        init = init || {};
-        init.method = 'POST';
-        init.body = body;
-        var request = new Request(input, init);
-        return this.fetch(request);
-    },
-
-    postJSON: function(input, body, init) {
-        init = init || {};
-        init.method = 'POST';
-        init.body = JSON.stringify(body);
-        init.headers = init.headers || {};
-        if (!init.headers['Content-Type']) {
-            init.headers['Content-Type'] = 'application/json';
-        }
-        var request = new Request(input, init);
-        return this.fetch(request);
-    }
 };
 
 

@@ -6,6 +6,7 @@ import ruHyphenation from 'hyphenation.ru';
 import amajaxify from './lib/amajaxify';
 import core from './core';
 import common from './common';
+import { post } from '../utils/ajax';
 
 const hypher = new Hypher(ruHyphenation);
 
@@ -95,7 +96,7 @@ var story = {
                 return;
             }
             var url = this.href;
-            core.ajax.post(url)
+            post(url)
                 .then(function(response) {
                     return response.json();
                 })
@@ -122,7 +123,7 @@ var story = {
             }
             var link = this;
             var url = link.href;
-            core.ajax.post(url)
+            post(url)
                 .then(function(response) {
                     return response.json();
                 })
@@ -145,7 +146,7 @@ var story = {
                 return;
             }
             var url = this.href;
-            core.ajax.post(url)
+            post(url)
                 .then(function(response) {
                     return response.json();
                 })
@@ -165,7 +166,7 @@ var story = {
             event.stopImmediatePropagation();
             event.preventDefault();
             var url = this.href;
-            core.ajax.post(url)
+            post(url)
                 .then(function(response) {
                     return response.json();
                 })
@@ -181,7 +182,7 @@ var story = {
             event.stopImmediatePropagation();
             event.preventDefault();
             var url = this.href;
-            core.ajax.post(url)
+            post(url)
                 .then(function(response) {
                     return response.json();
                 })
@@ -198,7 +199,7 @@ var story = {
             event.stopImmediatePropagation();
             event.preventDefault();
             var url = this.href;
-            core.ajax.post(url)
+            post(url)
                 .then(function(response) {
                     return response.json();
                 })
@@ -359,7 +360,7 @@ var story = {
         var url = form.action || '';
         form.classList.add('uploading');
 
-        core.ajax.post(url, body)
+        post(url, body)
             .then(function(response) {
                 return response.json();
             })
@@ -457,7 +458,7 @@ var story = {
         formData.append('act', 'save_access');
 
         this.contributorsForm.act.disabled = true;
-        core.ajax.post(url, formData)
+        post(url, formData)
             .then(function(response) {
                 return response.json();
             })
@@ -791,7 +792,7 @@ var story = {
         var loadingImg = document.getElementById('chapter-preview-loading-img');
 
         var url = form.action || location.toString();
-        core.ajax.post(url, data)
+        post(url, data)
             .then(function(response) {
                 return response.json();
             })

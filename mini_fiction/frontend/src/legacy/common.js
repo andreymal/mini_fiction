@@ -1,5 +1,6 @@
 import core from './core';
 import HTMLSanitizer from './lib/htmlsanitizer';
+import { post } from '../utils/ajax';
 
 'use strict';
 
@@ -138,7 +139,7 @@ var common = {
         var data = new FormData(form);
         data.append('short', '1');
 
-        core.ajax.post(form.action, data)
+        post(form.action, data)
             .then(function(response) {
                 return response.json();
 

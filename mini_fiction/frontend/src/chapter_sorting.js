@@ -1,6 +1,7 @@
 import jQueryUI from './legacy/lib/jquery-ui-custom.min';
 import jQueryUITouchPunch from './legacy/lib/jquery-ui-touch-punch.min';
 import core from './legacy/core';
+import { postJSON } from './utils/ajax';
 
 const sortEventFactory = (jQuery) => () => {
   const items = jQuery('#sortable_chapters').sortable('toArray', { attribute: 'data-chapter' });
@@ -12,7 +13,7 @@ const sortEventFactory = (jQuery) => () => {
 
   const url = `/story/${window.document.getElementById('sortable_chapters')
     .getAttribute('data-story')}/sort/`;
-  core.ajax.postJSON(url, data)
+  postJSON(url, data)
     .then((response) => response.json())
     .then((response) => {
       core.handleResponse(response, url);

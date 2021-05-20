@@ -113,6 +113,7 @@ var amajaxify = {
      *   CSRF-токенов и подобного)
      * @param {boolean} [options.bindWithjQuery=false] - использовать jQuery
      *   для события onclick (решает некоторые проблемы с bootstrap)
+     * @param {Function} [options.jQueryRef=undefined] - ссылка на jQuery
      * @param {boolean} [options.withoutClickHandler=false] - не перехватывать
      *   нажатия на ссылки
      * @param {boolean} [options.withoutSubmitHandler=false] - не перехватывать
@@ -190,7 +191,7 @@ var amajaxify = {
             // Нативный listener выполняется раньше, чем jQuery live event в bootstrap,
             // отчего ломаются переключалки вкладок и спойлеры.
             // Поэтому если он здесь присутствует, то приходится тоже делать live event
-            (window.$ || window.jQuery)(document).on('click', 'a', this.linkClickHandler.bind(this));
+            options.jQueryRef(document).on('click', 'a', this.linkClickHandler.bind(this));
         } else if (!options.withoutClickHandler) {
             document.body.addEventListener('click', this.linkClickHandler.bind(this));
         } // else - кто-то должен повесить обработчик самостоятельно

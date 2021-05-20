@@ -2,7 +2,7 @@ import amajaxify from './lib/amajaxify';
 import captcha from './captcha';
 import core from './core';
 import common from './common';
-import { post, req } from '../utils/ajax';
+import { post, get } from '../utils/ajax';
 import { notify, notifyError } from '../utils/notifications';
 
 
@@ -285,7 +285,7 @@ var comments = {
         var url = this.getAttribute('data-ajax-href');
         var pagination = document.getElementById('comments-pagination');
         pagination.classList.add('pagination-loading');
-        req(url)
+        get(url)
             .then(function(response) {
                 return response.json();
             })
@@ -342,7 +342,7 @@ var comments = {
         }
 
         linkBlock.classList.add('comment-tree-loading');
-        var p = req(href)
+        var p = get(href)
             .then(function(response) {
                 return response.json();
             }).then(function(data) {

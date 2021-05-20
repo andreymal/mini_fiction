@@ -13,34 +13,32 @@ const setCsrfToken = (token) => {
   window.document.querySelector('meta[name=csrf-token]').content = token;
 };
 
-const req = (input, init) => {
-  let request;
-  // eslint-disable-next-line no-prototype-builtins
-  if (R.prototype.isPrototypeOf(input) && !init) {
-    request = input;
-  } else {
-    request = new R(input, init);
-  }
-  request = new R(request, { credentials: 'include' });
-  request.headers.set('Accept', 'application/json,*/*');
-  request.headers.set('X-AJAX', '1');
-  if (request.method !== 'GET') {
-    request.headers.set('X-CSRFToken', getCsrfToken());
-  }
+const defaultHeaders = [
+  ['Accept', 'application/json,*/*'],
+  ['X-AJAX', '1'],
+];
 
-  return window.fetch(request);
+const request = (originalRequest, headers = []) => {
+  const r = new R(originalRequest, { credentials: 'include' });
+  [...defaultHeaders, ...headers].forEach(([name, value]) => r.headers.set(name, value));
+  if (r.method !== 'GET') {
+    r.headers.set('X-CSRFToken', getCsrfToken());
+  }
+  return window.fetch(r);
 };
 
-const post = (input, body, init = {}) => {
-  const request = new R(input, { method: 'POST', body, ...init });
-  return req(request);
-};
+const get = (url) => request(new R(url, { credentials: 'include' }));
 
-const postJSON = (input, body) => post(input, JSON.stringify(body), { 'Content-Type': 'application/json' });
+const post = (url, body) => request(new R(url, { method: 'POST', body }));
+
+const postJSON = (url, body) => request(
+  new R(url, { method: 'POST', body: JSON.stringify(body) }),
+  [['Content-Type', 'application/json']],
+);
 
 export {
   setCsrfToken,
-  req,
+  get,
   post,
   postJSON,
 };

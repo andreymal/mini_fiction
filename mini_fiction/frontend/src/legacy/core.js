@@ -1,5 +1,5 @@
 import amajaxify from './lib/amajaxify';
-import { req, setCsrfToken } from '../utils/ajax';
+import { get, setCsrfToken } from '../utils/ajax';
 import { notifyError } from '../utils/notifications';
 
 'use strict';
@@ -201,7 +201,7 @@ var core = {
         }
 
         var initOk = amajaxify.init({
-            customFetch: req,
+            customFetch: get,
             withoutClickHandler: true,
             allowScriptTags: true,
             bindWithjQuery: true,

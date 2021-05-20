@@ -1,5 +1,5 @@
 import core from './core';
-import { post, req } from '../utils/ajax';
+import { post, get } from '../utils/ajax';
 
 'use strict';
 
@@ -56,7 +56,7 @@ var bell = {
         popup.style.display = '';
         link.parentNode.classList.add('active');
 
-        req(url)
+        get(url)
             .then(function(response) {
                 return response.json();
             })
@@ -98,7 +98,7 @@ var bell = {
             localStorage.mfBellLastRequest = tm.toString();
         }
 
-        req('/notifications/unread_count/')
+        get('/notifications/unread_count/')
             .then(function(response) {
                 if (response.status < 100 || response.status >= 400) {
                     return {success: false, error: 'Bell fetch error ' + response.status};

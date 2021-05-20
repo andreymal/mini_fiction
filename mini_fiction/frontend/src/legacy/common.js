@@ -18,7 +18,7 @@ var common = {
     jQuery: null,
 
     init: function(jQuery) {
-        this.jQuery = jQuery; // FIXME: Sad, but necessary workaround
+        common.jQuery = jQuery; // FIXME: Sad, but necessary workaround
         // Кнопка закрытия новости, если таковая присутствует
         var btn = document.getElementById('close-shown-newsitem');
         if (btn) {
@@ -173,7 +173,7 @@ var common = {
     },
 
     markitupDestroy: function(elem) {
-        this.jQuery('.with-markitup', elem).markItUpRemove();
+        common.jQuery('.with-markitup', elem).markItUpRemove();
 
         // Если у поля ввода был обработчик вставки, то отключаем его
         var areas = elem.getElementsByClassName('with-markitup');
@@ -194,29 +194,29 @@ var common = {
     },
 
     bootstrapFor: function(elem) {
-        this.jQuery('.bootstrap', elem).each(this.bootstrap);
+        common.jQuery('.bootstrap', elem).each(this.bootstrap);
     },
 
     buttonsFor: function(elem) {
         // Виджет выбора персонажей
-        this.jQuery('.characters-select:checked + img', elem).addClass('ui-selected');
-        this.jQuery(".character-item", elem).click(function() {
-            var input = this.jQuery('input', this);
+        common.jQuery('.characters-select:checked + img', elem).addClass('ui-selected');
+        common.jQuery(".character-item", elem).click(function() {
+            var input = common.jQuery('input', this);
             var typ = input.attr('type');
             var checked;
             if (typ == 'checkbox') {
                 checked = input.prop('checked');
                 input.prop('checked', !checked);
-                this.jQuery('img', this).toggleClass('ui-selected', !checked);
+                common.jQuery('img', this).toggleClass('ui-selected', !checked);
 
             } else if (typ == 'radio') {
                 var oldInput = input[0].form.querySelector('input[name="' + input.attr('name') + '"]:checked');
                 if (oldInput) {
-                    this.jQuery('img', oldInput.parentNode).toggleClass('ui-selected', false);
+                    common.jQuery('img', oldInput.parentNode).toggleClass('ui-selected', false);
                 }
                 checked = input.prop('checked');
                 input.prop('checked', !checked);
-                this.jQuery('img', this).toggleClass('ui-selected', !checked);
+                common.jQuery('img', this).toggleClass('ui-selected', !checked);
 
             } else {
                 throw new Error('Unsupported input type ' + typ);
@@ -225,31 +225,31 @@ var common = {
     },
 
     bootstrap: function() {
-        var group = this.jQuery(this);
-        var buttons_container = this.jQuery('.buttons-visible', group);
-        var data_container = this.jQuery('.buttons-data', group);
+        var group = common.jQuery(this);
+        var buttons_container = common.jQuery('.buttons-visible', group);
+        var data_container = common.jQuery('.buttons-data', group);
         var type = group.hasClass('checkbox') ? 'checkbox' : 'radio';
 
         // Обработка проставленных заранее чекбоксов и радиоселектов
-        this.jQuery('input', data_container).each(function() {
-            var input = this.jQuery(this);
+        common.jQuery('input', data_container).each(function() {
+            var input = common.jQuery(this);
             var value = input.attr('value');
             if (input.prop('checked')) {
-                this.jQuery('button[value=' + value + ']', buttons_container).addClass('active');
+                common.jQuery('button[value=' + value + ']', buttons_container).addClass('active');
             }
         });
         // Onclick-обработчик
-        this.jQuery('button', buttons_container).each(function() {
-            var button = this.jQuery(this);
+        common.jQuery('button', buttons_container).each(function() {
+            var button = common.jQuery(this);
             button.on('click', function() {
                 var value = button.attr('value');
                 if (type == 'checkbox') {
-                    var input = this.jQuery('input:checkbox[value=' + value + ']', data_container);
-                    input.prop('checked', !(this.jQuery('input:checked[value=' + value + ']', data_container).length | 0));
+                    var input = common.jQuery('input:checkbox[value=' + value + ']', data_container);
+                    input.prop('checked', !(common.jQuery('input:checked[value=' + value + ']', data_container).length | 0));
                 } else if (type == 'radio') {
-                    if (!(!!(this.jQuery('input:radio[value=' + value + ']', data_container).prop('checked')))) {
-                        this.jQuery('input:radio', data_container).prop('checked', false);
-                        this.jQuery('input:radio[value=' + value + ']', data_container).prop('checked', true);
+                    if (!(!!(common.jQuery('input:radio[value=' + value + ']', data_container).prop('checked')))) {
+                        common.jQuery('input:radio', data_container).prop('checked', false);
+                        common.jQuery('input:radio[value=' + value + ']', data_container).prop('checked', true);
                     }
                 }
             });

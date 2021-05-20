@@ -1,5 +1,4 @@
 import core from './core';
-import mySettings from './markitup-settings';
 import HTMLSanitizer from './lib/htmlsanitizer';
 
 'use strict';
@@ -163,9 +162,6 @@ var common = {
     },
 
     markitupFor: function(elem) {
-        // Собственно markitup
-        $('.with-markitup', elem).markItUp(mySettings);
-
         // Обработка вставки HTML-кода из буфера обмена
         var e = this._pasteEvent.bind(this);
 

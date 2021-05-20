@@ -59,7 +59,7 @@ module.exports = {
 
   output: {
     path: outputPath,
-    publicPath: '/',
+    publicPath: '/static/build/',
     filename: `${outputName}.js`,
   },
 

@@ -26,7 +26,7 @@ var core = {
     /*
      * Инициализация всего этого дела
      */
-    init: function() {
+    init: function(jQuery) {
         if (this.started) {
             return;
         }
@@ -48,12 +48,12 @@ var core = {
         var i;
 
         for (i = 0; i < this.initCallbacks.length; i++) {
-            this.initCallbacks[i]();
+            this.initCallbacks[i](jQuery);
         }
         this.initCallbacks = null;
 
         // Включение навигации через ajax
-        this.ajaxify();
+        this.ajaxify(jQuery);
 
         // Показываем предустановленное модальное окно
         if (this.modalElement.childNodes.length > 0) {
@@ -234,7 +234,7 @@ var core = {
         return true;
     },
 
-    ajaxify: function() {
+    ajaxify: function(jQuery) {
         if (document.cookie.indexOf('noajax=1') >= 0) {
             console.log('amajaxify disabled by cookie');
             return;
@@ -249,6 +249,7 @@ var core = {
             withoutClickHandler: true,
             allowScriptTags: true,
             bindWithjQuery: true,
+            jQueryRef: jQuery,
             updateModalFunc: function(html) {
                 if (html !== null) {
                     this.modal(html, true);

@@ -1,5 +1,3 @@
-import core from './core';
-
 'use strict';
 
 /* global core: false */

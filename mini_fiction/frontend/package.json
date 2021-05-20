@@ -58,6 +58,7 @@
     "url-loader": "^4.1.1",
     "webpack": "^5.36.2",
     "webpack-assets-manifest": "^5.0.6",
+    "webpack-bundle-analyzer": "^4.4.2",
     "webpack-cli": "^4.6.0",
     "webpack-remove-block-loader": "^1.0.2"
   }

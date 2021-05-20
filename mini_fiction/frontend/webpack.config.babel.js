@@ -10,6 +10,8 @@ import postCSSCustomProperties from 'postcss-custom-properties';
 import postCSSMixins from 'postcss-mixins';
 import postCSSNano from 'cssnano';
 
+const { BundleAnalyzerPlugin } = require('webpack-bundle-analyzer');
+
 const ENV = process.env.NODE_ENV || 'development';
 const isDev = ENV !== 'production';
 
@@ -48,6 +50,24 @@ const cssLoaderOptions = {
 const extractLoaderOptions = {
   publicPath: './',
 };
+
+const defaultPlugins = [
+  new MiniCssExtractPlugin({
+    filename: `${outputName}.css`,
+    chunkFilename: '[id].css',
+  }),
+  new CleanWebpackPlugin(),
+  new AssetsManifestPlugin({
+    output: 'manifest.json',
+    integrity: true,
+    integrityHashes: ['sha256'],
+    customize: (_, original) => original,
+  }),
+];
+
+const devPlugins = [
+  new BundleAnalyzerPlugin({ analyzerMode: 'static', openAnalyzer: false }),
+];
 
 module.exports = {
   mode: ENV,
@@ -124,19 +144,7 @@ module.exports = {
       }),
     ],
   },
-  plugins: [
-    new MiniCssExtractPlugin({
-      filename: `${outputName}.css`,
-      chunkFilename: '[id].css',
-    }),
-    new CleanWebpackPlugin(),
-    new AssetsManifestPlugin({
-      output: 'manifest.json',
-      integrity: true,
-      integrityHashes: ['sha256'],
-      customize: (_, original) => original,
-    }),
-  ],
+  plugins: [...defaultPlugins, ...(isDev ? devPlugins : [])],
 
   stats: { colors: true },
 

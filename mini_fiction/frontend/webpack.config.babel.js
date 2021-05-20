@@ -119,15 +119,6 @@ module.exports = {
         extractComments: false,
       }),
     ],
-    splitChunks: {
-      cacheGroups: {
-        vendor: {
-          test: /[\\/](node_modules|legacy\/lib)[\\/]/,
-          name: 'vendor',
-          chunks: 'all',
-        },
-      },
-    },
   },
   plugins: [
     new MiniCssExtractPlugin({

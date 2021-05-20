@@ -1,5 +1,19 @@
 {% extends base %}
 {% from 'macro.html' import breadcrumbs with context %}
+
+{%- block head_js %}
+    {{ super() }}
+    {% if story_tab == 'general' %}
+        {% set editor_js, story_js = webpack_asset('editor.js'), webpack_asset('story.js') %}
+        <script defer src="{{ url_for('static', filename='build/{}'.format(editor_js.src)) }}" integrity="{{ editor_js.integrity }}" crossorigin="anonymous"></script>
+        <script defer src="{{ url_for('static', filename='build/{}'.format(story_js.src)) }}" integrity="{{ story_js.integrity }}" crossorigin="anonymous"></script>
+    {% endif %}
+    {% if story_tab == 'chapters' %}
+        {% set chapter_sorting_js = webpack_asset('chapter_sorting.js') %}
+        <script defer src="{{ url_for('static', filename='build/{}'.format(chapter_sorting_js.src)) }}" integrity="{{ chapter_sorting_js.integrity }}" crossorigin="anonymous"></script>
+    {% endif %}
+{% endblock %}
+
 {% block content %}
 <div class="row">
     <div class="span12">

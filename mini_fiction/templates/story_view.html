@@ -1,6 +1,12 @@
 {% extends base %}
 {% from 'macro.html' import breadcrumbs, tag_link with context %}
 
+{%- block head_js %}
+    {{ super() }}
+    {% set editor_js = webpack_asset('editor.js') %}
+    <script defer src="{{ url_for('static', filename='build/{}'.format(editor_js.src)) }}" integrity="{{ editor_js.integrity }}" crossorigin="anonymous"></script>
+{% endblock %}
+
 {% block extrahead %}
     {{- super() }}
     {% if page_obj.has_previous() -%}

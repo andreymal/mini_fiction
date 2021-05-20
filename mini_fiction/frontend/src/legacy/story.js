@@ -7,9 +7,6 @@ import amajaxify from './lib/amajaxify';
 import core from './core';
 import common from './common';
 
-import arrowLeft from '../images/arrow-left.png';
-import arrowRight from '../images/arrow-right.png';
-
 const hypher = new Hypher(ruHyphenation);
 
 
@@ -72,43 +69,6 @@ var story = {
     },
 
     init: function() {
-        // Каруселька со случайными рассказами
-        var slides = document.getElementById('slides');
-        if (slides) {
-            $(slides).slidesjs({
-                width: 524,
-                height: 200,
-                navigation: {
-                    active: true,
-                    effect: 'fade',
-                },
-                pagination: {
-                    active: false,
-                },
-                effect: {
-                    slide: {
-                        speed: 1500,
-                    },
-                    fade: {
-                        speed: 300,
-                        crossfade: false,
-                    }
-                },
-                play: {
-                    active: false,
-                    effect: 'fade',
-                    interval: 7500,
-                    auto: true,
-                    swap: true,
-                    pauseOnHover: true,
-                    restartDelay: 3500
-                }
-            });
-            $('#slides .slidesjs-previous').html(`<img src="${arrowLeft}"/>`);
-            $('#slides .slidesjs-next').html(`<img src="${arrowRight}"/>`);
-            slides.classList.remove('carousel-inactive');
-        }
-
         // Обработка нажатия кнопок голосования за рассказ
         core.utils.addLiveClickListener('js-vote-button', this._voteButtonClickEvent.bind(this));
 
@@ -252,11 +212,6 @@ var story = {
 
         // Редактирование доступа
         this.contributorsStuff();
-
-        // Сортировка глав рассказа
-        $('#sortable_chapters').sortable({
-            update: this._sortEvent.bind(this)
-        });
 
         // Подтверждение удаления рассказа
         var delForm = document.getElementsByClassName('js-story-delete-form')[0];
@@ -686,23 +641,6 @@ var story = {
             this.panel.dom.classList.remove('story-panel-floating');
             this.panel.isFixed = false;
         }
-    },
-
-    _sortEvent: function() {
-        var items = $('#sortable_chapters').sortable('toArray', {attribute: 'data-chapter'});
-        var data = {chapters: []};
-        for (var i = 0; i < items.length; i++) {
-            data.chapters.push(parseInt(items[i]));
-        }
-
-        var url = '/story/' + document.getElementById('sortable_chapters').getAttribute('data-story') + '/sort/';
-        core.ajax.postJSON(url, data)
-            .then(function(response) {
-                return response.json();
-            })
-            .then(function(response) {
-                core.handleResponse(response, url);
-            }).catch(core.handleError);
     },
 
     _hashChangeEvent: function() {

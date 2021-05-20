@@ -18,7 +18,13 @@
 {% endblock -%}
 
 {%- block head_js %}
-    {# TODO: Pull up here all async stuff... later #}
+    {% set index_js, bootstrap_js = webpack_asset('index.js'), webpack_asset('bootstrap.js') %}
+    <script defer src="{{ url_for('static', filename='build/{}'.format(index_js.src)) }}" integrity="{{ index_js.integrity }}" crossorigin="anonymous"></script>
+    <script defer src="{{ url_for('static', filename='build/{}'.format(bootstrap_js.src)) }}" integrity="{{ bootstrap_js.integrity }}" crossorigin="anonymous"></script>
+    {%- if current_user.header_mode == '' or current_user.header_mode == 'ls' -%}
+        {% set slides_js = webpack_asset('slides.js') %}
+        <script defer src="{{ url_for('static', filename='build/{}'.format(slides_js.src)) }}" integrity="{{ slides_js.integrity }}" crossorigin="anonymous"></script>
+    {%- endif %}
 {% endblock -%}
 
 {%- block meta_robots_tag %}{% if robots_noindex or robots_nofollow %}

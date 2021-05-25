@@ -28,9 +28,5 @@ core.onload(comments.load.bind(comments));
 core.onunload(comments.unload.bind(comments));
 
 import('jquery').then(({ default: jQuery }) => {
-  if (window.document.readyState !== 'loading') {
-    core.init(jQuery);
-  } else {
-    window.document.addEventListener('DOMContentLoaded', () => core.init(jQuery));
-  }
+  core.init(jQuery);
 });

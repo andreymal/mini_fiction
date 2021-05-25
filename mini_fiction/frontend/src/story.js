@@ -11,8 +11,4 @@ Baz.register({
   SortableChapters,
 });
 
-if (window.document.readyState !== 'loading') {
-  Baz.watch();
-} else {
-  window.document.addEventListener('DOMContentLoaded', () => Baz.watch());
-}
+Baz.watch();

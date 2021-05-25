@@ -37,4 +37,11 @@ export default (node) => {
       update: sortEventFactory(jQuery)(node),
     });
   });
+
+  return () => {
+    import('jquery').then(({ module }) => {
+      const jQuery = module.default;
+      jQuery(node).sortable('disable');
+    });
+  };
 };

@@ -377,7 +377,6 @@ def add():
         'saved': False,
         'not_saved': False,
         'scripts': [
-            'editor.js',
             'story.js',
         ],
     }
@@ -447,7 +446,6 @@ def edit(pk):
         'form': form,
         'story_tab': 'general',
         'scripts': [
-            'editor.js',
             'story.js',
         ],
     }
@@ -502,7 +500,6 @@ def edit_chapters(pk):
         'story_tab': 'chapters',
         'chapters': list(story.chapters.select().order_by(Chapter.order, Chapter.id)),
         'scripts': [
-            'editor.js',
             'story.js',
         ],
     }

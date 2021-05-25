@@ -8,7 +8,7 @@ from mini_fiction.forms.form import Form
 
 
 class CommentForm(Form):
-    attrs_dict = {'class': 'span4 with-markitup js-form-saving'}
+    attrs_dict = {'class': 'span4 js-form-saving', 'data-bazooka': 'RichEditor'}
 
     text = TextAreaField(
         '',

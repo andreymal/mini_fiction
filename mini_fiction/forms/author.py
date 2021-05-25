@@ -31,7 +31,7 @@ class ContactForm(Form):
 
 class AuthorEditProfileForm(Form):
     attrs_dict = {'class': 'input-xlarge'}
-    attrs_bio_dict = {'class': 'input-xxxlarge with-markitup'}
+    attrs_bio_dict = {'class': 'input-xxxlarge', 'data-bazooka': 'RichEditor'}
 
     avatar = FileField(
         lazy_gettext('Avatar'),

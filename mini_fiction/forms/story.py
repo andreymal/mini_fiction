@@ -16,7 +16,7 @@ pgettext = lazy_pgettext  # avoid pybabel extract problem
 
 class StoryForm(Form):
     attrs_dict = {'class': 'input-xxxlarge'}
-    attrs_markitup_dict = {'class': 'input-xxxlarge with-markitup'}
+    attrs_markitup_dict = {'class': 'input-xxxlarge', 'data-bazooka': 'RichEditor'}
     attrs_tags_dict = {'class': 'input-xxxlarge', 'autocomplete': 'off'}
     img_attrs = {
            'group_container_class': 'characters-group group-',

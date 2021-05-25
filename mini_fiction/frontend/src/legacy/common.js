@@ -167,7 +167,7 @@ var common = {
         // Обработка вставки HTML-кода из буфера обмена
         var e = this._pasteEvent.bind(this);
 
-        var areas = elem.getElementsByClassName('with-markitup');
+        var areas = elem.querySelectorAll('[data-bazooka=RichEditor]');
         for (var i = 0; i < areas.length; i++) {
             areas[i].addEventListener('paste', e);
             this._pasteEvents.push([areas[i], e]);
@@ -175,14 +175,8 @@ var common = {
     },
 
     markitupDestroy: function(elem) {
-        // FIXME: Drop it with markitup
-        const markitupContainer = common.jQuery('.with-markitup', elem);
-        if (markitupContainer.hasOwnProperty('markItUpRemove')) {
-          markitupContainer.markItUpRemove();
-        }
-
         // Если у поля ввода был обработчик вставки, то отключаем его
-        var areas = elem.getElementsByClassName('with-markitup');
+        var areas = elem.querySelectorAll('[data-bazooka=RichEditor]');
         for (var i = 0; i < areas.length; i++) {
             var eventPos = null;
             for (var j = 0; j < this._pasteEvents.length; j++) {

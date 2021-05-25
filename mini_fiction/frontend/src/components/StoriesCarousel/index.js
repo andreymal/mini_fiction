@@ -1,8 +1,6 @@
 import arrowLeft from './images/arrow-left.png';
 import arrowRight from './images/arrow-right.png';
 
-const slides = window.document.getElementById('slides');
-
 const settings = {
   width: 524,
   height: 200,
@@ -33,14 +31,14 @@ const settings = {
   },
 };
 
-if (slides) {
+export default (node) => {
   Promise
-    .all([import('jquery'), import('./legacy/lib/jquery.slides.3.0.4.min')])
+    .all([import('jquery'), import('../../legacy/lib/jquery.slides.3.0.4.min')])
     .then(([{ default: jQuery }, { default: jQuerySlides }]) => {
       jQuerySlides(jQuery, window, window.document);
-      jQuery(slides).slidesjs(settings);
+      jQuery(node).slidesjs(settings);
       jQuery('#slides .slidesjs-previous').html(`<img src="${arrowLeft}"/>`);
       jQuery('#slides .slidesjs-next').html(`<img src="${arrowRight}"/>`);
-      slides.classList.remove('carousel-inactive');
+      node.classList.remove('carousel-inactive');
     });
-}
+};

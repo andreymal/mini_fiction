@@ -53,7 +53,7 @@ var core = {
         this.initCallbacks = null;
 
         // Включение навигации через ajax
-        // this.ajaxify(jQuery);
+        this.ajaxify(jQuery);
 
         // Показываем предустановленное модальное окно
         if (this.modalElement.childNodes.length > 0) {

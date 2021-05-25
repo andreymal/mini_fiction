@@ -36,9 +36,7 @@ const settings = {
 if (slides) {
   Promise
     .all([import('jquery'), import('./legacy/lib/jquery.slides.3.0.4.min')])
-    .then(([jQueryModule, jQuerySlidesModule]) => {
-      const jQuery = jQueryModule.default;
-      const jQuerySlides = jQuerySlidesModule.default;
+    .then(([{ default: jQuery }, { default: jQuerySlides }]) => {
       jQuerySlides(jQuery, window, window.document);
       jQuery(slides).slidesjs(settings);
       jQuery('#slides .slidesjs-previous').html(`<img src="${arrowLeft}"/>`);

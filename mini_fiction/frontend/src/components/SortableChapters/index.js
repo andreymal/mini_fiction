@@ -27,8 +27,7 @@ const sortEventFactory = (jQuery) => (node) => () => {
 };
 
 export default (node) => {
-  import('jquery').then((module) => {
-    const jQuery = module.default;
+  import('jquery').then(({ default: jQuery }) => {
     jQueryUI(jQuery);
     jQueryUITouchPunch(jQuery);
 
@@ -39,8 +38,7 @@ export default (node) => {
   });
 
   return () => {
-    import('jquery').then(({ module }) => {
-      const jQuery = module.default;
+    import('jquery').then(({ default: jQuery }) => {
       jQuery(node).sortable('disable');
     });
   };

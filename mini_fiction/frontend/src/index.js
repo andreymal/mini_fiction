@@ -27,8 +27,7 @@ core.onunload(captcha.unload);
 core.onload(comments.load.bind(comments));
 core.onunload(comments.unload.bind(comments));
 
-import('jquery').then((module) => {
-  const jQuery = module.default;
+import('jquery').then(({ default: jQuery }) => {
   if (window.document.readyState !== 'loading') {
     core.init(jQuery);
   } else {

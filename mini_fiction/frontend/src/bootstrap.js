@@ -14,8 +14,7 @@ import {
   typeahead,
 } from './legacy/lib/bootstrap.min';
 
-import('jquery').then((module) => {
-  const jQuery = module.default;
+import('jquery').then(({ default: jQuery }) => {
   transition(jQuery);
   modal(jQuery);
   dropdown(jQuery);

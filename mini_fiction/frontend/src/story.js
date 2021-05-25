@@ -1,5 +1,6 @@
 import Baz from 'bazooka';
 import storyTags from './story_tags/index';
+import SortableChapters from './components/SortableChapters/index';
 
 /* devblock:start */
 require('preact/debug');
@@ -7,6 +8,7 @@ require('preact/debug');
 
 Baz.register({
   storyTags,
+  SortableChapters,
 });
 
 if (window.document.readyState !== 'loading') {

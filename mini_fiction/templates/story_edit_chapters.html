@@ -10,7 +10,7 @@
                 <div class="control-group">
                     <div class="controls events">
                         {% if chapters %}
-                        <ul id="sortable_chapters" class="chapters-control" data-story="{{ story.id }}">
+                        <ul data-bazooka="SortableChapters" class="chapters-control" data-story="{{ story.id }}">
                             {% for chapter in chapters %}
                                   <li id="chapter_{{ chapter.id }}" data-chapter="{{ chapter.id }}" class="btn btn-large">
                                     {{ chapter.autotitle }}

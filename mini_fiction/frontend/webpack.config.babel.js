@@ -76,7 +76,6 @@ module.exports = {
     story: ['./story.js', './story.css'],
     index: ['./index.js', './index.css'],
     editor: ['./editor.js'],
-    chapter_sorting: ['./chapter_sorting.js'],
     bootstrap: ['./bootstrap.js'],
     slides: ['./slides.js'],
   },

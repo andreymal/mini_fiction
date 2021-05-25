@@ -504,7 +504,6 @@ def edit_chapters(pk):
         'scripts': [
             'editor.js',
             'story.js',
-            'chapter_sorting.js',
         ],
     }
 

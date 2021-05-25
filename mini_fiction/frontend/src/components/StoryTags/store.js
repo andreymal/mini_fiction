@@ -8,7 +8,7 @@ const setStoreFromUrl = (url) => {
   if (isSettled) return;
 
   window.fetch(url, { credentials: 'include' })
-    .then(response => response.json())
+    .then((response) => response.json())
     .then(({ tags }) => {
       resolver(tags);
       isSettled = true;

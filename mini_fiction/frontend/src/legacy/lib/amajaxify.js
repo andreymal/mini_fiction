@@ -975,20 +975,8 @@ var amajaxify = {
         }
     },
 
-    _createEvent: function(name, detail) {
-        try {
-            // DOM L4
-            return new CustomEvent(name, {cancelable: true, detail: detail || {}});
-        } catch (e) {
-            // DOM L3
-            var event = document.createEvent('CustomEvent');
-            event.initCustomEvent(name, true, true, detail || {});
-            return event;
-        }
-    },
-
-    _dispatchEvent: function(name, params) {
-        return document.dispatchEvent(this._createEvent(name, params));
+    _dispatchEvent: function(name, detail = {}) {
+        return document.dispatchEvent(new CustomEvent(name, {cancelable: true, detail }));
     }
 };
 

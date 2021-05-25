@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
+from typing import Optional
 
 from werkzeug.datastructures import ImmutableMultiDict
 from flask import Blueprint, current_app, request, render_template
@@ -25,9 +26,15 @@ def main():
     return search_action(postform)
 
 
-def search_form():
-    form = SearchForm()
-    data = {'form': form, 'page_title': gettext('Search of stories'), 'robots_noindex': True}
+def search_form(*, form: Optional[SearchForm] = None):
+    data = {
+        'form': form or SearchForm(),
+        'page_title': gettext('Search of stories'),
+        'robots_noindex': True,
+        'scripts': [
+            'story.js',
+        ],
+    }
     return render_template('search.html', **data)
 
 
@@ -35,8 +42,7 @@ def search_action(postform):
     from mini_fiction.apis.amsphinxql import SphinxError
 
     if not postform.validate():
-        data = {'form': postform, 'page_title': gettext('Search of stories'), 'robots_noindex': True}
-        return render_template('search.html', **data)
+        return search_form(form=postform)
 
     try:
         page_current = int(request.args.get('page') or 1)
@@ -48,7 +54,14 @@ def search_action(postform):
     search_type = postform.data['type']
     sort_type = postform.data['sort']
 
-    data = {'page_title': query.strip() or gettext('Search results'), 'search_type': search_type, 'robots_noindex': True}
+    data = {
+        'page_title': query.strip() or gettext('Search results'),
+        'search_type': search_type,
+        'robots_noindex': True,
+        'scripts': [
+            'story.js',
+        ],
+    }
 
     if search_type == 0:
         # if current_user.is_authenticated:
@@ -77,7 +90,7 @@ def search_action(postform):
                 excluded_categories=excluded_categories,
             )
         except SphinxError as exc:
-            data = {'form': postform, 'page_title': gettext('Search of stories'), 'error': 'Кажется, есть синтаксическая ошибка в запросе', 'error_type': 'syntax'}
+            data.update({'form': postform, 'page_title': gettext('Search of stories'), 'error': 'Кажется, есть синтаксическая ошибка в запросе', 'error_type': 'syntax'})
             if current_app.config['DEBUG'] or current_user.is_superuser:
                 data['error'] += ': ' + str(exc)
             return render_template('search.html', **data)
@@ -105,7 +118,7 @@ def search_action(postform):
                 min_vote_total=current_app.config['MINIMUM_VOTES_FOR_VIEW'] if int(sort_type) == 3 else None,
             )
         except SphinxError as exc:
-            data = {'form': postform, 'page_title': gettext('Search of stories'), 'error': 'Кажется, есть синтаксическая ошибка в запросе', 'error_type': 'syntax'}
+            data.update({'form': postform, 'page_title': gettext('Search of stories'), 'error': 'Кажется, есть синтаксическая ошибка в запросе', 'error_type': 'syntax'})
             if current_app.config['DEBUG'] or current_user.is_superuser:
                 data['error'] += ': ' + str(exc)
             return render_template('search.html', **data)

@@ -1,12 +1,6 @@
 {% extends base %}
 {% from 'macro.html' import breadcrumbs with context %}
 
-{%- block head_js %}
-    {{ super() }}
-    {% set story_js = webpack_asset('story.js') %}
-    <script defer src="{{ url_for('static', filename='build/{}'.format(story_js.src)) }}" integrity="{{ story_js.integrity }}" crossorigin="anonymous"></script>
-{% endblock %}
-
 {% block content %}
 
 <div class="row search-page">

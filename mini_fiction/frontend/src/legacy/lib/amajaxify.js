@@ -467,7 +467,7 @@ var amajaxify = {
      *     // список ссылок к скриптам, которые надобно выполнить строго один
      *     // раз (для скриптов, запускаемых при каждой перезагрузке страницы,
      *     // используйте обычный тег <script> в "data")
-     *     "scripts": ["/path/to/script.js", ...],
+     *     "scripts": [{"url": "/path/to/script.js"}, ...],
      *
      *     // плюс что угодно ещё для обработки сторонними обработчиками
      *     }
@@ -564,13 +564,17 @@ var amajaxify = {
             // Запускаем скрипты (только те, которые ещё не запускались когда-то раньше)
             if (readyContent.scripts) {
                 for (var i = 0; i < readyContent.scripts.length; i++) {
-                    var spath = readyContent.scripts[i];
+                    var scriptInfo = readyContent.scripts[i];
                     var s = document.createElement('script');
-                    s.src = spath; // Используем потом s.src вместо spath, ибо нормализованная ссылка
+                    s.src = scriptInfo.url;
                     if (this.state.loadedScripts.indexOf(s.src) >= 0) {
                         continue;
                     }
-                    document.body.appendChild(s);
+                    if (scriptInfo.integrity) {
+                        s.integrity = scriptInfo.integrity;
+                    }
+                    s.defer = true;
+                    document.head.appendChild(s);
                     this.state.loadedScripts.push(s.src);
                 }
             }

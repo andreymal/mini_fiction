@@ -28,6 +28,10 @@
     {%- endfor -%}
 {% endblock -%}
 
+{% for script in webpack_scripts() %}
+    <link rel="prefetch" as="script" href="{{ url_for('static', filename='build/{}'.format(script.src)) }}" integrity="{{ script.integrity }}">
+{% endfor %}
+
 {% set index_js, bootstrap_js = webpack_asset('index.js'), webpack_asset('bootstrap.js') %}
 <script defer src="{{ url_for('static', filename='build/{}'.format(index_js.src)) }}" integrity="{{ index_js.integrity }}" crossorigin="anonymous"></script>
 <script defer src="{{ url_for('static', filename='build/{}'.format(bootstrap_js.src)) }}" integrity="{{ bootstrap_js.integrity }}" crossorigin="anonymous"></script>

@@ -585,10 +585,8 @@ def configure_development(app):
 
 
 def configure_frontend(app: Flask):
-    app.add_template_global(
-        frontend.webpack_asset,
-        name='webpack_asset'
-    )
+    app.add_template_global(frontend.webpack_asset, name='webpack_asset')
+    app.add_template_global(frontend.webpack_scripts, name='webpack_scripts')
 
 
 def configure_sidebar(app: Flask):

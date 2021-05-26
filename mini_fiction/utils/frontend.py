@@ -56,3 +56,7 @@ def get_manifest() -> Manifest:
 
 def webpack_asset(name: str) -> Asset:
     return get_manifest().assets[name]
+
+
+def webpack_scripts() -> Iterable[Asset]:
+    return [asset for name, asset in get_manifest().assets.items() if name.endswith('.js')]

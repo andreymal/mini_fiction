@@ -1,4 +1,3 @@
-/* eslint-disable no-console */
 import Baz from 'bazooka';
 
 import core from './legacy/core';
@@ -9,6 +8,7 @@ import story from './legacy/story';
 import editlog from './legacy/editlog';
 import captcha from './legacy/captcha';
 import lazyBaz from './utils/lazyBaz';
+import { log } from './utils/logging';
 
 import {
   alert,
@@ -66,13 +66,13 @@ const initialize = (jQuery) => {
 if ('serviceWorker' in window.navigator) {
   window.navigator.serviceWorker.register('/sw.js', { scope: '/' }).then((reg) => {
     if (reg.installing) {
-      console.log('Service worker installing');
+      log('Service worker installing');
     } else if (reg.waiting) {
-      console.log('Service worker installed');
+      log('Service worker installed');
     } else if (reg.active) {
-      console.log('Service worker active');
+      log('Service worker active');
     }
-  }).catch((error) => console.log(`Registration failed with ${error}`));
+  }).catch((error) => log(`Registration failed with ${error}`));
 }
 
 if (window.document.readyState !== 'loading') {

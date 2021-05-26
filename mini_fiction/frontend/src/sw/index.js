@@ -1,4 +1,4 @@
-/* eslint-disable no-restricted-globals,no-console */
+/* eslint-disable no-restricted-globals */
 /* global self, caches, fetch */
 
 import {
@@ -23,7 +23,7 @@ self.addEventListener('fetch', (event) => {
     .then((cache) => cache.match(event.request, { ignoreSearch: true })
       .then((matching) => {
         if (matching) {
-          console.log('Found cached', event.request.url, ' and serving from', cacheName);
+          log('Found cached', event.request.url, 'and serving from', cacheName);
         }
         return matching || Promise.reject(NOT_FOUND_IN_CACHE);
       }));
@@ -33,14 +33,14 @@ self.addEventListener('fetch', (event) => {
       if (err.message !== NOT_FOUND_IN_CACHE.message) {
         throw err;
       }
-      console.log('Resource', event.request.url, 'not found in', cacheName, 'fetching it');
+      log('Resource', event.request.url, 'not found in', cacheName, 'fetching it');
       return fetch(event.request.clone()).then((response) => {
         caches.open(cacheName).then((cache) => {
           if (response.status < 400) {
-            console.log('Caching', event.request.url, 'into', cacheName);
+            log('Caching', event.request.url, 'into', cacheName);
             return cache.put(event.request, response.clone());
           }
-          console.log('Got', response.status, 'status for', event.request.url, 'skip caching');
+          log('Got', response.status, 'status for', event.request.url, 'skip caching');
           return Promise.reject(new Error('Upstream error'));
         });
       });

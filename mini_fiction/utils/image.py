@@ -23,7 +23,8 @@ class ImageMeta:
 
 
 def save_image(*, kind: ImageKind, data: bytes) -> ImageMeta:
-    relative_path = Path(kind.value) / f'{uuid4()}.png'
+    name = uuid4().hex
+    relative_path = Path(kind.value) / name[:2] / f'{name}.png'
     save_path = current_app.config['MEDIA_ROOT'] / relative_path
 
     save_path.parent.mkdir(parents=True)

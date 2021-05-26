@@ -1,9 +1,7 @@
 import core from './core';
+import { post, get } from '../utils/ajax';
 
 'use strict';
-
-/* global core: false */
-
 
 var bell = {
     _storageEventBind: null,
@@ -58,7 +56,7 @@ var bell = {
         popup.style.display = '';
         link.parentNode.classList.add('active');
 
-        core.ajax.fetch(url)
+        get(url)
             .then(function(response) {
                 return response.json();
             })
@@ -100,7 +98,7 @@ var bell = {
             localStorage.mfBellLastRequest = tm.toString();
         }
 
-        core.ajax.fetch('/notifications/unread_count/')
+        get('/notifications/unread_count/')
             .then(function(response) {
                 if (response.status < 100 || response.status >= 400) {
                     return {success: false, error: 'Bell fetch error ' + response.status};
@@ -150,7 +148,7 @@ var bell = {
             return;
         }
 
-        core.ajax.post('/notifications/' + lastId + '/set_viewed/')
+        post('/notifications/' + lastId + '/set_viewed/')
             .then(function(response) {
                 return response.json();
 

@@ -1,10 +1,3 @@
-    {% set vendor_js, index_js, story_js = webpack_asset('vendor.js'), webpack_asset('index.js'), webpack_asset('story.js') %}
-    {# NOTE: Vendor bundle remains synchronous as long as it depends on jQuery crap #}
-    {# TODO: Fix it and pull up to head_js block #}
-    <script src="{{ url_for('static', filename='build/{}'.format(vendor_js.src)) }}" integrity="{{ vendor_js.integrity }}" crossorigin="anonymous"></script>
-    <script src="{{ url_for('static', filename='build/{}'.format(index_js.src)) }}" integrity="{{ index_js.integrity }}" crossorigin="anonymous"></script>
-    <script src="{{ url_for('static', filename='build/{}'.format(story_js.src)) }}" integrity="{{ story_js.integrity }}" crossorigin="anonymous"></script>
-
 {%- for js_link in extra_js %}
     <script src="{{ js_link }}"></script>
 {%- endfor -%}

@@ -52,7 +52,8 @@
                             id="id_notes"
                             cols="40" rows="4"
                             maxlength="4096"
-                            class="input-xxxlarge chapter-textarea with-markitup js-form-saving"
+                            class="input-xxxlarge chapter-textarea js-form-saving"
+                            data-bazooka="RichEditor"
                             data-formgroup="chapter"
                             data-formsaving="chapter_notes"
                             placeholder="{{ _('Chapter notes') }}">{{ form.data.notes }}</textarea>
@@ -77,7 +78,8 @@
                             {% if not current_user.is_staff -%}
                             maxlength="{{ chapter_max_length }}"
                             {% endif -%}
-                            class="input-xxxlarge chapter-textarea with-markitup js-form-saving"
+                            class="input-xxxlarge chapter-textarea js-form-saving"
+                            data-bazooka="RichEditor"
                             data-formgroup="chapter"
                             data-formsaving="chapter_text">{{ form.data.text }}</textarea>
                         {% if form.errors.text %}

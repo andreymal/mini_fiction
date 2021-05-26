@@ -1,15 +1,22 @@
-#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
-
 import os
-from collections import namedtuple
+from dataclasses import dataclass
+from typing import Dict, Iterable
 
 from flask import current_app, g
 from flask import json as flask_json
 
 
-Manifest = namedtuple('Manifest', ['size', 'mtime', 'assets'])
-Asset = namedtuple('Asset', ['src', 'integrity'])
+@dataclass
+class Asset:
+    src: str
+    integrity: str
+
+
+@dataclass
+class Manifest:
+    size: int
+    mtime: float
+    assets: Dict[str, Asset]
 
 
 def get_manifest() -> Manifest:
@@ -49,3 +56,7 @@ def get_manifest() -> Manifest:
 
 def webpack_asset(name: str) -> Asset:
     return get_manifest().assets[name]
+
+
+def webpack_scripts() -> Iterable[Asset]:
+    return [asset for name, asset in get_manifest().assets.items() if name.endswith('.js')]

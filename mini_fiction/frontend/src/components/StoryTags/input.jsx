@@ -9,11 +9,10 @@ import {
 } from './autocomplete';
 import { PlainTag } from './tag';
 
-
 const ENTER = 13;
 
-
 class Suggester extends React.Component {
+  // eslint-disable-next-line react/state-in-constructor
   state = {
     suggestions: [],
     value: '',
@@ -47,7 +46,7 @@ class Suggester extends React.Component {
 
   onSuggestionsFetchRequested = ({ value }) => {
     getSuggestion(value)
-      .then(suggestions => this.setState({ suggestions }));
+      .then((suggestions) => this.setState({ suggestions }));
   };
 
   onSuggestionsClearRequested = () => this.setState({ suggestions: [] });
@@ -63,6 +62,7 @@ class Suggester extends React.Component {
     const { highlighted, suggestions } = this.state;
     const tag = highlighted || (suggestions.length === 1 && suggestions[0]);
     return (
+      // eslint-disable-next-line react/jsx-props-no-spreading
       <div {...containerProps}>
         { children }
         <div className="tag-help">
@@ -86,7 +86,7 @@ class Suggester extends React.Component {
         onSuggestionsClearRequested={this.onSuggestionsClearRequested}
         onSuggestionHighlighted={this.onSuggestionHighlighted}
         getSuggestionValue={getSuggestionValue}
-        renderSuggestion={s => <PlainTag withCount tag={s} />}
+        renderSuggestion={(s) => <PlainTag withCount tag={s} />}
         renderSuggestionsContainer={this.renderSuggestionsContainer}
         inputProps={inputProps}
         onSuggestionSelected={this.onSuggestionSelected}
@@ -95,4 +95,5 @@ class Suggester extends React.Component {
   }
 }
 
-export default props => <Suggester {...props} />;
+// eslint-disable-next-line react/jsx-props-no-spreading
+export default (props) => <Suggester {...props} />;

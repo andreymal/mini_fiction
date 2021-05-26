@@ -1,9 +1,4 @@
-// Init bootstrap and other legacy stuff
-import 'expose-loader?exposes=$,jQuery!jquery';
-import './legacy/lib/jquery-ui-custom.min.js';
-import './legacy/lib/jquery.markitup.js';
-import './legacy/lib/jquery.slides.3.0.4.min.js';
-import './legacy/lib/bootstrap.min.js';
+import Baz from 'bazooka';
 
 import core from './legacy/core';
 import common from './legacy/common';
@@ -12,9 +7,11 @@ import bell from './legacy/bell';
 import story from './legacy/story';
 import editlog from './legacy/editlog';
 import captcha from './legacy/captcha';
+import lazyBaz from './utils/lazyBaz';
 
-
-const { document } = window;
+/* devblock:start */
+require('preact/debug');
+/* devblock:end */
 
 core.oninit(common.init.bind(common));
 core.onload(common.load.bind(common));
@@ -37,8 +34,19 @@ core.onunload(captcha.unload);
 core.onload(comments.load.bind(comments));
 core.onunload(comments.unload.bind(comments));
 
+Baz.register({
+  RichEditor: lazyBaz(() => import('./components/RichEditor')),
+  SortableChapters: lazyBaz(() => import('./components/SortableChapters')),
+  StoriesCarousel: lazyBaz(() => import('./components/StoriesCarousel')),
+  StoryTags: lazyBaz(() => import('./components/StoryTags')),
+});
+
 if (window.document.readyState !== 'loading') {
-  core.init();
+  Baz.watch();
+  import('jquery').then(({ default: jQuery }) => core.init(jQuery));
 } else {
-  window.document.addEventListener('DOMContentLoaded', () => core.init());
+  window.document.addEventListener('DOMContentLoaded', () => {
+    Baz.watch();
+    import('jquery').then(({ default: jQuery }) => core.init(jQuery));
+  });
 }

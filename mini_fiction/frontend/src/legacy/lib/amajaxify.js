@@ -113,6 +113,7 @@ var amajaxify = {
      *   CSRF-токенов и подобного)
      * @param {boolean} [options.bindWithjQuery=false] - использовать jQuery
      *   для события onclick (решает некоторые проблемы с bootstrap)
+     * @param {Function} [options.jQueryRef=undefined] - ссылка на jQuery
      * @param {boolean} [options.withoutClickHandler=false] - не перехватывать
      *   нажатия на ссылки
      * @param {boolean} [options.withoutSubmitHandler=false] - не перехватывать
@@ -190,7 +191,7 @@ var amajaxify = {
             // Нативный listener выполняется раньше, чем jQuery live event в bootstrap,
             // отчего ломаются переключалки вкладок и спойлеры.
             // Поэтому если он здесь присутствует, то приходится тоже делать live event
-            (window.$ || window.jQuery)(document).on('click', 'a', this.linkClickHandler.bind(this));
+            options.jQueryRef(document).on('click', 'a', this.linkClickHandler.bind(this));
         } else if (!options.withoutClickHandler) {
             document.body.addEventListener('click', this.linkClickHandler.bind(this));
         } // else - кто-то должен повесить обработчик самостоятельно
@@ -466,7 +467,7 @@ var amajaxify = {
      *     // список ссылок к скриптам, которые надобно выполнить строго один
      *     // раз (для скриптов, запускаемых при каждой перезагрузке страницы,
      *     // используйте обычный тег <script> в "data")
-     *     "scripts": ["/path/to/script.js", ...],
+     *     "scripts": [{"url": "/path/to/script.js"}, ...],
      *
      *     // плюс что угодно ещё для обработки сторонними обработчиками
      *     }
@@ -563,13 +564,17 @@ var amajaxify = {
             // Запускаем скрипты (только те, которые ещё не запускались когда-то раньше)
             if (readyContent.scripts) {
                 for (var i = 0; i < readyContent.scripts.length; i++) {
-                    var spath = readyContent.scripts[i];
+                    var scriptInfo = readyContent.scripts[i];
                     var s = document.createElement('script');
-                    s.src = spath; // Используем потом s.src вместо spath, ибо нормализованная ссылка
+                    s.src = scriptInfo.url;
                     if (this.state.loadedScripts.indexOf(s.src) >= 0) {
                         continue;
                     }
-                    document.body.appendChild(s);
+                    if (scriptInfo.integrity) {
+                        s.integrity = scriptInfo.integrity;
+                    }
+                    s.defer = true;
+                    document.head.appendChild(s);
                     this.state.loadedScripts.push(s.src);
                 }
             }
@@ -970,20 +975,8 @@ var amajaxify = {
         }
     },
 
-    _createEvent: function(name, detail) {
-        try {
-            // DOM L4
-            return new CustomEvent(name, {cancelable: true, detail: detail || {}});
-        } catch (e) {
-            // DOM L3
-            var event = document.createEvent('CustomEvent');
-            event.initCustomEvent(name, true, true, detail || {});
-            return event;
-        }
-    },
-
-    _dispatchEvent: function(name, params) {
-        return document.dispatchEvent(this._createEvent(name, params));
+    _dispatchEvent: function(name, detail = {}) {
+        return document.dispatchEvent(new CustomEvent(name, {cancelable: true, detail }));
     }
 };
 

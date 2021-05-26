@@ -19,7 +19,7 @@
         <div data-ti-autocomplete-url="{{ url_for('tags.autocomplete') }}"
              data-ti-holder-name="tags"
              data-ti-synthetic-tags
-             data-bazooka="storyTags">{{ form.tags }}</div>
+             data-bazooka="StoryTags">{{ form.tags }}</div>
         {% if form.tags.errors %}
             {% for error in form.tags.errors %}
             {% if not loop.first %}<br/>{% endif %}

@@ -10,7 +10,7 @@ from mini_fiction.forms.form import Form
 class HtmlBlockForm(Form):
     attrs_dict = {'class': 'input-xxlarge'}
     attrs_dict_short = {'class': 'input'}
-    attrs_markitup_dict = {'class': 'input-xxlarge with-markitup'}
+    attrs_markitup_dict = {'class': 'input-xxlarge', 'data-bazooka': 'RichEditor'}
 
     name = TextField(
         lazy_gettext('Name'),

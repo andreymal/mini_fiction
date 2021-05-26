@@ -6,9 +6,8 @@ import ruHyphenation from 'hyphenation.ru';
 import amajaxify from './lib/amajaxify';
 import core from './core';
 import common from './common';
-
-import arrowLeft from '../images/arrow-left.png';
-import arrowRight from '../images/arrow-right.png';
+import { post } from '../utils/ajax';
+import { notify, notifyError } from '../utils/notifications';
 
 const hypher = new Hypher(ruHyphenation);
 
@@ -72,43 +71,6 @@ var story = {
     },
 
     init: function() {
-        // Каруселька со случайными рассказами
-        var slides = document.getElementById('slides');
-        if (slides) {
-            $(slides).slidesjs({
-                width: 524,
-                height: 200,
-                navigation: {
-                    active: true,
-                    effect: 'fade',
-                },
-                pagination: {
-                    active: false,
-                },
-                effect: {
-                    slide: {
-                        speed: 1500,
-                    },
-                    fade: {
-                        speed: 300,
-                        crossfade: false,
-                    }
-                },
-                play: {
-                    active: false,
-                    effect: 'fade',
-                    interval: 7500,
-                    auto: true,
-                    swap: true,
-                    pauseOnHover: true,
-                    restartDelay: 3500
-                }
-            });
-            $('#slides .slidesjs-previous').html(`<img src="${arrowLeft}"/>`);
-            $('#slides .slidesjs-next').html(`<img src="${arrowRight}"/>`);
-            slides.classList.remove('carousel-inactive');
-        }
-
         // Обработка нажатия кнопок голосования за рассказ
         core.utils.addLiveClickListener('js-vote-button', this._voteButtonClickEvent.bind(this));
 
@@ -135,7 +97,7 @@ var story = {
                 return;
             }
             var url = this.href;
-            core.ajax.post(url)
+            post(url)
                 .then(function(response) {
                     return response.json();
                 })
@@ -162,7 +124,7 @@ var story = {
             }
             var link = this;
             var url = link.href;
-            core.ajax.post(url)
+            post(url)
                 .then(function(response) {
                     return response.json();
                 })
@@ -185,7 +147,7 @@ var story = {
                 return;
             }
             var url = this.href;
-            core.ajax.post(url)
+            post(url)
                 .then(function(response) {
                     return response.json();
                 })
@@ -205,7 +167,7 @@ var story = {
             event.stopImmediatePropagation();
             event.preventDefault();
             var url = this.href;
-            core.ajax.post(url)
+            post(url)
                 .then(function(response) {
                     return response.json();
                 })
@@ -221,7 +183,7 @@ var story = {
             event.stopImmediatePropagation();
             event.preventDefault();
             var url = this.href;
-            core.ajax.post(url)
+            post(url)
                 .then(function(response) {
                     return response.json();
                 })
@@ -238,7 +200,7 @@ var story = {
             event.stopImmediatePropagation();
             event.preventDefault();
             var url = this.href;
-            core.ajax.post(url)
+            post(url)
                 .then(function(response) {
                     return response.json();
                 })
@@ -252,11 +214,6 @@ var story = {
 
         // Редактирование доступа
         this.contributorsStuff();
-
-        // Сортировка глав рассказа
-        $('#sortable_chapters').sortable({
-            update: this._sortEvent.bind(this)
-        });
 
         // Подтверждение удаления рассказа
         var delForm = document.getElementsByClassName('js-story-delete-form')[0];
@@ -359,7 +316,7 @@ var story = {
             }
         }
 
-        core.notify(favorited ? 'Рассказ добавлен в избранное' : 'Рассказ удален из избранного');
+        notify(favorited ? 'Рассказ добавлен в избранное' : 'Рассказ удален из избранного');
         return true;
     },
 
@@ -382,7 +339,7 @@ var story = {
             }
         }
 
-        core.notify(bookmarked ? 'Рассказ добавлен в список' : 'Рассказ удален из списка');
+        notify(bookmarked ? 'Рассказ добавлен в список' : 'Рассказ удален из списка');
         return true;
     },
 
@@ -404,7 +361,7 @@ var story = {
         var url = form.action || '';
         form.classList.add('uploading');
 
-        core.ajax.post(url, body)
+        post(url, body)
             .then(function(response) {
                 return response.json();
             })
@@ -421,7 +378,7 @@ var story = {
 
     updateStoryVote: function(data) {
         if (!data.success) {
-            core.notifyError(data.error || 'Ошибка');
+            notifyError(data.error || 'Ошибка');
             return true;
         }
 
@@ -441,7 +398,7 @@ var story = {
             vote2Areas[i].innerHTML = data.vote_area_2_html;
         }
 
-        core.notify('Ваш голос учтен!');
+        notify('Ваш голос учтен!');
         return true;
     },
 
@@ -502,7 +459,7 @@ var story = {
         formData.append('act', 'save_access');
 
         this.contributorsForm.act.disabled = true;
-        core.ajax.post(url, formData)
+        post(url, formData)
             .then(function(response) {
                 return response.json();
             })
@@ -688,23 +645,6 @@ var story = {
         }
     },
 
-    _sortEvent: function() {
-        var items = $('#sortable_chapters').sortable('toArray', {attribute: 'data-chapter'});
-        var data = {chapters: []};
-        for (var i = 0; i < items.length; i++) {
-            data.chapters.push(parseInt(items[i]));
-        }
-
-        var url = '/story/' + document.getElementById('sortable_chapters').getAttribute('data-story') + '/sort/';
-        core.ajax.postJSON(url, data)
-            .then(function(response) {
-                return response.json();
-            })
-            .then(function(response) {
-                core.handleResponse(response, url);
-            }).catch(core.handleError);
-    },
-
     _hashChangeEvent: function() {
         if (!this.panel || !this.panel.isFixed) {
             return;
@@ -853,7 +793,7 @@ var story = {
         var loadingImg = document.getElementById('chapter-preview-loading-img');
 
         var url = form.action || location.toString();
-        core.ajax.post(url, data)
+        post(url, data)
             .then(function(response) {
                 return response.json();
             })

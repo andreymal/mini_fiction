@@ -15,32 +15,33 @@ const Layout = (tagComponents, inputComponent) => (
   </div>
 );
 
-const getHolderValue = tags => tags.map(t => t.name).join(', ');
+const getHolderValue = (tags) => tags.map((t) => t.name).join(', ');
 
-const extractPlainTags = node => node
+const extractPlainTags = (node) => node
   .getElementsByTagName('input')[0]
   .value
   .split(/,\s+/)
   .filter(shouldRenderSuggestion);
 
-const transformPlainTag = data => name => (
-  data.filter(tag => tag.name === name)[0] || synthesizeSuggestion(name)
+const transformPlainTag = (data) => (name) => (
+  data.filter((tag) => tag.name === name)[0] || synthesizeSuggestion(name)
 );
 
 const splitSeparators = [',', ';', '\\(', '\\)', '\\*', '/', ':', '\\?', '\n', '\r'];
 const splitRegex = new RegExp(splitSeparators.join('|'));
 
-const capitalize = v => v.charAt(0).toUpperCase() + v.slice(1);
+const capitalize = (v) => v.charAt(0).toUpperCase() + v.slice(1);
 
-const normalize = v => v.toLowerCase().trim();
+const normalize = (v) => v.toLowerCase().trim();
 
-const pasteSplit = input => input
+const pasteSplit = (input) => input
   .split(splitRegex)
   .map(normalize)
   .map(capitalize)
   .map(synthesizeSuggestion);
 
 class TagComponent extends React.Component {
+  // eslint-disable-next-line react/state-in-constructor
   state = { tags: [] };
 
   componentDidMount = () => {
@@ -53,8 +54,7 @@ class TagComponent extends React.Component {
     });
   };
 
-
-  handleChange = tags => this.setState({ tags });
+  handleChange = (tags) => this.setState({ tags });
 
   render() {
     const { tags } = this.state;
@@ -91,7 +91,7 @@ const getKey = (prefix, key) => {
 };
 
 const filterParams = (prefix, obj) => Object.keys(obj)
-  .filter(k => k.startsWith(prefix))
+  .filter((k) => k.startsWith(prefix))
   .reduce((acc, k) => {
     acc[getKey(prefix, k)] = obj[k];
     return acc;

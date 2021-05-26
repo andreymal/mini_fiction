@@ -1,4 +1,6 @@
 import amajaxify from './lib/amajaxify';
+import { get, setCsrfToken } from '../utils/ajax';
+import { notifyError } from '../utils/notifications';
 
 'use strict';
 
@@ -13,7 +15,6 @@ var core = {
     modalElement: null,
     modalBackgr: null,
     loadingIcon: null,
-    notifications: null,
 
     initCallbacks: [],
     loadCallbacks: [],
@@ -26,7 +27,7 @@ var core = {
     /*
      * Инициализация всего этого дела
      */
-    init: function() {
+    init: function(jQuery) {
         if (this.started) {
             return;
         }
@@ -41,19 +42,18 @@ var core = {
         this.modalBackgr = document.getElementById('modal-bg');
         this.modalBackgr.addEventListener('click', this._modalHideEvent.bind(this));
         this.loadingIcon = document.getElementById('loading-icon');
-        this.notifications = document.getElementById('popup-notifications');
 
         core.utils.init();
 
         var i;
 
         for (i = 0; i < this.initCallbacks.length; i++) {
-            this.initCallbacks[i]();
+            this.initCallbacks[i](jQuery);
         }
         this.initCallbacks = null;
 
         // Включение навигации через ajax
-        this.ajaxify();
+        this.ajaxify(jQuery);
 
         // Показываем предустановленное модальное окно
         if (this.modalElement.childNodes.length > 0) {
@@ -97,50 +97,6 @@ var core = {
 
     onunloadModal: function(callback) {
         this.unloadModalCallbacks.push(callback);
-    },
-
-    /** Показывает уведомление с переданным текстом */
-    notify: function(text) {
-        var not = document.createElement('div');
-        not.textContent = text;
-        this.putNotification(not);
-    },
-
-    /** Показывает уведомление-ошибку с переданным текстом */
-    notifyError: function(text) {
-        var not = document.createElement('div');
-        not.classList.add('notice-error');
-        not.textContent = text;
-        this.putNotification(not);
-    },
-
-    /** Отображает переданный HTML-элемент как ошибку */
-    putNotification: function(not) {
-        not.classList.add('popup-notification');
-        not.classList.add('notice-hidden');
-        not.addEventListener('click', function(e) {
-            e.preventDefault();
-            this.popNotification(not);
-            return false;
-        }.bind(this));
-        setTimeout(function() {
-            this.popNotification(not);
-        }.bind(this), 10000);
-        this.notifications.appendChild(not);
-        not.offsetWidth;  // force reflow
-        not.classList.remove('notice-hidden');
-    },
-
-    /** Скрывает переданный HTML-элемент, который был ранее отображён как уведомление */
-    popNotification: function(not) {
-        if (not.parentNode !== this.notifications || not.classList.contains('notice-hidden')) {
-            return false;
-        }
-        not.classList.add('notice-hidden');
-        setTimeout(function() {
-            this.notifications.removeChild(not);
-        }.bind(this), 300);
-        return true;
     },
 
     /*
@@ -234,7 +190,7 @@ var core = {
         return true;
     },
 
-    ajaxify: function() {
+    ajaxify: function(jQuery) {
         if (document.cookie.indexOf('noajax=1') >= 0) {
             console.log('amajaxify disabled by cookie');
             return;
@@ -245,10 +201,11 @@ var core = {
         }
 
         var initOk = amajaxify.init({
-            customFetch: core.ajax.fetch.bind(core.ajax),
+            customFetch: get,
             withoutClickHandler: true,
             allowScriptTags: true,
             bindWithjQuery: true,
+            jQueryRef: jQuery,
             updateModalFunc: function(html) {
                 if (html !== null) {
                     this.modal(html, true);
@@ -283,7 +240,7 @@ var core = {
             return true;
         }
         if (!data.success) {
-            this.notifyError(data.error || 'Ошибка');
+            notifyError(data.error || 'Ошибка');
             return true;
         }
         return false;
@@ -294,7 +251,7 @@ var core = {
     __handleError: function(exc) {
         console.error('Fetch error');
         console.error(exc);
-        this.notifyError(exc.toString());
+        notifyError(exc.toString());
     },
 
     // amajaxify utils
@@ -310,7 +267,7 @@ var core = {
         var i;
 
         if (event.detail.content.csrftoken) {
-            core.ajax.setCsrfToken(event.detail.content.csrftoken);
+            setCsrfToken(event.detail.content.csrftoken);
         }
 
         if (event.detail.toModal) {
@@ -360,66 +317,12 @@ var core = {
     _ajaxErrorEvent: function(event) {
         event.preventDefault();
         if (event.detail.response && (event.detail.response.status < 100 || event.detail.response.status >= 400)) {
-            this.notifyError('Ошибка ' + event.detail.response.status);
+            notifyError('Ошибка ' + event.detail.response.status);
         } else {
             this.handleError(event.detail.exc);
         }
         return false;
     },
-};
-
-
-core.ajax = {
-    csrfToken: null,
-
-    getCsrfToken: function() {
-        if (this.csrfToken === null) {
-            this.csrfToken = document.querySelector('meta[name=csrf-token]').content;
-        }
-        return this.csrfToken;
-    },
-
-    setCsrfToken: function(token) {
-        this.csrfToken = token;
-        document.querySelector('meta[name=csrf-token]').content = token;
-    },
-
-    fetch: function(input, init) {
-        var request;
-        if (Request.prototype.isPrototypeOf(input) && !init) {
-            request = input;
-        } else {
-            request = new Request(input, init);
-        }
-        request = new Request(request, {credentials: 'include'});
-        request.headers.set('Accept', 'application/json,*/*');
-        request.headers.set('X-AJAX', '1');
-        if (request.method != 'GET') {
-            request.headers.set('X-CSRFToken', this.getCsrfToken());
-        }
-
-        return fetch(request);
-    },
-
-    post: function(input, body, init) {
-        init = init || {};
-        init.method = 'POST';
-        init.body = body;
-        var request = new Request(input, init);
-        return this.fetch(request);
-    },
-
-    postJSON: function(input, body, init) {
-        init = init || {};
-        init.method = 'POST';
-        init.body = JSON.stringify(body);
-        init.headers = init.headers || {};
-        if (!init.headers['Content-Type']) {
-            init.headers['Content-Type'] = 'application/json';
-        }
-        var request = new Request(input, init);
-        return this.fetch(request);
-    }
 };
 
 

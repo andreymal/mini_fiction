@@ -19,10 +19,11 @@ import decrease from 'images/markitup/size-decrease.svg'
 import background from 'images/markitup/background.svg'
 import ficbook from 'images/markitup/ficbook.svg'
 
-import core from "./core";
+import { post } from '../utils/ajax';
+import { notify, notifyError } from '../utils/notifications';
 
 const formattingConverter = markitup => {
-    core.ajax.post('/convert/', markitup.textarea.value)
+    post('/convert/', markitup.textarea.value)
     .then((response) => response.json())
     .then(({changed, text}) => {
         let message;
@@ -32,9 +33,9 @@ const formattingConverter = markitup => {
         } else {
             message = 'С форматированием уже всё хорошо';
         }
-        core.notify(message);
+        notify(message);
     })
-    .catch((ignored) => core.notify('Не удалось отформатировать текст'));
+    .catch((ignored) => notifyError('Не удалось отформатировать текст'));
 }
 
 export default {

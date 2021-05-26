@@ -1,8 +1,11 @@
 /* eslint-disable no-restricted-globals */
-/* global self, caches, fetch */
+/* global self */
 
 import {
-  clearCaches, getCache, NOT_FOUND_IN_CACHE, precache,
+  clearCaches,
+  getCache,
+  handleResponse,
+  precache,
 } from './caching';
 
 import { log } from '../utils/logging';
@@ -18,34 +21,5 @@ self.addEventListener('fetch', (event) => {
     log('Resource at', event.request.url, 'is not cacheable, skipping');
     return;
   }
-
-  const cachedResponsePromise = caches.open(cacheName)
-    .then((cache) => cache.match(event.request, { ignoreSearch: true })
-      .then((matching) => {
-        if (matching) {
-          log('Found cached', event.request.url, 'and serving from', cacheName);
-        }
-        return matching || Promise.reject(NOT_FOUND_IN_CACHE);
-      }));
-
-  const resp = cachedResponsePromise.catch(
-    (err) => {
-      if (err.message !== NOT_FOUND_IN_CACHE.message) {
-        throw err;
-      }
-      log('Resource', event.request.url, 'not found in', cacheName, 'fetching it');
-      return fetch(event.request.clone()).then((response) => {
-        caches.open(cacheName).then((cache) => {
-          if (response.status < 400) {
-            log('Caching', event.request.url, 'into', cacheName);
-            cache.put(event.request, response.clone()).then(() => response);
-          }
-          log('Got', response.status, 'status for', event.request.url, 'skip caching');
-          return response;
-        });
-      });
-    },
-  );
-
-  event.respondWith(resp);
+  event.respondWith(handleResponse(event, cacheName));
 });

@@ -12,8 +12,6 @@ const COMMON_ASSETS = new RegExp('/media/(avatars|characters|logopics)/');
 
 const MANIFEST = '/manifest.json';
 
-export const NOT_FOUND_IN_CACHE = new Error('Not found in cache');
-
 /**
  * Precache application assets (js/css)
  * @returns {Promise<void>}
@@ -50,7 +48,7 @@ export const clearCaches = async () => {
 
 /**
  * Infer cache for resource
- * @param url
+ * @param {string} url
  * @returns {string|null}
  */
 export const getCache = (url) => {
@@ -62,4 +60,26 @@ export const getCache = (url) => {
     return CURRENT_CACHES.common;
   }
   return null;
+};
+
+/**
+ * Handle cacheable request
+ * @param {FetchEvent} event
+ * @param {string} cacheName
+ * @returns Promise<Response>
+ */
+export const handleResponse = async (event, cacheName) => {
+  const cache = await caches.open(cacheName);
+  const cachedResponse = await cache.match(event.request, { ignoreSearch: true });
+  if (cachedResponse) {
+    log('Found cached', event.request.url, 'and serving from', cacheName);
+    return cachedResponse;
+  }
+  log('Resource', event.request.url, 'not found in', cacheName, 'fetching it');
+  const freshResponse = await fetch(event.request.clone());
+  if (freshResponse.status < 400) {
+    log('Caching', event.request.url, 'into', cacheName);
+    await cache.put(event.request, freshResponse.clone());
+  }
+  return freshResponse;
 };

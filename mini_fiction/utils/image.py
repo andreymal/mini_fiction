@@ -12,6 +12,8 @@ from mini_fiction.utils.enum import AutoName
 class ImageKind(AutoName):
     CHARACTERS = auto()
     LOGOPICS = auto()
+    ILLUSTRATIONS = auto()
+    COMMON = auto()
 
 
 @dataclass

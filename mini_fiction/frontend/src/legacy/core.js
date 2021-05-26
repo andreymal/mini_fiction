@@ -201,7 +201,6 @@ var core = {
         }
 
         var initOk = amajaxify.init({
-            customFetch: get,
             withoutClickHandler: true,
             allowScriptTags: true,
             bindWithjQuery: true,

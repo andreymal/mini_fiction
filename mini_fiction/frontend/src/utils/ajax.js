@@ -15,7 +15,6 @@ const setCsrfToken = (token) => {
 
 const defaultHeaders = [
   ['Accept', 'application/json,*/*'],
-  ['X-AJAX', '1'],
 ];
 
 const request = (originalRequest, headers = []) => {

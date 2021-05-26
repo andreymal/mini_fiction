@@ -78,6 +78,7 @@ var amajaxify = {
     maxLifetime: 3600,
 
     customFetch: null,
+    headers: [['X-AJAX', '1']],
     updateModalFunc: null,
 
     archiveHosts: [
@@ -104,6 +105,8 @@ var amajaxify = {
      * @param {number} [options.scrollToTopFrom=400] - минимальная прокрутка
      *   по вертикали, при которой прокручивать обратно наверх после замены
      *   содержимого страницы
+     * @param {object} [options.headers] - HTTP-заголовки, которые будут
+     *   добавлены к каждому запросу (по умолчанию [['X-AJAX', '1']]);
      * @param {Function} [options.updateModalFunc] - функция, которая будет
      *   вызываться для запихивания HTML-кода модального окна на страницу
      *   (после события unload и перед prepare и load), должна принимать один
@@ -160,6 +163,9 @@ var amajaxify = {
 
         this.customFetch = options.customFetch;
 
+        if (options.headers) {
+            this.headers = headers;
+        }
         if (options.updateModalFunc) {
             this.updateModalFunc = options.updateModalFunc;
         }
@@ -294,7 +300,7 @@ var amajaxify = {
 
         // Собственно отправляем запрос
         this._dispatchEvent('amajaxify:beginrequest', {method: method, url: link});
-        fetchFunc(link, {method: method, body: body, redirect: 'error'})
+        fetchFunc(link, {method: method, body: body, headers: this.headers, redirect: 'error'})
             .then(function(response) {
                 this.state.current.response = response;
                 return response.json();

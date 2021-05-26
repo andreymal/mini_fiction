@@ -1,17 +1,15 @@
-#!/usr/bin/env python
-# -*- coding: utf-8 -*-
-
 # pylint: disable=unexpected-keyword-arg,no-value-for-parameter
 
-import os
 from hashlib import sha256
+from pathlib import Path
+from uuid import uuid4
 
 from flask import current_app
 from flask_babel import lazy_gettext
 
 from mini_fiction.bl.utils import BaseBL
 from mini_fiction.validation import Validator, ValidationError
-from mini_fiction.validation.sorting import CATEGORY, CHARACTER, CHARACTER_FOR_UPDATE, CHARACTER_GROUP, CLASSIFIER
+from mini_fiction.validation.sorting import CHARACTER, CHARACTER_FOR_UPDATE, CHARACTER_GROUP
 
 
 class CharacterBL(BaseBL):
@@ -117,22 +115,17 @@ class CharacterBL(BaseBL):
             ]})
         return data
 
-    def set_picture_data(self, data):
-        filename = str(self.model.id) + '.png'
-        pathset = ('characters', filename)
-        urlpath = '/'.join(pathset)  # equivalent to ospath except Windows!
-        ospath = os.path.join(current_app.config['MEDIA_ROOT'], *pathset)
+    def set_picture_data(self, data: bytes) -> None:
+        relative_path = Path('characters') / f'{uuid4()}.png'
+        save_path = current_app.config['MEDIA_ROOT'] / relative_path
 
-        dirpath = os.path.dirname(ospath)
-        if not os.path.isdir(dirpath):
-            os.makedirs(dirpath)
+        save_path.parent.mkdir(parents=True)
 
-        with open(ospath, 'wb') as fp:
+        with save_path.open(mode='wb') as fp:
             fp.write(data)
 
-        self.model.picture = urlpath
+        self.model.picture = relative_path.as_posix()
         self.model.sha256sum = sha256(data).hexdigest()
-        return urlpath
 
 
 class CharacterGroupBL(BaseBL):

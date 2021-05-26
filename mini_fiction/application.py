@@ -363,8 +363,8 @@ def configure_admin_views(app):
 def configure_staticfiles(app):
     from mini_fiction.views import misc
 
-    app.extra_css = []
-    app.extra_js = []
+    app.extra_css = list(app.config['EXTRA_CSS'])
+    app.extra_js = list(app.config['EXTRA_JS'])
 
     app.add_url_rule('/{}/<path:filename>'.format(app.config['MEDIA_URL'].strip('/')), 'media', misc.media)
     if app.config['LOCALSTATIC_ROOT']:

@@ -167,6 +167,10 @@ class Config(object):
     FRONTEND_MANIFEST_PATH = os.path.join(os.path.dirname(__file__), 'static/build/manifest.json')
     FRONTEND_MANIFEST_AUTO_RELOAD = False
 
+    # [{"endpoint": "localstatic", filename="your/local/file"}]
+    EXTRA_CSS = []
+    EXTRA_JS = []
+
     LOCALTEMPLATES = None
 
     SPHINX_DISABLED = False

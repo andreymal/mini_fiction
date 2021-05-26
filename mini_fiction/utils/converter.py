@@ -427,6 +427,16 @@ def fix_leading_whitespace(old_text: str, flags: List[str]) -> str:
     return new_text
 
 
+def fix_trailing_whitespace(old_text: str, flags: List[str]) -> str:
+    """
+    Удаляет пробельные символы и &nbsp; в конце строк, так как они всё равно бесполезны.
+    """
+    new_text = re.sub(r"(\s|&nbsp;)+$", "\n", old_text, flags=re.I | re.M)
+    if new_text != old_text:
+        flags.append("trailing_whitespace")
+    return new_text
+
+
 def fix_html_entities(old_text: str, flags: List[str]) -> str:
     """
     Заменяет некоторые html-сущности на оригинальные символы. Не трогает
@@ -648,6 +658,7 @@ def convert(old_text: str) -> TextContainer:
         new_text = repeat(fix_union_tags, new_text, flags)
 
     new_text = fix_leading_whitespace(new_text, flags)
+    new_text = fix_trailing_whitespace(new_text, flags)
     if has_html_entities:
         new_text = fix_html_entities(new_text, flags)
 

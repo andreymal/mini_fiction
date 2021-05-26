@@ -7,6 +7,7 @@ import { CloseableTag } from './tag';
 import Input from './input';
 import { getStore, setStoreFromUrl } from './store';
 import { shouldRenderSuggestion, synthesizeSuggestion } from './autocomplete';
+import { capitalize, filterParams, normalize } from '../../utils/attrs';
 
 const Layout = (tagComponents, inputComponent) => (
   <div className="tags-container">
@@ -29,10 +30,6 @@ const transformPlainTag = (data) => (name) => (
 
 const splitSeparators = [',', ';', '\\(', '\\)', '\\*', '/', ':', '\\?', '\n', '\r'];
 const splitRegex = new RegExp(splitSeparators.join('|'));
-
-const capitalize = (v) => v.charAt(0).toUpperCase() + v.slice(1);
-
-const normalize = (v) => v.toLowerCase().trim();
 
 const pasteSplit = (input) => input
   .split(splitRegex)
@@ -84,18 +81,6 @@ class TagComponent extends React.Component {
     );
   }
 }
-
-const getKey = (prefix, key) => {
-  const k = key.slice(prefix.length);
-  return k.charAt(0).toLowerCase() + k.slice(1);
-};
-
-const filterParams = (prefix, obj) => Object.keys(obj)
-  .filter((k) => k.startsWith(prefix))
-  .reduce((acc, k) => {
-    acc[getKey(prefix, k)] = obj[k];
-    return acc;
-  }, {});
 
 export default (node) => {
   const attrPrefix = 'ti';

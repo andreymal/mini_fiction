@@ -43,7 +43,6 @@ class CharacterBL(BaseBL):
         self.model.picture = picture_metadata.relative_path
         self.model.sha256sum = picture_metadata.sha256sum
 
-        character.bl.set_picture_data(picture)
         AdminLog.bl.create(user=author, obj=character, action=AdminLog.ADDITION)
 
         return character
@@ -84,7 +83,10 @@ class CharacterBL(BaseBL):
         for key, value in data.items():
             if key == 'picture':
                 if picture is not None:
-                    self.set_picture_data(picture)
+                    self.model.picture_path.unlink(missing_ok=True)
+                    picture_metadata = save_image(kind=ImageKind.CHARACTERS, data=value)
+                    self.model.picture = picture_metadata.relative_path
+                    self.model.sha256sum = picture_metadata.sha256sum
                     changed_fields |= {'picture',}
             elif key == 'group':
                 if character.group.id != value:

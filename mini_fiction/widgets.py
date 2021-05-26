@@ -70,7 +70,7 @@ class StoriesImgSelect(Select):
 class StoriesCharacterSelect(StoriesImgSelect):
     def get_img_url(self, field, value):
         characters = {x.id: x for x in orm.select(c for c in Character)}  # NOTE: Pony ORM caches this
-        return characters[value].thumb
+        return characters[value].url
 
 
 class StoriesButtons(Select):

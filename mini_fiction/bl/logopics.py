@@ -12,6 +12,7 @@ from datetime import datetime
 from flask import current_app
 
 from mini_fiction.bl.utils import BaseBL
+from mini_fiction.utils.image import save_image, ImageKind
 from mini_fiction.validation import Validator
 from mini_fiction.validation.logopics import LOGOPIC, LOGOPIC_FOR_UPDATE
 
@@ -25,7 +26,11 @@ class LogopicBL(BaseBL):
         picture = data.pop('picture')
         logopic = self.model(picture='pending', sha256sum='pending', **data)
         logopic.flush()
-        logopic.bl.set_picture_data(picture)
+
+        picture_metadata = save_image(kind=ImageKind.LOGOPICS, data=picture)
+        self.model.picture = picture_metadata.relative_path
+        self.model.sha256sum = picture_metadata.sha256sum
+
         current_app.cache.delete('logopics')
         AdminLog.bl.create(user=author, obj=logopic, action=AdminLog.ADDITION)
         return logopic
@@ -41,7 +46,10 @@ class LogopicBL(BaseBL):
         for key, value in data.items():
             if key == 'picture':
                 if value:
-                    self.set_picture_data(value)
+                    self.model.picture_path.unlink(missing_ok=True)
+                    picture_metadata = save_image(kind=ImageKind.LOGOPICS, data=value)
+                    self.model.picture = picture_metadata.relative_path
+                    self.model.sha256sum = picture_metadata.sha256sum
                     changed_fields |= {'picture',}
             else:
                 if key == 'original_link_label':
@@ -68,34 +76,6 @@ class LogopicBL(BaseBL):
         AdminLog.bl.create(user=author, obj=self.model, action=AdminLog.DELETION)
         self.model.delete()
         current_app.cache.delete('logopics')
-
-    def set_picture_data(self, f):
-        pathset = ('logopics', str(self.model.id), f.filename)
-        urlpath = '/'.join(pathset)  # equivalent to ospath except Windows!
-        ospath = os.path.join(current_app.config['MEDIA_ROOT'], *pathset)
-
-        dirpath = os.path.dirname(ospath)
-        if not os.path.isdir(dirpath):
-            os.makedirs(dirpath)
-
-        if self.model.picture:
-            old_ospath = os.path.join(current_app.config['MEDIA_ROOT'], self.model.picture)
-            if os.path.isfile(old_ospath):
-                os.remove(old_ospath)
-
-        f.save(ospath)
-
-        h = sha256(b'')
-        with open(ospath, 'rb') as fp:
-            while True:
-                data = fp.read(16384)
-                if not data:
-                    break
-                h.update(data)
-
-        self.model.picture = urlpath
-        self.model.sha256sum = h.hexdigest()
-        return urlpath
 
     def get_all(self):
         result = current_app.cache.get('logopics')

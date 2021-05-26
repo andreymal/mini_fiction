@@ -10,6 +10,7 @@ from flask_babel import lazy_gettext
 from mini_fiction.bl.utils import BaseBL
 from mini_fiction.validation import Validator, ValidationError
 from mini_fiction.validation.sorting import CHARACTER, CHARACTER_FOR_UPDATE, CHARACTER_GROUP
+from mini_fiction.utils.image import save_image, ImageKind
 
 
 class CharacterBL(BaseBL):
@@ -34,9 +35,14 @@ class CharacterBL(BaseBL):
             raise ValidationError(errors)
 
         picture = self.validate_and_get_picture_data(data.pop('picture'))
+        picture_metadata = save_image(kind=ImageKind.CHARACTERS, data=picture)
 
         character = self.model(picture='pending', sha256sum='pending', **data)
         character.flush()
+
+        self.model.picture = picture_metadata.relative_path
+        self.model.sha256sum = picture_metadata.sha256sum
+
         character.bl.set_picture_data(picture)
         AdminLog.bl.create(user=author, obj=character, action=AdminLog.ADDITION)
 
@@ -114,18 +120,6 @@ class CharacterBL(BaseBL):
                 lazy_gettext('Maximum picture size is {maxsize} KiB').format(maxsize=16)
             ]})
         return data
-
-    def set_picture_data(self, data: bytes) -> None:
-        relative_path = Path('characters') / f'{uuid4()}.png'
-        save_path = current_app.config['MEDIA_ROOT'] / relative_path
-
-        save_path.parent.mkdir(parents=True)
-
-        with save_path.open(mode='wb') as fp:
-            fp.write(data)
-
-        self.model.picture = relative_path.as_posix()
-        self.model.sha256sum = sha256(data).hexdigest()
 
 
 class CharacterGroupBL(BaseBL):

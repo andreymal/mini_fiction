@@ -22,9 +22,10 @@ class ImageMeta:
     sha256sum: str
 
 
-def save_image(*, kind: ImageKind, data: bytes) -> ImageMeta:
+# FIXME: Detect extension with libmagic1 (see python-magic)
+def save_image(*, kind: ImageKind, data: bytes, extension: str) -> ImageMeta:
     name = uuid4().hex
-    relative_path = Path(kind.value) / name[:2] / f'{name}.png'
+    relative_path = Path(kind.value) / name[:2] / f'{name}.{extension}'
     save_path = current_app.config['MEDIA_ROOT'] / relative_path
 
     save_path.parent.mkdir(parents=True)

@@ -27,7 +27,7 @@ class LogopicBL(BaseBL):
         logopic = self.model(picture='pending', sha256sum='pending', **data)
         logopic.flush()
 
-        picture_metadata = save_image(kind=ImageKind.LOGOPICS, data=picture)
+        picture_metadata = save_image(kind=ImageKind.LOGOPICS, data=picture, extension='jpg')
         self.model.picture = picture_metadata.relative_path
         self.model.sha256sum = picture_metadata.sha256sum
 
@@ -47,7 +47,7 @@ class LogopicBL(BaseBL):
             if key == 'picture':
                 if value:
                     self.model.picture_path.unlink(missing_ok=True)
-                    picture_metadata = save_image(kind=ImageKind.LOGOPICS, data=value)
+                    picture_metadata = save_image(kind=ImageKind.LOGOPICS, data=value, extension='jpg')
                     self.model.picture = picture_metadata.relative_path
                     self.model.sha256sum = picture_metadata.sha256sum
                     changed_fields |= {'picture',}

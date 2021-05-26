@@ -35,7 +35,7 @@ class CharacterBL(BaseBL):
             raise ValidationError(errors)
 
         picture = self.validate_and_get_picture_data(data.pop('picture'))
-        picture_metadata = save_image(kind=ImageKind.CHARACTERS, data=picture)
+        picture_metadata = save_image(kind=ImageKind.CHARACTERS, data=picture, extension='png')
 
         character = self.model(picture='pending', sha256sum='pending', **data)
         character.flush()
@@ -84,7 +84,7 @@ class CharacterBL(BaseBL):
             if key == 'picture':
                 if picture is not None:
                     self.model.picture_path.unlink(missing_ok=True)
-                    picture_metadata = save_image(kind=ImageKind.CHARACTERS, data=value)
+                    picture_metadata = save_image(kind=ImageKind.CHARACTERS, data=value, extension='jpg')
                     self.model.picture = picture_metadata.relative_path
                     self.model.sha256sum = picture_metadata.sha256sum
                     changed_fields |= {'picture',}
@@ -111,6 +111,7 @@ class CharacterBL(BaseBL):
         AdminLog.bl.create(user=author, obj=self.model, action=AdminLog.DELETION)
         self.model.delete()
 
+    # FIXME: Decouple validation logic and move it to mini_fiction.utils.image
     def validate_and_get_picture_data(self, picture):
         fp = picture.stream
         header = fp.read(4)

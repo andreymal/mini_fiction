@@ -158,7 +158,9 @@ HTMLSanitizer.prototype.putNewlines = function(n, collapsed) {
             nActual += 1;
         }
     }
-    this.current.appendChild(document.createTextNode(s));
+    if (s) {
+        this.current.appendChild(document.createTextNode(s));
+    }
     this.newlines += nActual;
     if (collapsed) {
         this.newlinesCollapsed = this.newlines;
@@ -425,15 +427,21 @@ HTMLSanitizer.prototype.processElement = function(node, copyAttrs) {
     // Пробуем объединить с предыдущим тегом
     // (FIXME: это не очень оптимально, лучше объединять без создания реального
     // DOM-элемента, но для этого нужно весь код рефакторить)
+    var merged = null;
     if (copyAttrs._merge) {
-        var merged = this.merge(cleanNode);
+        merged = this.merge(cleanNode);
         if (merged !== null) {
             cleanNode = merged;
         }
     }
 
+    // Если объединения не случилось, значит начался новый тег и нужно обновить
+    // информацию о состоянии переносов строк
+    if (!merged) {
+        this.setNewlines(0);
+    }
+
     // Копируем все внутренности
-    // push сделает this.setNewlines(0) сам
     if (!copyAttrs._nokids) {
         this.push(Array.prototype.slice.call(node.childNodes), cleanNode);
     }

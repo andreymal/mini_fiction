@@ -73,11 +73,9 @@ module.exports = {
   mode: ENV,
   context: path.resolve(__dirname, 'src'),
   entry: {
-    story: ['./story.js', './story.css'],
+    story: ['./story.css'],
     index: ['./index.js', './index.css'],
-    editor: ['./editor.js'],
     bootstrap: ['./bootstrap.js'],
-    slides: ['./slides.js'],
   },
 
   output: {

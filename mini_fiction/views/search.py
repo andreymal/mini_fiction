@@ -31,9 +31,6 @@ def search_form(*, form: Optional[SearchForm] = None):
         'form': form or SearchForm(),
         'page_title': gettext('Search of stories'),
         'robots_noindex': True,
-        'scripts': [
-            'story.js',
-        ],
     }
     return render_template('search.html', **data)
 
@@ -58,9 +55,6 @@ def search_action(postform):
         'page_title': query.strip() or gettext('Search results'),
         'search_type': search_type,
         'robots_noindex': True,
-        'scripts': [
-            'story.js',
-        ],
     }
 
     if search_type == 0:

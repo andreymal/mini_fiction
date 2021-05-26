@@ -104,9 +104,6 @@ def view(pk, comments_page):
         'favorites_count': story.favorites.select().count(),
         'show_meta_description': comments_page == -1,
         'chapter_subscriptions_count': chapter_subscriptions_count,
-        'scripts': [
-            'editor.js',
-        ],
     }
 
     return render_template('story_view.html', **data)
@@ -376,9 +373,6 @@ def add():
         'story_add': True,
         'saved': False,
         'not_saved': False,
-        'scripts': [
-            'story.js',
-        ],
     }
 
     if form.validate_on_submit():
@@ -445,9 +439,6 @@ def edit(pk):
         'page_title': 'Редактирование «{}»'.format(story.title),
         'form': form,
         'story_tab': 'general',
-        'scripts': [
-            'story.js',
-        ],
     }
 
     if request.method == 'POST':
@@ -499,9 +490,6 @@ def edit_chapters(pk):
         'page_title': 'Редактирование глав «{}»'.format(story.title),
         'story_tab': 'chapters',
         'chapters': list(story.chapters.select().order_by(Chapter.order, Chapter.id)),
-        'scripts': [
-            'story.js',
-        ],
     }
 
     return render_template('story_edit_chapters.html', **ctx)

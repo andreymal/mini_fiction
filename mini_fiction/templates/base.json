@@ -13,15 +13,6 @@
         "modal_content": {% filter safe %}{% filter tojson_raw -%}
             {%- block modal %}{% endblock %}
             {%- endfilter %}{% endfilter %},
-        "scripts": [{% if scripts is defined %}
-            {% for script_name in scripts %}
-                {%- set asset = webpack_asset(script_name) -%}
-                {
-                     "url": {{ url_for('static', filename='build/{}'.format(asset.src))|tojson_raw }},
-                     "integrity": {{ asset.integrity|tojson_raw }}
-                }{% if not loop.last %},{% endif %}
-            {% endfor %}
-        {% endif %}],
         "data": {
             "nav-main": {% filter safe %}{% filter tojson_raw -%}
                 {% include 'includes/nav.html' %}

@@ -573,6 +573,15 @@ common.allowedTags.a = function(node) {
 
 
 common.allowedTags.p = common.allowedTags.div = function(node) {
+    // Особый случай: вместо разделителя в виде трёх звёздочек у нас используется <hr>
+    var content = node.textContent.trim();
+    if (content.match(/^\s*\*+\s*\*+\s*\*+[\s\*]*$/)) {
+        this.requireNewlines(2);
+        this.pushNode(document.createElement('hr'));
+        this.requireNewlines(2, true);
+        return;
+    }
+
     // Копируем один разрешённый атрибут
     var align = null;
     var attrAlign = node.getAttribute('align') || getComputedStyle(node).textAlign;
@@ -616,7 +625,6 @@ common.allowedTags.p = common.allowedTags.div = function(node) {
             this.requireNewlines(1, true);
         }
     }
-    return null;
 };
 
 

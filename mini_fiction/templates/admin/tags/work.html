@@ -9,9 +9,13 @@
             [url_for('admin_tags.index'), _('Tags')]
         ]) }}
         <h1>
-            {%- if tag.is_blacklisted %}<s>{% endif -%}
-            {{ tag.name }}
-            {%- if tag.is_blacklisted %}</s>{% endif -%}
+            {% if edit %}
+                {%- if tag.is_blacklisted %}<s>{% endif -%}
+                {{ tag.name }}
+                {%- if tag.is_blacklisted %}</s>{% endif -%}
+            {% else %}
+                Создание тега
+            {% endif %}
         </h1>
 
         {% if saved %}<div class="alert-mini green">{{ _('Saved!') }}</div>{% endif %}

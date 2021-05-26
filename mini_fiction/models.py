@@ -240,10 +240,7 @@ class Character(db.Entity):
 
     @property
     def thumb(self):
-        return '{}?{}'.format(
-            url_for('media', filename=self.picture),
-            self.sha256sum[:8],
-        )
+        return url_for('media', filename=self.picture)
 
 
 class Category(db.Entity):

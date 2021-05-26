@@ -38,10 +38,10 @@ self.addEventListener('fetch', (event) => {
         caches.open(cacheName).then((cache) => {
           if (response.status < 400) {
             log('Caching', event.request.url, 'into', cacheName);
-            return cache.put(event.request, response.clone());
+            cache.put(event.request, response.clone()).then(() => response);
           }
           log('Got', response.status, 'status for', event.request.url, 'skip caching');
-          return Promise.reject(new Error('Upstream error'));
+          return response;
         });
       });
     },

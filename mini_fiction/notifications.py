@@ -2,6 +2,8 @@ import json
 import time
 from dataclasses import dataclass
 from enum import Enum, auto
+# noinspection PyUnresolvedReferences
+import typing_extensions
 from typing import Union, Optional, Literal, TypedDict, Dict
 
 from flask import current_app

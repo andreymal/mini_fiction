@@ -1,5 +1,7 @@
 import json
 from abc import ABCMeta, abstractmethod
+# noinspection PyUnresolvedReferences
+import typing_extensions
 from typing import Optional, Protocol, Dict, Any, runtime_checkable
 from dataclasses import is_dataclass, asdict
 

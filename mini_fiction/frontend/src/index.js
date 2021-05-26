@@ -1,3 +1,4 @@
+/* eslint-disable no-console */
 import Baz from 'bazooka';
 
 import core from './legacy/core';
@@ -61,6 +62,18 @@ const initialize = (jQuery) => {
   button(jQuery);
   collapse(jQuery);
 };
+
+if ('serviceWorker' in window.navigator) {
+  window.navigator.serviceWorker.register('/sw.js', { scope: '/' }).then((reg) => {
+    if (reg.installing) {
+      console.log('Service worker installing');
+    } else if (reg.waiting) {
+      console.log('Service worker installed');
+    } else if (reg.active) {
+      console.log('Service worker active');
+    }
+  }).catch((error) => console.log(`Registration failed with ${error}`));
+}
 
 if (window.document.readyState !== 'loading') {
   Baz.watch();

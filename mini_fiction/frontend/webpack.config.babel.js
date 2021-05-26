@@ -1,5 +1,6 @@
 import path from 'path';
 import zlib from 'zlib';
+import webpack from 'webpack';
 import AssetsManifestPlugin from 'webpack-assets-manifest';
 import MiniCssExtractPlugin from 'mini-css-extract-plugin';
 import TerserPlugin from 'terser-webpack-plugin';
@@ -20,6 +21,8 @@ const isDev = ENV !== 'production';
 
 const outputPath = path.resolve(__dirname, 'build');
 const outputName = `[name].${isDev ? 'dev' : '[contenthash]'}`;
+
+const STATIC_PATH = process.env.STATIC_PATH || '/static/build/';
 
 const reactAliases = {
   react: 'preact/compat',
@@ -68,6 +71,10 @@ const defaultPlugins = [
     integrityHashes: ['sha256'],
     customize: (_, original) => original,
   }),
+  new webpack.DefinePlugin({
+    STATIC_PATH: JSON.stringify(STATIC_PATH),
+    IS_DEV: JSON.stringify(isDev),
+  }),
 ];
 
 const devPlugins = [
@@ -100,11 +107,12 @@ module.exports = {
   context: path.resolve(__dirname, 'src'),
   entry: {
     index: ['./index.js', './index.css'],
+    sw: 'sw/index.js',
   },
 
   output: {
     path: outputPath,
-    publicPath: '/static/build/',
+    publicPath: STATIC_PATH,
     filename: `${outputName}.js`,
   },
 

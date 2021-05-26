@@ -334,6 +334,8 @@ def configure_views(app):
     app.register_blueprint(tags.bp)
 
     app.add_url_rule('/dump/', 'dump', misc.dump)
+    app.add_url_rule('/sw.js', 'service_worker', misc.service_worker, methods=('GET', 'HEAD'))
+    app.add_url_rule('/manifest.json', 'manifest', misc.manifest, methods=('GET', 'HEAD'))
 
 
 def configure_admin_views(app):

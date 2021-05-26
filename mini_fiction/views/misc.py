@@ -1,8 +1,11 @@
 import os
 from datetime import datetime
+from pathlib import Path
 
-from flask import current_app, send_from_directory, render_template, abort, url_for
+from flask import current_app, send_from_directory, render_template, abort, url_for, Response
 from pony.orm import db_session
+
+from mini_fiction.utils.frontend import get_manifest
 
 
 def localstatic(filename):
@@ -31,3 +34,11 @@ def dump():
         dump_size_kib=os.path.getsize(path) / 1024.0,
         mtime=mtime,
     )
+
+
+def service_worker() -> Response:
+    return send_from_directory(Path(current_app.config['STATIC_ROOT']) / 'build', get_manifest().assets['sw.js'].src)
+
+
+def manifest() -> Response:
+    return send_from_directory(Path(current_app.config['STATIC_ROOT']) / 'build', 'manifest.json')

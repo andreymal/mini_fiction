@@ -4,6 +4,7 @@
 import json
 import ipaddress
 from datetime import datetime
+from pathlib import Path
 
 from pony import orm
 from flask_babel import gettext
@@ -32,7 +33,11 @@ class Logopic(db.Entity):
 
     @property
     def url(self):
-        return url_for('media', filename=self.picture, v=self.sha256sum[:6])
+        return url_for('media', filename=self.picture)
+
+    @property
+    def picture_path(self):
+        return Path(current_app.config['MEDIA_ROOT']) / self.picture
 
 
 class AnonymousUser(AnonymousUserMixin):
@@ -239,11 +244,12 @@ class Character(db.Entity):
         return self.name
 
     @property
-    def thumb(self):
-        return '{}?{}'.format(
-            url_for('media', filename=self.picture),
-            self.sha256sum[:8],
-        )
+    def url(self):
+        return url_for('media', filename=self.picture)
+
+    @property
+    def picture_path(self):
+        return Path(current_app.config['MEDIA_ROOT']) / self.picture
 
 
 class Category(db.Entity):

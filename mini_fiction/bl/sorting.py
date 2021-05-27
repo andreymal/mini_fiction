@@ -1,17 +1,16 @@
-#!/usr/bin/env python
-# -*- coding: utf-8 -*-
-
 # pylint: disable=unexpected-keyword-arg,no-value-for-parameter
 
-import os
 from hashlib import sha256
+from pathlib import Path
+from uuid import uuid4
 
 from flask import current_app
 from flask_babel import lazy_gettext
 
 from mini_fiction.bl.utils import BaseBL
 from mini_fiction.validation import Validator, ValidationError
-from mini_fiction.validation.sorting import CATEGORY, CHARACTER, CHARACTER_FOR_UPDATE, CHARACTER_GROUP, CLASSIFIER
+from mini_fiction.validation.sorting import CHARACTER, CHARACTER_FOR_UPDATE, CHARACTER_GROUP
+from mini_fiction.utils.image import save_image, ImageKind
 
 
 class CharacterBL(BaseBL):
@@ -36,10 +35,14 @@ class CharacterBL(BaseBL):
             raise ValidationError(errors)
 
         picture = self.validate_and_get_picture_data(data.pop('picture'))
+        picture_metadata = save_image(kind=ImageKind.CHARACTERS, data=picture, extension='png')
 
         character = self.model(picture='pending', sha256sum='pending', **data)
         character.flush()
-        character.bl.set_picture_data(picture)
+
+        self.model.picture = picture_metadata.relative_path
+        self.model.sha256sum = picture_metadata.sha256sum
+
         AdminLog.bl.create(user=author, obj=character, action=AdminLog.ADDITION)
 
         return character
@@ -80,7 +83,10 @@ class CharacterBL(BaseBL):
         for key, value in data.items():
             if key == 'picture':
                 if picture is not None:
-                    self.set_picture_data(picture)
+                    self.model.picture_path.unlink(missing_ok=True)
+                    picture_metadata = save_image(kind=ImageKind.CHARACTERS, data=value, extension='jpg')
+                    self.model.picture = picture_metadata.relative_path
+                    self.model.sha256sum = picture_metadata.sha256sum
                     changed_fields |= {'picture',}
             elif key == 'group':
                 if character.group.id != value:
@@ -105,6 +111,7 @@ class CharacterBL(BaseBL):
         AdminLog.bl.create(user=author, obj=self.model, action=AdminLog.DELETION)
         self.model.delete()
 
+    # FIXME: Decouple validation logic and move it to mini_fiction.utils.image
     def validate_and_get_picture_data(self, picture):
         fp = picture.stream
         header = fp.read(4)
@@ -116,23 +123,6 @@ class CharacterBL(BaseBL):
                 lazy_gettext('Maximum picture size is {maxsize} KiB').format(maxsize=16)
             ]})
         return data
-
-    def set_picture_data(self, data):
-        filename = str(self.model.id) + '.png'
-        pathset = ('characters', filename)
-        urlpath = '/'.join(pathset)  # equivalent to ospath except Windows!
-        ospath = os.path.join(current_app.config['MEDIA_ROOT'], *pathset)
-
-        dirpath = os.path.dirname(ospath)
-        if not os.path.isdir(dirpath):
-            os.makedirs(dirpath)
-
-        with open(ospath, 'wb') as fp:
-            fp.write(data)
-
-        self.model.picture = urlpath
-        self.model.sha256sum = sha256(data).hexdigest()
-        return urlpath
 
 
 class CharacterGroupBL(BaseBL):

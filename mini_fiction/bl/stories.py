@@ -20,6 +20,7 @@ from flask import Markup, current_app
 from mini_fiction.ratelimit import RateLimitExceeded
 from mini_fiction.bl.utils import BaseBL
 from mini_fiction.bl.commentable import Commentable
+from mini_fiction.utils.converter import convert
 from mini_fiction.utils.misc import words_count, normalize_tag, call_after_request as later
 from mini_fiction.utils.misc import normalize_text_for_search_index, normalize_text_for_search_query
 from mini_fiction.utils import diff as utils_diff
@@ -1638,18 +1639,19 @@ class ChapterBL(BaseBL):
 
         new_order = orm.select(orm.max(x.order) for x in Chapter if x.story == story).first()
         data = Validator(CHAPTER).validated(data)
+        text_container = convert(data['text'])
 
         if not editor.is_staff:
             chapter_max_length = current_app.config['CHAPTER_MAX_LENGTH']
-            if len(data['text']) > chapter_max_length:
+            if len(text_container.text) > chapter_max_length:
                 raise ValidationError({'text': ['Глава слишком длинная!']})
 
         chapter = self.model(
             story=story,
             title=data['title'],
             notes=data['notes'],
-            text=data['text'],
-            text_md5=md5(data['text'].encode('utf-8')).hexdigest(),
+            text=text_container.text,
+            text_md5=md5(text_container.text.encode('utf-8')).hexdigest(),
             draft=True,
             story_published=story.published,
         )
@@ -1715,8 +1717,9 @@ class ChapterBL(BaseBL):
             edited_data['notes'] = [chapter.notes, data['notes']]
             chapter.notes = data['notes']
 
-        text = data.get('text')
-        if text is not None and text != chapter.text:
+        raw_text = data.get('text')
+        if raw_text is not None and raw_text != chapter.text:
+            text = convert(data['text']).text
             if len(chapter.text) <= current_app.config['MAX_SIZE_FOR_DIFF'] and len(text) <= current_app.config['MAX_SIZE_FOR_DIFF']:
                 # Для небольших текстов используем дифф на питоне, который красивый, но не быстрый
                 chapter_text_diff = utils_diff.get_diff_default(chapter.text, text)

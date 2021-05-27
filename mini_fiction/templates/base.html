@@ -13,6 +13,12 @@
     {% if config['FAVICON_URL'] -%}
         <link rel="shortcut icon" type="image/x-icon" href="{{ config['FAVICON_URL'] }}" />
     {%- endif %}
+    {% if config['APPLE_TOUCH_ICON_URL'] -%}
+        <link rel="apple-touch-icon" href="{{ config['APPLE_TOUCH_ICON_URL'] }}">
+    {%- endif %}
+    {% if config['APPLE_TOUCH_ICON_PRECOMPOSED_URL'] -%}
+        <link rel="apple-touch-icon-precomposed" href="{{ config['APPLE_TOUCH_ICON_PRECOMPOSED_URL'] }}">
+    {%- endif %}
 {% endblock -%}
 
 {%- block meta_csrf_token %}

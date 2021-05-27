@@ -8,7 +8,7 @@ const CURRENT_CACHES = {
   common: 'common-v1',
 };
 
-const COMMON_ASSETS = new RegExp('/media/(avatars|characters|logopics)/');
+const COMMON_ASSETS = new RegExp('(/media/(avatars|characters|logopics)/)|(/localstatic/)');
 
 const MANIFEST = '/manifest.json';
 

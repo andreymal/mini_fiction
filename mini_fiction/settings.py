@@ -144,6 +144,8 @@ class Config(object):
     SITE_DESCRIPTION = {'default': ''}
     SITE_FEEDBACK = '/'
     FAVICON_URL = None
+    APPLE_TOUCH_ICON_URL = None
+    APPLE_TOUCH_ICON_PRECOMPOSED_URL = None
     SESSION_COOKIE_DOMAIN = False
 
     # used by the converter to replace absolute links to relative

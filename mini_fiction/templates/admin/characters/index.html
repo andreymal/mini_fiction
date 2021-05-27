@@ -10,7 +10,7 @@
         <ul>
         {% for character in characters %}
             <li>
-                <a href="{{ url_for('admin_characters.update', pk=character.id) }}"><img src="{{ character.thumb }}" alt="{{ character.name }}" title="{{ character.name }}" /> {{ character.name }}</a>
+                <a href="{{ url_for('admin_characters.update', pk=character.id) }}"><img src="{{ character.url }}" alt="{{ character.name }}" title="{{ character.name }}" /> {{ character.name }}</a>
             </li>
         {% endfor %}
         </ul>

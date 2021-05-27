@@ -14,7 +14,7 @@
         {% if edit %}
             <div>
             {% for character in charactergroup.characters.select().order_by('c.id') %}
-                <a href="{{ url_for('search.simple', search_type='character', search_id=character.id) }}"><img src="{{ character.thumb }}" alt="{{ character.name }}" title="{{ character.name }}"/></a>
+                <a href="{{ url_for('search.simple', search_type='character', search_id=character.id) }}"><img src="{{ character.url }}" alt="{{ character.name }}" title="{{ character.name }}"/></a>
             {% endfor %}
             </div>
         {% endif %}

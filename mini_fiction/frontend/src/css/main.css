@@ -976,23 +976,37 @@ h1 .alert {
     text-indent: 2em;
 }
 
-.chapter-text p[align="center"],.chapter-text span[align="center"] {
+.chapter-text p[align="center"],
+.chapter-text h3[align="center"],
+.chapter-text span[align="center"] {
     display: inline-block;
     width: 100%;
     text-align: center;
 }
 
-.chapter-text p[align="left"],.chapter-text span[align="left"] {
+.chapter-text p[align="left"],
+.chapter-text h3[align="left"],
+.chapter-text span[align="left"] {
     text-align: left;
 }
 
-.chapter-text p[align="right"],.chapter-text span[align="right"] {
+.chapter-text p[align="right"],
+.chapter-text h3[align="right"],
+.chapter-text span[align="right"] {
     display: inline-block;
     width: 100%;
     text-align: right;
 }
 
-.chapter-text.mode-justify p[align="center"], .chapter-text.mode-justify span[align="center"] {
+.chapter-text.mode-indent-left p[align="center"],
+.chapter-text.mode-indent-left h3[align="center"],
+.chapter-text.mode-indent-left span[align="center"] {
+    text-indent: 0;
+}
+
+.chapter-text.mode-justify p[align="center"],
+.chapter-text.mode-justify h3[align="center"],
+.chapter-text.mode-justify span[align="center"] {
     display: inline-block;
     width: 100%;
     text-align: center;
@@ -1000,17 +1014,17 @@ h1 .alert {
     text-align-last: center;
 }
 
-.chapter-text.mode-indent-left p[align="center"], .chapter-text.mode-indent-left span[align="center"] {
-    text-indent: 0;
-}
-
-.chapter-text.mode-justify p[align="left"], .chapter-text.mode-justify span[align="left"] {
+.chapter-text.mode-justify p[align="left"],
+.chapter-text.mode-justify h3[align="left"],
+.chapter-text.mode-justify span[align="left"] {
     text-align: justify;
     -moz-text-align-last: left;
     text-align-last: left;
 }
 
-.chapter-text.mode-justify p[align="right"], .chapter-text.mode-justify span[align="right"] {
+.chapter-text.mode-justify p[align="right"],
+.chapter-text.mode-justify h3[align="right"],
+.chapter-text.mode-justify span[align="right"] {
     display: inline-block;
     width: 100%;
     text-align: justify;

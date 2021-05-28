@@ -312,6 +312,9 @@ class Config(object):
         'span': {
             'align': ['left', 'center', 'right'],
         },
+        'h3': {
+            'align': ['left', 'center', 'right'],
+        },
         'p': {
             'align': ['left', 'center', 'right'],
         },

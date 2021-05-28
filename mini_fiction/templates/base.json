@@ -1,6 +1,5 @@
 {
     "page_content": {
-        "v": {{ (STATIC_V or '')|tojson_raw|safe }},
         "csrftoken": {{ csrf_token()|tojson_raw|safe }},
         "title": {% filter safe %}{% filter tojson_raw -%}
             {%- block fulltitle -%}

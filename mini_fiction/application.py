@@ -367,21 +367,6 @@ def configure_staticfiles(app):
     if app.config['LOCALSTATIC_ROOT']:
         app.add_url_rule('/{}/<path:filename>'.format(app.config['LOCALSTATIC_URL'].strip('/')), 'localstatic', misc.localstatic)
 
-    # Static invalidation
-    app.static_v = None
-    if app.config.get('STATIC_V'):
-        app.static_v = app.config['STATIC_V']
-    elif app.config.get('STATIC_ROOT') and app.config.get('STATIC_VERSION_FILE'):
-        version_file_path = os.path.join(app.config['STATIC_ROOT'], app.config['STATIC_VERSION_FILE'])
-        if os.path.isfile(version_file_path):
-            with open(version_file_path, 'r', encoding='utf-8') as fp:
-                app.static_v = fp.read().strip()
-
-    @app.url_defaults
-    def static_postfix(endpoint, values):
-        if endpoint in ('static', 'localstatic') and 'v' not in values and not values['filename'].startswith('build/') and app.static_v:
-            values['v'] = app.static_v
-
 
 def configure_ajax(app):
     @app.before_request

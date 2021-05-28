@@ -154,9 +154,6 @@ class Config(object):
 
     STATIC_ROOT = os.path.join(os.path.dirname(__file__), 'static')
     STATIC_URL = '/static'
-    STATIC_VERSION_FILE = 'VERSION'
-    STATIC_VERSION_TYPE = 'date'  # or 'hash'
-    STATIC_V = None
 
     LOCALSTATIC_ROOT = None
     LOCALSTATIC_URL = '/localstatic'

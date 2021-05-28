@@ -11,6 +11,7 @@ from mini_fiction.bl.utils import BaseBL
 from mini_fiction.validation import Validator, ValidationError
 from mini_fiction.validation.sorting import CHARACTER, CHARACTER_FOR_UPDATE, CHARACTER_GROUP
 from mini_fiction.utils.image import save_image, ImageKind
+from mini_fiction.utils.misc import call_after_request as later
 
 
 class CharacterBL(BaseBL):
@@ -37,11 +38,12 @@ class CharacterBL(BaseBL):
         picture = self.validate_and_get_picture_data(data.pop('picture'))
         picture_metadata = save_image(kind=ImageKind.CHARACTERS, data=picture, extension='png')
 
-        character = self.model(picture='pending', sha256sum='pending', **data)
+        character = self.model(
+            picture=picture_metadata.relative_path,
+            sha256sum=picture_metadata.sha256sum,
+            **data
+        )
         character.flush()
-
-        self.model.picture = picture_metadata.relative_path
-        self.model.sha256sum = picture_metadata.sha256sum
 
         AdminLog.bl.create(user=author, obj=character, action=AdminLog.ADDITION)
 
@@ -83,11 +85,12 @@ class CharacterBL(BaseBL):
         for key, value in data.items():
             if key == 'picture':
                 if picture is not None:
-                    self.model.picture_path.unlink(missing_ok=True)
-                    picture_metadata = save_image(kind=ImageKind.CHARACTERS, data=value, extension='jpg')
+                    old_path = self.model.picture_path
+                    picture_metadata = save_image(kind=ImageKind.CHARACTERS, data=picture, extension='jpg')
                     self.model.picture = picture_metadata.relative_path
                     self.model.sha256sum = picture_metadata.sha256sum
                     changed_fields |= {'picture',}
+                    later(lambda: old_path.unlink(missing_ok=True))
             elif key == 'group':
                 if character.group.id != value:
                     setattr(character, key, value)
@@ -109,6 +112,8 @@ class CharacterBL(BaseBL):
     def delete(self, author):
         from mini_fiction.models import AdminLog
         AdminLog.bl.create(user=author, obj=self.model, action=AdminLog.DELETION)
+        old_path = self.model.picture_path
+        later(lambda: old_path.unlink(missing_ok=True))
         self.model.delete()
 
     # FIXME: Decouple validation logic and move it to mini_fiction.utils.image

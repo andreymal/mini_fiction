@@ -15,6 +15,7 @@ from mini_fiction.bl.utils import BaseBL
 from mini_fiction.utils.image import save_image, ImageKind
 from mini_fiction.validation import Validator
 from mini_fiction.validation.logopics import LOGOPIC, LOGOPIC_FOR_UPDATE
+from mini_fiction.utils.misc import call_after_request as later
 
 
 class LogopicBL(BaseBL):
@@ -23,13 +24,15 @@ class LogopicBL(BaseBL):
 
         data = Validator(LOGOPIC).validated(data)
 
-        picture = data.pop('picture')
-        logopic = self.model(picture='pending', sha256sum='pending', **data)
-        logopic.flush()
-
+        picture = data.pop('picture').stream.read()
         picture_metadata = save_image(kind=ImageKind.LOGOPICS, data=picture, extension='jpg')
-        self.model.picture = picture_metadata.relative_path
-        self.model.sha256sum = picture_metadata.sha256sum
+
+        logopic = self.model(
+            picture=picture_metadata.relative_path,
+            sha256sum=picture_metadata.sha256sum,
+            **data
+        )
+        logopic.flush()
 
         current_app.cache.delete('logopics')
         AdminLog.bl.create(user=author, obj=logopic, action=AdminLog.ADDITION)
@@ -46,11 +49,13 @@ class LogopicBL(BaseBL):
         for key, value in data.items():
             if key == 'picture':
                 if value:
-                    self.model.picture_path.unlink(missing_ok=True)
-                    picture_metadata = save_image(kind=ImageKind.LOGOPICS, data=value, extension='jpg')
+                    picture = value.stream.read()
+                    old_path = self.model.picture_path
+                    picture_metadata = save_image(kind=ImageKind.LOGOPICS, data=picture, extension='jpg')
                     self.model.picture = picture_metadata.relative_path
                     self.model.sha256sum = picture_metadata.sha256sum
                     changed_fields |= {'picture',}
+                    later(lambda: old_path.unlink(missing_ok=True))
             else:
                 if key == 'original_link_label':
                     value = value.replace('\r', '')
@@ -74,6 +79,8 @@ class LogopicBL(BaseBL):
     def delete(self, author):
         from mini_fiction.models import AdminLog
         AdminLog.bl.create(user=author, obj=self.model, action=AdminLog.DELETION)
+        old_path = self.model.picture_path
+        later(lambda: old_path.unlink(missing_ok=True))
         self.model.delete()
         current_app.cache.delete('logopics')
 

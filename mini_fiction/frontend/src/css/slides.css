@@ -62,9 +62,7 @@
     height: 100%;
     top: 0;
     left: 0;
-    transform: translateX(-100%);
-    transition-duration: .8s;
-    opacity: 1;
+    opacity: 0;
 
     & .story-summary {
         /*noinspection CssUnknownProperty*/
@@ -77,11 +75,11 @@
 }
 
 input:checked ~ .slide {
-    transform: translateX(100%);
+    /* Add some transition too?.. */
 }
 
 input:checked + label + .slide {
-    transform: translateX(0);
+    transition: opacity 0.5s ease-in-out;
     opacity: 1;
 }
 

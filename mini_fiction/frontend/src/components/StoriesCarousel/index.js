@@ -5,6 +5,7 @@ export default (node) => {
   const inputs = [...node.getElementsByTagName('input')];
   let current = 0;
   let interval;
+  let paused = false;
 
   const loop = () => setInterval(() => {
     inputs[current % inputs.length].checked = true;
@@ -13,14 +14,16 @@ export default (node) => {
   interval = loop();
 
   const pause = () => {
+    if (paused) return;
+    paused = true;
     clearInterval(interval);
     setTimeout(() => {
       interval = loop();
+      paused = false;
     }, SLEEP_MS);
   };
 
   // Pause loop further on user interaction
-  node.addEventListener('click', pause);
   node.addEventListener('mouseenter', pause);
 
   return () => clearInterval(interval);

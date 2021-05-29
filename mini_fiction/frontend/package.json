@@ -19,8 +19,6 @@
     "bazooka": "^0.9.1",
     "classnames": "^2.3.1",
     "core-js": "^3.11.1",
-    "hyphenation.ru": "^0.2.1",
-    "hypher": "^0.2.5",
     "jquery": "^2.2.4",
     "preact": "^10.5.13",
     "react-autosuggest": "^10.1.0",

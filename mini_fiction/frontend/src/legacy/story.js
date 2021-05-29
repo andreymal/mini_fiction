@@ -1,38 +1,10 @@
-'use strict';
-
-import Hypher from 'hypher';
-import ruHyphenation from 'hyphenation.ru';
-
 import amajaxify from './lib/amajaxify';
 import core from './core';
 import common from './common';
 import { post } from '../utils/ajax';
 import { notify, notifyError } from '../utils/notifications';
 
-const hypher = new Hypher(ruHyphenation);
-
-
-/**
- * (This method is created by andreymal)
- *
- * Recursively hyphenates a array of DOM nodes.
- *
- * @param {object} nodes - DOM node or list of DOM nodes (text or elements)
- */
-const hyphenateDOM = (nodes) => {
-  if ((nodes instanceof HTMLElement) || (nodes instanceof Text)) {
-    nodes = [nodes];
-  }
-  nodes.forEach(node => {
-    if (node.nodeType === document.TEXT_NODE) {
-      node.nodeValue = hypher.hyphenateText(node.nodeValue);
-    } else if (node.childNodes && node.childNodes.length > 0) {
-      hyphenateDOM([...node.childNodes]);
-    }
-  });
-};
-
-/* global core: false, $: false, Hypher: false, common: false */
+/* global core: false, $: false, common: false */
 
 
 var story = {
@@ -992,11 +964,6 @@ var story = {
 
         // hyphens
         if (current.hyphens == 'yes') {
-            if (!element.classList.contains('with-hypher')) {
-                // TODO: internationalization
-                hyphenateDOM(element);
-                element.classList.add('with-hypher');
-            }
             element.classList.add('mode-hyphens');
         } else {
             if (current.hyphens != 'no') {

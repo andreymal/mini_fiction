@@ -105,12 +105,10 @@
 
 @media (max-width: 767px) {
   .markItUp {
-    width: 90%;
     width: calc(100% - 12px);
   }
 
   .markItUpEditor {
-    width: 90% !important;
     width: calc(100% - 12px) !important;
   }
 }
@@ -120,7 +118,6 @@
     width: auto;
   }
   & .markItUpEditor {
-    width: 95% !important;
     width: calc(100% - 12px) !important;
     max-width: none;
   }

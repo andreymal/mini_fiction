@@ -5,7 +5,6 @@ body {
 }
 
 a {
-    -webkit-text-decoration-skip-ink: none;
     text-decoration-skip-ink: none;
 }
 
@@ -95,7 +94,7 @@ a {
 }
 
 .stories-carousel .story-item {
-    margin: 0px!important;
+    margin: 0!important;
     box-sizing: border-box;
 }
 .stories-carousel .story-item .meta .story-tag {
@@ -113,7 +112,7 @@ a {
 a.slidesjs-navigation {
     display: inline-block;
     position: relative;
-    top: 0px;
+    top: 0;
     left: 425px;
     padding: 2px;
     margin-bottom: 3px;
@@ -453,15 +452,12 @@ ul.nav-profile-menu-content > li > a {
         margin: 5px;
     }
     .nav-icon {
-        width: 7%;
         width: calc(30px);
     }
     .nav-main-profile {
-        width: 90%;
         width: calc(100% - 40px);
     }
     .nav-profile-menu {
-        width: 75%;
         width: calc(100% - 80px);
         min-width: auto;
     }
@@ -678,7 +674,7 @@ a.authorlink:hover,a.edit-link:hover {
 
 .vote-area-2 {
     display: block;
-    margin: 10px 0px;
+    margin: 10px 0;
 }
 
 .starblock {
@@ -699,11 +695,10 @@ a.authorlink:hover,a.edit-link:hover {
 }
 
 .starvote {
-    background: transparent url(../images/votes.png) no-repeat;
     width: 24px;
     height: 24px;
     display: inline-block;
-    background-position: 0px 0px;
+    background: transparent url(../images/votes.png) no-repeat 0 0;
     background-size: 100%;
 }
 
@@ -719,40 +714,40 @@ a.authorlink:hover,a.edit-link:hover {
 }
 
 .starvote.star-0 {
-    background-position: 0px 0px;
+    background-position: 0 0;
 }
 
 .starvote.star-1 {
-    background-position: 0px -24px;
+    background-position: 0 -24px;
 }
 
 .starvote.star-2 {
-    background-position: 0px -48px;
+    background-position: 0 -48px;
 }
 
 .starvote.star-3 {
-    background-position: 0px -72px;
+    background-position: 0 -72px;
 }
 
 .starvote.star-4 {
-    background-position: 0px -96px;
+    background-position: 0 -96px;
 }
 
 .starvote.star-5 {
-    background-position: 0px -120px;
+    background-position: 0 -120px;
 }
 
 .starvote.star-6 {
-    background-position: 0px -144px;
+    background-position: 0 -144px;
 }
 
 .starblock-voting:hover .starvote.star-button {
-    background-position: 0px 0px;
+    background-position: 0 0;
 }
 
 .starblock-voting .starvote.star-button:hover,
 .starblock-voting .starvote.star-button:hover ~ .starvote.star-button {
-    background-position: 0px -120px;
+    background-position: 0 -120px;
 }
 
 h1 .alert {
@@ -943,10 +938,6 @@ h1 .alert {
     font-family: Verdana, Arial, sans-serif;
     font-size: 14px;
     line-height: 26px;
-
-    -ms-hyphens: none;
-    -moz-hyphens: none;
-    -webkit-hyphens: none;
     hyphens: none;
 }
 
@@ -956,19 +947,15 @@ h1 .alert {
 
 .chapter-text.mode-justify {
     text-align: justify;
-    -moz-text-align-last: left;
     text-align-last: left;
 }
 
 .chapter-text.mode-hyphens {
-    -ms-hyphens: manual;
-    -moz-hyphens: manual;
-    -webkit-hyphens: manual;
     hyphens: manual;
 }
 
 .chapter-text.mode-indent-left p, .chapter-text.mode-indent-left span {
-    margin-bottom: 0px;
+    margin-bottom: 0;
     text-indent: 2em;
 }
 
@@ -1010,7 +997,6 @@ h1 .alert {
     display: inline-block;
     width: 100%;
     text-align: center;
-    -moz-text-align-last: center;
     text-align-last: center;
 }
 
@@ -1018,7 +1004,6 @@ h1 .alert {
 .chapter-text.mode-justify h3[align="left"],
 .chapter-text.mode-justify span[align="left"] {
     text-align: justify;
-    -moz-text-align-last: left;
     text-align-last: left;
 }
 
@@ -1028,7 +1013,6 @@ h1 .alert {
     display: inline-block;
     width: 100%;
     text-align: justify;
-    -moz-text-align-last: right;
     text-align-last: right;
 }
 
@@ -1144,12 +1128,10 @@ hr {
 }
 
 .spoiler-gray img {
-    -webkit-filter: contrast(0%) brightness(159.375%);
     filter: contrast(0%) brightness(159.375%);
 }
 
 .spoiler-gray:hover img {
-    -webkit-filter: inherit;
     filter: inherit;
 }
 
@@ -1230,10 +1212,8 @@ select.select-size {
     height: 12px;
     margin: 3px;
     vertical-align: top;
-    background: url(../images/story-formatting-button.png);
     background-size: 12px 12px;
-    background-repeat: no-repeat;
-    background-position: 0px 0px;
+    background: url(../images/story-formatting-button.png) no-repeat 0 0;
 }
 
 .story-formatting-window {
@@ -1241,10 +1221,8 @@ select.select-size {
     z-index: 15;
     width: 300px;
     top: 36px;
-    max-height: 90%;
     max-height: calc(100% - 37px);
     overflow-y: auto;
-    left: 45%;
     left: calc(50% - 150px);
     background-color: white;
     border-radius: 6px;
@@ -1253,14 +1231,12 @@ select.select-size {
     line-height: 18px;
 
     opacity: 1.0;
-    -webkit-transform: translateY(0px);
-    transform: translateY(0px);
-    transition-property: opacity, transform, -webkit-transform;
+    transform: translateY(0);
+    transition-property: opacity, transform;
     transition-duration: 150ms;
 }
 
 .story-formatting-window.hiding {
-    -webkit-transform: translateY(-20px);
     transform: translateY(-20px);
     opacity: 0.0;
 }
@@ -1308,7 +1284,6 @@ select.select-size {
 .story-formatting-window select {
     margin: 0 -5px 4px -5px;
     padding: 2px 0;
-    width: 100%;
     width: calc(100% + 10px);
     box-sizing: border-box;
     font-family: inherit;
@@ -1544,7 +1519,7 @@ p.meta .chapter-controls {
 }
 
 .search-type-buttons {
-    padding-left: 0px;
+    padding-left: 0;
 }
 
 .search-tags-mode-widget,
@@ -1656,7 +1631,7 @@ input.hidden {
 }
 
 .nav-pills.nav-simple ul {
-    margin-bottom: 0px;
+    margin-bottom: 0;
 }
 
 .nav-pills.nav-simple>li>a {
@@ -1814,11 +1789,7 @@ a.btn {
     border-style: solid;
     border-width: 1px;
     border-radius: 5px;
-    -webkit-box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
-    -moz-box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
     box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
-    -webkit-background-clip: padding-box;
-    -moz-background-clip: padding;
     background-clip: padding-box;
 }
 
@@ -1836,7 +1807,7 @@ a.btn {
     color: #ffffff;
     text-decoration: none;
     background-color: #0088cc;
-    border-radius: 0px;
+    border-radius: 0;
     background-image: none;
 }
 
@@ -2124,7 +2095,6 @@ a.btn {
 }
 
 .main-menu {
-    padding: 34px 0 0;
     margin: 0;
     color: #CDCAE9;
     list-style-type: none;
@@ -2485,7 +2455,6 @@ ul.editlog .editlog-item:nth-child(2n+1) {
 .admin-dashboard > a {
     display: inline-block;
     vertical-align: top;
-    width: 49%;
     width: calc(50% - 8px);
     min-height: 98px;
     box-sizing: border-box;
@@ -2636,7 +2605,6 @@ ul.editlog .editlog-item:nth-child(2n+1) {
 .admin-input-text-full {
     margin-left: 0;
     margin-right: 0;
-    width: 90%;
     width: calc(100% - 12px - 2px);  /* margin and padding */
 }
 
@@ -2759,7 +2727,6 @@ ul.editlog .editlog-item:nth-child(2n+1) {
         font-size: 32px;
     }
     .chapter-text-block {
-        width: 96%;
         width: calc(100% - 20px);
         margin: 0;
     }
@@ -2833,7 +2800,6 @@ ul.editlog .editlog-item:nth-child(2n+1) {
         opacity: 1;
     }
     .chapter-text-block {
-        width: 96%;
         width: calc(100% - 20px);
         margin: 0;
     }
@@ -2864,18 +2830,15 @@ ul.editlog .editlog-item:nth-child(2n+1) {
         min-height: auto;
     }
     .input-xxxlarge {
-        width: 95%;
         width: calc(100% - 12px - 12px);
     }
     .admin-dashboard > a {
         display: block;
         width: auto;
         min-height: 0;
-        margin-right: 8px;
         margin-right: calc(12px - 1%);
     }
     .admin-log-list {
-        margin-right: 8px;
         margin-right: calc(12px - 1%);
     }
     .all-tags-list > li {
@@ -2896,11 +2859,9 @@ ul.editlog .editlog-item:nth-child(2n+1) {
         padding-top: 12px;
     }
     .controls textarea {
-        width: 95%;
         width: calc(100% - 12px - 12px);
     }
     .search-input {
-        width: 95%;
         width: calc(100% - 12px - 2px);
         margin-right: 0;
     }
@@ -2920,10 +2881,9 @@ ul.editlog .editlog-item:nth-child(2n+1) {
         padding: 6px 8px;
     }
     .nav-tabs>li,.nav-pills>li {
-        padding: 0 0 0px;
+        padding: 0 0 0;
     }
     .chapter-text-block {
-        width: 96%;
         width: calc(100% - 12px);
         margin: 0;
     }

@@ -1,16 +1,27 @@
 const DURATION_MS = 3000;
+const SLEEP_MS = DURATION_MS * 10;
 
 export default (node) => {
-  let current = 0;
-
   const inputs = [...node.getElementsByTagName('input')];
-  const looper = setInterval(() => {
+  let current = 0;
+  let interval;
+
+  const loop = () => setInterval(() => {
     inputs[current % inputs.length].checked = true;
     current += 1;
   }, DURATION_MS);
+  interval = loop();
 
-  // Do not loop further on user interaction
-  node.addEventListener('click', () => clearInterval(looper));
+  const pause = () => {
+    clearInterval(interval);
+    setTimeout(() => {
+      interval = loop();
+    }, SLEEP_MS);
+  };
 
-  return () => clearInterval(looper);
+  // Pause loop further on user interaction
+  node.addEventListener('click', pause);
+  node.addEventListener('mouseenter', pause);
+
+  return () => clearInterval(interval);
 };

@@ -11,6 +11,7 @@ import ipaddress
 import traceback
 from hashlib import md5
 from datetime import datetime, timedelta
+from typing import Optional, List
 
 import lxml.html
 import lxml.etree
@@ -1675,7 +1676,15 @@ class ChapterBL(BaseBL):
         # current_app.cache.delete('index_updated_chapters') не нужен, если draft=True
         return chapter
 
-    def edit_log(self, editor, action, data, chapter_text_diff=None, text_md5=None, flags=None):
+    def edit_log(
+        self,
+        editor,
+        action,
+        data,
+        chapter_text_diff: Optional[str] = None,
+        text_md5: Optional[str] = None,
+        flags: Optional[List[str]] = None
+    ) -> None:
         from mini_fiction.models import StoryLog
 
         chapter = self.model
@@ -1686,7 +1695,7 @@ class ChapterBL(BaseBL):
             assert isinstance(v, (list, tuple))
             assert len(v) == 2
 
-        sl = StoryLog(
+        StoryLog(
             user=editor,
             story=chapter.story,
             chapter_action=action,
@@ -1698,8 +1707,6 @@ class ChapterBL(BaseBL):
             chapter_md5=text_md5 or '',
             chapter_text_flags=flags
         )
-
-        return sl
 
     def update(self, editor, data, minor=False):
         if minor and (not editor or not editor.is_staff):

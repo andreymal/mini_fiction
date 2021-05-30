@@ -1639,19 +1639,23 @@ class ChapterBL(BaseBL):
 
         new_order = orm.select(orm.max(x.order) for x in Chapter if x.story == story).first()
         data = Validator(CHAPTER).validated(data)
-        text_container = convert(data['text'])
+
+        if editor.text_source_behaviour:
+            text = convert(data['text']).text
+        else:
+            text = data['text']
 
         if not editor.is_staff:
             chapter_max_length = current_app.config['CHAPTER_MAX_LENGTH']
-            if len(text_container.text) > chapter_max_length:
+            if len(text) > chapter_max_length:
                 raise ValidationError({'text': ['Глава слишком длинная!']})
 
         chapter = self.model(
             story=story,
             title=data['title'],
             notes=data['notes'],
-            text=text_container.text,
-            text_md5=md5(text_container.text.encode('utf-8')).hexdigest(),
+            text=text,
+            text_md5=md5(text.encode('utf-8')).hexdigest(),
             draft=True,
             story_published=story.published,
         )
@@ -1719,7 +1723,10 @@ class ChapterBL(BaseBL):
 
         raw_text = data.get('text')
         if raw_text is not None and raw_text != chapter.text:
-            text = convert(data['text']).text
+            if editor.text_source_behaviour:
+                text = convert(data['text']).text
+            else:
+                text = raw_text
             if len(chapter.text) <= current_app.config['MAX_SIZE_FOR_DIFF'] and len(text) <= current_app.config['MAX_SIZE_FOR_DIFF']:
                 # Для небольших текстов используем дифф на питоне, который красивый, но не быстрый
                 chapter_text_diff = utils_diff.get_diff_default(chapter.text, text)

@@ -10,7 +10,7 @@ from flask import current_app
 class TextContainer:
     changed: bool
     flags: List[str]
-    text: Optional[str]
+    text: str
 
 
 star_begin = r'\s*\n\s*(<(p|span)( align="?[a-z]+"?)?>|<strong>|<b>|<em>|<i>|<center>|<h[1-6]>)*(\s|&nbsp;)*'
@@ -672,6 +672,6 @@ def convert(old_text: str) -> TextContainer:
     new_text = fix_p_unwrap(new_text, flags)
 
     if new_text == old_text.strip():
-        return TextContainer(changed=False, flags=flags, text=None)
+        return TextContainer(changed=False, flags=None, text=new_text)
 
-    return TextContainer(changed=True, flags=flags, text=new_text)
+    return TextContainer(changed=True, flags=sorted(flags), text=new_text)

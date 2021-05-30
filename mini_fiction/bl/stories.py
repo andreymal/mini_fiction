@@ -1641,9 +1641,12 @@ class ChapterBL(BaseBL):
         data = Validator(CHAPTER).validated(data)
 
         if editor.text_source_behaviour:
-            text = convert(data['text']).text
+            res = convert(data['text'])
+            text = res.text
+            flags = res.flags
         else:
             text = data['text']
+            flags = None
 
         if not editor.is_staff:
             chapter_max_length = current_app.config['CHAPTER_MAX_LENGTH']
@@ -1663,7 +1666,7 @@ class ChapterBL(BaseBL):
 
         self.update_words_count(chapter)
         chapter.flush()
-        chapter.bl.edit_log(editor, 'add', {}, text_md5=chapter.text_md5)
+        chapter.bl.edit_log(editor, 'add', {}, text_md5=chapter.text_md5, flags=flags)
         story.all_chapters_count += 1
         if not chapter.draft:
             story.published_chapters_count += 1
@@ -1672,7 +1675,7 @@ class ChapterBL(BaseBL):
         # current_app.cache.delete('index_updated_chapters') не нужен, если draft=True
         return chapter
 
-    def edit_log(self, editor, action, data, chapter_text_diff=None, text_md5=None):
+    def edit_log(self, editor, action, data, chapter_text_diff=None, text_md5=None, flags=None):
         from mini_fiction.models import StoryLog
 
         chapter = self.model
@@ -1693,6 +1696,7 @@ class ChapterBL(BaseBL):
             data_json=json.dumps(data, ensure_ascii=False),
             chapter_text_diff=json.dumps(chapter_text_diff, ensure_ascii=False) if chapter_text_diff is not None else '',
             chapter_md5=text_md5 or '',
+            chapter_text_flags=flags
         )
 
         return sl
@@ -1724,9 +1728,12 @@ class ChapterBL(BaseBL):
         raw_text = data.get('text')
         if raw_text is not None and raw_text != chapter.text:
             if editor.text_source_behaviour:
-                text = convert(data['text']).text
+                res = convert(data['text'])
+                text = res.text
+                flags = res.flags
             else:
-                text = raw_text
+                text = data['text']
+                flags = None
             if len(chapter.text) <= current_app.config['MAX_SIZE_FOR_DIFF'] and len(text) <= current_app.config['MAX_SIZE_FOR_DIFF']:
                 # Для небольших текстов используем дифф на питоне, который красивый, но не быстрый
                 chapter_text_diff = utils_diff.get_diff_default(chapter.text, text)
@@ -1748,7 +1755,14 @@ class ChapterBL(BaseBL):
             if not minor:
                 chapter.updated = datetime.utcnow()
                 chapter.story.updated = datetime.utcnow()
-            chapter.bl.edit_log(editor, 'edit', edited_data, chapter_text_diff=chapter_text_diff, text_md5=chapter.text_md5)
+            chapter.bl.edit_log(
+                editor,
+                'edit',
+                edited_data,
+                chapter_text_diff=chapter_text_diff,
+                text_md5=chapter.text_md5,
+                flags=flags,
+            )
 
         later(current_app.tasks['sphinx_update_chapter'].delay, chapter.id)
         return chapter

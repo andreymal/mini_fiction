@@ -9,7 +9,7 @@ from flask import current_app
 @dataclass
 class TextContainer:
     changed: bool
-    flags: List[str]
+    flags: Optional[List[str]]
     text: str
 
 

@@ -930,6 +930,7 @@ class StoryLog(db.Entity):
 
     # [["=", длина], ["-", "удалённый кусок"], ["+", "добавленный кусок"]]
     chapter_text_diff = orm.Optional(orm.LongStr, lazy=False)
+    chapter_text_flags = orm.Optional(str, 512,)
     chapter_md5 = orm.Optional(str, 32)
 
     orm.composite_index(story, created_at)

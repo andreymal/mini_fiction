@@ -17,26 +17,6 @@ import superscript from 'images/markitup/superscript.svg'
 import code from 'images/markitup/code.svg'
 import decrease from 'images/markitup/size-decrease.svg'
 import background from 'images/markitup/background.svg'
-import ficbook from 'images/markitup/ficbook.svg'
-
-import { post } from '../utils/ajax';
-import { notify, notifyError } from '../utils/notifications';
-
-const formattingConverter = markitup => {
-    post('/convert/', markitup.textarea.value)
-    .then((response) => response.json())
-    .then(({changed, text}) => {
-        let message;
-        if (changed) {
-            markitup.textarea.value = text;
-            message = 'Форматирование текста починено';
-        } else {
-            message = 'С форматированием уже всё хорошо';
-        }
-        notify(message);
-    })
-    .catch((ignored) => notifyError('Не удалось отформатировать текст'));
-}
 
 export default {
     onShiftEnter: {keepDefault: false, replaceWith: '<br />\n'},
@@ -97,7 +77,5 @@ export default {
         {name: 'Код', openWith: '<pre>', closeWith: '</pre>', svg: code},
         {name: 'Уменьшить размер', openWith: '<small>', closeWith: '</small>', svg: decrease},
         {name: 'Lite-спойлер', openWith: '<span class="spoiler-gray">', closeWith: '</span>', svg: background},
-        {separator: ' '},
-        {name: 'Исправить разметку', replaceWith: formattingConverter, svg: ficbook},
     ]
 };

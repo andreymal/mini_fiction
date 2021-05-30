@@ -11,6 +11,7 @@ import ipaddress
 import traceback
 from hashlib import md5
 from datetime import datetime, timedelta
+from typing import Optional, Dict, Tuple, Any, Iterable
 
 import lxml.html
 import lxml.etree
@@ -20,6 +21,7 @@ from flask import Markup, current_app
 from mini_fiction.ratelimit import RateLimitExceeded
 from mini_fiction.bl.utils import BaseBL
 from mini_fiction.bl.commentable import Commentable
+from mini_fiction.utils.converter import convert
 from mini_fiction.utils.misc import words_count, normalize_tag, call_after_request as later
 from mini_fiction.utils.misc import normalize_text_for_search_index, normalize_text_for_search_query
 from mini_fiction.utils import diff as utils_diff
@@ -280,7 +282,7 @@ class StoryBL(BaseBL, Commentable):
 
         story.approved = bool(approved)
         if user:
-            self.edit_log(user, {'approved': [old_approved, story.approved]})
+            self.edit_log(user, {'approved': (old_approved, story.approved)})
             if story.approved:
                 story.approved_by = user
 
@@ -323,7 +325,7 @@ class StoryBL(BaseBL, Commentable):
             story.draft = not published
 
             if user:
-                self.edit_log(user, {'draft': [old_draft, story.draft]})
+                self.edit_log(user, {'draft': (old_draft, story.draft)})
 
             if not story.draft and user and not user.is_staff:
                 story.published_by_author = user
@@ -412,7 +414,11 @@ class StoryBL(BaseBL, Commentable):
             if not c.draft:
                 continue
             c.draft = False
-            c.bl.edit_log(user, 'edit', {'draft': [True, False]})
+            c.bl.edit_log(
+                editor=user,
+                action='edit',
+                data={'draft': (True, False)},
+            )
             story.words += c.words
             later(current_app.tasks['sphinx_update_chapter'].delay, c.id)
             if story.published and not c.first_published_at:
@@ -703,7 +709,7 @@ class StoryBL(BaseBL, Commentable):
 
         # Если разница есть, то записываем в лог
         if old_contributors != new_contributors:
-            self.edit_log(editor, {'contributors': [old_contributors, new_contributors]})
+            self.edit_log(editor, {'contributors': (old_contributors, new_contributors)})
 
     # access control
 
@@ -1639,17 +1645,24 @@ class ChapterBL(BaseBL):
         new_order = orm.select(orm.max(x.order) for x in Chapter if x.story == story).first()
         data = Validator(CHAPTER).validated(data)
 
+        text = data['text']
+        flags = ()
+        if editor.text_source_behaviour:
+            res = convert(data['text'])
+            text = res.text
+            flags = res.flags
+
         if not editor.is_staff:
             chapter_max_length = current_app.config['CHAPTER_MAX_LENGTH']
-            if len(data['text']) > chapter_max_length:
+            if len(text) > chapter_max_length:
                 raise ValidationError({'text': ['Глава слишком длинная!']})
 
         chapter = self.model(
             story=story,
             title=data['title'],
             notes=data['notes'],
-            text=data['text'],
-            text_md5=md5(data['text'].encode('utf-8')).hexdigest(),
+            text=text,
+            text_md5=md5(text.encode('utf-8')).hexdigest(),
             draft=True,
             story_published=story.published,
         )
@@ -1657,7 +1670,13 @@ class ChapterBL(BaseBL):
 
         self.update_words_count(chapter)
         chapter.flush()
-        chapter.bl.edit_log(editor, 'add', {}, text_md5=chapter.text_md5)
+        chapter.bl.edit_log(
+            editor=editor,
+            action='add',
+            data={},
+            text_md5=chapter.text_md5,
+            flags=flags,
+        )
         story.all_chapters_count += 1
         if not chapter.draft:
             story.published_chapters_count += 1
@@ -1666,7 +1685,16 @@ class ChapterBL(BaseBL):
         # current_app.cache.delete('index_updated_chapters') не нужен, если draft=True
         return chapter
 
-    def edit_log(self, editor, action, data, chapter_text_diff=None, text_md5=None):
+    def edit_log(
+        self,
+        *,
+        editor,
+        action: str,
+        data: Dict[str, Tuple[Any, Any]],
+        flags: Iterable[str] = (),
+        chapter_text_diff: Optional[str] = None,
+        text_md5: Optional[str] = None,
+    ) -> None:
         from mini_fiction.models import StoryLog
 
         chapter = self.model
@@ -1677,7 +1705,7 @@ class ChapterBL(BaseBL):
             assert isinstance(v, (list, tuple))
             assert len(v) == 2
 
-        sl = StoryLog(
+        StoryLog(
             user=editor,
             story=chapter.story,
             chapter_action=action,
@@ -1687,9 +1715,8 @@ class ChapterBL(BaseBL):
             data_json=json.dumps(data, ensure_ascii=False),
             chapter_text_diff=json.dumps(chapter_text_diff, ensure_ascii=False) if chapter_text_diff is not None else '',
             chapter_md5=text_md5 or '',
+            chapter_text_flags=','.join(flags),
         )
-
-        return sl
 
     def update(self, editor, data, minor=False):
         if minor and (not editor or not editor.is_staff):
@@ -1716,6 +1743,12 @@ class ChapterBL(BaseBL):
             chapter.notes = data['notes']
 
         text = data.get('text')
+        flags = ()
+        if editor.text_source_behaviour and 'text' in data:
+            res = convert(data['text'])
+            text = res.text
+            flags = res.flags
+
         if text is not None and text != chapter.text:
             if len(chapter.text) <= current_app.config['MAX_SIZE_FOR_DIFF'] and len(text) <= current_app.config['MAX_SIZE_FOR_DIFF']:
                 # Для небольших текстов используем дифф на питоне, который красивый, но не быстрый
@@ -1738,7 +1771,14 @@ class ChapterBL(BaseBL):
             if not minor:
                 chapter.updated = datetime.utcnow()
                 chapter.story.updated = datetime.utcnow()
-            chapter.bl.edit_log(editor, 'edit', edited_data, chapter_text_diff=chapter_text_diff, text_md5=chapter.text_md5)
+            chapter.bl.edit_log(
+                editor=editor,
+                action='edit',
+                data=edited_data,
+                chapter_text_diff=chapter_text_diff,
+                text_md5=chapter.text_md5,
+                flags=flags,
+            )
 
         later(current_app.tasks['sphinx_update_chapter'].delay, chapter.id)
         return chapter
@@ -1765,7 +1805,11 @@ class ChapterBL(BaseBL):
         later(current_app.tasks['sphinx_delete_chapter'].delay, story.id, chapter.id)
 
         old_order = chapter.order
-        chapter.bl.edit_log(editor, 'delete', {})
+        chapter.bl.edit_log(
+            editor=editor,
+            action='delete',
+            data={},
+        )
 
         # Помогаем поне удалять связи
         for x in chapter.edit_log:
@@ -2001,7 +2045,11 @@ class ChapterBL(BaseBL):
         chapter.draft = not published
 
         if user:
-            self.edit_log(user, 'edit', {'draft': [not chapter.draft, chapter.draft]})
+            self.edit_log(
+                editor=user,
+                action='edit',
+                data={'draft': (not chapter.draft, chapter.draft)},
+            )
 
         if chapter.draft:
             story.published_chapters_count -= 1

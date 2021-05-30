@@ -109,7 +109,7 @@ class AuthorBL(BaseBL):
                 setattr(user, field, data[field])
                 changed_fields |= {field,}
 
-        for field in ('is_staff', 'is_active', 'is_superuser', 'detail_view', 'nsfw'):
+        for field in ('is_staff', 'is_active', 'is_superuser', 'detail_view', 'nsfw', 'text_source_behaviour'):
             if field in data and getattr(user, field) != bool(data[field]):
                 setattr(user, field, bool(data[field]))
                 changed_fields |= {field,}

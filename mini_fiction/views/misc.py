@@ -1,13 +1,8 @@
-import json
 import os
-from dataclasses import asdict
 from datetime import datetime
 
-from flask import current_app, send_from_directory, render_template, abort, url_for, Response, request
-from flask_login import login_required
+from flask import current_app, send_from_directory, render_template, abort, url_for
 from pony.orm import db_session
-
-from mini_fiction.utils.converter import convert
 
 
 def localstatic(filename):
@@ -36,11 +31,3 @@ def dump():
         dump_size_kib=os.path.getsize(path) / 1024.0,
         mtime=mtime,
     )
-
-
-@login_required
-def converter() -> Response:
-    raw_text = request.data.decode()
-    result = convert(raw_text)
-    response = current_app.response_class(json.dumps(asdict(result), ensure_ascii=False), mimetype='application/json')
-    return response

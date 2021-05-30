@@ -78,6 +78,12 @@
         <label>Картинка в шапке:</label>
         {{ form.header_mode }}
     </div>
+
+    <div class="padded bootstrap radio">
+        <label>Поведение текста при сохранении:</label>
+        {{ form.text_source_behaviour }}
+    </div>
+
     {% if non_field_errors %}
         <div class="control-group error">
             {% for error in non_field_errors %}

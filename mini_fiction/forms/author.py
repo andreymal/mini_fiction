@@ -145,6 +145,15 @@ class AuthorEditPrefsForm(Form):
         render_kw=radio_attrs,
     )
 
+    text_source_behaviour = SelectField(
+        '',
+        [],
+        choices=[(0, 'Оставить как есть'), (1, 'Исправлять ошибки')],
+        coerce=int,
+        widget=StoriesButtons(),
+        render_kw=radio_attrs,
+    )
+
 
 class AuthorEditEmailForm(Form):
     attrs_dict = {'class': 'input-xlarge'}

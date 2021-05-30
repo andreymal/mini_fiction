@@ -48,7 +48,7 @@ var story = {
         btn: null,
         btnEvent: null,
         selectedBtn: null,
-        selectedBtnEvent: null,
+        // selectedBtnEvent: null,
 
         area: null,
 
@@ -654,7 +654,7 @@ var story = {
 
     chapterPreviewStuff: function() {
         this._preview.btn = document.getElementById('chapter-preview-btn');
-        this._preview.selectedBtn = document.getElementById('chapter-preview-selected-btn');
+        // this._preview.selectedBtn = document.getElementById('chapter-preview-selected-btn');
         this._preview.area = document.getElementById('chapter-preview');
 
         // Включаем выбранные пользователем параметры отображения текста главы
@@ -667,7 +667,7 @@ var story = {
 
         if (!window.FormData) {
             this._preview.area = null;
-            this._preview.selectedBtn = null;
+            // this._preview.selectedBtn = null;
             this._preview.btn = null;
             return;
         }
@@ -678,7 +678,7 @@ var story = {
 
         if (!this._preview.btn || !this._preview.area || !this._preview.textInput) {
             this._preview.btn = null;
-            this._preview.selectedBtn = null;
+            // this._preview.selectedBtn = null;
             this._preview.area = null;
             return;
         }
@@ -691,15 +691,15 @@ var story = {
 
         this._preview.btn.addEventListener('click', this._preview.btnEvent);
 
-        if (this._preview.selectedBtn) {
-            this._preview.selectedBtnEvent = function(event) {
-                this.previewChapter(this._preview.selectedBtn.form, true);
-                event.preventDefault();
-                return false;
-            }.bind(this);
-
-            this._preview.selectedBtn.addEventListener('click', this._preview.selectedBtnEvent);
-        }
+        // if (this._preview.selectedBtn) {
+        //     this._preview.selectedBtnEvent = function(event) {
+        //         this.previewChapter(this._preview.selectedBtn.form, true);
+        //         event.preventDefault();
+        //         return false;
+        //     }.bind(this);
+        //
+        //     this._preview.selectedBtn.addEventListener('click', this._preview.selectedBtnEvent);
+        // }
 
         this._preview.textInputSelectEvent = function(event) {
             var textarea = this._preview.textInput;
@@ -745,10 +745,10 @@ var story = {
             this._preview.btn.removeEventListener('click', this._preview.btnEvent);
             this._preview.btnEvent = null;
         }
-        if (this._preview.selectedBtnEvent) {
-            this._preview.selectedBtn.removeEventListener('click', this._preview.selectedBtnEvent);
-            this._preview.selectedBtnEvent = null;
-        }
+        // if (this._preview.selectedBtnEvent) {
+        //     this._preview.selectedBtn.removeEventListener('click', this._preview.selectedBtnEvent);
+        //     this._preview.selectedBtnEvent = null;
+        // }
 
         var loadingImg = document.getElementById('chapter-preview-loading-img');
         if (loadingImg) {

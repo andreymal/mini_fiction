@@ -278,6 +278,7 @@ def edit_personal(user_id=None):
             else current_app.config['COMMENT_SPOILER_THRESHOLD']
         ),
         'header_mode': {'': 2, 'off': 0, 'l': 1, 'ls': 2}[user.header_mode],
+        'text_source_behaviour': user.text_source_behaviour,
     })
     non_field_errors = []
 

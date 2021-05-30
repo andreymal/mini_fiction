@@ -14,6 +14,8 @@ from mini_fiction.utils.misc import diff2html, words_count
 from mini_fiction.linters import create_chapter_linter
 from mini_fiction.validation import Validator, ValidationError
 from mini_fiction.validation.chapters import CHAPTER_FORM
+from mini_fiction.utils.converter import convert
+
 
 from .story import get_story
 
@@ -78,13 +80,16 @@ def view(story_id, chapter_order=None):
     return response
 
 
-def _gen_preview(form, only_selected=False):
-    title = request.form.get('title') or gettext('Chapter')
-    sel_start = request.form.get('sel_start') or ''
-    sel_end = request.form.get('sel_end') or ''
-    notes_html = Chapter.bl.notes2html(request.form.get('notes', '')[:4096])
+def _gen_preview(*, form, only_selected: bool, formatted: bool):
+    title = form.get('title') or gettext('Chapter')
+    sel_start = form.get('sel_start') or ''
+    sel_end = form.get('sel_end') or ''
+    notes_html = Chapter.bl.notes2html(form.get('notes', '')[:4096])
 
-    text = request.form.get('text', '')[:current_app.config['CHAPTER_MAX_LENGTH']]
+    text = form.get('text', '')[:current_app.config['CHAPTER_MAX_LENGTH']]
+    if formatted:
+        text = convert(text).text
+
     if only_selected and sel_start.isdigit() and sel_end.isdigit():
         html = Chapter.bl.text2html(text, start=int(sel_start), end=int(sel_end))
     else:
@@ -143,7 +148,11 @@ def add(story_id):
     }
 
     if request.form.get('act') in ('preview', 'preview_selected'):
-        preview_data = _gen_preview(request.form, only_selected=request.form.get('act') == 'preview_selected')
+        preview_data = _gen_preview(
+            form=request.form,
+            only_selected=request.form.get('act') == 'preview_selected',
+            formatted=user.text_source_behaviour
+        )
 
         if request.form.get('ajax') == '1':
             return jsonify(
@@ -253,7 +262,11 @@ def edit(pk):
     }
 
     if request.form.get('act') in ('preview', 'preview_selected'):
-        preview_data = _gen_preview(request.form, only_selected=request.form.get('act') == 'preview_selected')
+        preview_data = _gen_preview(
+            form=request.form,
+            only_selected=request.form.get('act') == 'preview_selected',
+            formatted=user.text_source_behaviour
+        )
 
         if request.form.get('ajax') == '1':
             return jsonify(

@@ -1744,12 +1744,12 @@ class ChapterBL(BaseBL):
 
         text = data.get('text')
         flags = ()
+        if editor.text_source_behaviour:
+            res = convert(data['text'])
+            text = res.text
+            flags = res.flags
 
         if text is not None and text != chapter.text:
-            if editor.text_source_behaviour:
-                res = convert(data['text'])
-                text = res.text
-                flags = res.flags
             if len(chapter.text) <= current_app.config['MAX_SIZE_FOR_DIFF'] and len(text) <= current_app.config['MAX_SIZE_FOR_DIFF']:
                 # Для небольших текстов используем дифф на питоне, который красивый, но не быстрый
                 chapter_text_diff = utils_diff.get_diff_default(chapter.text, text)

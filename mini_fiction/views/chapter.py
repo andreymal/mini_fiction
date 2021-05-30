@@ -310,6 +310,7 @@ def edit(pk):
         if not form['errors']:
             _update_publication_status(chapter, user, data)
             form['saved'] = True
+            form['data']['text'] = chapter.text
         else:
             form['not_saved'] = True
 

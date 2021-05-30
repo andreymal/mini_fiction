@@ -1,0 +1,11 @@
+/* Link */
+
+a {
+    color: var(--color-primary);
+    text-decoration: none;
+
+    &:focus,
+    &:hover {
+        color: var(--color-secondary);
+    }
+}

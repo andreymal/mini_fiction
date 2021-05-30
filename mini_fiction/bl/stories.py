@@ -1744,7 +1744,7 @@ class ChapterBL(BaseBL):
 
         text = data.get('text')
         flags = ()
-        if editor.text_source_behaviour:
+        if editor.text_source_behaviour and 'text' in data:
             res = convert(data['text'])
             text = res.text
             flags = res.flags

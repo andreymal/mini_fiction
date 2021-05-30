@@ -15,6 +15,7 @@ from mini_fiction.database import db
 from mini_fiction.bl.registry import Resource
 from mini_fiction.filters import filter_html, filtered_html_property
 from mini_fiction.utils.misc import htmlcrop
+from mini_fiction.utils.random import random_string
 
 
 class Logopic(db.Entity):
@@ -71,7 +72,7 @@ class Author(db.Entity, UserMixin):
     ban_reason = orm.Optional(orm.LongStr)
     date_joined = orm.Required(datetime, 6, default=datetime.utcnow, optimistic=False)  # Дата отправки формы регистрации
     activated_at = orm.Optional(datetime, 6, optimistic=False)  # Дата перехода по ссылке активации из письма
-    session_token = orm.Required(str, 32, optimistic=False)
+    session_token = orm.Required(str, 32, optimistic=False, default=lambda: random_string(32))
 
     premoderation_mode = orm.Optional(str, 8, py_check=lambda x: x in {'', 'off', 'on'})
 

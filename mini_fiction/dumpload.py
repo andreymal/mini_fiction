@@ -128,13 +128,14 @@ zip_dump_params = {
         'include': (
             'avatar_large', 'avatar_medium', 'avatar_small', 'bio', 'date_joined', 'first_name',
             'id', 'is_active', 'is_staff', 'is_superuser', 'last_name', 'last_visit', 'username',
-            'session_token', 'activated_at', 'last_login', 'text_source_behaviour',
+            'activated_at', 'last_login', 'text_source_behaviour',
         ),
         'exclude': (
             'comment_spoiler_threshold', 'comments_maxdepth', 'detail_view', 'excluded_categories',
             'last_viewed_notification_id', 'nsfw', 'premoderation_mode', 'last_password_change',
             'silent_email', 'silent_tracker', 'comments_per_page', 'header_mode', 'extra',
             'ban_reason', 'published_stories_count', 'all_story_comments_count', 'timezone',
+            'session_token',
         ),
         'override': {'email': '', 'password': ''},
         'with_collections': False,

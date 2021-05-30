@@ -674,4 +674,4 @@ def convert(old_text: str) -> TextContainer:
     if new_text == old_text.strip():
         return TextContainer(changed=False, flags=None, text=new_text)
 
-    return TextContainer(changed=True, flags=sorted(flags), text=new_text)
+    return TextContainer(changed=True, flags=flags, text=new_text)

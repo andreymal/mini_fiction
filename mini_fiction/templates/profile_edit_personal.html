@@ -6,6 +6,8 @@
         <div class="alert-mini green">Личные настройки сохранены</div>
     {% endif -%}
 
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+
     <div class="padded bootstrap radio">
         <label>Часовой пояс:</label>
         <select name="timezone" class="timezone-select" autocomplete="off">

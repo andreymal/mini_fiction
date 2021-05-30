@@ -11,6 +11,7 @@
 </div>
 <div class="modal-footer">
     <form method="POST" action="{{ url_for('news_comment.delete', news_id=newsitem.id, local_id=comment.local_id) }}" style="margin: 0">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
         <button class="btn" data-dismiss="modal" aria-hidden="true">Отменить</button>
         <button type="submit" class="btn btn-danger ajax_comment_delete">Удалить комментарий</a>
     </form>

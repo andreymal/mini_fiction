@@ -10,6 +10,7 @@
 </div>
 <div class="modal-footer">
     <form method="POST" action="{{ url_for('chapter.delete', pk=chapter.id) }}" style="margin: 0;">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
         <button class="btn" data-dismiss="modal" aria-hidden="true">Отменить</button>
         <button type="submit" class="btn btn-danger ajax_chapter_delete">Удалить главу</a>
     </form>

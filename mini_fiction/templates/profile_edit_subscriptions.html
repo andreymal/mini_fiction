@@ -6,6 +6,8 @@
         <div class="alert-mini green">Настройки уведомлений сохранены</div>
     {% endif -%}
 
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+
     <div class="control-group"><div class="controls">
         {% if user_is_current -%}
             <em>Выберите, где какие уведомления вы желаете получать</em><br/><br/>

@@ -10,6 +10,7 @@
 </div>
 <div class="modal-footer">
     <form method="POST" action="{{ url_for('story_local_comment.restore', story_id=local.story.id, local_id=comment.local_id) }}" style="margin: 0">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
         <button class="btn" data-dismiss="modal" aria-hidden="true">Отменить</button>
         <button type="submit" class="btn btn-danger ajax_comment_restore">Восстановить комментарий</a>
     </form>

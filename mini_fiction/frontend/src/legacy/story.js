@@ -97,7 +97,7 @@ var story = {
                 return;
             }
             var url = this.href;
-            post(url)
+            post(url, undefined, [['X-AJAX', '1']])
                 .then(function(response) {
                     return response.json();
                 })
@@ -124,7 +124,7 @@ var story = {
             }
             var link = this;
             var url = link.href;
-            post(url)
+            post(url, undefined, [['X-AJAX', '1']])
                 .then(function(response) {
                     return response.json();
                 })
@@ -147,7 +147,7 @@ var story = {
                 return;
             }
             var url = this.href;
-            post(url)
+            post(url, undefined, [['X-AJAX', '1']])
                 .then(function(response) {
                     return response.json();
                 })
@@ -167,7 +167,7 @@ var story = {
             event.stopImmediatePropagation();
             event.preventDefault();
             var url = this.href;
-            post(url)
+            post(url, undefined, [['X-AJAX', '1']])
                 .then(function(response) {
                     return response.json();
                 })
@@ -183,7 +183,7 @@ var story = {
             event.stopImmediatePropagation();
             event.preventDefault();
             var url = this.href;
-            post(url)
+            post(url, undefined, [['X-AJAX', '1']])
                 .then(function(response) {
                     return response.json();
                 })
@@ -200,7 +200,7 @@ var story = {
             event.stopImmediatePropagation();
             event.preventDefault();
             var url = this.href;
-            post(url)
+            post(url, undefined, [['X-AJAX', '1']])
                 .then(function(response) {
                     return response.json();
                 })

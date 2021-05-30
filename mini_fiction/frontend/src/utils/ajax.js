@@ -26,13 +26,19 @@ const request = (originalRequest, headers = []) => {
   return window.fetch(r);
 };
 
-const get = (url) => request(new R(url, { credentials: 'include' }));
+const get = (url, headers = []) => request(
+  new R(url, { credentials: 'include' }),
+  headers,
+);
 
-const post = (url, body) => request(new R(url, { method: 'POST', body }));
+const post = (url, body, headers = []) => request(
+  new R(url,{ method: 'POST', body }),
+  headers,
+);
 
-const postJSON = (url, body) => request(
+const postJSON = (url, body, headers = []) => request(
   new R(url, { method: 'POST', body: JSON.stringify(body) }),
-  [['Content-Type', 'application/json']],
+  [...['Content-Type', 'application/json'], ...headers],
 );
 
 export {

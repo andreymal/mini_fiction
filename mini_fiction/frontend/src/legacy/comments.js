@@ -162,7 +162,7 @@ var comments = {
 
         var formData = new FormData(form);
         formData.append('extra_ajax', '1');
-        post(form.action, formData)
+        post(form.action, formData, [['X-AJAX', '1']])
             .then(function(response) {
                 return response.json();
             })

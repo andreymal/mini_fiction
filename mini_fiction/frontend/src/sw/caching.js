@@ -70,7 +70,7 @@ export const getCache = (url) => {
  */
 export const handleResponse = async (event, cacheName) => {
   const cache = await caches.open(cacheName);
-  const cachedResponse = await cache.match(event.request, { ignoreSearch: true });
+  const cachedResponse = await cache.match(event.request);
   if (cachedResponse) {
     log('Found cached', event.request.url, 'and serving from', cacheName);
     return cachedResponse;

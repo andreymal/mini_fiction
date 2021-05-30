@@ -53,7 +53,9 @@ clean-frontend:
 	rm -f mini_fiction/frontend/build/*
 
 lint:
-	$(PYTHON) pylint --rcfile=pylintrc mini_fiction
+	pylint --rcfile=pylintrc mini_fiction/logic
+	mypy mini_fiction/logic
+	flake8 mini_fiction/logic
 
 test:
 	pybabel compile -d mini_fiction/translations

@@ -1681,9 +1681,9 @@ class ChapterBL(BaseBL):
         editor,
         action,
         data,
+        flags: List[str],
         chapter_text_diff: Optional[str] = None,
         text_md5: Optional[str] = None,
-        flags: Optional[List[str]] = None
     ) -> None:
         from mini_fiction.models import StoryLog
 
@@ -1705,7 +1705,7 @@ class ChapterBL(BaseBL):
             data_json=json.dumps(data, ensure_ascii=False),
             chapter_text_diff=json.dumps(chapter_text_diff, ensure_ascii=False) if chapter_text_diff is not None else '',
             chapter_md5=text_md5 or '',
-            chapter_text_flags=flags and ','.join(flags) or None
+            chapter_text_flags=','.join(flags),
         )
 
     def update(self, editor, data, minor=False):

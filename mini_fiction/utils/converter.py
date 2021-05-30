@@ -9,7 +9,7 @@ from flask import current_app
 @dataclass
 class TextContainer:
     changed: bool
-    flags: Optional[List[str]]
+    flags: List[str]
     text: str
 
 
@@ -672,6 +672,6 @@ def convert(old_text: str) -> TextContainer:
     new_text = fix_p_unwrap(new_text, flags)
 
     if new_text == old_text.strip():
-        return TextContainer(changed=False, flags=None, text=new_text)
+        return TextContainer(changed=False, flags=flags, text=new_text)
 
     return TextContainer(changed=True, flags=flags, text=new_text)

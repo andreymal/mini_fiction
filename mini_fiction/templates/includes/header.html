@@ -7,7 +7,7 @@
 <!-- Logo image and carousel start -->
 <div class="logopic" style="background-image: url('{{ logo['url'] }}')">
     {%- if current_user.header_mode == '' or current_user.header_mode == 'ls' -%}
-    <div data-bazooka="StoriesCarousel" id="slides" class="stories-carousel carousel-inactive">
+    <div data-bazooka="StoriesCarousel" id="slides">
         {{ random_stories() }}
     </div>
     {%- endif %}

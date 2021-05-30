@@ -1,7 +1,9 @@
 {%- from 'macro.html' import tag_link with context -%}
 
 {% for random_story in random_stories %}
-    <div class="story-item">
+    <input type="radio" id="slide-trigger-{{ loop.index }}" name="slider" {% if loop.index == 1 %}checked autofocus{% endif %}>
+    <label for="slide-trigger-{{ loop.index }}"></label>
+    <div class="story-item slide">
         <h3><a href="{{ url_for('story.view', pk=random_story.id) }}">{{ random_story.title }}</a></h3>
         <p class="meta">
                 {%- if current_user.is_authenticated -%}
@@ -15,7 +17,7 @@
                 {% endif %}{% endfor -%}
                 </span>
         </p>
-        <p>{{ random_story.summary|striptags|truncate(200) }}</p>
+        <p class="story-summary">{{ random_story.summary|striptags }}</p>
         <p class="meta">
                 <span class="character-list">
                     {%- for character in random_story.characters|sort(attribute='id') -%}

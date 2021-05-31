@@ -1,11 +1,9 @@
-#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
-
 from flask import Blueprint, render_template, abort, url_for, redirect, request
 from flask_babel import gettext
 from flask_login import current_user
 from pony.orm import db_session
 
+from mini_fiction.logic import logopics
 from mini_fiction.utils.views import admin_required
 from mini_fiction.validation import ValidationError
 from mini_fiction.forms.admin.logopic import LogopicForm
@@ -42,7 +40,7 @@ def create():
 
     if form.validate_on_submit():
         try:
-            logopic = Logopic.bl.create(current_user._get_current_object(), form.data)
+            logopic = logopics.create(current_user._get_current_object(), form.data)
         except ValidationError as exc:
             form.set_errors(exc.errors)
         else:
@@ -75,7 +73,7 @@ def update(pk):
 
     if form.validate_on_submit():
         try:
-            logopic.bl.update(current_user._get_current_object(), form.data)
+            logopics.update(logopic, current_user._get_current_object(), form.data)
         except ValidationError as exc:
             form.set_errors(exc.errors)
         else:
@@ -101,7 +99,7 @@ def delete(pk):
 
     if request.method == 'POST':
         try:
-            logopic.bl.delete(current_user._get_current_object())
+            logopics.delete(logopic, current_user._get_current_object())
         except ValidationError:
             abort(403)
         else:

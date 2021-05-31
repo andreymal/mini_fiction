@@ -1,9 +1,6 @@
-# -*- coding: utf-8 -*-
-
-
 def init_bl():
     from mini_fiction.bl import registry, authors, stories, comments, htmlblocks, staticpages, news
-    from mini_fiction.bl import sorting, logopics, adminlog, tag_categories, tags
+    from mini_fiction.bl import sorting, adminlog, tag_categories, tags
 
     registry.register('bl.author', authors.AuthorBL)
     registry.register('bl.story', stories.StoryBL)
@@ -17,7 +14,6 @@ def init_bl():
     registry.register('bl.news_comment', comments.NewsCommentBL)
     registry.register('bl.character', sorting.CharacterBL)
     registry.register('bl.charactergroup', sorting.CharacterGroupBL)
-    registry.register('bl.logopic', logopics.LogopicBL)
     registry.register('bl.adminlog', adminlog.AdminLogBL)
     registry.register('bl.tag_category', tag_categories.TagCategoryBL)
     registry.register('bl.tag', tags.TagBL)

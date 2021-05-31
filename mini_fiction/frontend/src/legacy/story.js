@@ -9,7 +9,7 @@ import common from './common';
 import { post } from '../utils/ajax';
 import { notify, notifyError } from '../utils/notifications';
 
-const hypher = new Hypher(ruHyphenation);
+let hypher;
 
 
 /**
@@ -17,17 +17,18 @@ const hypher = new Hypher(ruHyphenation);
  *
  * Recursively hyphenates a array of DOM nodes.
  *
+ * @param {Hypher} hyphenator
  * @param {object} nodes - DOM node or list of DOM nodes (text or elements)
  */
-const hyphenateDOM = (nodes) => {
+const hyphenateDOM = (hyphenator, nodes) => {
   if ((nodes instanceof HTMLElement) || (nodes instanceof Text)) {
     nodes = [nodes];
   }
   nodes.forEach(node => {
     if (node.nodeType === document.TEXT_NODE) {
-      node.nodeValue = hypher.hyphenateText(node.nodeValue);
+      node.nodeValue = hyphenator.hyphenateText(node.nodeValue);
     } else if (node.childNodes && node.childNodes.length > 0) {
-      hyphenateDOM([...node.childNodes]);
+      hyphenateDOM(hyphenator, [...node.childNodes]);
     }
   });
 };
@@ -992,9 +993,13 @@ var story = {
 
         // hyphens
         if (current.hyphens == 'yes') {
+            if (!hypher) {
+              // Late initialization to save resources
+              hypher = new Hypher(ruHyphenation);
+            }
             if (!element.classList.contains('with-hypher')) {
                 // TODO: internationalization
-                hyphenateDOM(element);
+                hyphenateDOM(hypher, element);
                 element.classList.add('with-hypher');
             }
             element.classList.add('mode-hyphens');

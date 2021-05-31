@@ -6,7 +6,6 @@ import { CleanWebpackPlugin } from 'clean-webpack-plugin';
 
 import postCSSAutoPrefixer from 'autoprefixer';
 import postCSSNesting from 'postcss-nesting';
-import postCSSCustomProperties from 'postcss-custom-properties';
 import postCSSMixins from 'postcss-mixins';
 import postCSSNano from 'cssnano';
 
@@ -28,10 +27,6 @@ const postCSSOptions = {
     postCSSAutoPrefixer(),
     postCSSMixins(),
     postCSSNesting(),
-    postCSSCustomProperties({
-      preserve: false,
-      warnings: true,
-    }),
     postCSSNano({
       preset: ['default', {
         discardComments: !isDev,

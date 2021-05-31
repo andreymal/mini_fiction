@@ -64,9 +64,10 @@
             </div>
         {% endif %}
         <p class="meta">
+                {# TODO: split on snippets somehow, see random_stories #}
                 <span class="character-list">
                     {%- for character in story.characters|sort(attribute='id') -%}
-                        <a href="{{ url_for('search.simple', search_type='character', search_id=character.id) }}"><img src="{{ character.url }}" alt="{{ character.name }}" title="{{ character.name }}"/></a>
+                        <a href="{{ url_for('search.simple', search_type='character', search_id=character.id) }}"><img  width="32" height="32" src="{{ character.url }}" alt="{{ character.name }}" title="{{ character.name }}"/></a>
                     {%- endfor -%}
                 </span>
         </p>

@@ -1,11 +1,3 @@
-:root {
-    --max-lines: 4;
-    --slides-height: 13rem;
-    --bullets-margin: 0.5rem;
-    --bullets-size: 0.75em;
-    --bullets-color-main: #999;
-    --bullets-color-accent: #555;
-}
 #slides {
     position: absolute;
     top: 1rem;

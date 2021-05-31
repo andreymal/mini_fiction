@@ -1158,8 +1158,7 @@ select.select-size {
     height: 12px;
     margin: 3px;
     vertical-align: top;
-    background-size: 12px 12px;
-    background: url(../images/story-formatting-button.png) no-repeat 0 0;
+    background: url(../images/story-formatting-button.png) no-repeat 0 0 / 12px 12px;
 }
 
 .story-formatting-window {

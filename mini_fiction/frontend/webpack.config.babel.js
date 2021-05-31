@@ -1,8 +1,10 @@
 import path from 'path';
+import zlib from 'zlib';
 import AssetsManifestPlugin from 'webpack-assets-manifest';
 import MiniCssExtractPlugin from 'mini-css-extract-plugin';
 import TerserPlugin from 'terser-webpack-plugin';
 import { CleanWebpackPlugin } from 'clean-webpack-plugin';
+import CompressionPlugin from 'compression-webpack-plugin';
 
 import postCSSAutoPrefixer from 'autoprefixer';
 import postCSSNesting from 'postcss-nesting';
@@ -62,6 +64,24 @@ const defaultPlugins = [
 
 const devPlugins = [
   new BundleAnalyzerPlugin({ analyzerMode: 'static', openAnalyzer: false }),
+];
+
+const productionPlugins = [
+  new CompressionPlugin({
+    filename: '[path][base].gz',
+    algorithm: 'gzip',
+    exclude: /.map$/,
+  }),
+  new CompressionPlugin({
+    filename: '[path][base].br',
+    algorithm: 'brotliCompress',
+    exclude: /.map$/,
+    compressionOptions: {
+      params: {
+        [zlib.constants.BROTLI_PARAM_QUALITY]: 19,
+      },
+    },
+  }),
 ];
 
 module.exports = {
@@ -136,7 +156,7 @@ module.exports = {
       }),
     ],
   },
-  plugins: [...defaultPlugins, ...(isDev ? devPlugins : [])],
+  plugins: [...defaultPlugins, ...(isDev ? devPlugins : productionPlugins)],
 
   stats: { colors: true },
 

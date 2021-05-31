@@ -5,3 +5,4 @@ wheel
 pylint
 flake8
 mypy
+black

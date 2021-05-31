@@ -14,6 +14,7 @@ help:
 	@echo "clean-translations - remove gettext *.mo files"
 	@echo "clean-frontend - remove frontend build"
 	@echo "lint - check style with pylint"
+	@echo "format - reformat with black"
 	@echo "test - run tests quickly with the default Python with pytest"
 	@echo "test-all - run tests on every Python version with tox"
 	@echo "coverage - check code coverage quickly with the default Python and pytest"
@@ -56,6 +57,9 @@ lint:
 	pylint --rcfile=pylintrc mini_fiction/logic
 	mypy mini_fiction/logic
 	flake8 mini_fiction/logic
+
+format:
+	black mini_fiction/logic
 
 test:
 	pybabel compile -d mini_fiction/translations

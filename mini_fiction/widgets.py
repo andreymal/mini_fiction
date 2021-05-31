@@ -62,7 +62,7 @@ class StoriesImgSelect(Select):
         img_url = self.get_img_url(field, value)
         img_class = 'ui-selected' if selected else ''
         # NOTE: hardcoded width and height are added to prevent FOOC and will be removed ASAP with this piece of crap
-        item_image = '<img width="32px" height="32px" class="%s" src="%s" alt="%s" title="%s" />' % (img_class, img_url, label, label)
+        item_image = '<img  width="32" height="32" class="%s" src="%s" alt="%s" title="%s" />' % (img_class, img_url, label, label)
         cb = Input('checkbox' if self.multiple else 'radio')
         rendered_cb = cb(field, id=False, value=value, checked=selected, **data_attrs)
         return '<span %s>%s%s</span>' % (html_params(**container_attrs), rendered_cb, item_image)

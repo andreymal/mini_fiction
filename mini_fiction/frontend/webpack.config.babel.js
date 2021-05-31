@@ -29,7 +29,7 @@ const postCSSOptions = {
     postCSSMixins(),
     postCSSNesting(),
     postCSSCustomProperties({
-      preserve: false,
+      preserve: true,
       warnings: true,
     }),
     postCSSNano({

@@ -135,12 +135,6 @@ class StoryBL(BaseBL, Commentable):
     def edit_log(self, editor, data):
         from mini_fiction.models import StoryLog
 
-        assert isinstance(data, dict)
-        for k, v in data.items():
-            assert isinstance(k, str)
-            assert isinstance(v, list)
-            assert len(v) == 2
-
         sl = StoryLog(
             user=editor,
             story=self.model,
@@ -1698,12 +1692,6 @@ class ChapterBL(BaseBL):
         from mini_fiction.models import StoryLog
 
         chapter = self.model
-
-        assert isinstance(data, dict)
-        for k, v in data.items():
-            assert isinstance(k, str)
-            assert isinstance(v, (list, tuple))
-            assert len(v) == 2
 
         StoryLog(
             user=editor,

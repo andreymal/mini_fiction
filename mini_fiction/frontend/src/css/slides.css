@@ -1,12 +1,17 @@
 :root {
     --max-lines: 4;
+    --slides-height: 13rem;
+    --bullets-margin: 0.5rem;
+    --bullets-size: 0.75em;
+    --bullets-color-main: #999;
+    --bullets-color-accent: #555;
 }
 #slides {
     position: absolute;
     top: 1rem;
     right: 1rem;
     width: 36rem;
-    height: 13rem;
+    height: var(--slides-height);
     overflow: hidden;
     background-color: rgba(255, 255, 255, 0.8);
 
@@ -19,12 +24,13 @@
 
     & label {
         display: inline-block;
-        width: 0.75em;
-        height: 0.75em;
-        border: 0.15em solid #999;
+        width: var(--bullets-size);
+        height: var(--bullets-size);
+        border: calc(var(--bullets-size) / 5) solid var(--bullets-color-main);
         border-radius: 999px;
         background-color: transparent;
-        margin: 12em 0.5em 0 0;
+        margin-top: calc(var(--slides-height) - var(--bullets-margin) - 1rem);
+        margin-right: var(--bullets-margin);
         z-index: 2;
         cursor: pointer;
         transition-duration: .4s;
@@ -33,11 +39,11 @@
     }
 
     & input:checked + label {
-        background-color: #555;
+        background-color: var(--bullets-color-accent);
     }
 
     & input:focus + label {
-        box-shadow: 0 0 0 2px #555, 0 0 5px #999;
+        box-shadow: 0 0 0 2px var(--bullets-color-accent), 0 0 5px var(--bullets-color-main);
     }
 
     & h3 {

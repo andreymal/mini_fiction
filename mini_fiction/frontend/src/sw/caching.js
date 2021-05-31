@@ -82,7 +82,10 @@ export const handleResponse = async (event, cacheName) => {
 
   event.waitUntil((async () => {
     log('Executing scheduled task to save', url, 'in', cacheName);
-    await cache.put(event.request, await clonedNetworkResponse);
+    const response = await clonedNetworkResponse;
+    if (response.ok) {
+      await cache.put(event.request, response);
+    }
   })());
 
   return networkResponse;

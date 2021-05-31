@@ -82,10 +82,12 @@
 
 input:checked ~ .slide {
     /* Add some transition too?.. */
+    transform: translateX(100%);
 }
 
 input:checked + label + .slide {
     transition: opacity 0.5s ease-in-out;
+    transform: translateX(0);
     opacity: 1;
 }
 

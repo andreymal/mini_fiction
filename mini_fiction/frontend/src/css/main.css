@@ -326,7 +326,6 @@ ul.nav-main-links {
     background-size: 12px 12px;
 }
 
-
 .user-avatar-container {
     width: 2em;
     height: 2em;
@@ -336,10 +335,13 @@ ul.nav-main-links {
     vertical-align: middle;
     overflow: hidden;
 }
+
 .user-avatar-placeholder {
     background: url(../images/userpic.png) no-repeat center / contain;
 }
+
 .user-avatar-container img {
+    width: 100%;
     border-radius: inherit;
 }
 
@@ -884,6 +886,10 @@ h1 .alert {
     font-size: 14px;
     line-height: 26px;
     hyphens: none;
+}
+
+.chapter-text img {
+    max-width: 100%;
 }
 
 .chapter-text p,.chapter-text span {
@@ -1898,6 +1904,10 @@ a.btn {
 .comment-text, .comment-text p {
     font-size: 12px;
     margin-bottom: 4px;
+}
+
+.comment-text img {
+    max-width: 100%;
 }
 
 .comment-text-deleted {

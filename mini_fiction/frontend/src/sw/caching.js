@@ -69,17 +69,21 @@ export const getCache = (url) => {
  * @returns Promise<Response>
  */
 export const handleResponse = async (event, cacheName) => {
+  const { url } = event.request;
   const cache = await caches.open(cacheName);
   const cachedResponse = await cache.match(event.request);
   if (cachedResponse) {
-    log('Found cached', event.request.url, 'and serving from', cacheName);
+    log('Found cached', url, 'and serving from', cacheName);
     return cachedResponse;
   }
-  log('Resource', event.request.url, 'not found in', cacheName, 'fetching it');
-  const freshResponse = await fetch(event.request.clone());
-  if (freshResponse.status < 400) {
-    log('Caching', event.request.url, 'into', cacheName);
-    await cache.put(event.request, freshResponse.clone());
-  }
-  return freshResponse;
+  log('Resource', url, 'not found in', cacheName, 'fetching it');
+  const networkResponse = fetch(event.request.clone());
+  const clonedNetworkResponse = networkResponse.then((r) => r.clone());
+
+  event.waitUntil((async () => {
+    log('Executing scheduled task to save', url, 'in', cacheName);
+    await cache.put(event.request, await clonedNetworkResponse);
+  })());
+
+  return networkResponse;
 };

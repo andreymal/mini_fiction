@@ -1,0 +1,66 @@
+/* Base */
+
+/* Set box-sizing globally to handle padding and border widths */
+*,
+*:after,
+*:before {
+    box-sizing: inherit;
+}
+
+/* The base font-size is set at 62.5% for having the convenience */
+/* of sizing rems in a way that is similar to using px: 1.6rem = 16px */
+html {
+    box-sizing: border-box;
+    font-size: 62.5%;
+}
+
+/* Default body styles */
+body {
+    color: var(--color-secondary);
+    font-family: var(--font-family-sans);
+    font-size: 1.6em; /* Currently ems cause chrome bug misinterpreting rems on body element */
+    font-weight: 300;
+    letter-spacing: 0.01em;
+    line-height: 1.6;
+    background: var(--color-background) repeat 0 0;
+}
+
+.container {
+    @mixin rounded-footer;
+    display: grid;
+    grid-template-columns: 1fr;
+    grid-template-rows: auto auto 4em;
+    gap: 0 0;
+    grid-template-areas:
+        "header"
+        "main"
+        "footer";
+    max-width: var(--max-width);
+    min-height: var(--min-height);
+    background-color: var(--color-grey-lighter);
+    box-shadow: 0 0 1em -.5em var(--color-black);
+    margin: 0 auto 2em;
+}
+
+header {
+    grid-area: header;
+    display: grid;
+    grid-template-columns: 1fr;
+    grid-template-rows: 5em calc(var(--slides-height) + var(--slides-border) * 2) auto;
+    gap: 0 0;
+    grid-template-areas:
+        "roof"
+        "logopic"
+        "navigation";
+}
+
+main {
+    grid-area: main;
+    margin-left: 2rem;
+}
+
+footer {
+    grid-area: footer;
+    @mixin rounded-footer;
+    @mixin background-dark;
+}

@@ -27,7 +27,9 @@ const reactAliases = {
 const postCSSOptions = {
   plugins: [
     postCSSAutoPrefixer(),
-    postCSSMixins(),
+    postCSSMixins({
+      mixinsFiles: path.join(__dirname, 'src', 'css', 'mixins.pcss'),
+    }),
     postCSSNesting(),
     postCSSNano({
       preset: ['default', {
@@ -89,6 +91,7 @@ module.exports = {
   context: path.resolve(__dirname, 'src'),
   entry: {
     index: ['./index.js', './index.css'],
+    experimental_index: ['./experimental_index.js', './experimental_index.css'],
   },
 
   output: {
@@ -136,7 +139,7 @@ module.exports = {
         type: 'asset/source',
       },
       {
-        test: /\.(png|jpg|gif|eot|ttf|woff|woff2)$/,
+        test: /\.(png|jpg|gif|eot|ttf|woff|woff2|svg)$/,
         type: 'asset',
         parser: {
           dataUrlCondition: {

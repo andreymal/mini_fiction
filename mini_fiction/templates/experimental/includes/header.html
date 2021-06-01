@@ -1,0 +1,35 @@
+<div class="roof">
+    <nav aria-label='External links'>
+        <!--
+        <ul>
+            <li><a href="#">Main link</a></li>
+            <li><a href="#">Secondary link</a></li>
+            …
+        </ul>
+        -->
+        {{ html_block('experimental_header') }}
+    </nav>
+</div>
+{%- if current_user.header_mode != 'off' -%}
+    {%- set logo = get_current_logopic() -%}
+    {% if logo -%}
+        <div class="logopic" style="background-image: url('{{ logo['url'] }}')">
+            {% if logo.original_link and logo.original_link_label -%}
+                <a href="{{ logo.original_link }}" target="_blank">{{ logo.original_link_label }}</a>
+            {%- endif %}
+            {# FIXME #}
+{#            {%- if current_user.header_mode == '' or current_user.header_mode == 'ls' -%}#}
+{#                <div data-bazooka="StoriesCarousel" id="slides">#}
+{#                    {{ random_stories() }}#}
+{#                </div>#}
+{#            {%- endif %}#}
+        </div>
+    {% endif -%}
+{%- endif -%}
+
+<div class="navigation">
+    {% include 'experimental/includes/nav.html' %}
+</div>
+
+{# FIXME #}
+{#{% include 'includes/important_notifications.html' %}#}

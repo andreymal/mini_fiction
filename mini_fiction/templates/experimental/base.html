@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="{{ g.locale.language }}">
+<head>
+    <meta charset="utf-8"/>
+    <title>
+        {%- block fulltitle -%}
+            {% block title %}{{ page_title }}{% endblock %} &mdash; {{ SITE_NAME }}
+        {%- endblock fulltitle -%}
+    </title>
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, user-scalable=yes"/>
+    {%- block favicon %}
+        {% if config['FAVICON_URL'] -%}
+            <link rel="shortcut icon" type="image/x-icon" href="{{ config['FAVICON_URL'] }}"/>
+        {%- endif %}
+        {% if config['APPLE_TOUCH_ICON_URL'] -%}
+            <link rel="apple-touch-icon" href="{{ config['APPLE_TOUCH_ICON_URL'] }}">
+        {%- endif %}
+        {% if config['APPLE_TOUCH_ICON_PRECOMPOSED_URL'] -%}
+            <link rel="apple-touch-icon-precomposed" href="{{ config['APPLE_TOUCH_ICON_PRECOMPOSED_URL'] }}">
+        {%- endif %}
+    {% endblock -%}
+
+    {%- block meta_csrf_token %}
+        <meta name="csrf-token" content="{{ csrf_token() }}"/>
+    {% endblock -%}
+
+    {%- block head_css %}
+        {% set index_css = webpack_asset('experimental_index.css') %}
+        <link rel="stylesheet" href="{{ url_for('static', filename='build/{}'.format(index_css.src)) }}"
+              integrity="{{ index_css.integrity }}" crossorigin="anonymous"/>
+    {% endblock -%}
+
+    {% set index_js = webpack_asset('experimental_index.js') %}
+    <script defer src="{{ url_for('static', filename='build/{}'.format(index_js.src)) }}"
+            integrity="{{ index_js.integrity }}" crossorigin="anonymous"></script>
+
+    {%- block meta_robots_tag %}{% if robots_noindex or robots_nofollow %}
+        <meta name="robots" content="
+    {%- if robots_noindex -%}noindex{%- else -%}index{%- endif -%}
+    , {% if robots_nofollow -%}nofollow{%- else -%}follow{%- endif -%}"/>
+    {% endif %}{% endblock -%}
+
+    {%- block html_block_head %}
+        {{ html_block('head') }}
+    {%- endblock -%}
+
+    {% block extrahead %}{% endblock %}
+</head>
+
+<body>
+<div class="container">
+    <header>
+        {% include 'experimental/includes/header.html' with context %}
+    </header>
+
+    <main>
+        {%- block main %}{% endblock -%}
+    </main>
+
+    <aside>
+        {%- block aside %}{% endblock -%}
+    </aside>
+
+    <footer>
+        {{ html_block('footer') }}
+    </footer>
+</div>
+
+</body>
+</html>

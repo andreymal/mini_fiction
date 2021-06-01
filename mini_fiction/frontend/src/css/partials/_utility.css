@@ -17,3 +17,12 @@
 .float-right {
     float: right;
 }
+
+.hidden {
+    opacity: 0;
+    transition: opacity 0.15s linear;
+}
+
+.shown {
+    opacity: 1;
+}

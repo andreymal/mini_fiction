@@ -1,8 +1,5 @@
 /* Modules */
 
-@import './variables.css';
-
-@import './partials/_base.css';
 @import './partials/_blockquote.css';
 @import './partials/_button.css';
 @import './partials/_code.css';
@@ -12,7 +9,5 @@
 @import './partials/_list.css';
 @import './partials/_spacing.css';
 @import './partials/_table.css';
-@import './partials/_typography.css';
 @import './partials/_image.css';
-@import './partials/_utility.css';
 

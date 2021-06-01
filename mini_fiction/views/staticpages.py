@@ -34,4 +34,4 @@ def index(name):
             return jsonify({'page_content': {'full_link': request.url}})
         return Response(content, mimetype=staticpages.get_mimetype(page))
     else:
-        return render_template('staticpage.html', content=Markup(content), page_name=page.name, page_title=page.title)
+        return render_template('experimental/staticpage.html', content=Markup(content), page_name=page.name, page_title=page.title)

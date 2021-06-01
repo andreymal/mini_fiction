@@ -1,0 +1,33 @@
+:root {
+    /* Color */
+    --color-initial: #fff;
+    --color-primary: #9b4dca;
+    --color-secondary: #606c76;
+    --color-tertiary: #f4f5f6;
+    --color-quaternary: #d1d1d1;
+    --color-quinary: #e1e1e1;
+
+    --color-background: #c5ccfe;
+    --color-background-dark: #1d2a4f;
+    --color-links-roof-primary: #cdcae9;
+    --color-links-roof-secondary: #fafae8;
+
+    --color-white: #fff;
+    --color-grey-lighter: #f1f5f8;
+    --color-grey: #b8c2cc;
+    --color-grey-darker: #606f7b;
+    --color-grey-darkest: #3d4852;
+    --color-black: #22292f;
+
+    /* Fonts */
+    --font-family-serif: Georgia, Times, serif;
+    --font-family-sans: Arial, sans-serif;
+
+    /* Dimensions */
+    --max-width: 87.5em;
+    --min-height: 100vh;
+
+    /* Slider */
+    --slides-height: 13em;
+    --slides-border: 1em;
+}

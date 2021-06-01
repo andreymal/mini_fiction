@@ -29,7 +29,7 @@ body {
     @mixin rounded-footer;
     display: grid;
     grid-template-columns: 1fr;
-    grid-template-rows: auto auto 4em;
+    grid-template-rows: auto auto 3em;
     gap: 0 0;
     grid-template-areas:
         "header"

@@ -71,42 +71,45 @@
     display: flex;
     justify-content: space-between;
 
-    & nav:first-of-type ul {
+    & nav:first-of-type > ul {
         justify-content: flex-start;
         padding-left: var(--padding-linkblocks);
     }
 
-    & nav:last-of-type ul {
+    & nav:last-of-type > ul {
         justify-content: flex-end;
         padding-right: var(--padding-linkblocks);
     }
 
     & nav {
-        & ul {
+        & a, & span {
+            color: var(--color-links-roof-secondary);
+        }
+
+        /* Direct ancestors */
+        & > ul {
             display: flex;
             align-items: baseline;
             list-style-type: none;
             margin-top: var(--gap-linkblock);
             margin-bottom: var(--gap-linkblock);
             gap: var(--gap-linkblock);
-        }
 
-        & li {
-            line-height: 1em;
-            padding: var(--gap-linkblock) calc(var(--gap-linkblock) * 1.5);
-
-            & a, & span {
-                color: var(--color-links-roof-secondary);
-            }
-
-            &.active, &:hover {
-                background-color: #fafae8;
-                border-radius: .25em;
+            & li.active, & li:hover {
+                background-color: var(--color-links-roof-secondary);
+                border-radius: var(--default-border-radius);
                 text-decoration: none;
-                & a, & span {
+
+                & > a, & > span, & > div span {
                     color: var(--color-background-dark);
                 }
             }
+        }
+
+        /* All list items */
+        & li {
+            line-height: 1em;
+            padding: var(--gap-linkblock) calc(var(--gap-linkblock) * 1.5);
         }
     }
 

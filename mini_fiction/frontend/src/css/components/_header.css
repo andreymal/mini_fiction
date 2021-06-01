@@ -6,6 +6,7 @@
 /* Top links */
 .roof {
     @mixin background-dark;
+    @mixin overhang;
     grid-area: roof;
 
     & nav {

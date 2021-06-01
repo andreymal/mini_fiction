@@ -63,4 +63,5 @@ footer {
     grid-area: footer;
     @mixin rounded-footer;
     @mixin background-dark;
+    @mixin overhang;
 }

@@ -1,0 +1,38 @@
+.dropdown {
+    position: relative;
+
+    & ul {
+        display: grid;
+        place-items: start;
+        list-style: none;
+        margin: 0;
+        padding: 0;
+    }
+
+    &:hover, &:focus-within {
+        & .dropdown__menu {
+            opacity: 1;
+            transform: rotateX(0) translateX(-50%);
+            visibility: visible;
+        }
+    }
+
+    & .dropdown__menu {
+        @mixin background-dark;
+        border-radius: var(--default-border-radius);
+        box-shadow: 0 0.15em 0.25em rgba(0, 0, 0, 0.25);
+        min-width: 15ch;
+        position: absolute;
+        /* Pull up to overlap the parent list item very slightly */
+        top: calc(100% - 0.25rem);
+        /* Use the left from absolute position to shift the left side */
+        left: 50%;
+        /* Use translateX to shift the menu 50% of it's width back to the left */
+        transform: rotateX(-90deg) translateX(-50%);
+        transform-origin: top center;
+        opacity: 0.3;
+        transition: 280ms all 120ms ease-out;
+        gap: var(--gap-linkblock);
+        padding: calc(var(--gap-linkblock) * 2)
+    }
+}

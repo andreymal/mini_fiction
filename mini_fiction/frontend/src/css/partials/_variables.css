@@ -27,6 +27,9 @@
     --max-width: 87.5em;
     --min-height: 100vh;
 
+    /* Views */
+    --default-border-radius: .25em;
+
     /* Slider */
     --slides-height: 13em;
     --slides-border: 1em;

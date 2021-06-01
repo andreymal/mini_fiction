@@ -852,6 +852,11 @@ h1 .alert {
     color: #999;
 }
 
+.story-info img,
+.story-notes img {
+    max-width: 100%;
+}
+
 .story-chapters {
     margin-top: 12px;
 }

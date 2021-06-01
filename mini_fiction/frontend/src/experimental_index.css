@@ -5,5 +5,6 @@
 @import "css/partials/_typography.css";
 @import "css/partials/_utility.css";
 
-@import "css/components/_header.css";
+@import "css/components/_navbars.css";
+@import "css/components/_logopics.css";
 @import "css/components/_dropdown.css";

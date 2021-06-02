@@ -1,23 +1,32 @@
 :root {
     /* Color */
     --color-initial: #fff;
-    --color-primary: #9b4dca;
-    --color-secondary: #606c76;
-    --color-tertiary: #f4f5f6;
-    --color-quaternary: #d1d1d1;
-    --color-quinary: #e1e1e1;
+
+    --color-primary: #2A489C;
+    --color-primary-light: #495F9C;
+    --color-primary-dark: #1D2A4F;
+
+    --color-complementary-lighter: #ACA79B;
+    --color-complementary-lightest: #E8E1D1;
+    --color-complementary-light: #9C771A;
+    --color-complementary-dark: #4F411D;
+
+    /* Light complementary hues */
+    --color-complementary-1-hex: #9C8A5D;
+    --color-complementary-2-hex: #E8CE8B;
+    --color-complementary-5-hex: #695D3F;
 
     --color-background: #c5ccfe;
-    --color-background-dark: #1d2a4f;
     --color-links-roof-primary: #cdcae9;
     --color-links-roof-secondary: #fafae8;
 
     --color-white: #fff;
-    --color-grey-lighter: #f1f5f8;
-    --color-grey: #b8c2cc;
-    --color-grey-darker: #606f7b;
-    --color-grey-darkest: #3d4852;
-    --color-black: #22292f;
+    --color-grey-lightest: #f6f6f6;
+    --color-grey-lighter: #e4e6eb;
+    --color-grey: #b0b3b8;
+    --color-grey-darker: #3a3b3c;
+    --color-grey-darkest: #242526;
+    --color-black: #18191A;
 
     /* Fonts */
     --font-family-serif: Georgia, Times, serif;

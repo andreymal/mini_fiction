@@ -55,15 +55,16 @@ def search_action(postform):
         'page_title': query.strip() or gettext('Search results'),
         'search_type': search_type,
         'robots_noindex': True,
+        'story_weights': None,
+        'chapter_weights': None,
     }
 
+    story_results = None
+    chapter_results = None
+
     if search_type == 0:
-        # if current_user.is_authenticated:
-        #     excluded_categories = [x for x in current_user.excluded_categories_list if x not in postform.data['genre']]
-        # else:
-        excluded_categories = []
         try:
-            raw_result, result = Story.bl.search(
+            story_results = Story.bl.search(
                 query,
                 limit,
                 int(sort_type),
@@ -81,7 +82,6 @@ def search_action(postform):
                 min_words=postform.data['min_words'],
                 max_words=postform.data['max_words'],
                 min_vote_total=current_app.config['MINIMUM_VOTES_FOR_VIEW'] if int(sort_type) == 3 else None,
-                excluded_categories=excluded_categories,
             )
         except SphinxError as exc:
             data.update({'form': postform, 'page_title': gettext('Search of stories'), 'error': 'Кажется, есть синтаксическая ошибка в запросе', 'error_type': 'syntax'})
@@ -89,9 +89,11 @@ def search_action(postform):
                 data['error'] += ': ' + str(exc)
             return render_template('search.html', **data)
 
+        max_matches = story_results.total
+
     else:
         try:
-            raw_result, result = Chapter.bl.search(
+            chapter_results = Chapter.bl.search(
                 query,
                 limit,
                 int(sort_type),
@@ -117,18 +119,30 @@ def search_action(postform):
                 data['error'] += ': ' + str(exc)
             return render_template('search.html', **data)
 
-    pagination = Paginator(number=page_current, total=int(raw_result['total'] or 0), per_page=current_app.config['SPHINX_CONFIG']['limit'])
+        max_matches = chapter_results.total
+
+    if max_matches > 0:
+        pagination = Paginator(
+            number=page_current,
+            total=max_matches,
+            per_page=current_app.config['SPHINX_CONFIG']['limit'],
+        )
+    else:
+        pagination = None
 
     data['form'] = postform
     data['pagination'] = pagination
-    data['total'] = int(raw_result['total_found'])
-    data['result'] = result
-    data['weights'] = [(x['id'], x['weight']) for x in raw_result['matches']]
+    data['story_results'] = story_results
+    data['chapter_results'] = chapter_results
+    if story_results:
+        data['story_weights'] = [(x['id'], x['weight']) for x in story_results.matches]
+    if chapter_results:
+        data['chapter_weights'] = [(x['id'], x['weight']) for x in chapter_results.matches]
 
     if search_type == 0:
-        data.update(cached_lists([x.id for x in result]))
+        data.update(cached_lists([x.id for x in story_results.stories]))
     else:
-        data.update(cached_lists([x[0].story.id for x in result]))
+        data.update(cached_lists([x[0].story.id for x in chapter_results.chapters]))
 
     return render_template('search.html', **data)
 

@@ -10,8 +10,9 @@ import random
 import ipaddress
 import traceback
 from hashlib import md5
+from dataclasses import dataclass, field
 from datetime import datetime, timedelta
-from typing import Optional, Dict, Tuple, Any, Iterable
+from typing import TYPE_CHECKING, Any, Union, Optional, Dict, Tuple, List, Iterable
 
 import lxml.html
 import lxml.etree
@@ -19,6 +20,7 @@ from pony import orm
 from flask import Markup, current_app
 
 from mini_fiction.ratelimit import RateLimitExceeded
+from mini_fiction.apis.amsphinxql import SphinxSearchResult
 from mini_fiction.bl.utils import BaseBL
 from mini_fiction.bl.commentable import Commentable
 from mini_fiction.utils.converter import convert
@@ -31,6 +33,23 @@ from mini_fiction.validation.chapters import CHAPTER
 from mini_fiction.filters import filter_html
 from mini_fiction.filters.base import html_doc_to_string
 from mini_fiction.filters.html import footnotes_to_html
+
+if TYPE_CHECKING:
+    from mini_fiction.models import Story, Chapter
+
+
+@dataclass
+class StorySearchResult(SphinxSearchResult):
+    total: int = 0
+    total_found: int = 0
+    stories: List["Story"] = field(default_factory=list)
+
+
+@dataclass
+class ChapterSearchResult(SphinxSearchResult):
+    total: int = 0
+    total_found: int = 0
+    chapters: List[Tuple["Chapter", str]] = field(default_factory=list)
 
 
 class StoryBL(BaseBL, Commentable):
@@ -932,18 +951,24 @@ class StoryBL(BaseBL, Commentable):
 
         return common_fields
 
-    def search(self, query, limit, sort_by=0, only_published=True, extended_syntax=True, **filters):
+    def search(
+        self,
+        query: str,
+        limit: Union[int, Tuple[int, int]],
+        sort_by: int = 0,
+        only_published: bool = True,
+        extended_syntax: bool = True,
+        **filters: Any,
+    ) -> StorySearchResult:
         from mini_fiction.models import Tag
 
-        raw_result = {'total': 0, 'total_found': 0, 'matches': []}
-
         if current_app.config['SPHINX_DISABLED']:
-            return raw_result, []
+            return StorySearchResult(matches=[])
 
         if sort_by not in self.sort_types:
             sort_by = 0
 
-        sphinx_filters = {}
+        sphinx_filters: Dict[str, Any] = {}
         if only_published:
             sphinx_filters['draft'] = 0
             sphinx_filters['approved'] = 1
@@ -964,7 +989,7 @@ class StoryBL(BaseBL, Commentable):
         if tags:
             tags_info = Tag.bl.get_tags_objects(tags, create=False)
             if not tags_info['success']:
-                return raw_result, []
+                return StorySearchResult(matches=[])
             tags = [x.id for x in tags_info['tags']]
         if tags:
             if filters.get('tags_mode') == 'any':
@@ -978,9 +1003,6 @@ class StoryBL(BaseBL, Commentable):
             exclude_tags = [x.id for x in Tag.bl.get_tags_objects(exclude_tags, create=False)['tags'] if x is not None]
         if exclude_tags:
             sphinx_filters['tag__not_in'] = exclude_tags
-
-        # if filters.get('excluded_categories'):
-        #     sphinx_filters['category__not_in'] = [int(x) for x in filters['excluded_categories']]
 
         if filters.get('min_words') is not None:
             sphinx_filters['words__gte'] = int(filters['min_words'])
@@ -998,21 +1020,29 @@ class StoryBL(BaseBL, Commentable):
             sphinx_filters['vote_value__lte'] = int(filters['max_vote_value'])
 
         with current_app.sphinx as sphinx:
-            raw_result = sphinx.search(
+            result_orig = sphinx.search(
                 'stories',
                 query,
                 weights=current_app.config['SPHINX_CONFIG']['weights_stories'],
                 options=current_app.config['SPHINX_CONFIG']['select_options'],
                 limit=limit,
                 sort_by=self.sort_types[sort_by],
-                **sphinx_filters
+                meta=True,
+                **sphinx_filters,
             )
 
-        ids = [x['id'] for x in raw_result['matches']]
-        result = {x.id: x for x in self.model.select(lambda x: x.id in ids)}
-        result = [result[i] for i in ids if i in result]
+        ids: List[int] = [x['id'] for x in result_orig.matches]
+        stories_dict: Dict[int, "Story"] = {x.id: x for x in self.model.select(lambda x: x.id in ids)}
+        stories = [stories_dict[i] for i in ids if i in stories_dict]
 
-        return raw_result, result
+        return StorySearchResult(
+            matches=result_orig.matches,
+            meta=result_orig.meta,
+            sql=result_orig.sql,
+            total=int(result_orig.meta["total"]),
+            total_found=int(result_orig.meta["total_found"]),
+            stories=stories,
+        )
 
     def dump_to_file_full(self, path, gzip_compression=0, dump_collections=False):
         path = os.path.abspath(path)
@@ -2168,20 +2198,26 @@ class ChapterBL(BaseBL):
     def search_delete(self, update_story_words=True):
         self.delete_chapters_from_search((self.model.story.id), (self.model.id,), update_story_words=update_story_words)
 
-    def search(self, query, limit, sort_by=0, only_published=True, extended_syntax=True, **filters):
+    def search(
+        self,
+        query: str,
+        limit: Union[int, Tuple[int, int]],
+        sort_by: int = 0,
+        only_published: bool = True,
+        extended_syntax: bool = True,
+        **filters: Any,
+    ) -> ChapterSearchResult:
         from mini_fiction.models import Tag
 
-        raw_result = {'total': 0, 'total_found': 0, 'matches': []}
-
         if current_app.config['SPHINX_DISABLED']:
-            return raw_result, []
+            return ChapterSearchResult(matches=[])
 
         if sort_by not in self.sort_types:
             sort_by = 0
 
         query = normalize_text_for_search_query(query, query_mode="extended" if extended_syntax else "none")
 
-        sphinx_filters = {}
+        sphinx_filters: Dict[str, Any] = {}
         if only_published:
             sphinx_filters['chapter_draft'] = 0
             sphinx_filters['draft'] = 0
@@ -2201,7 +2237,7 @@ class ChapterBL(BaseBL):
         if tags:
             tags_info = Tag.bl.get_tags_objects(tags, create=False)
             if not tags_info['success']:
-                return raw_result, []
+                return ChapterSearchResult(matches=[])
             tags = [x.id for x in tags_info['tags']]
         if tags:
             if filters.get('tags_mode') == 'any':
@@ -2214,9 +2250,6 @@ class ChapterBL(BaseBL):
             exclude_tags = [x.id for x in Tag.bl.get_tags_objects(exclude_tags, create=False)['tags'] if x is not None]
         if exclude_tags:
             sphinx_filters['tag__not_in'] = exclude_tags
-
-        # if filters.get('excluded_categories'):
-        #     sphinx_filters['category__not_in'] = [int(x) for x in filters['excluded_categories']]
 
         if filters.get('min_words') is not None:
             sphinx_filters['words__gte'] = int(filters['min_words'])
@@ -2234,23 +2267,40 @@ class ChapterBL(BaseBL):
             sphinx_filters['vote_value__lte'] = int(filters['max_vote_value'])
 
         with current_app.sphinx as sphinx:
-            raw_result = sphinx.search(
+            result_orig = sphinx.search(
                 'chapters',
                 query,
                 weights=current_app.config['SPHINX_CONFIG']['weights_chapters'],
                 options=current_app.config['SPHINX_CONFIG']['select_options'],
                 limit=limit,
                 sort_by=self.sort_types[sort_by],
-                **sphinx_filters
+                meta=True,
+                **sphinx_filters,
             )
 
-            ids = [x['id'] for x in raw_result['matches']]
-            dresult = {x.id: x for x in self.model.select(lambda x: x.id in ids).prefetch(self.model.story)}
-            result = []
-            for i in ids:
-                if i not in dresult:
-                    continue
-                excerpt = sphinx.call_snippets('chapters', dresult[i].text, query, **current_app.config['SPHINX_CONFIG']['excerpts_opts'])
-                result.append((dresult[i], excerpt[0] if excerpt else ''))
+            ids = [x['id'] for x in result_orig.matches]
+            chapters_dict: Dict[int, "Chapter"] = {x.id: x for x in self.model.select(
+                lambda x: x.id in ids
+            ).prefetch(self.model.story)}
 
-        return raw_result, result
+            chapters: List[Tuple["Chapter", str]] = []
+
+            for i in ids:
+                if i not in chapters_dict:
+                    continue
+                excerpt = sphinx.call_snippets(
+                    index="chapters",
+                    texts=chapters_dict[i].text,
+                    query=query,
+                    **current_app.config["SPHINX_CONFIG"]["excerpts_opts"],
+                )
+                chapters.append((chapters_dict[i], excerpt[0] if excerpt else ""))
+
+        return ChapterSearchResult(
+            matches=result_orig.matches,
+            meta=result_orig.meta,
+            sql=result_orig.sql,
+            total=int(result_orig.meta["total"]),
+            total_found=int(result_orig.meta["total_found"]),
+            chapters=chapters,
+        )

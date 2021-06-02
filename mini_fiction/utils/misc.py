@@ -9,6 +9,7 @@ import time
 from datetime import timedelta
 from urllib.request import Request, urlopen
 from urllib.parse import quote
+from typing import List
 
 from flask import current_app, g, escape, render_template, abort, url_for, request, has_request_context
 from flask_babel import pgettext, ngettext
@@ -471,7 +472,7 @@ def fprint_substring(s, l=0, file=sys.stdout):
     return len(s)
 
 
-def striptags(s):
+def striptags(s: str) -> str:
     # Простая удалялка тегов по регуляркам; не используйте как защиту от XSS
 
     # Добавляем разделительные пробелы тем тегам, которые разделяют слова
@@ -484,7 +485,12 @@ def striptags(s):
     return s
 
 
-def words_split(s, html=True, strip_punctuation=False, strip_entities=False):
+def words_split(
+    s: str,
+    html: bool = True,
+    strip_punctuation: bool = False,
+    strip_entities: bool = False,
+) -> List[str]:
     '''По-умному разделяет строку на слова.'''
 
     s = str(s)
@@ -510,16 +516,16 @@ def words_split(s, html=True, strip_punctuation=False, strip_entities=False):
     return words
 
 
-def words_count(s, html=True):
+def words_count(s: str, html: bool = True) -> int:
     '''По-умному считает число слов в строке.'''
     return len(words_split(s, html=html, strip_punctuation=True, strip_entities=True))
 
 
-def normalize_text_for_search_index(s, html=True):
+def normalize_text_for_search_index(s: str, html: bool = True) -> str:
     return ' '.join(words_split(s, html=html, strip_entities=False))
 
 
-def normalize_text_for_search_query(s, query_mode="extended"):
+def normalize_text_for_search_query(s: str, query_mode: str = "extended") -> str:
     from mini_fiction.apis.amsphinxql import SphinxConnection
 
     result = s.replace('\u00ad', '')
@@ -529,7 +535,6 @@ def normalize_text_for_search_query(s, query_mode="extended"):
 
     if query_mode == "exact":
         # Выпиливаем спецсимволы за ненадобностью, они лишь ошибки синтаксиса генерят
-        result = result
         toreplace = [
             '\\', '(', ')', '|', '-', '!', '@', '~', '"', '&', '/', '^', '$', '=', '<',
         ]

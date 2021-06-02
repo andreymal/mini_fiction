@@ -130,23 +130,36 @@
     </div>
     {% else %}
     <div class="span9 search-results tab-content">
-        {% if search_type == 0 %}
+        {% if story_results %}
             <!-- Рассказы: начало вывода -->
-            {% if result %}<div class="story-item"><h3>{{ ngettext("Found %(num)d story", "Found %(num)d stories", total) }}</h3></div>{% endif %}
-            {% if weights and config['DEBUG'] %}
+            {% if story_results.total_found > 0 -%}
+                <div class="story-item"><h3>{{ ngettext("Found %(num)d story", "Found %(num)d stories", story_results.total_found) }}</h3></div>
+            {%- endif %}
+            {% if story_weights and config['DEBUG'] %}
             <div style="font-size: 0.8em; line-height: 1.1em">
                 Weights:<br/>
-                {% for x in weights %}{{ x[0] }}: {{ x[1] }}<br/>{% endfor %}
+                {% for x in story_weights %}{{ x[0] }}: {{ x[1] }}<br/>{% endfor %}
             </div>
             {% endif -%}
-            {% with stories = result %}
+            {% with stories = story_results.stories %}
                 {% include "includes/stories.html" %}
             {% endwith %}
             <!-- Рассказы: конец вывода -->
-        {% else %}
+        {% endif %}
+        {% if chapter_results %}
             <!-- Главы: начало вывода -->
-            {% if result %}<div class="story-item"><h3>{{ ngettext("Found %(num)d chapter", "Found %(num)d chapters", total) }}</h3></div>{% else %}<h3>{{ _('There is nothing here yet') }}</h3>{% endif %}
-            {% for chapter, excerpt in result %}
+            {% if chapter_results.total_found > 0 -%}
+                <div class="story-item"><h3>{{ ngettext("Found %(num)d chapter", "Found %(num)d chapters", chapter_results.total_found) }}</h3></div>
+            {%- else -%}
+                <h3>{{ _('There is nothing here yet') }}</h3>
+            {%- endif %}
+            {% if chapter_weights and config['DEBUG'] %}
+            <div style="font-size: 0.8em; line-height: 1.1em">
+                Weights:<br/>
+                {% for x in chapter_weights %}{{ x[0] }}: {{ x[1] }}<br/>{% endfor %}
+            </div>
+            {% endif -%}
+            {% for chapter, excerpt in chapter_results.chapters %}
                 <div class="story-item">
                     <h3><a href="{{ url_for('chapter.view', story_id=chapter.story.id, chapter_order=chapter.order) }}">{{ chapter.autotitle }}</a></h3>
                     <p>{{ excerpt|safe }}</p>
@@ -155,7 +168,7 @@
             {% endfor %}
             <!-- Главы: конец вывода -->
         {% endif %}
-        {% if result %}
+        {% if pagination %}
             <div id="search-pagination" class="pagination">
                 {% for page_id in pagination.iter_pages() %}
                     <input form="searchform" type="submit" class="btn{% if page_id == pagination.number %} btn-primary{% endif %}" name="page" value="{{ page_id }}" >

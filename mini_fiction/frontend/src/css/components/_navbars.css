@@ -22,7 +22,7 @@
         }
         & li {
             & a {
-                color: var(--color-links-roof-secondary);
+                color: var(--color-complementary-lightest);
                 font-size: x-large;
                 text-decoration: none;
                 font-family: var(--font-family-serif);

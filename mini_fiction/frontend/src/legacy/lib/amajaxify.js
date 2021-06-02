@@ -76,6 +76,9 @@ var amajaxify = {
     allowScriptTags: false,
     scrollToTopFrom: 400,
     maxLifetime: 3600,
+    ajaxAllowedAttr: 'data-ajax',
+    ajaxUnallowedAttr: 'data-noajax',
+    customAjaxAllowedChecker: null,
 
     customFetch: null,
     headers: [['X-AJAX', '1']],
@@ -127,6 +130,15 @@ var amajaxify = {
      *   страницы, при превышении которого amajaxify отключится и позволит
      *   следующему клику по ссылке перезагрузить страницу целиком
      *   (в секундах, 0 отключает данное поведение)
+     * @param {string} [options.ajaxAllowedAttr="data-ajax"] - атрибут ссылок,
+     *   форм и кнопок форм, наличие которого со значением "1" указывает, что
+     *   ссылку или форму amajaxify может отправлять
+     * @param {string} [options.ajaxUnallowedAttr="data-noajax"] - атрибут
+     *   ссылок, форм и кнопок форм, наличие которого со значением "1"
+     *   указывает, что ссылку или форму amajaxify не может отправлять
+     * @param {function} [options.customAjaxAllowedChecker=null] - кастомная
+     *   функция, проверяющая, может ли amajaxify обрабатывать данную ссылку
+     *   или форму
      * @returns {boolean}
      *
      * @method init
@@ -159,6 +171,15 @@ var amajaxify = {
 
         if (options.maxLifetime !== undefined && options.maxLifetime !== null) {
             this.maxLifetime = options.maxLifetime;
+        }
+        if (options.ajaxAllowedAttr !== undefined) {
+            this.ajaxAllowedAttr = options.ajaxAllowedAttr;
+        }
+        if (options.ajaxUnallowedAttr !== undefined) {
+            this.ajaxUnallowedAttr = options.ajaxUnallowedAttr;
+        }
+        if (options.customAjaxAllowedChecker !== undefined) {
+            this.customAjaxAllowedChecker = options.customAjaxAllowedChecker;
         }
 
         this.customFetch = options.customFetch;
@@ -388,7 +409,7 @@ var amajaxify = {
         }
 
         // Проверяем, что её можно обрабатывать
-        if (target.getAttribute('data-noajax') == '1') {
+        if (!this.ajaxAllowedFor(target)) {
             return;
         }
 
@@ -680,6 +701,45 @@ var amajaxify = {
         }
     },
 
+    /**
+     * Проверяет по атрибутам (ajaxAllowedAttr и ajaxUnallowedAttr), можно ли
+     * применять ajax для оправки запроса с этой ссылки или этой формы. Если
+     * элемент не содержит никаких атрибутов, возвращает true.
+     *
+     * В отличие от defaultAjaxAllowedFor, сперва вызывает
+     * customAjaxAllowedChecker, и только если он отсутствует или вернёт null,
+     * тогда тогда вызывает стандартный defaultAjaxAllowedFor.
+     *
+     * @param {Element} element - проверяемая ссылка, кнопка или форма
+     */
+    ajaxAllowedFor: function(element) {
+        var result = null;
+        if (this.customAjaxAllowedChecker) {
+            result = this.customAjaxAllowedChecker(element);
+        }
+        if (result === null) {
+            result = this.defaultAjaxAllowedFor(element);
+        }
+        return result;
+    },
+
+    /**
+     * Проверяет по атрибутам (ajaxAllowedAttr и ajaxUnallowedAttr), можно ли
+     * применять ajax для оправки запроса с этой ссылки или этой формы. Если
+     * элемент не содержит никаких атрибутов, возвращает true.
+     *
+     * @param {Element} element - проверяемая ссылка, кнопка или форма
+     */
+    defaultAjaxAllowedFor: function(element) {
+        if (element.getAttribute(this.ajaxUnallowedAttr) === '1') {
+            return false;
+        }
+        if (element.getAttribute(this.ajaxAllowedAttr) === '1') {
+            return true;
+        }
+        return true;
+    },
+
     _linkAjaxDisableIfNeeded: function(content) {
         // Если версия статики не совпадает с нашей, то пришло время обновлять страницу полностью
         if (content.v) {
@@ -831,7 +891,18 @@ var amajaxify = {
      * @method submitForm
      */
     submitForm: function(form, submitButton) {
-        if (form.getAttribute('data-noajax') == '1' || !this.state.enabled) {
+        if (!this.state.enabled) {
+            return false;
+        }
+
+        submitButton = submitButton || this._getSubmitButton(form);
+
+        // Проверяем, что кнопка разрешает отправку формы через ajax
+        if (submitButton && !this.ajaxAllowedFor(submitButton)) {
+            return false;
+        }
+        // И форма тоже
+        if (!this.ajaxAllowedFor(form)) {
             return false;
         }
 
@@ -847,7 +918,6 @@ var amajaxify = {
         }
 
         var formData = new FormData(form);
-        submitButton = submitButton || this._getSubmitButton(form);
         if (submitButton && submitButton.name) {
             formData.append(submitButton.name, submitButton.value || '');
         }

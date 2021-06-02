@@ -16,7 +16,7 @@ html {
 
 /* Default body styles */
 body {
-    color: var(--color-secondary);
+    color: var(--color-grey-darker);
     font-family: var(--font-family-sans);
     font-size: 1.6em; /* Currently ems cause chrome bug misinterpreting rems on body element */
     font-weight: 300;
@@ -37,7 +37,7 @@ body {
         "footer";
     max-width: var(--max-width);
     min-height: var(--min-height);
-    background-color: var(--color-grey-lighter);
+    background-color: var(--color-grey-lightest);
     box-shadow: 0 0 1em -.5em var(--color-black);
     margin: 0 auto 2em;
 }
@@ -56,7 +56,7 @@ header {
 
 main {
     grid-area: main;
-    margin-left: 2rem;
+    margin: 2rem;
 }
 
 footer {

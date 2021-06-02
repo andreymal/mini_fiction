@@ -1,0 +1,13 @@
+/* Divider */
+
+hr {
+    border: 0;
+    font-size: larger;
+    font-weight: bold;
+    text-align: center;
+    text-align-last: center;
+}
+
+hr::after {
+    content: "* * *";
+}

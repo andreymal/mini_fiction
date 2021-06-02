@@ -6,6 +6,7 @@ a {
 
     &:focus,
     &:hover {
-        color: var(--color-secondary);
+        color: var(--color-complementary-dark);
+        text-decoration: underline;
     }
 }

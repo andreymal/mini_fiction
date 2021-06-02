@@ -1,0 +1,28 @@
+/* Code */
+
+code {
+    background: var(--color-complementary-lightest);
+    border-radius: var(--default-border-radius);
+    font-size: smaller;
+    font-family: monospace;
+    white-space: nowrap;
+    margin: 0 0.2rem;
+    padding: 0.2rem 0.5rem;
+}
+
+pre {
+    background: var(--color-complementary-lightest);
+    border-left: 0.3rem solid var(--color-complementary-dark);
+    overflow-y: hidden;
+    white-space: pre-wrap;
+    word-break: break-all;
+    padding: var(--default-padding) calc(var(--default-padding) * 2);
+    font-family: monospace;
+
+    & > code {
+        border-radius: 0;
+        display: block;
+        padding: var(--default-padding) calc(var(--default-padding) * 2);
+        white-space: pre;
+    }
+}

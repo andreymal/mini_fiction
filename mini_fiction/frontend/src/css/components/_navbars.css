@@ -73,7 +73,7 @@
                 text-decoration: none;
 
                 & > a, & > span, & > div span {
-                    color: var(--color-background-dark);
+                    color: var(--color-primary-dark);
                 }
             }
         }

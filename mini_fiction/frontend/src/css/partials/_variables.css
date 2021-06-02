@@ -38,6 +38,7 @@
 
     /* Views */
     --default-border-radius: .25em;
+    --default-padding: .4em;
 
     /* Slider */
     --slides-height: 13em;

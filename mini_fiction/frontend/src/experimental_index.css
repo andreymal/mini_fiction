@@ -1,10 +1,19 @@
 @import "~normalize.css";
 @import '~@fortawesome/fontawesome-free/css/all.css';
-@import "css/partials/_variables.css";
-@import "css/partials/_base.css";
+
+/* Modules */
+@import "css/partials/_blockquote.css";
+@import "css/partials/_code.css";
+@import "css/partials/_divider.css";
+@import "css/partials/_image.css";
+@import "css/partials/_link.css";
+@import "css/partials/_list.css";
+@import "css/partials/_spacing.css";
 @import "css/partials/_typography.css";
 @import "css/partials/_utility.css";
+@import "css/partials/_variables.css";
 
+@import "css/components/_base.css";
 @import "css/components/_navbars.css";
 @import "css/components/_logopics.css";
 @import "css/components/_dropdown.css";

@@ -35,6 +35,8 @@
     /* Dimensions */
     --max-width: 87.5em;
     --min-height: 100vh;
+    --roof-height: 5em;
+    --footer-height: 3em;
 
     /* Views */
     --default-border-radius: .25em;

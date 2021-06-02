@@ -29,7 +29,7 @@ body {
     @mixin rounded-footer;
     display: grid;
     grid-template-columns: 1fr;
-    grid-template-rows: auto auto 3em;
+    grid-template-rows: auto auto var(--footer-height);
     gap: 0 0;
     grid-template-areas:
         "header"
@@ -46,7 +46,7 @@ header {
     grid-area: header;
     display: grid;
     grid-template-columns: 1fr;
-    grid-template-rows: 5em calc(var(--slides-height) + var(--slides-border) * 2) auto;
+    grid-template-rows: var(--roof-height) calc(var(--slides-height) + var(--slides-border) * 2) auto;
     gap: 0 0;
     grid-template-areas:
         "roof"

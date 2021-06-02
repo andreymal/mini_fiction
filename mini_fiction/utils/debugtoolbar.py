@@ -3,7 +3,7 @@
 
 import threading
 
-from flask import current_app, abort, json_available, g
+from flask import current_app, abort, g
 from flask_debugtoolbar import module
 from flask_debugtoolbar.panels import DebugPanel
 import itsdangerous
@@ -74,7 +74,7 @@ def recording_enabled():
 
 
 def is_available():
-    return json_available and recording_enabled()
+    return recording_enabled()
 
 
 def get_queries():
@@ -116,7 +116,6 @@ class PonyDebugPanel(DebugPanel):
 
         if not queries and not is_available():
             return self.render('panels/sqlalchemy_error.html', {
-                'json_available': json_available,
                 'sqlalchemy_available': True,
                 'extension_used': True,
                 'recording_enabled': recording_enabled(),

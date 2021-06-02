@@ -205,7 +205,7 @@ class BaseCommentBL(BaseBL):
         if parent:
             parent.answers_count += 1
 
-        current_app.cache.delete('index_comments_html')
+        current_app.cache.delete('index_comments_html_guest')
 
         return comment
 
@@ -246,7 +246,7 @@ class BaseCommentBL(BaseBL):
         )
         editlog.flush()
 
-        current_app.cache.delete('index_comments_html')
+        current_app.cache.delete('index_comments_html_guest')
 
         return editlog
 
@@ -275,7 +275,7 @@ class BaseCommentBL(BaseBL):
         if hasattr(target, 'last_comment_id') and target.last_comment_id == self.model.id:
             target.last_comment_id = orm.select(orm.max(x.id) for x in target.comments if not x.deleted).first() or 0
 
-        current_app.cache.delete('index_comments_html')
+        current_app.cache.delete('index_comments_html_guest')
 
     def restore(self, author=None):
         if not self.can_restore_by(author):
@@ -286,7 +286,7 @@ class BaseCommentBL(BaseBL):
         if hasattr(target, 'last_comment_id'):
             target.last_comment_id = orm.select(orm.max(x.id) for x in target.comments if not x.deleted).first()
 
-        current_app.cache.delete('index_comments_html')
+        current_app.cache.delete('index_comments_html_guest')
 
     def vote(self, author, value):
         if not author or not author.is_authenticated:

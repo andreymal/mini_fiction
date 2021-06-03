@@ -6,8 +6,8 @@ code {
     font-size: smaller;
     font-family: monospace;
     white-space: nowrap;
-    margin: 0 0.2rem;
-    padding: 0.2rem 0.5rem;
+    padding: var(--small-padding) calc(var(--small-padding) * 2);
+    max-width: fit-content;
 }
 
 pre {
@@ -16,13 +16,14 @@ pre {
     overflow-y: hidden;
     white-space: pre-wrap;
     word-break: break-all;
-    padding: var(--default-padding) calc(var(--default-padding) * 2);
+    padding: var(--default-padding) var(--big-padding);
     font-family: monospace;
+    max-width: fit-content;
 
     & > code {
         border-radius: 0;
         display: block;
-        padding: var(--default-padding) calc(var(--default-padding) * 2);
+        padding: var(--default-padding) var(--big-padding);
         white-space: pre;
     }
 }

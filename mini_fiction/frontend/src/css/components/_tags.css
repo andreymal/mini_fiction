@@ -1,0 +1,12 @@
+.tags {
+    & a {
+        padding: var(--small-padding) var(--default-padding);
+        border-radius: var(--default-border-radius);
+        color: var(--color-white);
+        font-size: small;
+
+        &:hover {
+            text-decoration: none;
+        }
+    }
+}

@@ -9,7 +9,17 @@
 
         <ul>
         {% for rp in registrations %}
-            <li><a href="{{ url_for('admin_registrations.update', pk=rp.id) }}">{{ rp.username }} ({{ rp.email }})</a> ({{ rp.created_at|datetimeformat(DEFAULT_DATETIME_FORMAT) }})</li>
+            <li>
+                {% if rp.activated_by_user %}
+                    <span title="Подтверждено">✅</span>
+                {% elif rp.is_expired() %}
+                    <span title="Истёкло время ожидания">🚫</span>
+                {% else %}
+                    <span title="Ожидает подтверждения">⏳</span>
+                {% endif %}
+                <a href="{{ url_for('admin_registrations.update', pk=rp.id) }}">{{ rp.username }} ({{ rp.email }})</a>
+                ({{ rp.created_at|datetimeformat(DEFAULT_DATETIME_FORMAT) }})
+            </li>
         {% endfor %}
         </ul>
 

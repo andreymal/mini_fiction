@@ -1,6 +1,5 @@
 {% extends base %}
-{% from 'macro.html' import breadcrumbs with context %}
-{% from 'macro.html' import form_fields with context %}
+{% from 'macro.html' import user_avatar, form_fields, breadcrumbs with context %}
 {% block content %}
 
 <div class="row">
@@ -36,6 +35,18 @@
                 </span>
             </div>
         </div>
+
+        {% if rp.activated_by_user -%}
+        <div class="control-group">
+            <label class="control-label">{{ _('Activated by user') }}</label>
+            <div class="controls">
+                {{ user_avatar(rp.activated_by_user) }}
+                <a href="{{ url_for('admin_authors.update', pk=rp.activated_by_user.id) }}">
+                    {{- rp.activated_by_user.username -}}
+                </a>
+            </div>
+        </div>
+        {% endif -%}
 
         {% if not too_old %}
             <div class="controls">

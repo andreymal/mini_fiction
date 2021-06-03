@@ -15,7 +15,7 @@
     {% if logo -%}
         <div class="logopic" style="background-image: url('{{ logo['url'] }}')">
             {% if logo.original_link and logo.original_link_label -%}
-                <a href="{{ logo.original_link }}" target="_blank">{{ logo.original_link_label }}</a>
+                <a href="{{ logo.original_link }}" class="logopic__link" target="_blank">{{ logo.original_link_label }}</a>
             {%- endif %}
             {# FIXME #}
 {#            {%- if current_user.header_mode == '' or current_user.header_mode == 'ls' -%}#}

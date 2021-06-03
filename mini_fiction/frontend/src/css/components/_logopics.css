@@ -2,26 +2,26 @@
 .logopic {
     grid-area: logopic;
 
-    & a:first-of-type {
-        margin-left: var(--padding-linkblocks);
-        margin-top: var(--padding-linkblocks);
-        padding: 0.2em 0.5em;
+    & a.logopic__link {
+        margin: var(--padding-linkblocks) 0 0 var(--padding-linkblocks);
+        padding: var(--small-padding) calc(var(--small-padding) * 2);
+        border-radius: var(--small-border-radius);
         font-size: small;
         background-color: rgba(50, 50, 50, 0.6);
         color: var(--color-white);
-        text-decoration: underline;
-        display: inline-block;
         opacity: 0;
         pointer-events: none;
         transition-property: opacity;
-        transition-duration: 500ms;
+        transition-duration: .3s;
+        width: max-content;
+        height: max-content;
 
         &:hover {
             color: var(--color-links-roof-primary);
         }
     }
 
-    &:hover a:first-of-type {
+    &:hover a.logopic__link {
         opacity: 1;
         pointer-events: auto;
     }

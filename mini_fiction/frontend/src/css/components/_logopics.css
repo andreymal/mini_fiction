@@ -1,6 +1,10 @@
 
 .logopic {
     grid-area: logopic;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0;
+    grid-template-areas: ". slides";
 
     & a.logopic__link {
         margin: var(--padding-linkblocks) 0 0 var(--padding-linkblocks);

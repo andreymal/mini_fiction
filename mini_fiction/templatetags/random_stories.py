@@ -12,3 +12,12 @@ def random_stories():
         Story.tags, StoryTag.tag, Tag.category,
     ))
     return {'random_stories': stories}
+
+
+@registry.inclusion_tag('experimental/includes/stories_random.html')
+def experimental_random_stories():
+    stories = Story.bl.get_random(prefetch=(
+        Story.characters, Story.contributors, StoryContributor.user,
+        Story.tags, StoryTag.tag, Tag.category,
+    ))
+    return {'random_stories': stories}

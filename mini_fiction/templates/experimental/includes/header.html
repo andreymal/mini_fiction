@@ -18,11 +18,11 @@
                 <a href="{{ logo.original_link }}" class="logopic__link" target="_blank">{{ logo.original_link_label }}</a>
             {%- endif %}
             {# FIXME #}
-{#            {%- if current_user.header_mode == '' or current_user.header_mode == 'ls' -%}#}
-{#                <div data-bazooka="StoriesCarousel" id="slides">#}
-{#                    {{ random_stories() }}#}
-{#                </div>#}
-{#            {%- endif %}#}
+            {%- if current_user.header_mode == '' or current_user.header_mode == 'ls' -%}
+                <div data-bazooka="StoriesCarousel" id="slides">
+                    {{ experimental_random_stories() }}
+                </div>
+            {%- endif %}
         </div>
     {% endif -%}
 {%- endif -%}

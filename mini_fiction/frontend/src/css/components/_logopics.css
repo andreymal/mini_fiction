@@ -5,6 +5,8 @@
     grid-template-columns: 1fr 1fr;
     gap: 0;
     grid-template-areas: ". slides";
+    background-size: cover;
+    background-position: 50% center;
 
     & a.logopic__link {
         margin: var(--padding-linkblocks) 0 0 var(--padding-linkblocks);

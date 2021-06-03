@@ -31,7 +31,7 @@
         transform: rotateX(-90deg) translateX(-50%);
         transform-origin: top center;
         opacity: 0.3;
-        transition: 280ms all 120ms ease-out;
+        transition: var(--default-transition-duration) all var(--fast-transition-duration) ease-out;
         gap: var(--gap-linkblock);
         padding: calc(var(--gap-linkblock) * 2)
     }

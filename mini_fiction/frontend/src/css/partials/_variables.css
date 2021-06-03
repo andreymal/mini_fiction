@@ -55,4 +55,9 @@
 
     /* Notifications */
     --counter-base-size: .6em;
+
+    /* Transitions */
+    --default-transition-duration: .3s;
+    --fast-transition-duration: calc(var(--default-transition-duration) / 2);
+    --slow-transition-duration: calc(var(--default-transition-duration) * 2);
 }

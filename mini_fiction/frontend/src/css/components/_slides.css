@@ -26,7 +26,7 @@
         margin-right: var(--default-padding);
         z-index: 2;
         cursor: pointer;
-        transition-duration: .4s;
+        transition-duration: var(--default-transition-duration);
         float: right;
         position: relative;
     }
@@ -71,7 +71,7 @@ input:checked ~ .slide {
 }
 
 input:checked + label + .slide {
-    transition: opacity 0.5s ease-in-out;
+    transition: opacity var(--slow-transition-duration) ease-in-out;
     transform: translateX(0);
     opacity: 1;
 }

@@ -16,7 +16,7 @@
         opacity: 0;
         pointer-events: none;
         transition-property: opacity;
-        transition-duration: .3s;
+        transition-duration: var(--default-transition-duration);
         width: max-content;
         height: max-content;
 

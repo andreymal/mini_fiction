@@ -20,7 +20,7 @@
 
 .hidden {
     opacity: 0;
-    transition: opacity 0.15s linear;
+    transition: opacity var(--fast-transition-duration) linear;
 }
 
 .shown {

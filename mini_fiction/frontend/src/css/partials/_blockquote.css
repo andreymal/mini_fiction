@@ -4,7 +4,7 @@ blockquote {
     border-left: 0.3rem solid var(--color-complementary-light);
     margin-left: 0;
     margin-right: 0;
-    padding: var(--default-padding) calc(var(--default-padding) * 2);
+    padding: var(--default-padding) var(--big-padding);
 
     & *:last-child {
         margin-bottom: 0;

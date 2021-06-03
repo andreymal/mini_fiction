@@ -1,5 +1,4 @@
 {%- from 'macro.html' import nav_item, user_avatar -%}
-{%- set next_url = (url_for(request.endpoint, **request.view_args) if request.endpoint and not request.endpoint.startswith('auth.') and request.view_args != None else None) -%}
 
 <div id="mobile-menu-btn" class="nav-icon mobile-menu-btn"></div>
 
@@ -49,12 +48,12 @@
                 'admin_index.index',
             ) }}
         {% endif %}
-        {{ nav_item(_('Log out'), url_for('auth.logout', next=next_url), noajax=True) }}
+        {{ nav_item(_('Log out'), url_for('auth.logout'), noajax=True) }}
     </ul>
     </div><!-- /nav-profile-menu -->
 {%- else -%}
 <ul class="nav-items">
-    {{ nav_item(_('Log in'), url_for('auth.login', next=next_url), 'auth.login') }}
+    {{ nav_item(_('Log in'), url_for('auth.login'), 'auth.login') }}
     {%- if config.REGISTRATION_OPEN %}
         {{ nav_item(_('Register'), url_for('auth.registration'), 'auth.registration') }}
     {% endif %}

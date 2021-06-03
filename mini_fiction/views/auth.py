@@ -13,6 +13,7 @@ from mini_fiction.captcha import CaptchaError
 from mini_fiction.validation import ValidationError
 from mini_fiction.forms.login import LoginForm
 from mini_fiction.forms.register import AuthorRegistrationForm, AuthorPasswordResetForm, AuthorNewPasswordForm
+from mini_fiction.utils.misc import check_own_url
 
 
 bp = Blueprint('auth', __name__)
@@ -25,6 +26,10 @@ def login():
 
     captcha = None
     captcha_error = None
+
+    next_url = check_own_url(
+        request.form.get("next") or request.args.get("next") or request.referrer
+    ) or url_for("index.index")
 
     form = LoginForm()
     if form.validate_on_submit():
@@ -45,9 +50,6 @@ def login():
         else:
             user.last_login = datetime.utcnow()
             user.last_visit = user.last_login
-            next_url = request.args.get('next')
-            if not next_url or len(next_url) < 2 or next_url[0] != '/' or next_url.startswith('//'):
-                next_url = url_for('index.index')
             return redirect(next_url)
 
     if not captcha and current_app.captcha and Author.bl.need_captcha_for_auth(request.remote_addr):
@@ -59,6 +61,7 @@ def login():
         page_title=page_title,
         captcha=captcha,
         captcha_error=captcha_error,
+        next_url=next_url,
     )
 
 
@@ -198,7 +201,7 @@ def logout():
     if current_app.config['AUTH_LOG'] and current_user.is_authenticated:
         current_app.logger.info('%s logged out (ID: %s, IP: %s)', current_user.username, current_user.id, request.remote_addr)
     logout_user()
-    next_url = request.args.get('next')
-    if not next_url or len(next_url) < 2 or next_url[0] != '/' or next_url.startswith('//'):
-        next_url = url_for('index.index')
+    next_url = check_own_url(
+        request.args.get("next") or request.referrer
+    ) or url_for("index.index")
     return redirect(next_url)

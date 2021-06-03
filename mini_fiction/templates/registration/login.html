@@ -21,6 +21,7 @@
     <div class="span12 login-text">
         <h1>Парадный вход в библиотеку</h1>
             <form action="" method="POST" enctype="multipart/form-data" class="form-horizontal registration-form" data-noajax="1">
+            <input type="hidden" name="next" value="{{ next_url }}" />
             <fieldset>
                 {% for field in form %}
                     {% if field.widget.input_type == 'hidden' %}{{ field }}{% else %}

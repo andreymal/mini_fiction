@@ -8,9 +8,10 @@ import math
 import time
 from datetime import timedelta
 from urllib.request import Request, urlopen
-from urllib.parse import quote
-from typing import List
+from urllib.parse import quote, urljoin
+from typing import Optional, List
 
+from werkzeug.urls import url_parse
 from flask import current_app, g, escape, render_template, abort, url_for, request, has_request_context
 from flask_babel import pgettext, ngettext
 
@@ -717,3 +718,24 @@ def soft_urlquote(s, chars=None):
     for c in chars:
         s = s.replace(c, '%{:02X}'.format(ord(c)))
     return s
+
+
+def check_own_url(url: Optional[str]) -> Optional[str]:
+    """Проверяет, что URL принадлежит нашему сайту и на него безопасно
+    редиректить. «Нашим» считается хост, прописанный в SERVER_NAME.
+    Если наш, то возвращается нормализованный абсолютный URL; если не наш,
+    то None.
+    """
+    if not url:
+        return None
+
+    base_scheme = current_app.config["PREFERRED_URL_SCHEME"]
+    base_host = current_app.config["SERVER_NAME"]
+    base_url = f"{base_scheme}://{base_host}/"
+
+    url_abs = urljoin(base_url, url)
+    url_info = url_parse(url_abs)
+
+    if url_info.scheme in ("http", "https") and url_info.netloc == base_host:
+        return url_abs
+    return None

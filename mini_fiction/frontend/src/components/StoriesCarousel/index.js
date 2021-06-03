@@ -1,4 +1,4 @@
-const DURATION_MS = 3000;
+const DURATION_MS = 7500;
 const SLEEP_MS = DURATION_MS * 10;
 
 export default (node) => {

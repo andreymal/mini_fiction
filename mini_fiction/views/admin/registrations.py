@@ -1,8 +1,3 @@
-#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
-
-from datetime import datetime, timedelta
-
 from flask import Blueprint, current_app, render_template, abort, redirect, url_for, request
 from flask_babel import gettext
 from flask_login import current_user
@@ -48,7 +43,7 @@ def update(pk):
         user.flush()
         return redirect(url_for('admin_authors.update', pk=user.id))
 
-    too_old = rp.created_at + timedelta(days=current_app.config['ACCOUNT_ACTIVATION_DAYS']) < datetime.utcnow()
+    too_old = rp.is_expired()
     too_old = too_old or Author.exists(email=rp.email)
     too_old = too_old or Author.exists(username=rp.username)
 

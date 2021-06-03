@@ -29,6 +29,7 @@ dumpdb_params = {
         'story_local_last_edited_comments', 'story_local_deleted_comments',
         'contacts', 'subscriptions', 'notifications',
         'created_notifications', 'published_stories', 'approvals',
+        'registration_profiles',
         'change_email_profiles', 'password_reset_profiles',
         'abuse_reports', 'admin_log', 'tags_created', 'tags_aliases',
         'tags_blacklist', 'tags_log',

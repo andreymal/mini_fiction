@@ -3,7 +3,7 @@
 
 import json
 import ipaddress
-from datetime import datetime
+from datetime import datetime, timedelta
 from pathlib import Path
 
 from pony import orm
@@ -102,6 +102,7 @@ class Author(db.Entity, UserMixin):
 
     extra = orm.Required(orm.LongStr, lazy=False, default='{}')
 
+    registration_profiles = orm.Set('RegistrationProfile')
     password_reset_profiles = orm.Set('PasswordResetProfile')
     change_email_profiles = orm.Set('ChangeEmailProfile')
     contacts = orm.Set('Contact')
@@ -180,6 +181,14 @@ class RegistrationProfile(db.Entity):
     password = orm.Optional(str, 255)
     username = orm.Required(str, 32, index=True, autostrip=False)
     created_at = orm.Required(datetime, 6, default=datetime.utcnow)
+    activated_by_user = orm.Optional(Author)
+
+    @property
+    def expiration_date(self) -> datetime:
+        return self.created_at + timedelta(days=current_app.config["ACCOUNT_ACTIVATION_DAYS"])
+
+    def is_expired(self) -> bool:
+        return self.expiration_date < datetime.utcnow()
 
     def __str__(self):
         return 'Registration information for {}'.format(self.username)

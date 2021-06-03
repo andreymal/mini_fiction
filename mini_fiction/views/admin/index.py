@@ -43,7 +43,9 @@ def index():
 
     # Статистика по регистрациям
     account_registration_mindate = datetime.utcnow() - timedelta(days=current_app.config['ACCOUNT_ACTIVATION_DAYS'])
-    ctx['registrationprofile_count'] = models.RegistrationProfile.select(lambda x: x.created_at >= account_registration_mindate).count()
+    ctx['registrationprofile_count'] = models.RegistrationProfile.select(
+        lambda x: x.activated_by_user is None and x.created_at >= account_registration_mindate
+    ).count()
     ctx['registrationprofile_last'] = models.RegistrationProfile.select().order_by(models.RegistrationProfile.id.desc()).first()
 
     return render_template('admin/index.html', **ctx)

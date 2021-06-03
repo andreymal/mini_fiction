@@ -593,16 +593,23 @@ class AuthorBL(BaseBL):
         prp.activated = True
         return True
 
-    def activate(self, activation_key):
+    def activate(self, activation_key: str):
         from mini_fiction.models import RegistrationProfile
 
         rp = RegistrationProfile.get(activation_key=activation_key)
         if not rp:
-            return
+            return None
 
-        if not rp.password or rp.created_at + timedelta(days=current_app.config['ACCOUNT_ACTIVATION_DAYS']) < datetime.utcnow():
+        if rp.activated_by_user is not None:
+            # Пользователь кликнул по ссылке из письма второй раз —
+            # разрешаем это некоторое время, чтобы он не пугался
+            if not rp.is_expired():
+                return rp.activated_by_user
+            return None
+
+        if not rp.password or rp.is_expired():
             rp.delete()
-            return
+            return None
 
         tm = datetime.utcnow()
 
@@ -618,12 +625,24 @@ class AuthorBL(BaseBL):
                 'activated_at': tm,
             })
         except ValidationError:
-            return
+            return None
 
         assert rp.username == user.username
         assert rp.email == user.email
-        RegistrationProfile.select(lambda x: x.username == user.username).delete(bulk=True)
-        RegistrationProfile.select(lambda x: x.email == user.email).delete(bulk=True)
+
+        # Удаляем все лишние неактивированные регистрации
+        # с такими же юзернеймом и почтой
+        RegistrationProfile.select(
+            lambda x: x.username == user.username and x.id != rp.id
+        ).delete(bulk=True)
+        RegistrationProfile.select(
+            lambda x: x.email == user.email and x.id != rp.id
+        ).delete(bulk=True)
+
+        # Запоминаем, что текущая регистрация успешно активирована (не удаляем
+        # из базы, чтобы пользователь мог кликнуть по ссылке второй раз, см. выше)
+        rp.activated_by_user = user
+
         return user
 
     def activate_changed_email(self, activation_key):

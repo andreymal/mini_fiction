@@ -3,7 +3,7 @@
 
 <nav aria-label='Primary links'>
     <ul>
-        {{ nav_item(pgettext('best_stories', 'Best'), url_for('object_lists.top'), match_endpoint='object_lists.top') }}
+        {{ nav_item(pgettext('best_stories', 'Best'), url_for('object_lists.top', period='7'), match_endpoint='object_lists.top') }}
         {{ nav_item(gettext('Tags'), url_for('tags.index'), match_endpoint='tags.index') }}
         {{ nav_item(_('Search'), url_for('search.main'), 'search.') }}
 

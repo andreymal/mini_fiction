@@ -1,0 +1,5 @@
+.characters {
+    & img {
+        border-radius: var(--default-border-radius);
+    }
+}

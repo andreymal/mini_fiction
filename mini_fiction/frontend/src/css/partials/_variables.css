@@ -22,6 +22,7 @@
     --color-grey-lightest: #f6f6f6;
     --color-grey-lighter: #e4e6eb;
     --color-grey: #b0b3b8;
+    --color-grey-dark: #555;
     --color-grey-darker: #3a3b3c;
     --color-grey-darkest: #242526;
     --color-black: #18191A;
@@ -40,7 +41,18 @@
     --default-border-radius: .25em;
     --default-padding: .4em;
 
+    --small-border-radius: calc(var(--default-border-radius) / 2);
+    --small-padding: calc(var(--default-padding) / 2);
+
+    --big-border-radius: calc(var(--default-border-radius) * 2);
+    --big-padding: calc(var(--default-padding) * 2);
+
     /* Slider */
     --slides-height: 13em;
     --slides-border: 1em;
+    --max-lines: 4;
+    --bullets-size: 1em;
+
+    /* Notifications */
+    --counter-base-size: .6em;
 }

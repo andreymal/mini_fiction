@@ -96,14 +96,14 @@
     }
 
     & i[data-count]:after {
-        background: red; /* FIXME */
+        background: var(--color-complementary-light);
         border-radius: 999px;
-        color: var(--color-links-roof-secondary);
+        color: var(--color-white);
         position: relative;
-        right: .6em;
-        bottom: .6em;
-        padding: .4em;
-        margin-right: -1em; /* To prevent padding shift */
+        right: var(--counter-base-size);
+        bottom: var(--counter-base-size);
+        padding: calc(var(--counter-base-size) / 2);
+        margin-right: calc(var(--counter-base-size) * -2); /* To prevent padding shift */
         content: attr(data-count);
         font-family: sans-serif;
         font-size: x-small;

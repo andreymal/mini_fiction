@@ -36,8 +36,8 @@
         {%- if current_user.is_authenticated %}
             {% set notifications_count = get_unread_notifications_count() %}
             <li>
-                {# FIXME #}
-                <a>
+                {# TODO: Add real bell widget #}
+                <a href="{{ url_for('notifications.index') }}">
                     <i class="fas fa-bell fa-lg"
                        {% if notifications_count >0 %}data-count="{{ notifications_count }}"{% endif %}></i>
                 </a>

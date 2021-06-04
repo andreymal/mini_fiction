@@ -18,7 +18,7 @@ const sortEventFactory = (jQuery) => (node) => () => {
     .then((response) => response.json())
     .then((result) => {
       if (!result.success) {
-        notifyError(data.error);
+        notifyError(result.error);
       } else {
         notify('Главы отсортированы');
       }

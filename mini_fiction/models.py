@@ -227,8 +227,6 @@ class CharacterGroup(db.Entity):
 
     characters = orm.Set('Character')
 
-    bl = Resource('bl.charactergroup')
-
     def __str__(self):
         return self.name
 
@@ -243,8 +241,6 @@ class Character(db.Entity):
     sha256sum = orm.Required(str, 64)
 
     stories = orm.Set('Story')
-
-    bl = Resource('bl.character')
 
     def __str__(self):
         return self.name

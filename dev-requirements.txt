@@ -6,3 +6,4 @@ pylint
 flake8
 mypy
 black
+isort

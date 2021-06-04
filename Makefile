@@ -59,6 +59,7 @@ lint:
 	flake8 mini_fiction/logic
 
 format:
+	isort mini_fiction/logic
 	black mini_fiction/logic
 
 test:

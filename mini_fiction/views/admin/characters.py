@@ -9,6 +9,7 @@ from pony.orm import db_session
 from mini_fiction.utils.views import admin_required
 from mini_fiction.validation import ValidationError
 from mini_fiction.forms.admin.sorting import CharacterForm
+from mini_fiction.logic import characters
 from mini_fiction.models import Character, CharacterGroup
 from mini_fiction.utils.views import paginate_view
 
@@ -41,7 +42,7 @@ def create():
 
     if form.validate_on_submit():
         try:
-            character = Character.bl.create(current_user._get_current_object(), form.data)
+            character = characters.create(current_user._get_current_object(), form.data)
         except ValidationError as exc:
             form.set_errors(exc.errors)
         else:
@@ -73,7 +74,7 @@ def update(pk):
 
     if form.validate_on_submit():
         try:
-            character.bl.update(current_user._get_current_object(), form.data)
+            characters.update(character, current_user._get_current_object(), form.data)
         except ValidationError as exc:
             form.set_errors(exc.errors)
         else:
@@ -99,7 +100,7 @@ def delete(pk):
 
     if request.method == 'POST':
         try:
-            character.bl.delete(current_user._get_current_object())
+            characters.delete(character, current_user._get_current_object())
         except ValidationError:
             abort(403)
         else:

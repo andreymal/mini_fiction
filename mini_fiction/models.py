@@ -1,6 +1,3 @@
-#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
-
 import json
 import ipaddress
 from datetime import datetime, timedelta
@@ -29,8 +26,6 @@ class Logopic(db.Entity):
     original_link_label = orm.Optional(orm.LongStr, lazy=False)
     created_at = orm.Required(datetime, 6, default=datetime.utcnow)
     updated_at = orm.Required(datetime, 6, default=datetime.utcnow)
-
-    bl = Resource('bl.logopic')
 
     @property
     def url(self):

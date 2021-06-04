@@ -4,6 +4,7 @@
 import re
 import copy
 from collections import Iterable
+from typing import Any, Dict
 
 import cerberus
 from werkzeug.datastructures import FileStorage
@@ -17,6 +18,8 @@ MAX_LENGTH_NOSTRIP = cerberus.errors.ErrorDefinition(0x4128, 'maxlengthnostrip')
 DYNREGEX_MISMATCH = cerberus.errors.ErrorDefinition(0x4141, 'dynregex')
 
 file_type = cerberus.TypeDefinition('file', (FileStorage,), ())
+
+RawData = Dict[str, Any]
 
 
 class ValidationError(ValueError):

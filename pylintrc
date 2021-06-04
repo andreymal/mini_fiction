@@ -1,26 +1,12 @@
-[MASTER]
-unsafe-load-any-extension=y
-
 [MESSAGES CONTROL]
-# W0142 -- Used * or ** magic
-# W0212 -- Access to a protected member
-# W0603 -- Using the global statement
-# W0613 -- Unused argument
-# W0702 -- No exception type(s) specified
-# W0703 -- Catching too general exception Exception
-# C0103 -- Invalid variable name
-# C0111 -- Missing docstring
-# C0301 -- Line too long
-# C0322 -- Wrong continued indentation
-# C0330 -- Wrong hanging indentation
-# R0201 -- Method could be a function
-# R0801 -- Similar lines
-# R0901 -- Too many ancestors
-# R0903 -- Too few public methods
-# R0904 -- Too many public methods
-# R0912 -- Too many branches
-# R0913 -- Too many arguments
-# R0914 -- Too many local variables
-# R0204 -- Redefinition of variable type
-# I0011 -- Locally disabling
-disable=W0142,W0212,W0603,W0613,W0702,W0703,C0103,C0111,C0301,C0322,C0330,R0201,R0801,R0901,R0903,R0904,R0912,R0913,R0914,R0204,I0011
+disable=invalid-name,
+        missing-module-docstring,
+        missing-class-docstring,
+        missing-function-docstring,
+        too-many-ancestors,
+        too-few-public-methods,
+        too-many-public-methods,
+        too-many-branches,
+        too-many-arguments,
+        too-many-locals,
+        line-too-long

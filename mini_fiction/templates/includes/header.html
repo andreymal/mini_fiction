@@ -3,6 +3,7 @@
 
 {%- if current_user.header_mode != 'off' -%}
 {%- set logo = get_current_logopic() -%}
+{%- set logo_label = logo.original_link_label.get(g.locale.language) or logo.original_link_label.get('', '') -%}
 {% if logo -%}
 <!-- Logo image and carousel start -->
 <div class="logopic" style="background-image: url('{{ logo['url'] }}')">
@@ -12,7 +13,7 @@
     </div>
     {%- endif %}
     {% if logo.original_link and logo.original_link_label -%}
-        <a class="logopic-sourcelink" href="{{ logo.original_link }}" target="_blank">{{ logo.original_link_label }}</a>
+        <a class="logopic-sourcelink" href="{{ logo.original_link }}" target="_blank">{{ logo_label }}</a>
     {%- endif %}
 </div>
 <!-- Logo image and carousel end -->

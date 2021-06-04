@@ -10,3 +10,6 @@ disable=invalid-name,
         too-many-arguments,
         too-many-locals,
         line-too-long
+
+[TYPECHECK]
+generated-members=flush

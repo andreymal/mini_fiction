@@ -3,14 +3,14 @@ import time
 from dataclasses import dataclass
 from datetime import datetime
 from pathlib import Path
-from typing import Optional, List, Dict
+from typing import Dict, List, Optional
 
 from flask import current_app
 
-from mini_fiction.models import Logopic, Author, AdminLog
-from mini_fiction.utils.image import save_image, ImageKind
+from mini_fiction.models import AdminLog, Author, Logopic
+from mini_fiction.utils.image import ImageKind, save_image
 from mini_fiction.utils.misc import call_after_request as later
-from mini_fiction.validation import Validator, RawData
+from mini_fiction.validation import RawData, Validator
 from mini_fiction.validation.logopics import LOGOPIC, LOGOPIC_FOR_UPDATE
 
 
@@ -34,7 +34,7 @@ def create(author: Author, data: RawData) -> Logopic:
         sha256sum=picture_metadata.sha256sum,
         **data
     )
-    logopic.flush()  # pylint: disable=maybe-no-member
+    logopic.flush()
 
     current_app.cache.delete("logopics")
     AdminLog.bl.create(user=author, obj=logopic, action=AdminLog.ADDITION)
@@ -80,7 +80,7 @@ def update(logopic: Logopic, author: Author, data: RawData) -> Logopic:
         )
 
     if old_path and old_path.exists():
-        later(lambda: old_path.unlink())
+        later(lambda: old_path.unlink())  # pylint: disable=unnecessary-lambda
     return logopic
 
 
@@ -88,7 +88,7 @@ def delete(logopic: Logopic, author: Author) -> None:
     AdminLog.bl.create(user=author, obj=logopic, action=AdminLog.DELETION)
     old_path = logopic.picture_path
     if old_path and old_path.exists():
-        later(lambda: old_path.unlink())
+        later(lambda: old_path.unlink())  # pylint: disable=unnecessary-lambda
     logopic.delete()
     current_app.cache.delete("logopics")
 

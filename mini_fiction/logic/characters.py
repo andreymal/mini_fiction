@@ -83,9 +83,7 @@ def update(character: Character, author: Author, data: RawData) -> None:
                 character.sha256sum = picture_metadata.sha256sum
                 changed_fields |= {"picture"}
                 if old_path and old_path.exists():
-                    later(
-                        lambda: old_path.unlink()  # pylint: disable=unnecessary-lambda
-                    )
+                    later(lambda: old_path.unlink())
         elif key == "group":
             if character.group.id != value:
                 setattr(character, key, value)
@@ -107,7 +105,7 @@ def delete(character: Character, author: Author) -> None:
     AdminLog.bl.create(user=author, obj=character, action=AdminLog.DELETION)
     old_path = character.picture_path
     if old_path and old_path.exists():
-        later(lambda: old_path.unlink())  # pylint: disable=unnecessary-lambda
+        later(lambda: old_path.unlink())
     character.delete()
 
 

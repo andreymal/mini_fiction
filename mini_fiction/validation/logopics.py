@@ -33,7 +33,7 @@ LOGOPIC = {
     },
     'original_link_label': {
         'type': 'string',
-        'coerce': safe_string_coerce,
+        'coerce': safe_string_multiline_coerce,
         'required': False,
         'default': '',
         'minlength': 0,

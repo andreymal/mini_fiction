@@ -62,8 +62,6 @@ def update(logopic: Logopic, author: Author, data: RawData) -> Logopic:
                     "picture",
                 }
         else:
-            if key == "original_link_label":
-                value = value.replace("\r", "")
             if getattr(logopic, key) != value:
                 setattr(logopic, key, value)
                 changed_fields |= {

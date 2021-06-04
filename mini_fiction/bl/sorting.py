@@ -90,7 +90,8 @@ class CharacterBL(BaseBL):
                     self.model.picture = picture_metadata.relative_path
                     self.model.sha256sum = picture_metadata.sha256sum
                     changed_fields |= {'picture',}
-                    later(lambda: old_path.unlink(missing_ok=True))
+                    if old_path and old_path.exists():
+                        later(lambda: old_path.unlink())
             elif key == 'group':
                 if character.group.id != value:
                     setattr(character, key, value)
@@ -113,7 +114,8 @@ class CharacterBL(BaseBL):
         from mini_fiction.models import AdminLog
         AdminLog.bl.create(user=author, obj=self.model, action=AdminLog.DELETION)
         old_path = self.model.picture_path
-        later(lambda: old_path.unlink(missing_ok=True))
+        if old_path and old_path.exists():
+            later(lambda: old_path.unlink())
         self.model.delete()
 
     # FIXME: Decouple validation logic and move it to mini_fiction.utils.image

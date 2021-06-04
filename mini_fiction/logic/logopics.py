@@ -79,15 +79,16 @@ def update(logopic: Logopic, author: Author, data: RawData) -> Logopic:
             fields=sorted(changed_fields),
         )
 
-    if old_path:
-        later(lambda: old_path.unlink(missing_ok=True))
+    if old_path and old_path.exists():
+        later(lambda: old_path.unlink())
     return logopic
 
 
 def delete(logopic: Logopic, author: Author) -> None:
     AdminLog.bl.create(user=author, obj=logopic, action=AdminLog.DELETION)
     old_path = logopic.picture_path
-    later(lambda: old_path.unlink(missing_ok=True))
+    if old_path and old_path.exists():
+        later(lambda: old_path.unlink())
     logopic.delete()
     current_app.cache.delete("logopics")
 

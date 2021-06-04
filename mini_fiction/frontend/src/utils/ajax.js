@@ -38,7 +38,7 @@ const post = (url, body, headers = []) => request(
 
 const postJSON = (url, body, headers = []) => request(
   new R(url, { method: 'POST', body: JSON.stringify(body) }),
-  [...['Content-Type', 'application/json'], ...headers],
+  [['Content-Type', 'application/json'], ...headers],
 );
 
 export {

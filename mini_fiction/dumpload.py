@@ -1,16 +1,20 @@
-#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
-
 import os
 import sys
-from io import BytesIO
 from datetime import datetime
+from io import BytesIO
+from pathlib import Path
+from typing import Set
+from zipfile import ZIP_DEFLATED, ZipFile, ZipInfo
+
+from pydantic import parse_raw_as
 
 from mini_fiction import ponydump
-
+from mini_fiction.logic.image import SavedImage
 
 # Вообще всё будет работать и без этих exclude, но выкидывание избыточной
 # информации о связях сильно уменьшает размер дампа
+
+# TODO: wrap into dataclass
 dumpdb_params = {
     'story': {'exclude': (
         'edit_log', 'story_views_set', 'votes', 'favorites', 'bookmarks',
@@ -78,20 +82,20 @@ dumpdb_params = {
 zip_dump_params = {
     'logopic': {
         'include': (
-            'id', 'picture', 'sha256sum', 'visible', 'description',
+            'id', 'image_bundle', 'visible', 'description',
             'original_link', 'original_link_label', 'created_at', 'updated_at',
         ),
         'datekey': 'updated_at',
-        'media': ('picture',),
+        'media': ('image_bundle',),
     },
     'charactergroup': {
         'include': ('id', 'name', 'description'),
         'exclude': ('characters',),
     },
     'character': {
-        'include': ('id', 'name', 'description', 'picture', 'sha256sum', 'group'),
+        'include': ('id', 'name', 'description', 'image_bundle', 'group'),
         'exclude': ('stories',),
-        'media': ('picture',),
+        'media': ('image_bundle',),
     },
     'tagcategory': {
         'include': ('id', 'name', 'color', 'description', 'created_at', 'updated_at'),
@@ -127,7 +131,7 @@ zip_dump_params = {
     'author': {
         # Дампится только один системный пользователь
         'include': (
-            'avatar_large', 'avatar_medium', 'avatar_small', 'bio', 'date_joined', 'first_name',
+            'bio', 'date_joined', 'first_name', 'image_bundle',
             'id', 'is_active', 'is_staff', 'is_superuser', 'last_name', 'last_visit', 'username',
             'activated_at', 'last_login', 'text_source_behaviour',
         ),
@@ -140,7 +144,7 @@ zip_dump_params = {
         ),
         'override': {'email': '', 'password': ''},
         'with_collections': False,
-        'media': ('avatar_large', 'avatar_medium', 'avatar_small'),
+        'media': ('image_bundle',),
     },
 }
 
@@ -314,21 +318,20 @@ def loaddb_console(paths, verbosity=2, only_create=False):
                     ))
 
 
-def zip_dump(path, params=None, keep_broken=False):
-    '''Создаёт дамп некоторых моделей сайта, безопасный для публичного
+def zip_dump(path: Path, params=None, keep_broken=False):
+    """
+    Создаёт дамп некоторых моделей сайта, безопасный для публичного
     распространения: жанры, персонажи, HTML-блоки, системная учётная запись
     (без e-mail и пароля, конечно) и т.п.
-    '''
-
-    import zipfile
+    """
 
     from mini_fiction import database
 
     if not params:
         params = zip_dump_params
 
-    if os.path.isfile(path):
-        raise ValueError('File %r already exists' % path)
+    if path.exists():
+        raise ValueError(f'File {path.as_posix()} already exists')
 
     es = ponydump.get_entities_dict(database.db)
 
@@ -373,25 +376,24 @@ def zip_dump(path, params=None, keep_broken=False):
     mfd = MiniFictionDump(dict_params=dict_params)
 
     try:
-        with zipfile.ZipFile(path, 'w', compression=zipfile.ZIP_DEFLATED) as z:
-            media_files = set()
+        with ZipFile(path, 'w', compression=ZIP_DEFLATED) as z:  # type: ZipFile
+            media_files: Set[SavedImage] = set()
 
             # Дампим БД и попутно собираем список файлов из media
             for name, e_params in params.items():
-                zip_dump_db_entity(z, mfd, name, e_params, media_files)
+                media_files |= zip_dump_db_entity(z, mfd, name, e_params)
 
             # Дампим файлы из media
             zip_dump_media(z, media_files)
 
     except:
         # В случае проблем или Ctrl+C не оставляем битый файл валяться
-        if not keep_broken and os.path.isfile(path):
-            os.remove(path)
+        if not keep_broken and path.exists():
+            path.unlink()
         raise
 
 
-def zip_dump_db_entity(z, mfd, name, e_params, media_files):
-    import zipfile
+def zip_dump_db_entity(z: ZipFile, mfd: MiniFictionDump, name: str, e_params) -> Set[SavedImage]:
     from pony import orm
     from flask import current_app
 
@@ -401,6 +403,7 @@ def zip_dump_db_entity(z, mfd, name, e_params, media_files):
     media = e_params.get('media') or ()
 
     date = [None]
+    media_files: Set[SavedImage] = set()
 
     def sanitizer(dump):
         for obj in dump[:]:
@@ -408,9 +411,9 @@ def zip_dump_db_entity(z, mfd, name, e_params, media_files):
             for k, v in obj.items():
                 if k == '_entity':
                     if v != name:
-                        raise ValueError('Unexpected entity in zip dump! Expected {}, got {}'.format(name, v))
+                        raise ValueError(f'Unexpected entity in zip dump! Expected {name}, got {v}')
                 elif k in exclude:
-                    raise ValueError('Security problem: excluded attribute {}.{} is still stored in dump'.format(name, k))
+                    raise ValueError(f'Security problem: excluded attribute {name}.{k} is still stored in dump')
                 else:
                     assert k in include or k in override
 
@@ -433,7 +436,7 @@ def zip_dump_db_entity(z, mfd, name, e_params, media_files):
             for attr in media:
                 if obj.get(attr):
                     assert isinstance(obj[attr], str)
-                    media_files.add(obj[attr])
+                    media_files.add(parse_raw_as(SavedImage, obj[attr]))
 
             # Если у модели есть дата, самую позднюю будем использовать как дату файла в архиве
             # (date[0] вместо просто date для имитации nonlocal в старых питонах)
@@ -461,29 +464,26 @@ def zip_dump_db_entity(z, mfd, name, e_params, media_files):
         date[0] = datetime.utcnow()
 
     # Подготавливаем мета-инфу
-    zipinfo = zipfile.ZipInfo(
+    zipinfo = ZipInfo(
         'dump/{}_dump.jsonl'.format(name),
         date_time=date[0].timetuple()[:6],
     )
-    zipinfo.compress_type = zipfile.ZIP_DEFLATED
-    zipinfo.external_attr = 0o644 << 16  # Python 3.4 ставит файлам права 000, фиксим
+    zipinfo.compress_type = ZIP_DEFLATED
 
     # Теперь пишем подготовленный дамп в архив
     z.writestr(zipinfo, fp.getvalue())
+    return media_files
 
 
-def zip_dump_media(z, media_files):
-    import zipfile
-
+def zip_dump_media(z: ZipFile, media_files: Set[SavedImage]):
     from flask import current_app
+    media_dir = current_app.config['MEDIA_ROOT']
 
-    media_dir = os.path.abspath(current_app.config['MEDIA_ROOT'])
-
-    for subpath in media_files:
-        if not subpath or subpath[0] in ('/', '\\', os.path.sep):
-            raise ValueError('Invalid media path: %r' % subpath)
-        path = os.path.join(media_dir, subpath)
-        if not path.startswith(media_dir + os.path.sep):
-            raise ValueError('Media path %r tried to escape from media catalog')
-
-        z.write(path, 'media/{}'.format(subpath), compress_type=zipfile.ZIP_DEFLATED)
+    for image in media_files:
+        # Write original
+        z.write(media_dir / image.original, f'media/{image.original}', compress_type=ZIP_DEFLATED)
+        # Write images from resized bundle
+        for name, meta in image.resized:
+            if name.startswith('x'):
+                z.write(media_dir / meta.webp, f'media/{meta.webp}', compress_type=ZIP_DEFLATED)
+                z.write(media_dir / meta.png, f'media/{meta.png}', compress_type=ZIP_DEFLATED)

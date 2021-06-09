@@ -1,11 +1,9 @@
-#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
-
 from flask import Blueprint, render_template, abort, url_for, redirect, request
 from flask_babel import gettext
 from flask_login import current_user
 from pony.orm import db_session
 
+from mini_fiction.logic import staticpages
 from mini_fiction.utils.views import admin_required
 from mini_fiction.validation import ValidationError
 from mini_fiction.forms.admin.staticpage import StaticPageForm
@@ -44,7 +42,7 @@ def create():
 
     if form.validate_on_submit():
         try:
-            staticpage = StaticPage.bl.create(current_user._get_current_object(), form.data)
+            staticpage = staticpages.create(current_user._get_current_object(), form.data)
         except ValidationError as exc:
             form.set_errors(exc.errors)
         else:
@@ -84,7 +82,7 @@ def update(name, lang):
 
     if can_edit and form.validate_on_submit():
         try:
-            staticpage.bl.update(current_user._get_current_object(), form.data)
+            staticpages.update(staticpage, current_user._get_current_object(), form.data)
         except ValidationError as exc:
             form.set_errors(exc.errors)
         else:
@@ -115,7 +113,7 @@ def delete(name, lang):
 
     if request.method == 'POST':
         try:
-            staticpage.bl.delete(current_user._get_current_object())
+            staticpages.delete(staticpage, current_user._get_current_object())
         except ValidationError:
             abort(403)
         else:

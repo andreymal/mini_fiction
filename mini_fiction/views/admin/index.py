@@ -46,27 +46,3 @@ def index():
     ctx['registrationprofile_last'] = models.RegistrationProfile.select().order_by(models.RegistrationProfile.id.desc()).first()
 
     return render_template('admin/index.html', **ctx)
-
-
-def get_adminlog_object_url(typ, pk):
-    if typ == 'abusereport':
-        return url_for('admin_abuse_reports.show', abuse_id=pk)
-    if typ == 'author':
-        return url_for('admin_authors.update', pk=pk)
-    if typ == 'character':
-        return url_for('admin_characters.update', pk=pk)
-    if typ == 'charactergroup':
-        return url_for('admin_charactergroups.update', pk=pk)
-    if typ == 'htmlblock':
-        return url_for('admin_htmlblocks.update', name=pk[0], lang=pk[1])
-    if typ == 'logopic':
-        return url_for('admin_logopics.update', pk=pk)
-    if typ == 'newsitem':
-        return url_for('admin_news.update', pk=pk)
-    if typ == 'staticpage':
-        return url_for('admin_staticpages.update', name=pk[0], lang=pk[1])
-    if typ == 'tagcategory':
-        return url_for('admin_tag_categories.update', pk=pk)
-    if typ == 'tag':
-        return url_for('admin_tags.update', pk=pk)
-    return None

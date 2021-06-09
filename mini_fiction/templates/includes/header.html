@@ -6,7 +6,7 @@
 {%- set logo_label = logo.original_link_label.get(g.locale.language) or logo.original_link_label.get('', '') -%}
 {% if logo -%}
 <!-- Logo image and carousel start -->
-<div class="logopic" style="background-image: url('{{ logo['url'] }}')">
+<div class="logopic" style="background-image: url('{{ url_for('media', filename=logo.bundle.x1194.webp) }}')">
     {%- if current_user.header_mode == '' or current_user.header_mode == 'ls' -%}
     <div data-bazooka="StoriesCarousel" id="slides">
         {{ random_stories() }}

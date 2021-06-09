@@ -41,8 +41,7 @@ class CharacterForm(Form):
 
     picture = FileField(
         lazy_gettext('Picture'),
-        description=lazy_gettext('PNG only'),
-        render_kw=dict(attrs_dict, accept='image/png'),
+        render_kw=attrs_dict,
     )
 
     description = TextAreaField(

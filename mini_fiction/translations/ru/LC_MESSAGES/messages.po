@@ -157,10 +157,6 @@ msgstr "Персонаж уже существует"
 msgid "Group not found"
 msgstr "Группа не найдена"
 
-#: mini_fiction/bl/sorting.py:112 mini_fiction/forms/admin/sorting.py:44
-msgid "PNG only"
-msgstr "Только PNG"
-
 #: mini_fiction/bl/sorting.py:116
 msgid "Maximum picture size is {maxsize} KiB"
 msgstr "Максимальный размер картинки {maxsize} КиБ"

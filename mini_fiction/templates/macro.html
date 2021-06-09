@@ -278,3 +278,18 @@
         {% endfor %}
     </div>
 {%- endmacro %}
+
+
+{% macro character_picture(character) -%}
+    <picture>
+        <source srcset="{{ url_for('media', filename=character.bundle.x32.webp) }}"
+                sizes="32px"
+                type="image/webp">
+        <source srcset="{{ url_for('media', filename=character.bundle.x32.png) }}"
+                sizes="32px"
+                type="image/png">
+        <img src="{{ url_for('media', filename=character.bundle.x32.png) }}"
+             alt="{{ character.name }}"
+             title="{{ character.name }}">
+    </picture>
+{%- endmacro %}

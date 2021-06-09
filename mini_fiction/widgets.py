@@ -1,15 +1,12 @@
-#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
-
 from itertools import chain
 
 from pony import orm
-from flask import Markup, escape
+from flask import Markup, escape, url_for
 from flask_babel import gettext
 from wtforms.widgets import Select, Input, TextInput
 from wtforms.widgets.core import html_params
 
-from mini_fiction.models import Category, Character, Tag
+from mini_fiction.models import Character
 
 
 class ButtonWidget(object):
@@ -62,7 +59,7 @@ class StoriesImgSelect(Select):
         img_url = self.get_img_url(field, value)
         img_class = 'ui-selected' if selected else ''
         # NOTE: hardcoded width and height are added to prevent FOOC and will be removed ASAP with this piece of crap
-        item_image = '<img  width="32" height="32" class="%s" src="%s" alt="%s" title="%s" />' % (img_class, img_url, label, label)
+        item_image = '<img width="32" height="32" class="%s" src="%s" alt="%s" title="%s" />' % (img_class, img_url, label, label)
         cb = Input('checkbox' if self.multiple else 'radio')
         rendered_cb = cb(field, id=False, value=value, checked=selected, **data_attrs)
         return '<span %s>%s%s</span>' % (html_params(**container_attrs), rendered_cb, item_image)
@@ -71,7 +68,7 @@ class StoriesImgSelect(Select):
 class StoriesCharacterSelect(StoriesImgSelect):
     def get_img_url(self, field, value):
         characters = {x.id: x for x in orm.select(c for c in Character)}  # NOTE: Pony ORM caches this
-        return characters[value].url
+        return url_for('media', filename=characters[value].bundle.x32.webp)
 
 
 class StoriesButtons(Select):

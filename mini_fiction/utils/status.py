@@ -230,17 +230,6 @@ class ProjectStatus(Status):
 
         return self._ok('sphinx', 'working')
 
-    def avatars(self):
-        if not self.app.config['AVATARS_UPLOADING']:
-            return self._ok('avatars', 'disabled')
-
-        try:
-            from PIL import Image  # pylint: disable=unused-variable
-        except ImportError:
-            return self._fail('avatars', 'enabled, but Pillow is not available')
-        else:
-            return self._ok('avatars', 'enabled')
-
     def celery(self):
         insp = self.app.celery.control.inspect(timeout=0.5)
 
@@ -379,7 +368,6 @@ class ProjectStatus(Status):
         yield self.localstatic_root()
         yield self.localtemplates()
         yield self.sphinx()
-        yield self.avatars()
         yield self.celery()
         yield self.diff()
         yield self.linter()

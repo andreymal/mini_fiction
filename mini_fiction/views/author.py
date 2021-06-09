@@ -131,9 +131,6 @@ def info(user_id=None, comments_page=1):
 def edit_general(user_id=None):
     user = _get_user_for_edit(user_id, select_for_update=request.method == 'POST')
 
-    has_avatar = bool(user.avatar_small or user.avatar_medium or user.avatar_large)
-    avatar_uploading = bool(current_app.config['AVATARS_UPLOADING'])
-
     contacts = list(Contact.select(lambda x: x.author == user).order_by(Contact.id))
 
     form = AuthorEditProfileForm(data={
@@ -144,10 +141,8 @@ def edit_general(user_id=None):
         ] + [{'name': '', 'value': ''}]
     })
 
-    if not has_avatar:
+    if user.image is None:
         del form.delete_avatar
-    if not avatar_uploading:
-        del form.avatar
 
     ctx = {
         'page_title': 'Основные настройки',

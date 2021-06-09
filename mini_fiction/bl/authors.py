@@ -1,20 +1,14 @@
-#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
-
-# pylint: disable=unexpected-keyword-arg,no-value-for-parameter
-
-import os
 import json
 import time
-from io import BytesIO
 from hashlib import md5
 from datetime import datetime, timedelta
 
 import pytz
-from flask import current_app, url_for, render_template
+from flask import current_app, render_template
 from flask_babel import lazy_gettext
 
 from mini_fiction import hashers
+from mini_fiction.logic.image import save_image, AvatarBundle, cleanup_image
 from mini_fiction.utils import random as utils_random
 from mini_fiction.utils.misc import call_after_request as later
 from mini_fiction.bl.utils import BaseBL
@@ -199,24 +193,24 @@ class AuthorBL(BaseBL):
             changed_fields |= {'contacts',}  # TODO: надо ли?
 
         if data.get('delete_avatar'):
-            self.delete_avatar()
-            changed_fields |= {'avatar_small', 'avatar_medium', 'avatar_large'}
+            old_saved_image = user.image
+            later(lambda: cleanup_image(old_saved_image))
+            del user.image
+            changed_fields |= {'image_bundle'}
 
-        elif current_app.config['AVATARS_UPLOADING'] and data.get('avatar'):
-            from PIL import Image
-
+        elif data.get('avatar'):
+            # TODO: abstract over size checks
             image_data = data['avatar'].stream.read(256 * 1024 + 1)
             if len(image_data) > 256 * 1024:
                 raise ValidationError({'avatar': [lazy_gettext('Too big avatar; must be {value} KiB or smaller').format(value=256)]})
 
-            try:
-                image = Image.open(BytesIO(image_data))
-            except Exception:
+            old_saved_image = user.image
+            saved_image = save_image(bundle=AvatarBundle, raw_data=image_data)
+            if not saved_image:
                 raise ValidationError({'avatar': [lazy_gettext('Cannot read avatar')]})
-            else:
-                with image:
-                    self.validate_and_set_avatar(image, image_data)
-                changed_fields |= {'avatar_small', 'avatar_medium', 'avatar_large'}
+            user.image = saved_image
+            changed_fields |= {"image_bundle"}
+            later(lambda: cleanup_image(old_saved_image))
 
         if data.get('extra') is not None:
             if isinstance(data['extra'], str):
@@ -382,111 +376,6 @@ class AuthorBL(BaseBL):
 
         self._extra[key] = value
         self.model.extra = json.dumps(self._extra, ensure_ascii=False)
-
-    def delete_avatar(self):
-        user = self.model
-
-        root = os.path.join(current_app.config['MEDIA_ROOT'])
-
-        if user.avatar_small:
-            path = os.path.join(root, user.avatar_small)
-            if os.path.isfile(path):
-                os.remove(path)
-            user.avatar_small = ''
-
-        if user.avatar_medium:
-            path = os.path.join(root, user.avatar_medium)
-            if os.path.isfile(path):
-                os.remove(path)
-            user.avatar_medium = ''
-
-        if user.avatar_large:
-            path = os.path.join(root, user.avatar_large)
-            if os.path.isfile(path):
-                os.remove(path)
-            user.avatar_large = ''
-
-    def validate_and_set_avatar(self, image, image_data=None):
-        if not current_app.config['AVATARS_UPLOADING']:
-            raise ValidationError({'avatar': ['Avatar uploading is disabled']})
-
-        from PIL import Image
-
-        user = self.model
-
-        # Валидация размера
-        errors = []
-        if image.size[0] < 16 or image.size[1] < 16:
-            errors.append(lazy_gettext('Too small avatar; must be {w}x{h} or bigger').format(w=16, h=16))
-        if image.size[0] > 512 or image.size[1] > 512:
-            errors.append(lazy_gettext('Too big avatar; must be {w}x{h} or smaller').format(w=512, h=512))
-
-        if errors:
-            raise ValidationError({'avatar': errors})
-
-        # Выбор формата для сохранения
-        if image.format == 'JPEG':
-            frmt = 'JPEG'
-            ext = 'jpg'
-        elif image.format == 'GIF':
-            frmt = 'GIF'
-            ext = 'gif'
-        else:
-            frmt = 'PNG'
-            ext = 'png'
-
-        result = {}
-
-        # Пути для сохранения
-        urlpath = '/'.join(('avatars', str(user.id)))  # equivalent to ospath except Windows!
-        ospath = os.path.join(current_app.config['MEDIA_ROOT'], 'avatars', str(user.id))
-        prefix = str(int(time.time()) - 1451606400) + '_'
-        if not os.path.isdir(ospath):
-            os.makedirs(ospath)
-
-        # Обрезка под квадрат
-        if image.size[0] > image.size[1]:
-            offset = (image.size[0] - image.size[1]) // 2
-            cropped = image.crop((offset, 0, image.size[1] + offset, image.size[1]))
-        elif image.size[0] < image.size[1]:
-            offset = (image.size[1] - image.size[0]) // 2
-            cropped = image.crop((0, offset, image.size[0], image.size[0] + offset))
-        else:
-            cropped = image.copy()
-
-        cropped.load()
-        with cropped:
-            # Сохраняем три размера
-            mindim = min(cropped.size)
-            for name, dim in (('small', 24), ('medium', 100), ('large', 256)):
-                size = (min(mindim, dim), min(mindim, dim))
-                filename = prefix + name + '.' + ext
-                result[name] = urlpath + '/' + filename
-                filepath = os.path.join(ospath, filename)
-
-                if cropped.size == size:
-                    # Если можем, сохраняем картинку как есть
-                    if image.size == size and image_data and image.format == frmt:
-                        with open(filepath, 'wb') as fp:
-                            fp.write(image_data)
-                    else:
-                        # При отличающемся формате или отсутствии оригинала пересохраняем
-                        cropped.save(filepath, frmt, quality=92)
-                else:
-                    # При неподходящем размере изменяем и сохраняем
-                    with cropped.resize(size, Image.ANTIALIAS) as resized:
-                        resized.save(filepath, frmt, quality=92)
-
-        # Удаляем старую аватарку с ФС
-        self.delete_avatar()
-
-        # Сохраняем в БД
-        user.avatar_small = result['small']
-        user.avatar_medium = result['medium']
-        user.avatar_large = result['large']
-
-        # Возвращаем имена сохранённых файлов
-        return result
 
     def register(self, data):
         from mini_fiction.models import RegistrationProfile
@@ -835,10 +724,6 @@ class AuthorBL(BaseBL):
 
     def get_short_name(self):
         return self._model().first_name
-
-    def get_avatar_url(self):
-        if self.model.avatar_large:
-            return url_for('media', filename=self.model.avatar_large)
 
     def get_unread_notifications_count(self):
         user = self.model

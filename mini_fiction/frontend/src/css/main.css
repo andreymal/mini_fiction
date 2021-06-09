@@ -33,7 +33,7 @@ a {
 .logopic {
     height: calc(var(--slides-height) + var(--slides-border) * 2);
     position: relative;
-    background-position: 0 0;
+    background-position: 0 50%;
     background-repeat: no-repeat;
     background-size: cover;
 }

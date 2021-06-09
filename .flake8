@@ -1,9 +1,10 @@
 [flake8]
 max-line-length = 120
-select = E,F,W,C90,I25,VNE,FS,PIE
+select = E,F,W,C90,I25,VNE,PIE
+ignore = FS003
 
 percent-greedy=2
-format-greedy=2
+format-greedy=0
 
 banned-modules =
     typing.Any = What good is typing if it is explicitly violated?.

@@ -8,6 +8,7 @@ from flask_babel import gettext
 from pony.orm import db_session
 
 from mini_fiction import models
+from mini_fiction.logic.adminlog import get_list
 from mini_fiction.utils.views import admin_required
 
 bp = Blueprint('admin_index', __name__)
@@ -17,13 +18,9 @@ bp = Blueprint('admin_index', __name__)
 @db_session
 @admin_required
 def index():
-    log = models.AdminLog.bl.get_list()
-    for x in log['items']:
-        x['admin_url'] = get_adminlog_object_url(x['type_str'], x['object_id'])
-
     ctx = {
         'page_title': gettext('Administration'),
-        'log': log,
+        'log': get_list(),
     }
 
     last_24_hours = datetime.utcnow() - timedelta(days=1)

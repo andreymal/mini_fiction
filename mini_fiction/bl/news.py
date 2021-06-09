@@ -9,14 +9,13 @@ from pony import orm
 
 from mini_fiction.bl.utils import BaseBL
 from mini_fiction.bl.commentable import Commentable
+from mini_fiction.logic.adminlog import log_addition, log_changed_fields, log_deletion
 from mini_fiction.validation import Validator, ValidationError
 from mini_fiction.validation.news import NEWS_ITEM
 
 
 class NewsItemBL(BaseBL, Commentable):
     def create(self, author, data):
-        from mini_fiction.models import AdminLog
-
         data = Validator(NEWS_ITEM).validated(data)
 
         if not author.is_superuser and data.get('is_template'):
@@ -34,12 +33,10 @@ class NewsItemBL(BaseBL, Commentable):
 
         newsitem = self.model(author=author, **data)
         newsitem.flush()
-        AdminLog.bl.create(user=author, obj=newsitem, action=AdminLog.ADDITION)
+        log_addition(by=author, what=newsitem)
         return newsitem
 
     def update(self, author, data):
-        from mini_fiction.models import AdminLog
-
         data = Validator(NEWS_ITEM).validated(data, update=True)
         newsitem = self.model
 
@@ -65,17 +62,11 @@ class NewsItemBL(BaseBL, Commentable):
                 changed_fields |= {key,}
 
         if changed_fields:
-            AdminLog.bl.create(
-                user=author,
-                obj=newsitem,
-                action=AdminLog.CHANGE,
-                fields=sorted(changed_fields),
-            )
+            log_changed_fields(by=author, what=newsitem, fields=sorted(changed_fields))
 
         return newsitem
 
     def delete(self, author):
-        from mini_fiction.models import AdminLog
         from mini_fiction.models import NewsComment, NewsCommentEdit, NewsCommentVote
         from mini_fiction.models import Subscription, Notification
 
@@ -98,7 +89,7 @@ class NewsItemBL(BaseBL, Commentable):
         orm.select(c for c in NewsCommentEdit if c.comment in newsitem.comments).delete(bulk=True)
         newsitem.comments.select().order_by(NewsComment.id.desc()).delete()
 
-        AdminLog.bl.create(user=author, obj=newsitem, action=AdminLog.DELETION)
+        log_deletion(by=author, what=newsitem)
         newsitem.delete()
 
     def hide_shown_newsitem(self):

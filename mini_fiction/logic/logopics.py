@@ -6,8 +6,9 @@ from typing import Dict, List, Optional
 
 from flask import current_app
 
+from mini_fiction.logic.adminlog import log_addition, log_changed_fields, log_deletion
 from mini_fiction.logic.image import LogopicBundle, cleanup_image, save_image
-from mini_fiction.models import AdminLog, Author, Logopic
+from mini_fiction.models import Author, Logopic
 from mini_fiction.utils.misc import call_after_request as later
 from mini_fiction.validation import RawData, ValidationError, Validator
 from mini_fiction.validation.logopics import LOGOPIC, LOGOPIC_FOR_UPDATE
@@ -33,7 +34,7 @@ def create(author: Author, data: RawData) -> Logopic:
     logopic.flush()  # pylint: disable=maybe-no-member
 
     current_app.cache.delete("logopics")
-    AdminLog.bl.create(user=author, obj=logopic, action=AdminLog.ADDITION)
+    log_addition(by=author, what=logopic)
     return logopic
 
 
@@ -62,18 +63,13 @@ def update(logopic: Logopic, author: Author, data: RawData) -> Logopic:
         logopic.updated_at = datetime.utcnow()
         current_app.cache.delete("logopics")
 
-        AdminLog.bl.create(
-            user=author,
-            obj=logopic,
-            action=AdminLog.CHANGE,
-            fields=sorted(changed_fields),
-        )
+        log_changed_fields(by=author, what=logopic, fields=sorted(changed_fields))
 
     return logopic
 
 
 def delete(logopic: Logopic, author: Author) -> None:
-    AdminLog.bl.create(user=author, obj=logopic, action=AdminLog.DELETION)
+    log_deletion(by=author, what=logopic)
     old_saved_image = logopic.image
     later(lambda: cleanup_image(old_saved_image))
     logopic.delete()

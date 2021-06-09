@@ -8,6 +8,7 @@ from flask import current_app, render_template
 from flask_babel import lazy_gettext
 
 from mini_fiction import hashers
+from mini_fiction.logic.adminlog import log_changed_fields, log_changed_generic
 from mini_fiction.logic.image import save_image, AvatarBundle, cleanup_image
 from mini_fiction.utils import random as utils_random
 from mini_fiction.utils.misc import call_after_request as later
@@ -227,13 +228,7 @@ class AuthorBL(BaseBL):
                 changed_fields |= {'extra',}
 
         if modified_by_user and fill_admin_log and changed_fields:
-            from mini_fiction.models import AdminLog
-            AdminLog.bl.create(
-                user=modified_by_user,
-                obj=user,
-                action=AdminLog.CHANGE,
-                fields=sorted(changed_fields),
-            )
+            log_changed_fields(by=modified_by_user, what=user, fields=sorted(changed_fields))
 
         return changed_fields
 
@@ -260,13 +255,8 @@ class AuthorBL(BaseBL):
             user.silent_email = ','.join(silent)
 
         if modified_by_user and fill_admin_log and modified:
-            from mini_fiction.models import AdminLog
-            AdminLog.bl.create(
-                user=modified_by_user,
-                obj=user,
-                action=AdminLog.CHANGE,
-                change_message='Изменены настройки уведомлений на e-mail ({})'.format(', '.join(modified)),
-            )
+            change_message = 'Изменены настройки уведомлений на e-mail ({})'.format(', '.join(modified))
+            log_changed_generic(by=modified_by_user, what=user, message=change_message)
 
         return modified
 
@@ -293,13 +283,8 @@ class AuthorBL(BaseBL):
             user.silent_tracker = ','.join(silent)
 
         if modified_by_user and fill_admin_log and modified:
-            from mini_fiction.models import AdminLog
-            AdminLog.bl.create(
-                user=modified_by_user,
-                obj=user,
-                action=AdminLog.CHANGE,
-                change_message='Изменены настройки уведомлений в трекере ({})'.format(', '.join(modified)),
-            )
+            changed_message = f'Изменены настройки уведомлений в трекере ({", ".join(modified)})'
+            log_changed_generic(by=modified_by_user, what=user, message=changed_message)
 
         return modified
 

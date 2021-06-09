@@ -7,14 +7,13 @@ from flask import current_app, render_template
 from flask_babel import lazy_gettext
 
 from mini_fiction.bl.utils import BaseBL
+from mini_fiction.logic.adminlog import log_addition, log_changed_fields, log_deletion
 from mini_fiction.validation import Validator, ValidationError
 from mini_fiction.validation.staticpages import STATIC_PAGE
 
 
 class StaticPageBL(BaseBL):
     def create(self, author, data):
-        from mini_fiction.models import AdminLog
-
         data = Validator(STATIC_PAGE).validated(data)
 
         if not author.is_superuser and data.get('is_template'):
@@ -32,12 +31,10 @@ class StaticPageBL(BaseBL):
 
         staticpage = self.model(**data)
         staticpage.flush()
-        AdminLog.bl.create(user=author, obj=staticpage, action=AdminLog.ADDITION)
+        log_addition(by=author, what=staticpage)
         return staticpage
 
     def update(self, author, data):
-        from mini_fiction.models import AdminLog
-
         data = Validator(STATIC_PAGE).validated(data, update=True)
         staticpage = self.model
 
@@ -60,25 +57,18 @@ class StaticPageBL(BaseBL):
                 changed_fields |= {key,}
 
         if changed_fields:
-            AdminLog.bl.create(
-                user=author,
-                obj=staticpage,
-                action=AdminLog.CHANGE,
-                fields=sorted(changed_fields),
-            )
+            log_changed_fields(by=author, what=staticpage, fields=sorted(changed_fields))
 
         return staticpage
 
     def delete(self, author):
-        from mini_fiction.models import AdminLog
-
         staticpage = self.model
         if staticpage.name in ('help', 'terms', 'robots.txt') and staticpage.lang == 'none':
             raise ValidationError({'is_template': [lazy_gettext('This is system page, you cannot delete it')]})
         if staticpage.is_template and not author.is_superuser:
             raise ValidationError({'is_template': [lazy_gettext('Access denied')]})
 
-        AdminLog.bl.create(user=author, obj=staticpage, action=AdminLog.DELETION)
+        log_deletion(by=author, what=staticpage)
         staticpage.delete()
 
     def check_renderability(self, author, name, content):

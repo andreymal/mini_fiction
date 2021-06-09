@@ -1,6 +1,7 @@
 from flask_babel import lazy_gettext
 
-from mini_fiction.models import AdminLog, Author, CharacterGroup
+from mini_fiction.logic.adminlog import log_addition, log_changed_fields, log_deletion
+from mini_fiction.models import Author, CharacterGroup
 from mini_fiction.validation import RawData, ValidationError, Validator
 from mini_fiction.validation.sorting import CHARACTER_GROUP
 
@@ -14,7 +15,7 @@ def create(author: Author, data: RawData) -> CharacterGroup:
 
     group = CharacterGroup(**data)
     group.flush()
-    AdminLog.bl.create(user=author, obj=group, action=AdminLog.ADDITION)
+    log_addition(by=author, what=group)
     return group
 
 
@@ -33,14 +34,9 @@ def update(group: CharacterGroup, author: Author, data: RawData) -> None:
             changed_fields |= {key}
 
     if changed_fields:
-        AdminLog.bl.create(
-            user=author,
-            obj=group,
-            action=AdminLog.CHANGE,
-            fields=sorted(changed_fields),
-        )
+        log_changed_fields(by=author, what=group, fields=sorted(changed_fields))
 
 
 def delete(group: CharacterGroup, author: Author) -> None:
-    AdminLog.bl.create(user=author, obj=group, action=AdminLog.DELETION)
+    log_deletion(by=author, what=group)
     group.delete()

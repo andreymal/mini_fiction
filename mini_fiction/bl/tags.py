@@ -11,6 +11,7 @@ from flask_babel import lazy_gettext
 from pony import orm
 
 from mini_fiction.bl.utils import BaseBL
+from mini_fiction.logic.adminlog import log_addition, log_changed_fields, log_changed_generic
 from mini_fiction.validation import Validator, ValidationError
 from mini_fiction.validation.tags import TAG
 from mini_fiction.utils.misc import normalize_tag, call_after_request as later
@@ -297,7 +298,7 @@ class TagBL(BaseBL):
         return None
 
     def create(self, user, data):
-        from mini_fiction.models import Tag, AdminLog
+        from mini_fiction.models import Tag
 
         if not user or not user.is_staff:
             raise ValueError('Not authorized')
@@ -336,7 +337,7 @@ class TagBL(BaseBL):
         )
         tag.flush()
 
-        AdminLog.bl.create(user=user, obj=tag, action=AdminLog.ADDITION)
+        log_addition(by=user, what=tag)
 
         if data.get('reason_to_blacklist'):
             tag.bl.set_blacklist(user, data['reason_to_blacklist'])
@@ -346,7 +347,7 @@ class TagBL(BaseBL):
         return tag
 
     def update(self, user, data):
-        from mini_fiction.models import Tag, AdminLog
+        from mini_fiction.models import Tag
 
         if not user or not user.is_staff:
             raise ValueError('Not authorized')
@@ -396,12 +397,7 @@ class TagBL(BaseBL):
             changes['updated_at'] = datetime.utcnow()
             tag.set(**changes)
 
-            AdminLog.bl.create(
-                user=user,
-                obj=tag,
-                action=AdminLog.CHANGE,
-                fields=set(changes) - {'updated_at'},
-            )
+            log_changed_fields(by=user, what=tag, fields=set(changes) - {'updated_at'})
 
         if 'reason_to_blacklist' in data:
             self.set_blacklist(user, data['reason_to_blacklist'])
@@ -409,7 +405,7 @@ class TagBL(BaseBL):
             self.make_alias_for(user, canonical_tag, data.get('is_hidden_alias', tag.is_hidden_alias))
 
     def set_blacklist(self, user, reason):
-        from mini_fiction.models import StoryTag, StoryTagLog, AdminLog
+        from mini_fiction.models import StoryTag, StoryTagLog
 
         if not user or not user.is_staff:
             raise ValueError('Not authorized')
@@ -454,15 +450,10 @@ class TagBL(BaseBL):
             log_message = 'Тег добавлен в чёрный список.'
         else:
             log_message = 'Тег убран из чёрного списка.'
-        AdminLog.bl.create(
-            user=user,
-            obj=tag,
-            action=AdminLog.CHANGE,
-            change_message=log_message,
-        )
+        log_changed_generic(by=user, what=tag, message=log_message)
 
     def make_alias_for(self, user, canonical_tag, hidden=False):
-        from mini_fiction.models import StoryTag, StoryTagLog, AdminLog
+        from mini_fiction.models import StoryTag, StoryTagLog
 
         if not user or not user.is_staff:
             raise ValueError('Not authorized')
@@ -477,12 +468,7 @@ class TagBL(BaseBL):
             if canonical_tag and bool(hidden) != tag.is_hidden_alias:
                 tag.is_hidden_alias = bool(hidden)
                 tag.updated_at = datetime.utcnow()
-                AdminLog.bl.create(
-                    user=user,
-                    obj=tag,
-                    action=AdminLog.CHANGE,
-                    fields=('is_hidden_alias',),
-                )
+                log_changed_fields(by=user, what=tag, fields=('is_hidden_alias',))
             return
 
         tm = datetime.utcnow()
@@ -536,9 +522,4 @@ class TagBL(BaseBL):
             log_message = 'Тег стал синонимом тега «{}».'.format(tag.is_alias_for.name)
         else:
             log_message = 'Тег перестал быть синонимом.'
-        AdminLog.bl.create(
-            user=user,
-            obj=tag,
-            action=AdminLog.CHANGE,
-            change_message=log_message,
-        )
+        log_changed_generic(by=user, what=tag, message=log_message)

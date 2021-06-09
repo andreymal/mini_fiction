@@ -1,7 +1,8 @@
 from flask_babel import lazy_gettext
 
+from mini_fiction.logic.adminlog import log_addition, log_changed_fields, log_deletion
 from mini_fiction.logic.image import CharacterBundle, cleanup_image, save_image
-from mini_fiction.models import AdminLog, Author, Character, CharacterGroup
+from mini_fiction.models import Author, Character, CharacterGroup
 from mini_fiction.utils.misc import call_after_request as later
 from mini_fiction.validation import RawData, ValidationError, Validator
 from mini_fiction.validation.sorting import CHARACTER, CHARACTER_FOR_UPDATE
@@ -32,7 +33,7 @@ def create(author: Author, data: RawData) -> Character:
     character.image = saved_image
     character.flush()
 
-    AdminLog.bl.create(user=author, obj=character, action=AdminLog.ADDITION)
+    log_addition(by=author, what=character)
 
     return character
 
@@ -78,16 +79,11 @@ def update(character: Character, author: Author, data: RawData) -> None:
             changed_fields |= {key}
 
     if changed_fields:
-        AdminLog.bl.create(
-            user=author,
-            obj=character,
-            action=AdminLog.CHANGE,
-            fields=sorted(changed_fields),
-        )
+        log_changed_fields(by=author, what=character, fields=sorted(changed_fields))
 
 
 def delete(character: Character, author: Author) -> None:
-    AdminLog.bl.create(user=author, obj=character, action=AdminLog.DELETION)
+    log_deletion(by=author, what=character)
     old_saved_image = character.image
     later(lambda: cleanup_image(old_saved_image))
     character.delete()

@@ -4,6 +4,7 @@
 import os
 import sys
 import random
+from pathlib import Path
 
 from mini_fiction import models
 
@@ -167,14 +168,14 @@ class ProjectStatus(Status):
         return self._fail('hasher', 'unknown: {}'.format(hasher))
 
     def media_root(self):
-        root = os.path.abspath(self.app.config['MEDIA_ROOT'])
-        if not isinstance(root, str) or not os.path.isdir(root):
-            return self._fail('media_root', 'not found: {}'.format(root))
+        root: Path = self.app.config['MEDIA_ROOT']
+        if not root.is_dir():
+            return self._fail('media_root', f'not found: {root.as_posix()}')
 
         if not os.access(root, os.R_OK | os.W_OK | os.X_OK):
-            return self._fail('media_root', 'permission denied: {}'.format(root))
+            return self._fail('media_root', f'permission denied: {root.as_posix()}')
 
-        return self._ok('media_root', root)
+        return self._ok('media_root', root.as_posix())
 
     def static_root(self):
         if not self.app.config['STATIC_ROOT']:

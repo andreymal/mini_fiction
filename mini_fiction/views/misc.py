@@ -10,7 +10,7 @@ def localstatic(filename):
 
 
 def media(filename):
-    return send_from_directory(os.path.abspath(current_app.config['MEDIA_ROOT']), filename)
+    return send_from_directory(current_app.config['MEDIA_ROOT'].as_posix(), filename)
 
 
 @db_session
@@ -18,8 +18,8 @@ def dump():
     if not current_app.config.get('ZIP_DUMP_PATH'):
         abort(404)
 
-    path = os.path.join(current_app.config['MEDIA_ROOT'], current_app.config['ZIP_DUMP_PATH'])
-    if not os.path.isfile(path):
+    path = current_app.config['MEDIA_ROOT'] / current_app.config['ZIP_DUMP_PATH']
+    if not path.exists():
         abort(404)
 
     mtime = datetime.utcfromtimestamp(os.stat(path).st_mtime)

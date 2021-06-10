@@ -26,7 +26,7 @@ def create(author: Author, data: RawData) -> Logopic:
     raw_data = data.pop("picture").stream.read()
     saved_image = save_image(bundle=LogopicBundle, raw_data=raw_data)
     if not saved_image:
-        raise ValidationError("Cannot save image")
+        raise ValidationError({"picture": ["Cannot save image"]})
 
     logopic = Logopic(**data)
     logopic.image = saved_image
@@ -48,7 +48,7 @@ def update(logopic: Logopic, author: Author, data: RawData) -> Logopic:
         raw_data = raw_picture.stream.read()
         saved_image = save_image(bundle=LogopicBundle, raw_data=raw_data)
         if not saved_image:
-            raise ValidationError("Cannot save image")
+            raise ValidationError({"picture": ["Cannot save image"]})
         logopic.image = saved_image
         changed_fields |= {"image_bundle"}
         later(lambda: cleanup_image(old_saved_image))

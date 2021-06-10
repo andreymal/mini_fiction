@@ -26,7 +26,7 @@ def create(author: Author, data: RawData) -> Character:
     raw_data = data.pop("picture").stream.read()
     saved_image = save_image(bundle=CharacterBundle, raw_data=raw_data)
     if not saved_image:
-        raise ValidationError("Cannot save image")
+        raise ValidationError({"picture": ["Cannot save image"]})
 
     character = Character(**data)
     character.image = saved_image
@@ -63,7 +63,7 @@ def update(character: Character, author: Author, data: RawData) -> None:
         raw_data = raw_picture.stream.read()
         saved_image = save_image(bundle=CharacterBundle, raw_data=raw_data)
         if not saved_image:
-            raise ValidationError("Cannot save image")
+            raise ValidationError({"picture": ["Cannot save image"]})
         character.image = saved_image
         changed_fields |= {"image_bundle"}
         later(lambda: cleanup_image(old_saved_image))

@@ -1,8 +1,5 @@
-#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
-
-import os
 import time
+from pathlib import Path
 
 import click
 from pony import orm
@@ -21,8 +18,8 @@ from mini_fiction.management.manager import cli
 def zip_dump(path, keep_broken):
     from mini_fiction.dumpload import zip_dump as cmd
     orm.sql_debug(False)
-    path = os.path.abspath(path)
+    path = Path(path)
 
     tm = time.time()
     cmd(path, keep_broken=keep_broken)
-    print('Done with {:.2f}s: {}'.format(time.time() - tm, path))
+    print(f'Done with {time.time() - tm:.2f}s: {path}')

@@ -188,7 +188,7 @@ class Author(db.Entity, UserMixin):
         if value:
             self.image_bundle = value.dict()
         else:
-            del self.image_bundle
+            del self.image
 
     @image.deleter
     def image(self) -> None:

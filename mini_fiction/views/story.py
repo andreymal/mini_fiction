@@ -662,7 +662,7 @@ def download(story_id, filename):
         if not debug:
             if storage_path.exists():
                 storage_path.unlink()
-            storage_path.mkdir(parents=True, exist_ok=True)
+            storage_path.parent.mkdir(parents=True, exist_ok=True)
             storage_path.write_bytes(data)
 
     # TODO: delete file if story was deleted

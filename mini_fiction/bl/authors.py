@@ -255,7 +255,7 @@ class AuthorBL(BaseBL):
             user.silent_email = ','.join(silent)
 
         if modified_by_user and fill_admin_log and modified:
-            change_message = 'Изменены настройки уведомлений на e-mail ({})'.format(', '.join(modified))
+            change_message = f'Изменены настройки уведомлений на e-mail ({", ".join(modified)})'
             log_changed_generic(by=modified_by_user, what=user, message=change_message)
 
         return modified

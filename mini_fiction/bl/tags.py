@@ -519,7 +519,7 @@ class TagBL(BaseBL):
         tag.updated_at = tm
 
         if tag.is_alias_for:
-            log_message = 'Тег стал синонимом тега «{}».'.format(tag.is_alias_for.name)
+            log_message = f'Тег стал синонимом тега «{tag.is_alias_for.name}».'
         else:
             log_message = 'Тег перестал быть синонимом.'
         log_changed_generic(by=user, what=tag, message=log_message)

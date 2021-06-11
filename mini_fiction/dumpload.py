@@ -490,3 +490,4 @@ def zip_dump_media(z: ZipFile, media_files: List[SavedImage]):
             if name.startswith('x'):
                 z.write(media_dir / meta.webp, f'media/{meta.webp}', compress_type=ZIP_DEFLATED)
                 z.write(media_dir / meta.png, f'media/{meta.png}', compress_type=ZIP_DEFLATED)
+                z.write(media_dir / meta.jpeg, f'media/{meta.jpeg}', compress_type=ZIP_DEFLATED)

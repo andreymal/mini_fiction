@@ -12,7 +12,6 @@ from datetime import datetime
 from logging.handlers import SMTPHandler
 
 import jinja2
-import cachelib
 from celery import Celery
 from werkzeug.urls import iri_to_uri
 from werkzeug.utils import import_string

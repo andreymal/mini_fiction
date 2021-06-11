@@ -1,8 +1,6 @@
-#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
-
 import os
 import logging
+from pathlib import Path
 
 from celery.schedules import crontab
 from flask_babel import lazy_gettext
@@ -163,7 +161,7 @@ class Config(object):
     LOCALSTATIC_ROOT = None
     LOCALSTATIC_URL = '/localstatic'
 
-    MEDIA_ROOT = os.path.join(os.getcwd(), 'media')
+    MEDIA_ROOT = Path.cwd() / 'media'
     MEDIA_URL = '/media'
 
     FRONTEND_MANIFEST_PATH = os.path.join(os.path.dirname(__file__), 'static/build/manifest.json')
@@ -275,7 +273,6 @@ class Config(object):
     CHECK_PASSWORDS_SECURITY = True
 
     REGISTRATION_OPEN = True
-    AVATARS_UPLOADING = False
 
     STORY_NOTIFICATIONS_INTERVAL = 3600
 
@@ -478,7 +475,7 @@ class Test(Config):
     }
     DATABASE_CLEANER = {'provider': 'sqlite3'}  # TODO: MySQL and PostgreSQL
     TESTING_DIRECTORY = os.path.join(os.getcwd(), 'testmedia')
-    MEDIA_ROOT = os.path.join(os.getcwd(), 'testmedia', 'media')
+    MEDIA_ROOT = Path.cwd() / 'testmedia' / 'media'
     SQL_DEBUG = False
     CACHE_TYPE = 'null'
     SPHINX_DISABLED = True  # TODO: test it

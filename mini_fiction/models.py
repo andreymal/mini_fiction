@@ -1,7 +1,7 @@
 import json
 import ipaddress
 from datetime import datetime, timedelta
-from pathlib import Path
+from typing import Optional
 
 from pony import orm
 from flask_babel import gettext
@@ -11,6 +11,7 @@ from flask_login import AnonymousUserMixin, UserMixin
 from mini_fiction.database import db
 from mini_fiction.bl.registry import Resource
 from mini_fiction.filters import filter_html, filtered_html_property
+from mini_fiction.logic.image import SavedImage, LogopicBundle, AvatarBundle, CharacterBundle
 from mini_fiction.utils.misc import htmlcrop
 from mini_fiction.utils.random import random_string
 
@@ -18,8 +19,8 @@ from mini_fiction.utils.random import random_string
 class Logopic(db.Entity):
     """ Модель картинки в шапке сайта """
 
-    picture = orm.Required(str, 255)
-    sha256sum = orm.Required(str, 64)
+    picture = orm.Optional(str, 255)  # TODO: Remove after migration
+    image_bundle = orm.Optional(orm.Json, optimistic=False)  # FIXME: Remove this workaround after migration
     visible = orm.Required(bool, default=True)
     description = orm.Optional(orm.LongStr)
     original_link = orm.Optional(str, 255)
@@ -28,12 +29,17 @@ class Logopic(db.Entity):
     updated_at = orm.Required(datetime, 6, default=datetime.utcnow)
 
     @property
-    def url(self):
-        return url_for('media', filename=self.picture)
+    def image(self) -> SavedImage:
+        assert self.image_bundle
+        return SavedImage(**self.image_bundle)
+
+    @image.setter
+    def image(self, value: SavedImage) -> None:
+        self.image_bundle = value.dict()
 
     @property
-    def picture_path(self):
-        return Path(current_app.config['MEDIA_ROOT']) / self.picture
+    def bundle(self) -> LogopicBundle:
+        return self.image.resized
 
 
 class AnonymousUser(AnonymousUserMixin):
@@ -91,9 +97,11 @@ class Author(db.Entity, UserMixin):
     silent_tracker = orm.Optional(orm.LongStr, lazy=False)
     last_viewed_notification_id = orm.Required(int, default=0, optimistic=False)
 
+    # TODO: Remove after migration
     avatar_small = orm.Optional(str, 255)
     avatar_medium = orm.Optional(str, 255)
     avatar_large = orm.Optional(str, 255)
+    image_bundle = orm.Optional(orm.Json, optimistic=False)  # FIXME: Remove this workaround after migration
 
     extra = orm.Required(orm.LongStr, lazy=False, default='{}')
 
@@ -169,6 +177,30 @@ class Author(db.Entity, UserMixin):
     def silent_tracker_list(self):
         return self.silent_tracker.split(',')
 
+    @property
+    def image(self) -> Optional[SavedImage]:
+        if not self.image_bundle:
+            return None
+        return SavedImage(**self.image_bundle)
+
+    @image.setter
+    def image(self, value: Optional[SavedImage]) -> None:
+        if value:
+            self.image_bundle = value.dict()
+        else:
+            del self.image
+
+    @image.deleter
+    def image(self) -> None:
+        self.image_bundle = {}
+
+    @property
+    def bundle(self) -> Optional[AvatarBundle]:
+        # NOTE: This property can be null, because there are users without avatars
+        if not self.image:
+            return None
+        return self.image.resized
+
 
 class RegistrationProfile(db.Entity):
     activation_key = orm.Required(str, 40, unique=True)
@@ -237,8 +269,8 @@ class Character(db.Entity):
     description = orm.Optional(orm.LongStr)
     name = orm.Required(str, 256)
     group = orm.Optional(CharacterGroup)
-    picture = orm.Required(str, 128)
-    sha256sum = orm.Required(str, 64)
+    picture = orm.Optional(str, 128)  # TODO: Remove after migration
+    image_bundle = orm.Optional(orm.Json, optimistic=False)  # FIXME: Remove this workaround after migration
 
     stories = orm.Set('Story')
 
@@ -246,12 +278,17 @@ class Character(db.Entity):
         return self.name
 
     @property
-    def url(self):
-        return url_for('media', filename=self.picture)
+    def image(self) -> SavedImage:
+        assert self.image_bundle
+        return SavedImage(**self.image_bundle)
+
+    @image.setter
+    def image(self, value: SavedImage) -> None:
+        self.image_bundle = value.dict()
 
     @property
-    def picture_path(self):
-        return Path(current_app.config['MEDIA_ROOT']) / self.picture
+    def bundle(self) -> CharacterBundle:
+        return self.image.resized
 
 
 class Category(db.Entity):

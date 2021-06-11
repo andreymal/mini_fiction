@@ -1,9 +1,6 @@
-#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
-
-import os
 from io import StringIO
 from datetime import datetime
+from pathlib import Path
 
 from flask import Blueprint, Response, current_app, request, render_template, abort, redirect, url_for, send_file, jsonify, g
 from flask_babel import gettext
@@ -650,11 +647,11 @@ def download(story_id, filename):
         return redirect(fmt.url(story))
     filepath = 'stories/%s/%s.%s' % (story_id, filename, extension)
 
-    storage_path = os.path.abspath(os.path.join(current_app.config['MEDIA_ROOT'], filepath))
+    storage_path: Path = current_app.config['MEDIA_ROOT'] / filepath
 
     if (
-        not os.path.exists(storage_path) or
-        datetime.fromtimestamp(os.stat(storage_path).st_mtime) < story.updated or
+        not storage_path.exists() or
+        datetime.fromtimestamp(storage_path.stat().st_mtime) < story.updated or
         debug
     ):
         data = fmt.render(
@@ -663,12 +660,10 @@ def download(story_id, filename):
         )
 
         if not debug:
-            if os.path.exists(storage_path):
-                os.remove(storage_path)
-            elif not os.path.isdir(os.path.dirname(storage_path)):
-                os.makedirs(os.path.dirname(storage_path))
-            with open(storage_path, 'wb') as fp:
-                fp.write(data)
+            if storage_path.exists():
+                storage_path.unlink()
+            storage_path.mkdir(parents=True, exist_ok=True)
+            storage_path.write_bytes(data)
 
     # TODO: delete file if story was deleted
     if not debug:
@@ -678,7 +673,7 @@ def download(story_id, filename):
                 'media', filename='stories/{}/{}'.format(story.id, full_filename)
             )
         else:
-            response = send_file(storage_path)
+            response = send_file(storage_path.resolve())
             response.headers['Content-Type'] = fmt.content_type
 
         response.headers['Content-Disposition'] = 'attachment'

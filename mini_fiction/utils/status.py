@@ -4,6 +4,7 @@
 import os
 import sys
 import random
+from pathlib import Path
 
 from mini_fiction import models
 
@@ -167,14 +168,14 @@ class ProjectStatus(Status):
         return self._fail('hasher', 'unknown: {}'.format(hasher))
 
     def media_root(self):
-        root = os.path.abspath(self.app.config['MEDIA_ROOT'])
-        if not isinstance(root, str) or not os.path.isdir(root):
-            return self._fail('media_root', 'not found: {}'.format(root))
+        root: Path = self.app.config['MEDIA_ROOT']
+        if not root.is_dir():
+            return self._fail('media_root', f'not found: {root.as_posix()}')
 
         if not os.access(root, os.R_OK | os.W_OK | os.X_OK):
-            return self._fail('media_root', 'permission denied: {}'.format(root))
+            return self._fail('media_root', f'permission denied: {root.as_posix()}')
 
-        return self._ok('media_root', root)
+        return self._ok('media_root', root.as_posix())
 
     def static_root(self):
         if not self.app.config['STATIC_ROOT']:
@@ -228,17 +229,6 @@ class ProjectStatus(Status):
         # TODO: full config test
 
         return self._ok('sphinx', 'working')
-
-    def avatars(self):
-        if not self.app.config['AVATARS_UPLOADING']:
-            return self._ok('avatars', 'disabled')
-
-        try:
-            from PIL import Image  # pylint: disable=unused-variable
-        except ImportError:
-            return self._fail('avatars', 'enabled, but Pillow is not available')
-        else:
-            return self._ok('avatars', 'enabled')
 
     def celery(self):
         insp = self.app.celery.control.inspect(timeout=0.5)
@@ -378,7 +368,6 @@ class ProjectStatus(Status):
         yield self.localstatic_root()
         yield self.localtemplates()
         yield self.sphinx()
-        yield self.avatars()
         yield self.celery()
         yield self.diff()
         yield self.linter()

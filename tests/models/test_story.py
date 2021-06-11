@@ -50,7 +50,7 @@ def test_story_deletion_full(app, factories):
         # Фикстуры
         cg = models.CharacterGroup(name='Main')
         cg.flush()
-        models.Character(name='Даша', picture='na.png', sha256sum='foo', group=cg).flush()
+        models.Character(name='Даша', group=cg).flush()
         # models.Category(name='Приключения').flush()
         # models.Classifier(name='Особо жестокие сцены').flush()
         models.Tag(name='Приключения', iname='приключения').flush()

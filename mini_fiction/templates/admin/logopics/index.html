@@ -10,7 +10,7 @@
         <ul>
         {% for logopic in logopics %}
             <li style="margin: 4px 0;">
-                <a href="{{ url_for('admin_logopics.update', pk=logopic.id) }}"><img src="{{ logopic.url }}" alt="" style="height: 96px;" /></a>
+                <a href="{{ url_for('admin_logopics.update', pk=logopic.id) }}"><img src="{{ url_for('media', filename=logopic.bundle.x1194.webp) }}" alt="" style="height: 96px;" /></a>
             </li>
         {% endfor %}
         </ul>

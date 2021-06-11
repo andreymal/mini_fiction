@@ -12,7 +12,7 @@
         <h1>{{ page_title }}</h1>
 
         {% if edit %}
-            <div style="margin: 8px -20px;"><img src="{{ logopic.url }}" alt="" style="width: 100%;" /></div>
+            <div style="margin: 8px -20px;"><img src="{{ url_for('media', filename=logopic.bundle.x1194.webp) }}" alt="" style="width: 100%;" /></div>
         {% endif %}
 
         {% if saved %}<div class="alert-mini green">{{ _('Saved!') }}</div>{% endif %}

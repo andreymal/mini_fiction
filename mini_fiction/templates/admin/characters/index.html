@@ -1,5 +1,6 @@
 {% extends base %}
 {% from 'macro.html' import breadcrumbs, paginator with context %}
+{% from 'macro.html' import character_picture %}
 {% block content %}
 
 <div class="row">
@@ -10,7 +11,7 @@
         <ul>
         {% for character in characters %}
             <li>
-                <a href="{{ url_for('admin_characters.update', pk=character.id) }}"><img src="{{ character.url }}" alt="{{ character.name }}" title="{{ character.name }}" /> {{ character.name }}</a>
+                <a href="{{ url_for('admin_characters.update', pk=character.id) }}">{{ character_picture(character) }} {{ character.name }}</a>
             </li>
         {% endfor %}
         </ul>

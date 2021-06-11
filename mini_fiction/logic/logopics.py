@@ -2,21 +2,20 @@ import random
 import time
 from dataclasses import dataclass
 from datetime import datetime
-from pathlib import Path
 from typing import Dict, List, Optional
 
 from flask import current_app
 
+from mini_fiction.logic.image import LogopicBundle, cleanup_image, save_image
 from mini_fiction.models import AdminLog, Author, Logopic
-from mini_fiction.utils.image import ImageKind, save_image
 from mini_fiction.utils.misc import call_after_request as later
-from mini_fiction.validation import RawData, Validator
+from mini_fiction.validation import RawData, ValidationError, Validator
 from mini_fiction.validation.logopics import LOGOPIC, LOGOPIC_FOR_UPDATE
 
 
 @dataclass
 class PreparedLogopic:
-    url: str
+    bundle: LogopicBundle
     original_link: str
     original_link_label: Dict[str, str]
 
@@ -24,17 +23,14 @@ class PreparedLogopic:
 def create(author: Author, data: RawData) -> Logopic:
     data = Validator(LOGOPIC).validated(data)
 
-    picture = data.pop("picture").stream.read()
-    picture_metadata = save_image(
-        kind=ImageKind.LOGOPICS, data=picture, extension="jpg"
-    )
+    raw_data = data.pop("picture").stream.read()
+    saved_image = save_image(bundle=LogopicBundle, raw_data=raw_data)
+    if not saved_image:
+        raise ValidationError({"picture": ["Cannot save image"]})
 
-    logopic = Logopic(
-        picture=picture_metadata.relative_path,
-        sha256sum=picture_metadata.sha256sum,
-        **data
-    )
-    logopic.flush()
+    logopic = Logopic(**data)
+    logopic.image = saved_image
+    logopic.flush()  # pylint: disable=maybe-no-member
 
     current_app.cache.delete("logopics")
     AdminLog.bl.create(user=author, obj=logopic, action=AdminLog.ADDITION)
@@ -46,27 +42,21 @@ def update(logopic: Logopic, author: Author, data: RawData) -> Logopic:
 
     changed_fields = set()
 
-    old_path: Optional[Path] = None
+    raw_picture = data.pop("picture", None)
+    if raw_picture:
+        old_saved_image = logopic.image
+        raw_data = raw_picture.stream.read()
+        saved_image = save_image(bundle=LogopicBundle, raw_data=raw_data)
+        if not saved_image:
+            raise ValidationError({"picture": ["Cannot save image"]})
+        logopic.image = saved_image
+        changed_fields |= {"image_bundle"}
+        later(lambda: cleanup_image(old_saved_image))
 
     for key, value in data.items():
-        if key == "picture":
-            if value:
-                picture = value.stream.read()
-                old_path = logopic.picture_path
-                picture_metadata = save_image(
-                    kind=ImageKind.LOGOPICS, data=picture, extension="jpg"
-                )
-                logopic.picture = picture_metadata.relative_path
-                logopic.sha256sum = picture_metadata.sha256sum
-                changed_fields |= {
-                    "picture",
-                }
-        else:
-            if getattr(logopic, key) != value:
-                setattr(logopic, key, value)
-                changed_fields |= {
-                    key,
-                }
+        if getattr(logopic, key) != value:
+            setattr(logopic, key, value)
+            changed_fields |= {key}
 
     if changed_fields:
         logopic.updated_at = datetime.utcnow()
@@ -79,16 +69,13 @@ def update(logopic: Logopic, author: Author, data: RawData) -> Logopic:
             fields=sorted(changed_fields),
         )
 
-    if old_path and old_path.exists():
-        later(lambda: old_path.unlink())
     return logopic
 
 
 def delete(logopic: Logopic, author: Author) -> None:
     AdminLog.bl.create(user=author, obj=logopic, action=AdminLog.DELETION)
-    old_path = logopic.picture_path
-    if old_path and old_path.exists():
-        later(lambda: old_path.unlink())
+    old_saved_image = logopic.image
+    later(lambda: cleanup_image(old_saved_image))
     logopic.delete()
     current_app.cache.delete("logopics")
 
@@ -99,7 +86,7 @@ def get_all() -> List[PreparedLogopic]:
         return result
 
     result = []
-    for lp in Logopic.select(lambda x: x.visible):
+    for lp in Logopic.select(lambda x: x.visible):  # type: Logopic
 
         original_link_label = {"": ""}
         for line in lp.original_link_label.split("\n"):
@@ -113,7 +100,7 @@ def get_all() -> List[PreparedLogopic]:
                 original_link_label[""] = line
         result.append(
             PreparedLogopic(
-                url=lp.url,
+                bundle=lp.bundle,
                 original_link=lp.original_link,
                 original_link_label=original_link_label,
             )

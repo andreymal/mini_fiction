@@ -62,10 +62,24 @@
 
 
 {% macro user_avatar(user) -%}
-    {%- set avatar = user.bl.get_avatar_url() -%}
+    {%- set avatar = user.bundle -%}
     <div class="user-avatar-container {% if not avatar %}user-avatar-placeholder{% endif %}">
     {% if avatar %}
-        <img src="{{ avatar }}" title="{{ user.username }}" alt="{{ user.username }}"/>
+        <picture>
+            <source srcset="{{ url_for('media', filename=avatar.x32.webp) }} 1x,
+                            {{ url_for('media', filename=avatar.x48.webp) }} 1.5x,
+                            {{ url_for('media', filename=avatar.x64.webp) }} 2x,
+                            {{ url_for('media', filename=avatar.x128.webp) }} 3x"
+                    type="image/webp">
+            <source srcset="{{ url_for('media', filename=avatar.x32.png) }} 1x,
+                            {{ url_for('media', filename=avatar.x48.png) }} 1.5x,
+                            {{ url_for('media', filename=avatar.x64.png) }} 2x,
+                            {{ url_for('media', filename=avatar.x128.png) }} 3x"
+                    type="image/png">
+            <img src="{{ url_for('media', filename=avatar.x32.jpeg) }}"
+                 alt="{{ user.username }}"
+                 title="{{ user.username }}">
+        </picture>
     {% endif %}
     </div>
 {%- endmacro %}
@@ -277,4 +291,19 @@
             <a href="{{ page_obj.url_for_page(page_id) }}" class="btn{% if page_id == page_obj.number %} btn-primary{% endif %}">{{ page_id }}</a>
         {% endfor %}
     </div>
+{%- endmacro %}
+
+
+{% macro character_picture(character) -%}
+    <picture>
+        <source srcset="{{ url_for('media', filename=character.bundle.x32.webp) }}"
+                sizes="32px"
+                type="image/webp">
+        <source srcset="{{ url_for('media', filename=character.bundle.x32.png) }}"
+                sizes="32px"
+                type="image/png">
+        <img src="{{ url_for('media', filename=character.bundle.x32.jpeg) }}"
+             alt="{{ character.name }}"
+             title="{{ character.name }}">
+    </picture>
 {%- endmacro %}

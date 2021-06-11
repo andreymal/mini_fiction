@@ -98,9 +98,7 @@ def update(htmlblock: HtmlBlock, author: Author, data: RawData) -> None:
     for key, value in data.items():
         if getattr(htmlblock, key) != value:
             setattr(htmlblock, key, value)
-            changed_fields |= {
-                key,
-            }
+            changed_fields |= {key}
 
     later(clear_cache, old_name)
     if htmlblock.name != old_name:

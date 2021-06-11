@@ -55,6 +55,10 @@ class AnonymousUser(AnonymousUserMixin):
     timezone = ''
 
 
+# Anon, just anon
+ANON = AnonymousUser()
+
+
 class Author(db.Entity, UserMixin):
     """Модель автора"""
 

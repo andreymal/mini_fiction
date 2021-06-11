@@ -6,7 +6,7 @@ from flask_babel import lazy_gettext
 from typing_extensions import TypedDict
 
 from mini_fiction.logic.adminlog import log_addition, log_changed_fields, log_deletion
-from mini_fiction.models import AnonymousUser, Author, HtmlBlock
+from mini_fiction.models import ANON, AnonymousUser, Author, HtmlBlock
 from mini_fiction.utils.misc import call_after_request as later
 from mini_fiction.validation import RawData, ValidationError, Validator
 from mini_fiction.validation.htmlblocks import HTML_BLOCK
@@ -37,12 +37,6 @@ EMPTY_BLOCK = RenderedHtmlBlock()
 ERROR_BLOCK = RenderedHtmlBlock(
     content='<span style="color: red; font-size: 1.5em; display: inline-block;">[ERROR]</span>'
 )
-
-DEFAULT_CONTEXT: HtmlBlockContext = {
-    "htmlblock_name": "",
-    "htmlblock_title": "",
-    "current_user": None,
-}
 
 
 def create(author: Author, data: RawData) -> HtmlBlock:
@@ -143,13 +137,8 @@ def check_renderability(
             }
         ) from exc
 
-    if htmlblock:
-        context = _render_context(htmlblock)
-    else:
-        context = DEFAULT_CONTEXT
-
     try:
-        context["current_user"] = AnonymousUser()
+        context = _render_context(htmlblock, ANON)
         render_template(template, **context)
     except Exception as exc:
         raise ValidationError(
@@ -163,7 +152,7 @@ def check_renderability(
         ) from exc
 
     try:
-        context["current_user"] = author
+        context = _render_context(htmlblock, author)
         render_template(template, **context)
     except Exception as exc:
         raise ValidationError(
@@ -177,7 +166,10 @@ def check_renderability(
         ) from exc
 
 
-def render_block(htmlblock: HtmlBlock) -> RenderedHtmlBlock:
+def render_block(
+    htmlblock: HtmlBlock,
+    user: Union[Author, AnonymousUser],
+) -> RenderedHtmlBlock:
     rendered_block = RenderedHtmlBlock(
         name=htmlblock.name,
         lang=htmlblock.lang,
@@ -189,14 +181,20 @@ def render_block(htmlblock: HtmlBlock) -> RenderedHtmlBlock:
 
     template = current_app.jinja_env.from_string(htmlblock.content)
     template.name = f"db/htmlblocks/{htmlblock.name}.html"
-    rendered_block.content = render_template(template, **_render_context(htmlblock))
+    rendered_block.content = render_template(
+        template,
+        **_render_context(htmlblock, user),
+    )
 
     return rendered_block
 
 
-def _render_context(htmlblock: HtmlBlock) -> HtmlBlockContext:
+def _render_context(
+    htmlblock: Optional[HtmlBlock],
+    user: Union[Author, AnonymousUser],
+) -> HtmlBlockContext:
     return {
-        "htmlblock_name": htmlblock.name,
-        "htmlblock_title": htmlblock.title,
-        "current_user": None,
+        "htmlblock_name": htmlblock.name if htmlblock else "",
+        "htmlblock_title": htmlblock.title if htmlblock else "",
+        "current_user": user,
     }

@@ -1,6 +1,7 @@
 import traceback
 
 from flask import current_app, g
+from flask_login import current_user
 
 from mini_fiction.logic import htmlblocks
 from mini_fiction.logic.htmlblocks import RenderedHtmlBlock
@@ -22,7 +23,7 @@ def html_block(name, ignore_missing=True):
 
         try:
             if block:
-                rendered_block = htmlblocks.render_block(block)
+                rendered_block = htmlblocks.render_block(block, current_user)
             else:
                 rendered_block = None
 

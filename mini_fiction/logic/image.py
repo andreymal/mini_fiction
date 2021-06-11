@@ -123,6 +123,7 @@ def _save_resized_image(
         (media_root / webp_path).write_bytes(result.webp)
         # Maybe, someday, we will remove this fallback
         (media_root / png_path).write_bytes(result.png)
+        (media_root / jpeg_path).write_bytes(result.jpeg)
 
         kw[f"x{width}"] = ImageMeta(
             webp=webp_path.as_posix(),
@@ -201,6 +202,9 @@ def cleanup_image(saved_image: SavedImage) -> None:
             png_file = media_root / meta.png
             if png_file.exists():
                 png_file.unlink()
+            jpeg_file = media_root / meta.jpeg
+            if jpeg_file.exists():
+                jpeg_file.unlink()
 
     original_path = media_root / saved_image.original
     if original_path.exists():

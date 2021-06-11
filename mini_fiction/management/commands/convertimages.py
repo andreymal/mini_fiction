@@ -13,10 +13,7 @@ from mini_fiction.models import Logopic, Character, Author
 def _process_image(model, bundle_kind: Type[ImageBundle], debug: bool = False) -> None:
     media_root: Path = current_app.config["MEDIA_ROOT"]
     if not model.image_bundle:
-        print(f'There are no image_bundle for {model}, probably got consistency error')
-        return
-    if not model.image:
-        print(f'There are no image for {model}, probably it is not set at all')
+        print(f'There are no image_bundle for {model}, no need to do something')
         return
 
     raw_data = (media_root / model.image.original).read_bytes()

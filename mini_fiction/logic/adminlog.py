@@ -108,7 +108,7 @@ def get_list(offset: int = 0, limit: int = 20, order_desc: bool = True) -> Rende
             if obj.user
             else None,
             "type": obj.type.id,
-            "type_str": _types_cache_rev.get(obj.type.id, "N/A"),
+            "type_str": type_str,
             "object_id": ast.literal_eval(obj.object_id),
             "object_id_str": obj.object_id,
             "object_repr": obj.object_repr,
@@ -117,10 +117,6 @@ def get_list(offset: int = 0, limit: int = 20, order_desc: bool = True) -> Rende
             "action_time": obj.action_time,
             "admin_url": _get_object_url(type_str, object_id),
         }
-
-        if item["type_str"] == "N/A":
-            load_logs_type_cache()
-            item["type_str"] = _types_cache_rev.get(obj.type.id, "N/A")
 
         result.append(item)
 

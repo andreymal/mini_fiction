@@ -10,6 +10,7 @@ from pony.orm import db_session
 
 from mini_fiction import database, fixtures
 from mini_fiction.application import create_app
+from mini_fiction.logic.adminlog import load_logs_type_cache
 
 # pylint: disable=W0621
 
@@ -77,8 +78,6 @@ def wait_ajax(selenium):
 
 @pytest.fixture(scope="function", autouse=True)
 def database_cleaner(request):
-    from mini_fiction.models import AdminLog
-
     if 'nodbcleaner' in request.keywords:
         yield
         return
@@ -86,7 +85,7 @@ def database_cleaner(request):
     assert flask_app.config['DATABASE_CLEANER']['provider'] in ('sqlite3',)
     try:
         with db_session:  # FIXME: документация Pony ORM не советует так делать
-            AdminLog.bl._load_type_cache()
+            load_logs_type_cache()
             yield
     finally:
         database.db.rollback()

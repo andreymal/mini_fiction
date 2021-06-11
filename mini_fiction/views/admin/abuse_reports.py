@@ -7,6 +7,7 @@ from flask import Blueprint, render_template, abort, url_for, redirect, request
 from flask_login import current_user
 from pony.orm import select, db_session
 
+from mini_fiction.logic.adminlog import log_changed_fields
 from mini_fiction.utils.views import admin_required
 from mini_fiction import models
 from mini_fiction.utils.misc import Paginator
@@ -199,12 +200,7 @@ def _update_abuses(abuses, user, status):
             changed_fields |= {'ignored', 'accepted'}
 
         if changed_fields:
-            models.AdminLog.bl.create(
-                user=user,
-                obj=abuse,
-                action=models.AdminLog.CHANGE,
-                fields=sorted(changed_fields),
-            )
+            log_changed_fields(by=user, what=abuse, fields=sorted(changed_fields))
             changed_abuses.append(abuse)
 
     return changed_abuses

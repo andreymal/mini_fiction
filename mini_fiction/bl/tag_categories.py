@@ -6,14 +6,13 @@
 from flask_babel import lazy_gettext
 
 from mini_fiction.bl.utils import BaseBL
+from mini_fiction.logic.adminlog import log_addition, log_changed_fields, log_deletion
 from mini_fiction.validation import Validator, ValidationError
 from mini_fiction.validation.tag_categories import TAG_CATEGORY
 
 
 class TagCategoryBL(BaseBL):
     def create(self, author, data):
-        from mini_fiction.models import AdminLog
-
         data = Validator(TAG_CATEGORY).validated(data)
 
         exist_tag_category = self.model.get(name=data['name'])
@@ -22,13 +21,11 @@ class TagCategoryBL(BaseBL):
 
         tag_category = self.model(**data)
         tag_category.flush()
-        AdminLog.bl.create(user=author, obj=tag_category, action=AdminLog.ADDITION)
+        log_addition(by=author, what=tag_category)
 
         return tag_category
 
     def update(self, author, data):
-        from mini_fiction.models import AdminLog
-
         data = Validator(TAG_CATEGORY).validated(data, update=True)
         tag_category = self.model
 
@@ -45,16 +42,10 @@ class TagCategoryBL(BaseBL):
                 changed_fields |= {key,}
 
         if changed_fields:
-            AdminLog.bl.create(
-                user=author,
-                obj=tag_category,
-                action=AdminLog.CHANGE,
-                fields=sorted(changed_fields),
-            )
+            log_changed_fields(by=author, what=tag_category, fields=sorted(changed_fields))
 
         return tag_category
 
     def delete(self, author):
-        from mini_fiction.models import AdminLog
-        AdminLog.bl.create(user=author, obj=self.model, action=AdminLog.DELETION)
+        log_deletion(by=author, what=self.model)
         self.model.delete()

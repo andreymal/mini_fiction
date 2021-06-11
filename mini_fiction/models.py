@@ -1247,10 +1247,6 @@ class AdminLog(db.Entity):
     """Лог изменений в админке"""
     # ported from django
 
-    ADDITION = 1
-    CHANGE = 2
-    DELETION = 3
-
     action_time = orm.Required(datetime, 6, default=datetime.utcnow)
     user = orm.Optional(Author)
     type = orm.Required(AdminLogType)
@@ -1258,5 +1254,3 @@ class AdminLog(db.Entity):
     object_repr = orm.Optional(str, 255, autostrip=False)
     action_flag = orm.Required(int, size=8)
     change_message = orm.Optional(orm.LongStr)
-
-    bl = Resource('bl.adminlog')

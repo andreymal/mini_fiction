@@ -154,7 +154,7 @@ def _log_event(
     by: Author,
     what: Entity,
     action: AdminLogActionKind,
-    change_message: Optional[str] = None,
+    change_message: str = '',
 ) -> None:
     type_str = str(what.__class__.__name__).lower()
     type_id = _get_or_create_type_id(type_str)

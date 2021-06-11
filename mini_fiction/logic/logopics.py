@@ -30,7 +30,7 @@ def create(author: Author, data: RawData) -> Logopic:
 
     logopic = Logopic(**data)
     logopic.image = saved_image
-    logopic.flush()  # pylint: disable=maybe-no-member
+    logopic.flush()
 
     current_app.cache.delete("logopics")
     AdminLog.bl.create(user=author, obj=logopic, action=AdminLog.ADDITION)

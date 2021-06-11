@@ -3,10 +3,8 @@ import sys
 from datetime import datetime
 from io import BytesIO
 from pathlib import Path
-from typing import Set
+from typing import List
 from zipfile import ZIP_DEFLATED, ZipFile, ZipInfo
-
-from pydantic import parse_raw_as
 
 from mini_fiction import ponydump
 from mini_fiction.logic.image import SavedImage
@@ -85,6 +83,7 @@ zip_dump_params = {
             'id', 'image_bundle', 'visible', 'description',
             'original_link', 'original_link_label', 'created_at', 'updated_at',
         ),
+        'exclude': ('picture',),  # TODO: remove legacy field later
         'datekey': 'updated_at',
         'media': ('image_bundle',),
     },
@@ -94,7 +93,10 @@ zip_dump_params = {
     },
     'character': {
         'include': ('id', 'name', 'description', 'image_bundle', 'group'),
-        'exclude': ('stories',),
+        'exclude': (
+            'stories',
+            'picture',  # TODO: remove legacy field later
+        ),
         'media': ('image_bundle',),
     },
     'tagcategory': {
@@ -141,6 +143,7 @@ zip_dump_params = {
             'silent_email', 'silent_tracker', 'comments_per_page', 'header_mode', 'extra',
             'ban_reason', 'published_stories_count', 'all_story_comments_count', 'timezone',
             'session_token',
+            'avatar_small', 'avatar_medium', 'avatar_large',  # TODO: remove legacy fields later
         ),
         'override': {'email': '', 'password': ''},
         'with_collections': False,
@@ -377,11 +380,11 @@ def zip_dump(path: Path, params=None, keep_broken=False):
 
     try:
         with ZipFile(path, 'w', compression=ZIP_DEFLATED) as z:  # type: ZipFile
-            media_files: Set[SavedImage] = set()
+            media_files: List[SavedImage] = []
 
             # Дампим БД и попутно собираем список файлов из media
             for name, e_params in params.items():
-                media_files |= zip_dump_db_entity(z, mfd, name, e_params)
+                media_files.extend(zip_dump_db_entity(z, mfd, name, e_params))
 
             # Дампим файлы из media
             zip_dump_media(z, media_files)
@@ -393,7 +396,7 @@ def zip_dump(path: Path, params=None, keep_broken=False):
         raise
 
 
-def zip_dump_db_entity(z: ZipFile, mfd: MiniFictionDump, name: str, e_params) -> Set[SavedImage]:
+def zip_dump_db_entity(z: ZipFile, mfd: MiniFictionDump, name: str, e_params) -> List[SavedImage]:
     from pony import orm
     from flask import current_app
 
@@ -403,7 +406,7 @@ def zip_dump_db_entity(z: ZipFile, mfd: MiniFictionDump, name: str, e_params) ->
     media = e_params.get('media') or ()
 
     date = [None]
-    media_files: Set[SavedImage] = set()
+    media_files: List[SavedImage] = []
 
     def sanitizer(dump):
         for obj in dump[:]:
@@ -435,8 +438,8 @@ def zip_dump_db_entity(z: ZipFile, mfd: MiniFictionDump, name: str, e_params) ->
             # Если есть поля, указывающие на файлы в media, то дампим эти файлы
             for attr in media:
                 if obj.get(attr):
-                    assert isinstance(obj[attr], str)
-                    media_files.add(parse_raw_as(SavedImage, obj[attr]))
+                    assert isinstance(obj[attr], dict)
+                    media_files.append(SavedImage.parse_obj(obj[attr]))
 
             # Если у модели есть дата, самую позднюю будем использовать как дату файла в архиве
             # (date[0] вместо просто date для имитации nonlocal в старых питонах)
@@ -475,7 +478,7 @@ def zip_dump_db_entity(z: ZipFile, mfd: MiniFictionDump, name: str, e_params) ->
     return media_files
 
 
-def zip_dump_media(z: ZipFile, media_files: Set[SavedImage]):
+def zip_dump_media(z: ZipFile, media_files: List[SavedImage]):
     from flask import current_app
     media_dir = current_app.config['MEDIA_ROOT']
 

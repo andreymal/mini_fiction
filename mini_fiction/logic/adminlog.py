@@ -78,10 +78,7 @@ def load_logs_type_cache() -> None:
 
 
 def get_list(offset: int = 0, limit: int = 20, order_desc: bool = True) -> RenderedLog:
-    if limit < 1:
-        limit = 1
-    elif limit > 1000:
-        limit = 1000
+    limit = max(1, min(limit, 1000))
 
     objects = AdminLog.select()
     if order_desc:

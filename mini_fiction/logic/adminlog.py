@@ -170,7 +170,11 @@ def _log_event(
 
 
 def log_addition(*, by: Author, what: Entity) -> None:
-    _log_event(by=by, what=what, action=AdminLogActionKind.ADDITION)
+    _log_event(
+        by=by,
+        what=what,
+        action=AdminLogActionKind.ADDITION,
+    )
 
 
 def log_deletion(*, by: Author, what: Entity) -> None:

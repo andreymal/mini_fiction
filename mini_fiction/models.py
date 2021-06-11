@@ -19,7 +19,6 @@ from mini_fiction.utils.random import random_string
 class Logopic(db.Entity):
     """ Модель картинки в шапке сайта """
 
-    picture = orm.Optional(str, 255)  # TODO: Remove after migration
     image_bundle = orm.Optional(orm.Json, optimistic=False)  # FIXME: Remove this workaround after migration
     visible = orm.Required(bool, default=True)
     description = orm.Optional(orm.LongStr)
@@ -97,10 +96,6 @@ class Author(db.Entity, UserMixin):
     silent_tracker = orm.Optional(orm.LongStr, lazy=False)
     last_viewed_notification_id = orm.Required(int, default=0, optimistic=False)
 
-    # TODO: Remove after migration
-    avatar_small = orm.Optional(str, 255)
-    avatar_medium = orm.Optional(str, 255)
-    avatar_large = orm.Optional(str, 255)
     image_bundle = orm.Optional(orm.Json, optimistic=False)  # FIXME: Remove this workaround after migration
 
     extra = orm.Required(orm.LongStr, lazy=False, default='{}')
@@ -269,7 +264,6 @@ class Character(db.Entity):
     description = orm.Optional(orm.LongStr)
     name = orm.Required(str, 256)
     group = orm.Optional(CharacterGroup)
-    picture = orm.Optional(str, 128)  # TODO: Remove after migration
     image_bundle = orm.Optional(orm.Json, optimistic=False)  # FIXME: Remove this workaround after migration
 
     stories = orm.Set('Story')

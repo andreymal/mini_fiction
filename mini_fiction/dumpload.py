@@ -83,7 +83,6 @@ zip_dump_params = {
             'id', 'image_bundle', 'visible', 'description',
             'original_link', 'original_link_label', 'created_at', 'updated_at',
         ),
-        'exclude': ('picture',),  # TODO: remove legacy field later
         'datekey': 'updated_at',
         'media': ('image_bundle',),
     },
@@ -95,7 +94,6 @@ zip_dump_params = {
         'include': ('id', 'name', 'description', 'image_bundle', 'group'),
         'exclude': (
             'stories',
-            'picture',  # TODO: remove legacy field later
         ),
         'media': ('image_bundle',),
     },
@@ -143,7 +141,6 @@ zip_dump_params = {
             'silent_email', 'silent_tracker', 'comments_per_page', 'header_mode', 'extra',
             'ban_reason', 'published_stories_count', 'all_story_comments_count', 'timezone',
             'session_token',
-            'avatar_small', 'avatar_medium', 'avatar_large',  # TODO: remove legacy fields later
         ),
         'override': {'email': '', 'password': ''},
         'with_collections': False,

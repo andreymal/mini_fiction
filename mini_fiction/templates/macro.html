@@ -76,7 +76,7 @@
                             {{ url_for('media', filename=avatar.x64.png) }} 2x,
                             {{ url_for('media', filename=avatar.x128.png) }} 3x"
                     type="image/png">
-            <img src="{{ url_for('media', filename=avatar.x32.png) }}"
+            <img src="{{ url_for('media', filename=avatar.x32.jpeg) }}"
                  alt="{{ user.username }}"
                  title="{{ user.username }}">
         </picture>
@@ -302,7 +302,7 @@
         <source srcset="{{ url_for('media', filename=character.bundle.x32.png) }}"
                 sizes="32px"
                 type="image/png">
-        <img src="{{ url_for('media', filename=character.bundle.x32.png) }}"
+        <img src="{{ url_for('media', filename=character.bundle.x32.jpeg) }}"
              alt="{{ character.name }}"
              title="{{ character.name }}">
     </picture>

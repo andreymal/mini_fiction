@@ -83,7 +83,7 @@ def _resize_image(
 
     webp_buffer = BytesIO()
     png_buffer = BytesIO()
-    with image.resize((desired_width, desired_height), resample=LANCZOS) as resized:
+    with image.convert('RGBA').resize((desired_width, desired_height), resample=LANCZOS) as resized:
         resized.save(webp_buffer, format="WEBP", quality=IMAGE_QUALITY)
         resized.save(png_buffer, format="PNG", quality=IMAGE_QUALITY)
 

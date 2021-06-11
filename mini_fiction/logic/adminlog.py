@@ -139,36 +139,34 @@ def _get_or_create_type_id(type_str: str) -> int:
     return new_type.id
 
 
+def _generate_change_message(fields: Collection[str]) -> str:
+    msg = ["Изменен "]
+    for index, field in enumerate(fields):
+        if index > 0:
+            msg.append(" и " if index == len(fields) - 1 else ", ")
+        msg.append(field)
+    msg.append(".")
+    return "".join(msg)
+
+
 def _log_event(
     *,
     by: Author,
     what: Entity,
     action: AdminLogActionKind,
-    fields: Collection[str] = (),
     change_message: Optional[str] = None,
 ) -> None:
-    if change_message is None:
-        msg = ["Изменен "]
-        for index, field in enumerate(fields):
-            if index > 0:
-                msg.append(" и " if index == len(fields) - 1 else ", ")
-            msg.append(field)
-        msg.append(".")
-        change_message = "".join(msg)
-        del msg
-
     type_str = str(what.__class__.__name__).lower()
     type_id = _get_or_create_type_id(type_str)
 
-    logitem = AdminLog(
+    AdminLog(
         user=by,
         type=type_id,
         object_id=str(what.get_pk()),
         object_repr=str(what),
         action_flag=action.value,
         change_message=change_message,
-    )
-    logitem.flush()
+    ).flush()
 
 
 def log_addition(*, by: Author, what: Entity) -> None:
@@ -176,14 +174,27 @@ def log_addition(*, by: Author, what: Entity) -> None:
 
 
 def log_deletion(*, by: Author, what: Entity) -> None:
-    _log_event(by=by, what=what, action=AdminLogActionKind.DELETION)
+    _log_event(
+        by=by,
+        what=what,
+        action=AdminLogActionKind.DELETION,
+    )
 
 
 def log_changed_fields(*, by: Author, what: Entity, fields: Collection[str]) -> None:
-    _log_event(by=by, what=what, fields=fields, action=AdminLogActionKind.CHANGE)
+    message = _generate_change_message(fields)
+    _log_event(
+        by=by,
+        what=what,
+        change_message=message,
+        action=AdminLogActionKind.CHANGE,
+    )
 
 
 def log_changed_generic(*, by: Author, what: Entity, message: str) -> None:
     _log_event(
-        by=by, what=what, change_message=message, action=AdminLogActionKind.CHANGE
+        by=by,
+        what=what,
+        change_message=message,
+        action=AdminLogActionKind.CHANGE,
     )

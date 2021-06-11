@@ -87,10 +87,11 @@ def _resize_image(
     webp_buffer = BytesIO()
     png_buffer = BytesIO()
     jpeg_buffer = BytesIO()
-    with image.resize((desired_width, desired_height), resample=LANCZOS) as resized:
-        resized.convert("RGBA").save(webp_buffer, format="WEBP", quality=IMAGE_QUALITY)
-        resized.convert("RGBA").save(png_buffer, format="PNG", quality=IMAGE_QUALITY)
-        resized.convert("RGB").save(jpeg_buffer, format="JPEG", quality=IMAGE_QUALITY)
+    with image.convert("RGBA").resize((desired_width, desired_height), resample=LANCZOS) as resized:
+        resized.save(webp_buffer, format="WEBP", quality=IMAGE_QUALITY)
+        resized.save(png_buffer, format="PNG", quality=IMAGE_QUALITY)
+    with image.convert("RGB").resize((desired_width, desired_height), resample=LANCZOS) as resized:
+        resized.save(jpeg_buffer, format="JPEG", quality=IMAGE_QUALITY)
 
     return ResizedContainer(
         webp=webp_buffer.getvalue(),

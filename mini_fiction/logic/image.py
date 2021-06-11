@@ -95,7 +95,7 @@ def _resize_image(
     return ResizedContainer(
         webp=webp_buffer.getvalue(),
         png=png_buffer.getvalue(),
-        jpeg=png_buffer.getvalue(),
+        jpeg=jpeg_buffer.getvalue(),
         width=desired_width,
         height=desired_height,
     )

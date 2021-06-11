@@ -1,3 +1,4 @@
+from datetime import date
 from io import BytesIO
 from pathlib import Path
 from typing import Dict, Optional, Set, Type, Union
@@ -162,8 +163,13 @@ def save_image(
         return None
 
     name = uuid4().hex
+    current_year = date.today().year
+
     relative_path = (
-        Path(bundle._kind) / name[:2] / name  # pylint: disable=protected-access
+        Path(bundle._kind)  # pylint: disable=protected-access
+        / str(current_year)
+        / name[:2]
+        / name
     )
 
     media_root: Path = current_app.config["MEDIA_ROOT"]

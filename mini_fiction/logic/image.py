@@ -15,6 +15,7 @@ IMAGE_QUALITY = 85  # It's enough
 class ResizedContainer(BaseModel):
     webp: bytes
     png: bytes
+    jpeg: bytes
     width: int
     height: int
 
@@ -22,6 +23,7 @@ class ResizedContainer(BaseModel):
 class ImageMeta(BaseModel):
     webp: str
     png: str
+    jpeg: str
     width: int
     height: int
 
@@ -83,13 +85,16 @@ def _resize_image(
 
     webp_buffer = BytesIO()
     png_buffer = BytesIO()
-    with image.convert('RGBA').resize((desired_width, desired_height), resample=LANCZOS) as resized:
-        resized.save(webp_buffer, format="WEBP", quality=IMAGE_QUALITY)
-        resized.save(png_buffer, format="PNG", quality=IMAGE_QUALITY)
+    jpeg_buffer = BytesIO()
+    with image.resize((desired_width, desired_height), resample=LANCZOS) as resized:
+        resized.convert("RGBA").save(webp_buffer, format="WEBP", quality=IMAGE_QUALITY)
+        resized.convert("RGBA").save(png_buffer, format="PNG", quality=IMAGE_QUALITY)
+        resized.convert("RGB").save(jpeg_buffer, format="JPEG", quality=IMAGE_QUALITY)
 
     return ResizedContainer(
         webp=webp_buffer.getvalue(),
         png=png_buffer.getvalue(),
+        jpeg=png_buffer.getvalue(),
         width=desired_width,
         height=desired_height,
     )
@@ -112,6 +117,7 @@ def _save_resized_image(
         result = _resize_image(image=image, desired_width=width, desired_height=height)
         webp_path = relative_path.with_suffix(f".{width}.webp")
         png_path = relative_path.with_suffix(f".{width}.png")
+        jpeg_path = relative_path.with_suffix(f".{width}.jpeg")
 
         (media_root / webp_path).write_bytes(result.webp)
         # Maybe, someday, we will remove this fallback
@@ -120,6 +126,7 @@ def _save_resized_image(
         kw[f"x{width}"] = ImageMeta(
             webp=webp_path.as_posix(),
             png=png_path.as_posix(),
+            jpeg=jpeg_path.as_posix(),
             width=result.width,
             height=result.height,
         )

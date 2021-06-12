@@ -6,6 +6,7 @@ from flask_babel import gettext
 from flask_login import current_user
 from pony.orm import db_session
 
+from mini_fiction.logic import htmlblocks
 from mini_fiction.utils.views import admin_required
 from mini_fiction.validation import ValidationError
 from mini_fiction.forms.admin.htmlblock import HtmlBlockForm
@@ -36,7 +37,7 @@ def create():
 
     if form.validate_on_submit():
         try:
-            htmlblock = HtmlBlock.bl.create(current_user._get_current_object(), form.data)
+            htmlblock = htmlblocks.create(current_user._get_current_object(), form.data)
         except ValidationError as exc:
             form.set_errors(exc.errors)
         else:
@@ -76,7 +77,7 @@ def update(name, lang):
 
     if can_edit and form.validate_on_submit():
         try:
-            htmlblock.bl.update(current_user._get_current_object(), form.data)
+            htmlblocks.update(htmlblock, current_user._get_current_object(), form.data)
         except ValidationError as exc:
             form.set_errors(exc.errors)
         else:
@@ -107,7 +108,7 @@ def delete(name, lang):
 
     if request.method == 'POST':
         try:
-            htmlblock.bl.delete(current_user._get_current_object())
+            htmlblocks.delete(htmlblock, current_user._get_current_object())
         except ValidationError:
             abort(403)
         else:

@@ -4,9 +4,8 @@ from dataclasses import dataclass
 from datetime import datetime
 from typing import Dict, List, Optional
 
-from flask import current_app
-
 from mini_fiction.logic.adminlog import log_addition, log_changed_fields, log_deletion
+from mini_fiction.logic.caching import get_cache
 from mini_fiction.logic.image import LogopicBundle, cleanup_image, save_image
 from mini_fiction.models import Author, Logopic
 from mini_fiction.utils.misc import call_after_request as later
@@ -33,7 +32,7 @@ def create(author: Author, data: RawData) -> Logopic:
     logopic.image = saved_image
     logopic.flush()
 
-    current_app.cache.delete("logopics")
+    get_cache().delete("logopics")
     log_addition(by=author, what=logopic)
     return logopic
 
@@ -61,7 +60,7 @@ def update(logopic: Logopic, author: Author, data: RawData) -> Logopic:
 
     if changed_fields:
         logopic.updated_at = datetime.utcnow()
-        current_app.cache.delete("logopics")
+        get_cache().delete("logopics")
 
         log_changed_fields(by=author, what=logopic, fields=sorted(changed_fields))
 
@@ -73,11 +72,11 @@ def delete(logopic: Logopic, author: Author) -> None:
     old_saved_image = logopic.image
     later(lambda: cleanup_image(old_saved_image))
     logopic.delete()
-    current_app.cache.delete("logopics")
+    get_cache().delete("logopics")
 
 
 def get_all() -> List[PreparedLogopic]:
-    result = current_app.cache.get("logopics")
+    result = get_cache().get("logopics")
     if result is not None:
         return result
 
@@ -102,7 +101,7 @@ def get_all() -> List[PreparedLogopic]:
             )
         )
 
-    current_app.cache.set("logopics", result, 7200)
+    get_cache().set("logopics", result, 7200)
     return result
 
 

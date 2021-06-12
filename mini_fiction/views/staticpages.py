@@ -5,6 +5,7 @@ from flask import Blueprint, Markup, Response, request, current_app, render_temp
 from pony.orm import db_session
 
 from mini_fiction.models import StaticPage
+from mini_fiction.logic import staticpages
 
 bp = Blueprint('staticpages', __name__)
 
@@ -31,6 +32,6 @@ def index(name):
     if page.is_full_page:
         if g.is_ajax:
             return jsonify({'page_content': {'full_link': request.url}})
-        return Response(content, mimetype=page.bl.get_mimetype())
+        return Response(content, mimetype=staticpages.get_mimetype(page))
     else:
         return render_template('staticpage.html', content=Markup(content), page_name=page.name, page_title=page.title)

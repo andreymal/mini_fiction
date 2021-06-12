@@ -1,11 +1,13 @@
 from dataclasses import dataclass
 from typing import Optional, Union
 
-from flask import Markup, current_app, render_template
+from flask import current_app, render_template
 from flask_babel import lazy_gettext
+from markupsafe import Markup
 from typing_extensions import TypedDict
 
 from mini_fiction.logic.adminlog import log_addition, log_changed_fields, log_deletion
+from mini_fiction.logic.caching import get_cache
 from mini_fiction.models import ANON, AnonymousUser, Author, HtmlBlock
 from mini_fiction.utils.misc import call_after_request as later
 from mini_fiction.validation import RawData, ValidationError, Validator
@@ -113,7 +115,7 @@ def delete(htmlblock: HtmlBlock, author: Author) -> None:
 def clear_cache(name: str) -> None:
     for lang in current_app.config["LOCALES"]:
         cache_key = f"block_{lang}_{name}"
-        current_app.cache.set(cache_key, None, 1)
+        get_cache().set(cache_key, None, 1)
 
 
 def check_renderability(

@@ -55,7 +55,7 @@ clean-frontend:
 
 lint:
 	pylint --rcfile=pylintrc mini_fiction/logic
-	mypy mini_fiction/logic
+	mypy
 	flake8 mini_fiction/logic
 
 format:

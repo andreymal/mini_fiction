@@ -3,6 +3,6 @@ pytest-runner
 pytest-selenium
 pytest-flask>=1.0,<2.0
 pytest-cov
-pytest-metadata>=1.9.0
-pytest>=6.1,<7.0
+pytest-metadata>=1.11
+pytest>=6.2,<7.0
 tox

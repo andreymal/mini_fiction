@@ -107,10 +107,10 @@ class NewsItemBL(BaseBL, Commentable):
                 lazy_gettext('Cannot parse news item "{0}": {1}').format(name, str(exc))
             ]})
 
-        from mini_fiction.models import AnonymousUser
+        from mini_fiction.models import ANON
 
         try:
-            render_template(template, newsitem_name=name, current_user=AnonymousUser())
+            render_template(template, newsitem_name=name, current_user=ANON)
         except Exception as exc:
             raise ValidationError({'content': [
                 lazy_gettext('Cannot render news item "{0}" for anonymous: {1}').format(name, str(exc))

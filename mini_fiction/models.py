@@ -54,6 +54,9 @@ class AnonymousUser(AnonymousUserMixin):
     header_mode = ''
     timezone = ''
 
+    def __eq__(self, other):
+        return isinstance(other, type(self))
+
 
 # Anon, just anon
 ANON = AnonymousUser()

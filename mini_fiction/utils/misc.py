@@ -1,6 +1,3 @@
-#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
-
 import re
 import sys
 import json
@@ -322,8 +319,8 @@ def render_nonrequest_template(*args, **kwargs):
     if not hasattr(g, 'is_ajax'):
         g.is_ajax = False
     if not hasattr(g, 'current_user'):
-        from mini_fiction.models import AnonymousUser
-        g.current_user = AnonymousUser()
+        from mini_fiction.models import ANON
+        g.current_user = ANON
 
     # Некоторые сволочи типа Flask-Script запускают код в контексте фейкового
     # запроса, что меняет поведение url_for, а это нам нафиг не надо.

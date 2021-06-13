@@ -9,7 +9,7 @@
     <!-- Вывод шапки -->
     <div class="span8">
         <h1 id="author-name">
-            {{- user_avatar(author) }}
+            {{- user_avatar(author, large=True) }}
             {{ author.username }}
             {#{% if author.stories.count() > 0 %}Кабинет автора{% else %}Кабинет потенциального автора{% endif %}#}
             {% if not author.is_active %}

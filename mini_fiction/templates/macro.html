@@ -61,24 +61,36 @@
 {%- endmacro %}
 
 
-{% macro user_avatar(user) -%}
+{% macro user_avatar(user, large=False) -%}
     {%- set avatar = user.bundle -%}
     <div class="user-avatar-container {% if not avatar %}user-avatar-placeholder{% endif %}">
     {% if avatar %}
         <picture>
-            <source srcset="{{ url_for('media', filename=avatar.x32.webp) }} 1x,
-                            {{ url_for('media', filename=avatar.x48.webp) }} 1.5x,
-                            {{ url_for('media', filename=avatar.x64.webp) }} 2x,
-                            {{ url_for('media', filename=avatar.x128.webp) }} 3x"
-                    type="image/webp">
-            <source srcset="{{ url_for('media', filename=avatar.x32.png) }} 1x,
-                            {{ url_for('media', filename=avatar.x48.png) }} 1.5x,
-                            {{ url_for('media', filename=avatar.x64.png) }} 2x,
-                            {{ url_for('media', filename=avatar.x128.png) }} 3x"
-                    type="image/png">
-            <img src="{{ url_for('media', filename=avatar.x32.jpeg) }}"
-                 alt="{{ user.username }}"
-                 title="{{ user.username }}">
+            {% if large %}
+                <source srcset="{{ url_for('media', filename=avatar.x64.webp) }} 1x,
+                                {{ url_for('media', filename=avatar.x128.webp) }} 2x"
+                        type="image/webp">
+                <source srcset="{{ url_for('media', filename=avatar.x64.png) }} 1x,
+                                {{ url_for('media', filename=avatar.x128.png) }} 2x"
+                        type="image/png">
+                <img src="{{ url_for('media', filename=avatar.x64.jpeg) }}"
+                     alt="{{ user.username }}"
+                     title="{{ user.username }}">
+            {% else %}
+                <source srcset="{{ url_for('media', filename=avatar.x32.webp) }} 1x,
+                                {{ url_for('media', filename=avatar.x48.webp) }} 1.5x,
+                                {{ url_for('media', filename=avatar.x64.webp) }} 2x,
+                                {{ url_for('media', filename=avatar.x128.webp) }} 3x"
+                        type="image/webp">
+                <source srcset="{{ url_for('media', filename=avatar.x32.png) }} 1x,
+                                {{ url_for('media', filename=avatar.x48.png) }} 1.5x,
+                                {{ url_for('media', filename=avatar.x64.png) }} 2x,
+                                {{ url_for('media', filename=avatar.x128.png) }} 3x"
+                        type="image/png">
+                <img src="{{ url_for('media', filename=avatar.x32.jpeg) }}"
+                     alt="{{ user.username }}"
+                     title="{{ user.username }}">
+                {% endif %}
         </picture>
     {% endif %}
     </div>

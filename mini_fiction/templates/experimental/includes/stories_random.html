@@ -1,4 +1,5 @@
-{%- from 'experimental/macro.html' import tag_link with context -%}
+{%- from 'experimental/macro.html' import character_picture -%}
+{%- from 'experimental/macro.html' import tag_link -%}
 
 {% for random_story in random_stories %}
     <input {% if loop.index == 1 %}checked autofocus{% endif %}
@@ -13,25 +14,11 @@
                 {% endfor -%}
             </span>
         </p>
-{#  FIXME #}
-{#        {%- if current_user.is_authenticated -%}#}
-{#            <p class="meta">#}
-{#                <span class="chapter-controls">#}
-{#                    {%- set bookmarked = random_story.bookmarked(current_user.id) -%}#}
-{#                    <a title="Прочитать позже"#}
-{#                       href="{{ url_for('story.bookmark', pk=random_story.id, action='delete' if bookmarked else 'add') }}"#}
-{#                       class="{% if bookmarked %} bookmarked{% endif %}"></a>#}
-{#                </span>#}
-{#            </p>#}
-{#        {%- endif -%}#}
         <p>{{ random_story.summary|striptags }}</p>
         <p>
             <span class="characters">
                 {%- for character in random_story.characters|sort(attribute='id') -%}
-                    <a href="{{ url_for('search.simple', search_type='character', search_id=character.id) }}">
-                        <img width="32" height="32" src="{{ character.url }}" alt="{{ character.name }}"
-                             title="{{ character.name }}"/>
-                    </a>
+                    <a href="{{ url_for('search.simple', search_type='character', search_id=character.id) }}">{{ character_picture(character) }}</a>
                 {%- endfor -%}
             </span>
         </p>

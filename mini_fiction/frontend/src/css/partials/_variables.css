@@ -47,6 +47,8 @@
     --big-border-radius: calc(var(--default-border-radius) * 2);
     --big-padding: calc(var(--default-padding) * 2);
 
+    --thin-line: .1rem;
+
     /* Slider */
     --slides-height: 13em;
     --slides-border: 1em;

@@ -1,17 +1,19 @@
-/* Table */
-
 table {
     border-spacing: 0;
     display: block;
     overflow-x: auto;
     text-align: left;
     width: 100%;
+
+    & caption {
+        font-size: large;
+    }
 }
 
 td,
 th {
-    border-bottom: 0.1rem solid var(--color-quinary);
-    padding: 1.2rem 1.5rem;
+    border-bottom: var(--thin-line) solid var(--color-complementary-dark);
+    padding: var(--big-padding) var(--big-padding);
 
     &:first-child {
         padding-left: 0;
@@ -22,6 +24,7 @@ th {
     }
 }
 
+/* FIXME media query */
 @media (min-width: 40rem) {
     table {
         display: table;

@@ -7,8 +7,8 @@
     --color-primary-darkest: hsl(224, 46%, 21%);
     --color-primary-lighter-translucent: hsla(224, 56%, 45%, 0.5);
 
-    --color-complementary-lighter:  hsl(43, 9%, 64%);
     --color-complementary-lightest: hsl(43, 33%, 86%);
+    --color-complementary-lighter:  hsl(43, 33%, 64%);
     --color-complementary-light:    hsl(43, 71%, 36%);
     --color-complementary-dark:     hsl(43, 46%, 21%);
 
@@ -37,9 +37,8 @@
     --color-grey-dark-translucent: hsla(210, 2%, 45%, 0.5);
 
     /* Background colors */
-    --color-background: hsl(233, 97%, 88%);
-    --color-links-roof-primary: hsl(246, 41%, 85%);
-    --color-links-roof-secondary: hsl(60, 64%, 95%);
+    --color-background: hsl(224, 97%, 88%);
+    --color-links-roof-primary: hsl(224, 41%, 88%);
 
     /* Fonts */
     --font-family-serif: Georgia, Times, serif;

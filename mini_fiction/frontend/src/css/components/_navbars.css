@@ -62,7 +62,7 @@
 
     & nav {
         & a, & span {
-            color: var(--color-links-roof-secondary);
+            color: var(--color-grey-lightest);
         }
 
         /* Direct ancestors */
@@ -76,7 +76,7 @@
             gap: var(--gap-linkblock);
 
             & li.active, & li:hover {
-                background-color: var(--color-links-roof-secondary);
+                background-color: var(--color-grey-lightest);
                 border-radius: var(--default-border-radius);
                 text-decoration: none;
 

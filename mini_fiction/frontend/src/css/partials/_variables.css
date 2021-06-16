@@ -13,13 +13,13 @@
     --color-complementary-dark:     hsl(43, 46%, 21%);
 
     /* Button colors */
-    --color-success-lighter: hsl(85, 65%, 40%);
-    --color-success:         hsl(85, 65%, 32%);
-    --color-success-lighter-translucent: hsla(85, 65%, 40%, 0.5);
+    --color-success-lighter: hsl(85, 65%, 38%);
+    --color-success:         hsl(85, 65%, 30%);
+    --color-success-lighter-translucent: hsla(85, 65%, 38%, 0.5);
 
-    --color-warning-lighter: hsl(35, 75%, 55%);
-    --color-warning:         hsl(35, 75%, 43%);
-    --color-warning-lighter-translucent: hsla(35, 75%, 55%, 0.5);
+    --color-warning-lighter: hsl(35, 75%, 53%);
+    --color-warning:         hsl(35, 75%, 41%);
+    --color-warning-lighter-translucent: hsla(35, 75%, 53%, 0.5);
 
     --color-danger-lighter:  hsl(11, 56%, 40%);
     --color-danger:          hsl(11, 56%, 34%);

@@ -32,7 +32,7 @@
     }
 
     & input:checked + label, & input:checked:hover + label {
-        background-color: var(--color-grey-dark);
+        background-color: var(--color-grey-darker);
     }
 
     & input:hover + label {

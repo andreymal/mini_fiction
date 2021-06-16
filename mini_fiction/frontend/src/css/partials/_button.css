@@ -1,0 +1,99 @@
+.button,
+button,
+input[type='button'],
+input[type='reset'],
+input[type='submit'] {
+    color: var(--color-grey-lightest);
+    border-radius: var(--default-border-radius);
+    cursor: pointer;
+    font-weight: bolder;
+    display: inline-block;
+    letter-spacing: var(--thin-line);
+    padding: var(--default-padding) var(--big-padding);
+    margin: 0 var(--smallest-padding);
+    text-align: center;
+    text-decoration: none;
+    white-space: nowrap;
+    user-select: none;
+    transition: color var(--fast-transition-duration) ease-in-out, background-color var(--fast-transition-duration) ease-in-out, border-color var(--fast-transition-duration) ease-in-out, box-shadow var(--fast-transition-duration) ease-in-out;
+
+    &[disabled] {
+        cursor: not-allowed;
+        opacity: 0.75;
+    }
+
+    &:focus,
+    &:hover {
+        outline: 0;
+    }
+
+    &.small {
+        font-size: small;
+    }
+
+    &.big {
+        font-size: large;
+    }
+
+    &.primary {
+        background-color: var(--color-primary-lighter);
+        border: var(--thin-line) solid var(--color-primary);
+
+        &:focus,
+        &:hover {
+            background-color: var(--color-primary);
+            border-color: var(--color-primary);
+            box-shadow: 0 0 0 var(--small-padding) var(--color-primary-lighter-translucent);
+        }
+    }
+
+    &.secondary {
+        background-color: var(--color-grey-lighter);
+        border: var(--thin-line) solid var(--color-grey);
+        color: var(--color-grey-darker);
+
+        &:focus,
+        &:hover {
+            background-color: var(--color-grey-dark);
+            border-color: var(--color-grey-dark);
+            box-shadow: 0 0 0 var(--small-padding) var(--color-grey-dark-translucent);
+            color: var(--color-grey-lightest);
+        }
+    }
+
+    &.success {
+        background-color: var(--color-success-lighter);
+        border: var(--thin-line) solid var(--color-success);
+
+        &:focus,
+        &:hover {
+            background-color: var(--color-success);
+            border-color: var(--color-success);
+            box-shadow: 0 0 0 var(--small-padding) var(--color-success-lighter-translucent);
+        }
+    }
+
+    &.warning {
+        background-color: var(--color-warning-lighter);
+        border: var(--thin-line) solid var(--color-warning);
+
+        &:focus,
+        &:hover {
+            background-color: var(--color-warning);
+            border-color: var(--color-warning);
+            box-shadow: 0 0 0 var(--small-padding) var(--color-warning-lighter-translucent);
+        }
+    }
+
+    &.danger {
+        background-color: var(--color-danger-lighter);
+        border: var(--thin-line) solid var(--color-danger);
+
+        &:focus,
+        &:hover {
+            background-color: var(--color-danger);
+            border-color: var(--color-danger);
+            box-shadow: 0 0 0 var(--small-padding) var(--color-danger-lighter-translucent);
+        }
+    }
+}

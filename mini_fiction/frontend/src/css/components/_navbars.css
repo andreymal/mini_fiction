@@ -81,7 +81,7 @@
                 text-decoration: none;
 
                 & > a, & > span, & > div span {
-                    color: var(--color-primary-dark);
+                    color: var(--color-primary-darkest);
                 }
             }
         }

@@ -1,31 +1,45 @@
 :root {
-    /* Color */
-    --color-primary: #2A489C;
-    --color-primary-light: #495F9C;
-    --color-primary-dark: #1D2A4F;
+    /* Main palette */
+    --color-primary-light:   hsl(224, 36%, 45%);
+    --color-primary-lighter: hsl(224, 56%, 45%);
+    --color-primary:         hsl(224, 56%, 39%);
+    --color-primary-dark:    hsl(224, 46%, 28%);
+    --color-primary-darkest: hsl(224, 46%, 21%);
+    --color-primary-lighter-translucent: hsla(224, 56%, 45%, 0.5);
 
-    --color-complementary-lighter: #ACA79B;
-    --color-complementary-lightest: #E8E1D1;
-    --color-complementary-light: #9C771A;
-    --color-complementary-dark: #4F411D;
+    --color-complementary-lighter:  hsl(43, 9%, 64%);
+    --color-complementary-lightest: hsl(43, 33%, 86%);
+    --color-complementary-light:    hsl(43, 71%, 36%);
+    --color-complementary-dark:     hsl(43, 46%, 21%);
 
-    /* Light complementary hues */
-    --color-complementary-1-hex: #9C8A5D;
-    --color-complementary-2-hex: #E8CE8B;
-    --color-complementary-5-hex: #695D3F;
+    /* Button colors */
+    --color-success-lighter: hsl(85, 65%, 40%);
+    --color-success:         hsl(85, 65%, 32%);
+    --color-success-lighter-translucent: hsla(85, 65%, 40%, 0.5);
 
-    --color-background: #c5ccfe;
-    --color-links-roof-primary: #cdcae9;
-    --color-links-roof-secondary: #fafae8;
+    --color-warning-lighter: hsl(35, 75%, 55%);
+    --color-warning:         hsl(35, 75%, 43%);
+    --color-warning-lighter-translucent: hsla(35, 75%, 55%, 0.5);
 
-    --color-white: #fff;
-    --color-grey-lightest: #f6f6f6;
-    --color-grey-lighter: #e4e6eb;
-    --color-grey: #b0b3b8;
-    --color-grey-dark: #555;
-    --color-grey-darker: #3a3b3c;
-    --color-grey-darkest: #242526;
-    --color-black: #18191A;
+    --color-danger-lighter:  hsl(11, 56%, 40%);
+    --color-danger:          hsl(11, 56%, 34%);
+    --color-danger-lighter-translucent: hsla(11, 56%, 40%, 0.5);
+
+    /* Grey colors */
+    --color-white:         hsl(210, 2%, 100%);
+    --color-grey-lightest: hsl(210, 2%, 96%);
+    --color-grey-lighter:  hsl(210, 2%, 91%);
+    --color-grey:          hsl(210, 2%, 71%);
+    --color-grey-dark:     hsl(210, 2%, 45%);
+    --color-grey-darker:   hsl(210, 2%, 23%);
+    --color-grey-darkest:  hsl(210, 2%, 15%);
+    --color-black:         hsl(210, 2%, 10%);
+    --color-grey-dark-translucent: hsla(210, 2%, 45%, 0.5);
+
+    /* Background colors */
+    --color-background: hsl(233, 97%, 88%);
+    --color-links-roof-primary: hsl(246, 41%, 85%);
+    --color-links-roof-secondary: hsl(60, 64%, 95%);
 
     /* Fonts */
     --font-family-serif: Georgia, Times, serif;
@@ -43,6 +57,7 @@
 
     --small-border-radius: calc(var(--default-border-radius) / 2);
     --small-padding: calc(var(--default-padding) / 2);
+    --smallest-padding: calc(var(--default-padding) / 4);
 
     --big-border-radius: calc(var(--default-border-radius) * 2);
     --big-padding: calc(var(--default-padding) * 2);

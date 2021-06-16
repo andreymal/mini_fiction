@@ -25,6 +25,8 @@ input[type='submit'] {
     &:focus,
     &:hover {
         outline: 0;
+        text-decoration: none;
+        color: var(--color-grey-lightest);
     }
 
     &.small {

@@ -1,8 +1,7 @@
-
 .logopic {
     grid-area: logopic;
     display: grid;
-    grid-template-columns: 1fr 1fr;
+    grid-template-columns: 2fr 3fr;
     gap: 0;
     grid-template-areas: ". slides";
     background-size: cover;
@@ -30,5 +29,30 @@
     &:hover a.logopic__link {
         opacity: 1;
         pointer-events: auto;
+    }
+}
+
+@media (max-width: 85em) {
+    .logopic {
+        grid-template-columns: 1fr 1fr;
+    }
+}
+
+@media (max-width: 60em) {
+    :root {
+        --slides-height: 10em;
+        --max-lines: 2;
+        --slides-border: .5em;
+    }
+
+    .logopic {
+        grid-template-columns: 1fr 2fr;
+    }
+}
+
+@media (max-width: 48em) {
+    .logopic {
+        opacity: 0;
+        display: none;
     }
 }

@@ -62,6 +62,19 @@ main {
 footer {
     @mixin rounded-footer;
     @mixin background-dark;
-    @mixin overhang;
     grid-area: footer;
+}
+
+@media (min-width: 85em) {
+    footer {
+        @mixin overhang;
+    }
+}
+@media (max-width: 48em) {
+    header {
+        grid-template-areas:
+            "roof"
+            "navigation";
+        grid-template-rows: var(--roof-height) auto;
+    }
 }

@@ -6,7 +6,6 @@
 /* Top links */
 .roof {
     @mixin background-dark;
-    @mixin overhang;
     grid-area: roof;
     line-height: var(--roof-height);
 
@@ -110,4 +109,10 @@
         text-align: center;
     }
 
+}
+
+@media (min-width: 85em) {
+    .roof {
+        @mixin overhang;
+    }
 }

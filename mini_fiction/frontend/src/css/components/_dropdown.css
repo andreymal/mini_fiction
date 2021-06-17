@@ -26,7 +26,7 @@
         /* Pull up to overlap the parent list item very slightly */
         top: calc(100% - 0.25rem);
         /* Use the left from absolute position to shift the left side */
-        left: 50%;
+        left: 0.16em;
         /* Use translateX to shift the menu 50% of it's width back to the left */
         transform: rotateX(-90deg) translateX(-50%);
         transform-origin: top center;
@@ -34,5 +34,11 @@
         transition: var(--default-transition-duration) all var(--fast-transition-duration) ease-out;
         gap: var(--gap-linkblock);
         padding: calc(var(--gap-linkblock) * 2)
+    }
+}
+
+@media (min-width: 85em) {
+    .dropdown .dropdown__menu {
+        left: 50%;
     }
 }

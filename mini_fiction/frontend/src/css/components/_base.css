@@ -95,6 +95,6 @@ footer {
         grid-template-areas:
             "roof"
             "navigation";
-        grid-template-rows: var(--roof-height) auto;
+        grid-template-rows: 1fr 1fr;
     }
 }

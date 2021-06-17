@@ -1,13 +1,12 @@
-{% macro nav_item(title, link, match_endpoint=None, matched=None, right=False, noajax=False) -%}
+{% macro nav_item(title, link, match_endpoint=None, matched=None, noajax=False) -%}
     {%- if matched == None -%}
         {%- set matched = match_endpoint != None and request.endpoint != None and (request.endpoint == match_endpoint or match_endpoint.endswith('.') and request.endpoint.startswith(match_endpoint)) -%}
     {%- endif -%}
-    <li class="{{ 'active ' if matched else '' }}{{ 'right ' if right else '' }}"><a href="{{ link }}"{% if noajax %} data-noajax="1"{% endif %}>{{ title }}</a></li>
+    <li {% if matched %}class="active"{%- endif -%}><a href="{{ link }}"{% if noajax %} data-noajax="1"{% endif %}>{{ title }}</a></li>
 {%- endmacro %}
 
 {% macro user_avatar(user) -%}
     {%- set avatar = user.bundle -%}
-    <div class="user-avatar-container {% if not avatar %}user-avatar-placeholder{% endif %}">
     {% if avatar %}
         <picture>
             <source srcset="{{ url_for('media', filename=avatar.x32.webp) }} 1x,
@@ -21,11 +20,14 @@
                             {{ url_for('media', filename=avatar.x128.png) }} 3x"
                     type="image/png">
             <img src="{{ url_for('media', filename=avatar.x32.jpeg) }}"
+                 width="32"
+                 height="32"
                  alt="{{ user.username }}"
                  title="{{ user.username }}">
         </picture>
+    {% else %}
+        <span><i class="fas fa-user-alt fa-lg"></i></span>
     {% endif %}
-    </div>
 {%- endmacro %}
 
 {% macro tag_link(tag) -%}

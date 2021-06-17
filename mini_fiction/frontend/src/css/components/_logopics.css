@@ -41,7 +41,7 @@
 @media (max-width: 60em) {
     :root {
         --slides-height: 10em;
-        --max-lines: 2;
+        --max-lines: 3;
         --slides-border: .5em;
     }
 

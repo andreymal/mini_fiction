@@ -39,10 +39,6 @@ details {
             transition: var(--default-transition-duration) transform ease;
             margin-left: var(--default-padding);
         }
-
-        &::-webkit-details-marker {
-            display: none;
-        }
     }
 
     &[open] > summary:after {

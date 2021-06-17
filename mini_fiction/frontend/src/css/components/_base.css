@@ -81,6 +81,12 @@ footer {
     }
 }
 
+@media (max-width: 60em) {
+    :root {
+        --roof-height: 3.5em;
+    }
+}
+
 @media (max-width: 48em) {
     header {
         grid-template-areas:

@@ -56,7 +56,7 @@
 
     --small-border-radius: calc(var(--default-border-radius) / 2);
     --small-padding: calc(var(--default-padding) / 2);
-    --smallest-padding: calc(var(--default-padding) / 4);
+    --smallest-padding: calc(var(--default-padding) / 3);
 
     --big-border-radius: calc(var(--default-border-radius) * 2);
     --big-padding: calc(var(--default-padding) * 2);

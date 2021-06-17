@@ -5,7 +5,7 @@ details {
         cursor: pointer;
         font-weight: bolder;
         letter-spacing: var(--thin-line);
-        padding: var(--default-padding) calc(var(--default-padding) * 3) var(--default-padding) var(--big-padding);
+        padding: var(--default-padding) var(--biggest-padding) var(--default-padding) var(--big-padding);
         margin: 0 var(--smallest-padding);
         text-decoration: none;
         white-space: nowrap;

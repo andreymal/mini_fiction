@@ -62,6 +62,7 @@
 
     --big-border-radius: calc(var(--default-border-radius) * 2);
     --big-padding: calc(var(--default-padding) * 2);
+    --biggest-padding: calc(var(--default-padding) * 3);
 
     --thin-line: .1rem;
 

@@ -70,6 +70,13 @@ footer {
         @mixin overhang;
     }
 }
+
+@media (max-width: 75em) {
+    .container {
+        margin: 0;
+    }
+}
+
 @media (max-width: 48em) {
     header {
         grid-template-areas:

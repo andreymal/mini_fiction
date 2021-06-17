@@ -10,7 +10,7 @@ input[type='submit'] {
     display: inline-block;
     letter-spacing: var(--thin-line);
     padding: var(--default-padding) var(--big-padding);
-    margin: 0 var(--smallest-padding);
+    margin: 0 var(--smallest-margin);
     text-align: center;
     text-decoration: none;
     white-space: normal;

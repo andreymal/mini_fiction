@@ -6,7 +6,7 @@ details {
         font-weight: bolder;
         letter-spacing: var(--thin-line);
         padding: var(--default-padding) var(--biggest-padding) var(--default-padding) var(--big-padding);
-        margin: 0 var(--smallest-padding);
+        margin: 0 var(--smallest-margin);
         text-decoration: none;
         white-space: nowrap;
         user-select: none;
@@ -37,7 +37,7 @@ details {
             transform: rotate(0);
             transform-origin: var(--small-padding) 50%;
             transition: var(--default-transition-duration) transform ease;
-            margin-left: var(--default-padding);
+            margin-left: var(--default-margin);
         }
     }
 
@@ -46,7 +46,7 @@ details {
     }
 
     &[open] > summary ~ * {
-        margin-left: var(--big-padding);
-        margin-top: var(--big-padding);
+        margin-left: var(--big-margin);
+        margin-top: var(--big-margin);
     }
 }

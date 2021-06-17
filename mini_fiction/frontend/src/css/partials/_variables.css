@@ -55,6 +55,7 @@
     /* Views */
     --default-border-radius: .25em;
     --default-padding: .4em;
+    --default-margin: .4em;
 
     --small-border-radius: calc(var(--default-border-radius) / 2);
     --small-padding: calc(var(--default-padding) / 2);
@@ -63,6 +64,12 @@
     --big-border-radius: calc(var(--default-border-radius) * 2);
     --big-padding: calc(var(--default-padding) * 2);
     --biggest-padding: calc(var(--default-padding) * 3);
+
+    --small-margin: calc(var(--default-margin) / 2);
+    --smallest-margin: calc(var(--default-margin) / 3);
+
+    --big-margin: calc(var(--default-margin) * 2);
+    --biggest-margin: calc(var(--default-margin) * 3);
 
     --thin-line: .1rem;
 
@@ -76,7 +83,7 @@
     --counter-base-size: .6em;
 
     /* Navigation */
-    --navbar-margin: var(--default-padding);
+    --navbar-margin: var(--default-margin);
     --navbar-gap: var(--default-padding);
     --navbar-height: calc(1em + var(--default-padding) * 2 + var(--navbar-margin) * 2); /* line height, list element padding, list margin */
 

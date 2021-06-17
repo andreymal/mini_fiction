@@ -22,8 +22,8 @@
         border: calc(var(--bullets-size) / 6) solid var(--color-grey-dark);
         border-radius: var(--default-border-radius);
         background-color: transparent;
-        margin-top: calc(var(--slides-height) - var(--bullets-size) - var(--default-padding));
-        margin-right: var(--default-padding);
+        margin-top: calc(var(--slides-height) - var(--bullets-size) - var(--default-margin));
+        margin-right: var(--default-margin);
         z-index: 2;
         cursor: pointer;
         transition-duration: var(--default-transition-duration);

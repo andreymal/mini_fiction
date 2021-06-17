@@ -57,7 +57,7 @@ header {
 
 main {
     grid-area: main;
-    margin: 2rem;
+    margin: var(--biggest-margin);
 }
 aside {
     grid-area: aside;

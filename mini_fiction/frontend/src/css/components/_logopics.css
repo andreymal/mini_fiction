@@ -8,8 +8,8 @@
     background-position: 50% center;
 
     & a.logopic__link {
-        margin: var(--padding-linkblocks) 0 0 var(--padding-linkblocks);
-        padding: var(--small-padding) calc(var(--small-padding) * 2);
+        margin: var(--big-margin) 0 0 var(--big-margin);
+        padding: var(--small-padding) var(--default-padding);
         border-radius: var(--small-border-radius);
         font-size: small;
         background-color: rgba(50, 50, 50, 0.6);

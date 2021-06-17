@@ -29,11 +29,12 @@ body {
     @mixin rounded-footer;
     display: grid;
     grid-template-columns: 1fr;
-    grid-template-rows: auto auto var(--footer-height);
+    grid-template-rows: auto 1fr auto var(--footer-height);
     gap: 0 0;
     grid-template-areas:
         "header"
         "main"
+        "aside"
         "footer";
     max-width: var(--max-width);
     min-height: var(--min-height);
@@ -46,7 +47,7 @@ header {
     grid-area: header;
     display: grid;
     grid-template-columns: 1fr;
-    grid-template-rows: var(--roof-height) calc(var(--slides-height) + var(--slides-border) * 2) auto;
+    grid-template-rows: var(--roof-height) calc(var(--slides-height) + var(--slides-border) * 2) var(--navbar-height);
     gap: 0 0;
     grid-template-areas:
         "roof"
@@ -57,6 +58,9 @@ header {
 main {
     grid-area: main;
     margin: 2rem;
+}
+aside {
+    grid-area: aside;
 }
 
 footer {

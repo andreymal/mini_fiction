@@ -11,7 +11,6 @@
             {% if logo.original_link and logo.original_link_label -%}
                 <a rel="noopener noreferrer" href="{{ logo.original_link }}" class="logopic__link" target="_blank">{{ logo_label }}</a>
             {%- endif %}
-            {# FIXME #}
             {%- if current_user.header_mode == '' or current_user.header_mode == 'ls' -%}
                 <div data-bazooka="StoriesCarousel" id="slides">
                     {{ experimental_random_stories() }}

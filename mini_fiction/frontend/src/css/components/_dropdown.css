@@ -32,8 +32,8 @@
         transform-origin: top center;
         opacity: 0.3;
         transition: var(--default-transition-duration) all var(--fast-transition-duration) ease-out;
-        gap: var(--gap-linkblock);
-        padding: calc(var(--gap-linkblock) * 2)
+        gap: var(--navbar-gap);
+        padding: var(--big-padding);
     }
 }
 

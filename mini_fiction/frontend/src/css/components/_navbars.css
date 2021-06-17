@@ -1,6 +1,5 @@
 :root {
     --padding-linkblocks: 0.8em;
-    --gap-linkblock: 0.4em;
 }
 
 /* Top links */
@@ -70,9 +69,9 @@
             display: flex;
             align-items: baseline;
             list-style-type: none;
-            margin-top: var(--gap-linkblock);
-            margin-bottom: var(--gap-linkblock);
-            gap: var(--gap-linkblock);
+            margin-top: var(--navbar-margin);
+            margin-bottom: var(--navbar-margin);
+            gap: var(--navbar-gap);
 
             & li.active, & li:hover {
                 background-color: var(--color-grey-lightest);
@@ -89,7 +88,7 @@
 
         & li {
             line-height: 1em;
-            padding: var(--gap-linkblock) calc(var(--gap-linkblock) * 1.5);
+            padding: var(--default-padding) calc(var(--default-padding) * 1.5);
             margin: 0;
         }
     }

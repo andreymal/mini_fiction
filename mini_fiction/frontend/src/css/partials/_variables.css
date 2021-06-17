@@ -75,6 +75,11 @@
     /* Notifications */
     --counter-base-size: .6em;
 
+    /* Navigation */
+    --navbar-margin: var(--default-padding);
+    --navbar-gap: var(--default-padding);
+    --navbar-height: calc(1em + var(--default-padding) * 2 + var(--navbar-margin) * 2); /* line height, list element padding, list margin */
+
     /* Transitions */
     --default-transition-duration: .3s;
     --fast-transition-duration: calc(var(--default-transition-duration) / 2);

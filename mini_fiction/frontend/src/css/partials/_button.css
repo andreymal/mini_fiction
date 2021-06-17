@@ -13,9 +13,10 @@ input[type='submit'] {
     margin: 0 var(--smallest-padding);
     text-align: center;
     text-decoration: none;
-    white-space: nowrap;
+    white-space: normal;
     user-select: none;
     transition: color var(--fast-transition-duration) ease-in-out, background-color var(--fast-transition-duration) ease-in-out, border-color var(--fast-transition-duration) ease-in-out, box-shadow var(--fast-transition-duration) ease-in-out;
+    max-width: 90vw;
 
     &[disabled] {
         cursor: not-allowed;

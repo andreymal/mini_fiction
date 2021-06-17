@@ -12,6 +12,8 @@
     --color-complementary-light:    hsl(43, 71%, 36%);
     --color-complementary-dark:     hsl(43, 46%, 21%);
 
+    --color-complementary-dark-translucent: hsla(43, 46%, 21%, 0.5);
+
     /* Button colors */
     --color-success-lighter: hsl(85, 65%, 38%);
     --color-success:         hsl(85, 65%, 30%);

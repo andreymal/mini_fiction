@@ -1,0 +1,9 @@
+.avatar img {
+    border-radius: var(--default-border-radius);
+}
+
+.roof .avatar img {
+    width: var(--navbar-avatar);
+    height: var(--navbar-avatar);
+}
+

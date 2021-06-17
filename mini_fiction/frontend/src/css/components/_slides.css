@@ -45,6 +45,7 @@
     opacity: 0;
     padding: var(--default-padding) var(--big-padding);
     position: absolute;
+    will-change: transform;
 
     & h3 {
         margin: 0;

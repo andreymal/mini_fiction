@@ -86,6 +86,7 @@
     --navbar-margin: var(--default-margin);
     --navbar-gap: var(--default-padding);
     --navbar-height: calc(1em + var(--default-padding) * 2 + var(--navbar-margin) * 2); /* line height, list element padding, list margin */
+    --navbar-avatar: 3em;
 
     /* Transitions */
     --default-transition-duration: .3s;

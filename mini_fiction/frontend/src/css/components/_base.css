@@ -86,6 +86,7 @@ footer {
 @media (max-width: 60em) {
     :root {
         --roof-height: 3.5em;
+        --navbar-avatar: 2em;
     }
 }
 

@@ -16,6 +16,7 @@
 @import "css/partials/_utility.css";
 @import "css/partials/_variables.css";
 
+@import "css/components/_avatar.css";
 @import "css/components/_base.css";
 @import "css/components/_navbars.css";
 @import "css/components/_logopics.css";

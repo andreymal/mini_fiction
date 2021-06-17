@@ -67,6 +67,8 @@ footer {
     @mixin rounded-footer;
     @mixin background-dark;
     grid-area: footer;
+    display: grid;
+    grid-template-areas: "links";
 }
 
 @media (min-width: 85em) {

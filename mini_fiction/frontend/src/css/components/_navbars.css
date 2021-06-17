@@ -13,7 +13,7 @@
             display: flex;
             justify-content: flex-start;
             list-style-type: none;
-            align-items: baseline;
+            align-items: center;
             padding-left: var(--padding-linkblocks);
             gap: 1em;
             margin: 0;
@@ -44,9 +44,10 @@
 
 .navigation {
     @mixin background-dark;
-    grid-area: navigation;
+    grid-area: auto;
     display: flex;
     justify-content: space-between;
+    align-items: center;
 
     & nav:first-of-type > ul {
         justify-content: flex-start;
@@ -67,10 +68,9 @@
 
         & > ul {
             display: flex;
-            align-items: baseline;
+            align-items: center;
             list-style-type: none;
-            margin-top: var(--navbar-margin);
-            margin-bottom: var(--navbar-margin);
+            margin: 0;
             gap: var(--navbar-gap);
 
             & li.active, & li:hover {

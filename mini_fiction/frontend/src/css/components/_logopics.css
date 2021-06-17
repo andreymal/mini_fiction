@@ -40,7 +40,7 @@
 
 @media (max-width: 60em) {
     :root {
-        --slides-height: 10em;
+        --slides-height: 11em;
         --max-lines: 3;
         --slides-border: .5em;
     }

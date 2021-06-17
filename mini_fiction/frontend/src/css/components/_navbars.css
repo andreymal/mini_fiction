@@ -6,27 +6,6 @@
     align-items: center;
     padding: 0 var(--big-padding);
 
-    /* Top links */
-    &.roof nav:first-of-type {
-        & li {
-            & a {
-                color: var(--color-complementary-lightest);
-                font-size: x-large;
-                text-decoration: none;
-                font-family: var(--font-family-serif);
-            }
-        }
-
-        & li:first-child {
-            margin-right: 1em;
-
-            & a {
-                color: var(--color-links-roof-primary);
-                font-size: xx-large;
-            }
-        }
-    }
-
     & nav:first-of-type > ul {
         justify-content: flex-start;
     }
@@ -36,35 +15,61 @@
     }
 
     & nav {
-        & a, & span {
+        & a,
+        & span {
             color: var(--color-grey-lightest);
         }
 
-        /* Direct ancestors */
         & > ul {
             display: flex;
             align-items: center;
             list-style-type: none;
             margin: 0;
             gap: var(--navbar-gap);
-
-            & li.active, & li:hover {
-                background-color: var(--color-grey-lightest);
-                border-radius: var(--default-border-radius);
-                text-decoration: none;
-
-                & > a, & > span, & > div span {
-                    color: var(--color-primary-darkest);
-                }
-            }
         }
 
-        /* All list items */
-
         & li {
+            /* All list items */
+
             line-height: 1em;
             padding: var(--default-padding) calc(var(--default-padding) * 1.5);
             margin: 0;
+        }
+    }
+
+
+    &.roof nav > ul > li {
+        /* Top links */
+
+        & > a,
+        & > span {
+            color: var(--color-complementary-lightest);
+            font-size: x-large;
+            text-decoration: none;
+            font-family: var(--font-family-serif);
+        }
+
+        &:first-child > a {
+            color: var(--color-links-roof-primary);
+            font-size: xx-large;
+        }
+    }
+
+
+    &.plain nav > ul {
+        /* Direct ancestors */
+
+        & li.active,
+        & li:hover {
+            background-color: var(--color-grey-lightest);
+            border-radius: var(--default-border-radius);
+            text-decoration: none;
+
+            & > a,
+            & > span,
+            & > div span {
+                color: var(--color-primary-darkest);
+            }
         }
     }
 

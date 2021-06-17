@@ -1,4 +1,4 @@
-.dropdown__title, .dropdown {
+.dropdown__trigger, .dropdown {
     display: flex;
     align-items: center;
     gap: var(--big-padding);
@@ -32,7 +32,7 @@
         /* Pull up to overlap the parent list item very slightly */
         top: calc(100% - var(--default-padding));
         /* Use the left from absolute position to shift the left side */
-        left: -2.0rem;
+        left: 50%;
         /* Use translateX to shift the menu 50% of it's width back to the left */
         transform: rotateX(-90deg) translateX(-50%);
         transform-origin: top center;
@@ -44,8 +44,14 @@
     }
 }
 
-@media (min-width: 85em) {
+@media (max-width: 60em) {
     .dropdown .dropdown__menu {
-        left: 50%;
+        left: -2.25em;
+    }
+}
+
+@media (max-width: 85em) {
+    .dropdown .dropdown__menu {
+        left: -1.25em;
     }
 }

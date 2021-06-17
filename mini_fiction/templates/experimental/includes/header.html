@@ -1,17 +1,16 @@
 {%- from 'experimental/macro.html' import nav_item, user_avatar -%}
 {%- set next_url = (url_for(request.endpoint, **request.view_args) if request.endpoint and not request.endpoint.startswith('auth.') and request.view_args != None else None) -%}
 
-<div class="roof navigation">
+<div class="navigation roof">
     <nav aria-label='External links'>
         {{ html_block('experimental_header') }}
     </nav>
     <nav aria-label='User link'>
-        <ul class="dropdown__title">
-            <span>{{ current_user.username }}</span>
+        <ul class="dropdown__trigger">
             {%- if current_user.is_authenticated %}
+                <li><span>{{ current_user.username }}</span></li>
                 <li class="dropdown">
-                    <div class="dropdown__title"
-                         aria-expanded="false"
+                    <div aria-expanded="false"
                          aria-controls="profile-dropdown">
                         {{- user_avatar(current_user, large=True) }}
                     </div>
@@ -57,7 +56,7 @@
     {% endif -%}
 {%- endif -%}
 
-<div class="navigation">
+<div class="navigation plain">
     {% include 'experimental/includes/nav.html' %}
 </div>
 

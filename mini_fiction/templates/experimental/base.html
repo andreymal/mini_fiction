@@ -62,6 +62,8 @@
         {%- block aside %}{% endblock -%}
     </aside>
 
+    {% include 'experimental/includes/drawer.html' with context %}
+
     <footer>
         {{ html_block('experimental_footer') }}
     </footer>

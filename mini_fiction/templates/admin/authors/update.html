@@ -12,7 +12,7 @@
         ]) }}
 
         <h1 id="author-name">
-            {{- user_avatar(author) }}
+            {{- user_avatar(author, large=True) }}
             {% if not author.is_active %}
                 <sup id="banned">Read-only</sup>
             {% endif -%}

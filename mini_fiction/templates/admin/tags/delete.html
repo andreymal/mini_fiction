@@ -1,0 +1,35 @@
+{% extends base %}
+{% from 'macro.html' import breadcrumbs, tag_link, admin_tag_link with context %}
+{% block content %}
+<div class="row">
+    <div class="span12">
+        {{- breadcrumbs([
+            [url_for('admin_index.index'), _('Administration')],
+            [url_for('admin_tags.index'), _('Tags')],
+            [url_for('admin_tags.delete', pk=tag.id), tag.name]
+        ]) }}
+    <h1>{{ tag.name }}</h1>
+    {{ tag_link(tag) }}
+    {% if tag.is_alias %}
+        →
+        {{ admin_tag_link(tag.is_alias_for) }}
+    {% endif %}
+
+    <p>{{ _('Delete this tag?') }}</p>
+
+    <form method="POST" enctype="multipart/form-data">
+          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+          <div class="control-group">
+            <div class="controls">
+                <input type="submit" class="btn btn-danger" value="{{ _('Delete') }}">
+            </div>
+        </div>
+    </form>
+        {{- breadcrumbs([
+            [url_for('admin_index.index'), _('Administration')],
+            [url_for('admin_tags.index'), _('Tags')],
+            [url_for('admin_tags.delete', pk=tag.id), tag.name]
+        ]) }}
+    </div>
+</div>
+{% endblock %}

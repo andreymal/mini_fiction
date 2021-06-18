@@ -11,7 +11,7 @@ from flask_babel import lazy_gettext
 from pony import orm
 
 from mini_fiction.bl.utils import BaseBL
-from mini_fiction.logic.adminlog import log_addition, log_changed_fields, log_changed_generic
+from mini_fiction.logic.adminlog import log_addition, log_changed_fields, log_changed_generic, log_deletion
 from mini_fiction.validation import Validator, ValidationError
 from mini_fiction.validation.tags import TAG
 from mini_fiction.utils.misc import normalize_tag, call_after_request as later
@@ -403,6 +403,34 @@ class TagBL(BaseBL):
             self.set_blacklist(user, data['reason_to_blacklist'])
         if not tag.is_blacklisted and ('is_alias_for' in data or 'is_hidden_alias' in data):
             self.make_alias_for(user, canonical_tag, data.get('is_hidden_alias', tag.is_hidden_alias))
+
+    def delete(self, user):
+        from mini_fiction.models import StoryTag, StoryTagLog
+
+        if not user or not user.is_staff:
+            raise ValueError('Not authorized')
+
+        tag = self.model
+        tm = datetime.utcnow()
+
+        story_tags = list(StoryTag.select(lambda x: x.tag == tag).prefetch(StoryTag.story))
+        for st in story_tags:
+            StoryTagLog(
+                story=st.story.id,
+                tag=tag,
+                tag_name=tag.name,
+                action_flag=StoryTagLog.DELETION,
+                modified_by=user,
+                date=tm,
+            ).flush()
+            later(current_app.tasks['sphinx_update_story'].delay, st.story.id, ('tag',))
+            st.delete()
+            tag.stories_count -= 1
+            if st.story.published:
+                tag.published_stories_count -= 1
+
+        log_deletion(by=user, what=tag)
+        tag.delete()
 
     def set_blacklist(self, user, reason):
         from mini_fiction.models import StoryTag, StoryTagLog

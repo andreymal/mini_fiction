@@ -1304,6 +1304,10 @@ msgstr "Активировать"
 msgid "Delete this static page?"
 msgstr "Удалить эту статическую страницу?"
 
+#: mini_fiction/templates/admin/tags/delete.html:18
+msgid "Delete this tag?"
+msgstr "Удалить этот тег?"
+
 #: mini_fiction/templates/admin/tag_categories/delete.html:13
 msgid "Delete this tag category?"
 msgstr "Удалить эту категорию тегов?"

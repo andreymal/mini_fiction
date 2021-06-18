@@ -94,6 +94,11 @@
         {{ form_fields(form) }}
         <div class="controls">
             <input type="submit" value="{{ _('Save') }}" class="btn btn-primary" />
+            {% if edit %}
+                <a href="{{ url_for('admin_tags.delete', pk=tag.id) }}" class="btn">
+                    {{ _('Delete') }}
+                </a>
+            {% endif %}
         </div>
         </form>
 

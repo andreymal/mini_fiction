@@ -174,3 +174,26 @@ def update(pk):
         edit=True,
         saved=saved,
     )
+
+
+@bp.route('/<int:pk>/delete/', methods=('GET', 'POST'))
+@db_session
+@admin_required
+def delete(pk):
+    tag = Tag.get(id=pk)
+    if not tag:
+        abort(404)
+
+    if request.method == 'POST':
+        try:
+            tag.bl.delete(current_user._get_current_object())
+        except ValidationError:
+            abort(403)
+        else:
+            return redirect(url_for('admin_tags.index'))
+
+    return render_template(
+        'admin/tags/delete.html',
+        page_title=gettext('Delete'),
+        tag=tag,
+    )

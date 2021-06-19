@@ -25,23 +25,20 @@
     <meta name="csrf-token" content="{{ csrf_token() }}" />
 {% endblock -%}
 
-{%- block head_css %}
-    {% set index_css, story_css = webpack_asset('index.css'), webpack_asset('story.css') %}
-    <link rel="stylesheet" href="{{ url_for('static', filename='build/{}'.format(index_css.src)) }}" integrity="{{ index_css.integrity }}" crossorigin="anonymous"/>
-    <link rel="stylesheet" href="{{ url_for('static', filename='build/{}'.format(story_css.src)) }}" integrity="{{ story_css.integrity }}" crossorigin="anonymous"/>
-    {%- for css_link_args in extra_css %}
-        <link rel="stylesheet" href="{{ url_for(**css_link_args) }}" />
-    {%- endfor -%}
-{% endblock -%}
-
-{% for script in webpack_scripts() %}
-    <link rel="prefetch" as="script" href="{{ url_for('static', filename='build/{}'.format(script.src)) }}" integrity="{{ script.integrity }}">
+{# Prefetch all scripts #}
+{% for script in scripts() %}
+    <link rel="prefetch" as="script" href="{{ script.url }}" integrity="{{ script.integrity }}">
 {% endfor %}
 
-{% set index_js, bootstrap_js = webpack_asset('index.js'), webpack_asset('bootstrap.js') %}
-<script defer src="{{ url_for('static', filename='build/{}'.format(index_js.src)) }}" integrity="{{ index_js.integrity }}" crossorigin="anonymous"></script>
-<script defer src="{{ url_for('static', filename='build/{}'.format(bootstrap_js.src)) }}" integrity="{{ bootstrap_js.integrity }}" crossorigin="anonymous"></script>
+{# Include all stylesheets, internal and external #}
+{% for stylesheet in stylesheets() %}
+    <link rel="stylesheet" href="{{ stylesheet.url }}" integrity="{{ stylesheet.integrity }}" crossorigin="anonymous"/>
+{% endfor %}
 
+{# Include all internal and external entrypoints #}
+{% for script in scripts(entrypoint=True) %}
+    <script defer src="{{ script.url }}" integrity="{{ script.integrity }}" crossorigin="anonymous"></script>
+{% endfor %}
 
 {%- block meta_robots_tag %}{% if robots_noindex or robots_nofollow %}
     <meta name="robots" content="
@@ -76,7 +73,6 @@
     <div id="loading-icon" class="loader-container loader loader-hidden"></div>
     <div class="popup-notifications" id="popup-notifications"></div>
 {% include 'includes/formatting_window.html' %}
-{% include 'base_body_scripts.html' %}
 {% block extrabody %}{% endblock %}
 </body>
 </html>

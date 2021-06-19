@@ -116,7 +116,7 @@ def favicon_bundle() -> FaviconBundle:
     assets = get_assets()
     legacy_favicon = assets.get("favicon.ico")
     main_favicon = assets.get("favicon.png")
-    apple_favicon = assets.get("apple-touch-icon")
+    apple_favicon = assets.get("apple-touch-icon.png")
 
     return FaviconBundle(
         legacy=legacy_favicon and legacy_favicon.url or None,

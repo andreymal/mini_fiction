@@ -15,8 +15,6 @@ class FaviconBundle:
     apple: Optional[str] = None
 
 
-NO_FAVICONS = FaviconBundle()
-
 
 class Config(object):
     LOCALES = {
@@ -153,7 +151,7 @@ class Config(object):
     SITE_INDEX_TITLE = {'default': ''}
     SITE_DESCRIPTION = {'default': ''}
     SITE_FEEDBACK = '/'
-    FAVICONS = NO_FAVICONS
+    FAVICONS: Optional[FaviconBundle] = None
     APPLE_TOUCH_ICON_URL = None
     APPLE_TOUCH_ICON_PRECOMPOSED_URL = None
     SESSION_COOKIE_DOMAIN = False

@@ -1,13 +1,13 @@
 import re
 from itertools import chain
 from pathlib import Path
-from typing import Dict, List, Tuple
+from typing import Dict, List, Tuple, Optional
 
 from flask import current_app, g, url_for
 from pydantic import BaseModel, parse_file_as  # pylint: disable=no-name-in-module
 from werkzeug.datastructures import MultiDict
 
-from mini_fiction.settings import NO_FAVICONS, FaviconBundle
+from mini_fiction.settings import FaviconBundle
 
 PLAIN_STYLESHEET = re.compile(r".*\.css$")
 PLAIN_SCRIPT = re.compile(r".*\.js$")
@@ -102,9 +102,9 @@ def scripts(*, entrypoint: bool = False) -> List[ResolvedAsset]:
 
 
 def favicon_bundle() -> FaviconBundle:
-    default_favicons: FaviconBundle = current_app.config["FAVICONS"]
-    if default_favicons is not NO_FAVICONS:
-        return default_favicons
+    config_favicons: Optional[FaviconBundle] = current_app.config.get("FAVICONS")
+    if config_favicons is not None:
+        return config_favicons
 
     assets = get_assets()
     legacy_favicon = assets.get("favicon.ico")

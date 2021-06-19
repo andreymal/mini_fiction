@@ -565,6 +565,7 @@ def configure_development(app):
 def configure_frontend(app: Flask):
     app.add_template_global(frontend.stylesheets, name='stylesheets')
     app.add_template_global(frontend.scripts, name='scripts')
+    app.add_template_global(frontend.favicon_bundle, name='favicon_bundle')
 
 
 def configure_sidebar(app: Flask):

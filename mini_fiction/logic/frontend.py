@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 import re
 from itertools import chain
 from pathlib import Path
@@ -52,9 +50,7 @@ def get_manifest(*, bundle_type: str, path: Path) -> ResolvedAssets:
     ]
 
 
-def _get_assets() -> MultiDict[
-    str, ResolvedAsset
-]:  # pylint: disable=unsubscriptable-object
+def _get_assets() -> "MultiDict[str, ResolvedAsset]":
     static_root = Path(current_app.config["STATIC_ROOT"])
     bundled_manifests = chain(
         *(
@@ -76,10 +72,7 @@ def _get_assets() -> MultiDict[
     return MultiDict((*bundled_manifests, *localstatic_manifests))
 
 
-def get_assets() -> MultiDict[
-    str,
-    ResolvedAsset,
-]:  # pylint: disable=unsubscriptable-object
+def get_assets() -> "MultiDict[str, ResolvedAsset]":
     if current_app.config["FRONTEND_MANIFESTS_AUTO_RELOAD"]:
         # Always serve assets from fresh manifests
         return _get_assets()

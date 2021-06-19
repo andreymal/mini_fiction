@@ -77,7 +77,8 @@ def get_assets() -> List[Tuple[str, ResolvedAsset]]:
     manifests = getattr(g, "frontend_assets", None)
     if manifests is None:
         # Load and cache manifests
-        setattr(g, "frontend_assets", _get_assets())
+        manifests = _get_assets()
+        setattr(g, "frontend_assets", manifests)
     return manifests
 
 

@@ -3,3 +3,5 @@
 @import "css/bootstrap.css";
 @import "css/main.css";
 @import "css/slides.css";
+
+@import "components/StoryTags/styles.css";

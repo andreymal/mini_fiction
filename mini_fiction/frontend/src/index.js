@@ -9,6 +9,16 @@ import editlog from './legacy/editlog';
 import captcha from './legacy/captcha';
 import lazyBaz from './utils/lazyBaz';
 
+import {
+  alert,
+  button,
+  collapse,
+  dropdown,
+  modal,
+  tab,
+  transition,
+} from './legacy/lib/bootstrap.min';
+
 /* devblock:start */
 require('preact/debug');
 /* devblock:end */
@@ -41,12 +51,23 @@ Baz.register({
   StoryTags: lazyBaz(() => import('./components/StoryTags')),
 });
 
+const initialize = (jQuery) => {
+  core.init(jQuery);
+  transition(jQuery);
+  modal(jQuery);
+  dropdown(jQuery);
+  tab(jQuery);
+  alert(jQuery);
+  button(jQuery);
+  collapse(jQuery);
+};
+
 if (window.document.readyState !== 'loading') {
   Baz.watch();
-  import('jquery').then(({ default: jQuery }) => core.init(jQuery));
+  import('jquery').then(({ default: jQuery }) => initialize(jQuery));
 } else {
   window.document.addEventListener('DOMContentLoaded', () => {
     Baz.watch();
-    import('jquery').then(({ default: jQuery }) => core.init(jQuery));
+    import('jquery').then(({ default: jQuery }) => initialize(jQuery));
   });
 }

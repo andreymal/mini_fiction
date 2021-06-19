@@ -88,9 +88,7 @@ module.exports = {
   mode: ENV,
   context: path.resolve(__dirname, 'src'),
   entry: {
-    story: ['./story.css'],
     index: ['./index.js', './index.css'],
-    index_bootstrap: ['./bootstrap.js'],
   },
 
   output: {

@@ -30,8 +30,7 @@ from pony.flask import Pony
 from mini_fiction import models  # pylint: disable=unused-import
 from mini_fiction import database, tasks, context_processors, ratelimit
 from mini_fiction.bl import init_bl
-from mini_fiction.utils import frontend
-
+from mini_fiction.logic import frontend
 
 __all__ = ['create_app']
 
@@ -360,27 +359,9 @@ def configure_admin_views(app):
 def configure_staticfiles(app):
     from mini_fiction.views import misc
 
-    app.extra_css = list(app.config['EXTRA_CSS'])
-    app.extra_js = list(app.config['EXTRA_JS'])
-
     app.add_url_rule('/{}/<path:filename>'.format(app.config['MEDIA_URL'].strip('/')), 'media', misc.media)
     if app.config['LOCALSTATIC_ROOT']:
         app.add_url_rule('/{}/<path:filename>'.format(app.config['LOCALSTATIC_URL'].strip('/')), 'localstatic', misc.localstatic)
-
-    # Static invalidation
-    app.static_v = None
-    if app.config.get('STATIC_V'):
-        app.static_v = app.config['STATIC_V']
-    elif app.config.get('STATIC_ROOT') and app.config.get('STATIC_VERSION_FILE'):
-        version_file_path = os.path.join(app.config['STATIC_ROOT'], app.config['STATIC_VERSION_FILE'])
-        if os.path.isfile(version_file_path):
-            with open(version_file_path, 'r', encoding='utf-8') as fp:
-                app.static_v = fp.read().strip()
-
-    @app.url_defaults
-    def static_postfix(endpoint, values):
-        if endpoint in ('static', 'localstatic') and 'v' not in values and not values['filename'].startswith('build/') and app.static_v:
-            values['v'] = app.static_v
 
 
 def configure_ajax(app):
@@ -582,8 +563,8 @@ def configure_development(app):
 
 
 def configure_frontend(app: Flask):
-    app.add_template_global(frontend.webpack_asset, name='webpack_asset')
-    app.add_template_global(frontend.webpack_scripts, name='webpack_scripts')
+    app.add_template_global(frontend.stylesheets, name='stylesheets')
+    app.add_template_global(frontend.scripts, name='scripts')
 
 
 def configure_sidebar(app: Flask):

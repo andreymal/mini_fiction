@@ -19,11 +19,8 @@ def website_settings():
     result = {
         'SITE_NAME': sitename(),
         'EMAIL_SITE_NAME': emailsitename(),
-        'STATIC_V': current_app.static_v,
         'base': current_app.jinja_env.get_template('base.json' if getattr(g, 'is_ajax', False) else 'base.html'),
         'contact_types': {x['name']: x for x in current_app.config['CONTACTS']},
-        'extra_css': current_app.extra_css,
-        'extra_js': current_app.extra_js,
     }
 
     for k in [

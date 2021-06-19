@@ -154,9 +154,6 @@ class Config(object):
 
     STATIC_ROOT = os.path.join(os.path.dirname(__file__), 'static')
     STATIC_URL = '/static'
-    STATIC_VERSION_FILE = 'VERSION'
-    STATIC_VERSION_TYPE = 'date'  # or 'hash'
-    STATIC_V = None
 
     LOCALSTATIC_ROOT = None
     LOCALSTATIC_URL = '/localstatic'
@@ -164,12 +161,7 @@ class Config(object):
     MEDIA_ROOT = Path.cwd() / 'media'
     MEDIA_URL = '/media'
 
-    FRONTEND_MANIFEST_PATH = os.path.join(os.path.dirname(__file__), 'static/build/manifest.json')
-    FRONTEND_MANIFEST_AUTO_RELOAD = False
-
-    # [{"endpoint": "localstatic", filename="your/local/file"}]
-    EXTRA_CSS = []
-    EXTRA_JS = []
+    FRONTEND_MANIFESTS_AUTO_RELOAD = False
 
     LOCALTEMPLATES = None
 
@@ -462,7 +454,7 @@ class Development(Config):
     TEMPLATES_AUTO_RELOAD = True
     CELERY_CONFIG = dict(Config.CELERY_CONFIG)
     CELERY_CONFIG['task_always_eager'] = True
-    FRONTEND_MANIFEST_AUTO_RELOAD = True
+    FRONTEND_MANIFESTS_AUTO_RELOAD = True
 
 
 class Test(Config):

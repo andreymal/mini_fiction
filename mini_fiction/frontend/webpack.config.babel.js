@@ -90,7 +90,7 @@ module.exports = {
   entry: {
     story: ['./story.css'],
     index: ['./index.js', './index.css'],
-    bootstrap: ['./bootstrap.js'],
+    index_bootstrap: ['./bootstrap.js'],
   },
 
   output: {

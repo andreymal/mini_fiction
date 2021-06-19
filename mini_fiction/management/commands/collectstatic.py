@@ -1,10 +1,6 @@
-#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
-
 import os
 import shutil
 from hashlib import sha256
-from datetime import datetime
 
 import click
 from flask import current_app
@@ -40,29 +36,31 @@ def collect_files(src, only=None, ignore=None, follow_symlinks=False):
     return result
 
 
-def copyfile(src, dst, global_hash, follow_symlinks=False, verbose=True):
-    if verbose:
-        print(dst, end='', flush=True)
+def copyfile(source: str, destination: str, follow_symlinks=False, verbose=True):
+    global_hash = sha256()
 
-    dstdir = os.path.dirname(dst)
+    if verbose:
+        print(destination, end='', flush=True)
+
+    dstdir = os.path.dirname(destination)
     if not os.path.isdir(dstdir):
         os.makedirs(dstdir)  # TODO: что-то сделать с правами
 
-    if not follow_symlinks and os.path.islink(src):
+    if not follow_symlinks and os.path.islink(source):
         changed = False
-        if not os.path.islink(dst) or os.readlink(src) != os.readlink(dst):
-            if os.path.exists(dst):
-                os.remove(dst)
-            os.symlink(os.readlink(src), dst)
+        if not os.path.islink(destination) or os.readlink(source) != os.readlink(destination):
+            if os.path.exists(destination):
+                os.remove(destination)
+            os.symlink(os.readlink(source), destination)
             changed = True
         if verbose:
             print(' (symlink)', flush=True)
         return changed
 
     old_hash = None
-    if os.path.isfile(dst):
+    if os.path.isfile(destination):
         old_hash_obj = sha256()
-        with open(dst, 'rb') as fp:
+        with open(destination, 'rb') as fp:
             while True:
                 chunk = fp.read(16384)
                 if not chunk:
@@ -72,7 +70,7 @@ def copyfile(src, dst, global_hash, follow_symlinks=False, verbose=True):
         del old_hash_obj
 
     new_hash_obj = sha256()
-    with open(src, 'rb') as fp:
+    with open(source, 'rb') as fp:
         while True:
             chunk = fp.read(16384)
             if not chunk:
@@ -83,7 +81,7 @@ def copyfile(src, dst, global_hash, follow_symlinks=False, verbose=True):
     del new_hash_obj
 
     if old_hash != new_hash:
-        shutil.copy2(src, dst)
+        shutil.copy2(source, destination)
         if verbose:
             print(' (updated)', flush=True)
         return True
@@ -92,7 +90,11 @@ def copyfile(src, dst, global_hash, follow_symlinks=False, verbose=True):
         print(' (not changed)', flush=True)
     return False
 
-@cli.command(short_help='Copies static files.', help='Copies static files to DESTINATION directory (STATIC_ROOT by default).')
+
+@cli.command(
+    short_help='Copies static files.',
+    help='Copies static files to DESTINATION directory (STATIC_ROOT by default).'
+)
 @click.option('-v/-V', '--verbose/--no-verbose', default=True)
 @click.argument('destination', nargs=1, required=False)
 def collectstatic(verbose, destination):
@@ -111,18 +113,24 @@ def collectstatic(verbose, destination):
         print('Project static folder: {}'.format(projectstatic))
 
     copy_static_directory(
-        modulestatic, projectstatic, verbose=verbose,
-        static_version_file=current_app.config.get('STATIC_VERSION_FILE'),
+        source=modulestatic,
+        destination=projectstatic,
+        verbose=verbose,
         follow_symlinks=True,
     )
 
 
 def copy_static_directory(
-    src, dst, verbose=True, static_version_file=None,
-    only=None, ignore=None, follow_symlinks=False
-):
-    modulestatic = src
-    projectstatic = dst
+    *,
+    source: str,
+    destination: str,
+    verbose=True,
+    only=None,
+    ignore=None,
+    follow_symlinks=False
+) -> None:
+    modulestatic = source
+    projectstatic = destination
 
     if not os.path.isdir(projectstatic):
         os.makedirs(projectstatic)
@@ -134,37 +142,15 @@ def copy_static_directory(
     if verbose:
         print('found {} files.'.format(len(srcfiles)), flush=True)
 
-    global_hash = sha256()
-    changed_cnt = 0
-
-    for path in srcfiles:
-        src = os.path.join(modulestatic, path)
-        dst = os.path.join(projectstatic, path)
-        if copyfile(src, dst, global_hash=global_hash, verbose=verbose, follow_symlinks=follow_symlinks):
-            changed_cnt += 1
+    changed = [
+        copyfile(
+            source=os.path.join(modulestatic, path),
+            destination=os.path.join(projectstatic, path),
+            verbose=verbose,
+            follow_symlinks=follow_symlinks
+        )
+        for path in srcfiles
+    ]
 
     if verbose:
-        print('{} files updated.'.format(changed_cnt))
-
-    if changed_cnt > 0 and static_version_file:
-        version_file_path = os.path.join(projectstatic, static_version_file)
-        if not os.path.isdir(os.path.dirname(version_file_path)):
-            os.makedirs(os.path.dirname(version_file_path))
-
-        old_ver = None
-        if os.path.isfile(version_file_path):
-            with open(version_file_path, 'r', encoding='utf-8') as fp:
-                old_ver = fp.read().strip()
-
-        if current_app.config.get('STATIC_VERSION_TYPE') == 'date':
-            new_ver = datetime.now().strftime('%Y%m%d')
-            if new_ver == old_ver:
-                new_ver += '.1'
-        elif current_app.config.get('STATIC_VERSION_TYPE') == 'hash':
-            new_ver = global_hash.hexdigest()[:8]
-
-        if old_ver != new_ver:
-            with open(version_file_path, 'w', encoding='utf-8') as fp:
-                fp.write(new_ver + '\n')
-
-    return changed_cnt
+        print('{} files updated.'.format(changed.count(True)))

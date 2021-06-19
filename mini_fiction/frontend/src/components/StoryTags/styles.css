@@ -1,6 +1,6 @@
 :root {
   --background: #fff;
-  --default: #999;
+  --default-tag-color: #999;
   --highlight-filters: saturate(104%) brightness(104%);
 }
 
@@ -36,6 +36,7 @@
 }
 
 .tag-item {
+  background-color: var(--default-tag-color);
   border-radius: 0.25em;
   font-weight: bold;
   line-height: 1em;
@@ -54,7 +55,7 @@
 }
 
 .tag-item-type-default {
-  background-color: var(--default);
+  background-color: var(--default-tag-color);
 }
 
 .tag-remove {

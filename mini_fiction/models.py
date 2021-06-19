@@ -334,7 +334,6 @@ class TagCategory(db.Entity):
     """ Модель категории тега """
 
     name = orm.Required(str, 255)
-    color = orm.Optional(str, 7)
     description = orm.Optional(orm.LongStr)
     created_at = orm.Required(datetime, 6, default=datetime.utcnow)
     updated_at = orm.Required(datetime, 6, default=datetime.utcnow)
@@ -353,7 +352,6 @@ class Tag(db.Entity):
     name = orm.Required(str, 255)  # fancy human-readable name
     iname = orm.Required(str, 32, unique=True)  # normalized lowercase name
     category = orm.Optional(TagCategory)
-    color = orm.Optional(str, 7)
     description = orm.Optional(orm.LongStr)
     is_main_tag = orm.Required(bool, default=False)
     created_at = orm.Required(datetime, 6, default=datetime.utcnow)
@@ -381,13 +379,6 @@ class Tag(db.Entity):
             ' [blacklist]' if self.is_blacklisted else '',
             str(self)
         )
-
-    def get_color(self):
-        if self.color:
-            return self.color
-        if self.category and self.category.color:
-            return self.category.color
-        return ''
 
     @property
     def is_alias(self):

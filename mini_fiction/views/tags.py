@@ -108,7 +108,7 @@ def build_tags_autocomplete_json(tags=None):
             'description': tag.description,
             'stories_count': tag.published_stories_count,
             'aliases': [x.iname for x in aliases[tag.id]],
-            'color': tag.get_color(),
+            'category_id': tag.category.id if tag.category else 0,
         } for tag in tags],
     }
 

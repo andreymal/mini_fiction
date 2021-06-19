@@ -1,6 +1,3 @@
-#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
-
 from flask_babel import lazy_gettext
 from wtforms import TextField, TextAreaField, BooleanField
 
@@ -9,7 +6,6 @@ from pony import orm
 from mini_fiction.models import TagCategory
 from mini_fiction.forms.form import Form
 from mini_fiction.forms.fields import LazySelectField
-from mini_fiction.widgets import TagsInput
 
 
 class TagForm(Form):
@@ -25,11 +21,6 @@ class TagForm(Form):
         'Категория',
         choices=lambda: [(0, '-')] + list(orm.select((x.id, x.name) for x in TagCategory)),
         coerce=int,
-    )
-
-    color = TextField(
-        lazy_gettext('Color'),
-        render_kw=dict(attrs_dict, maxlength=7, type='text'),
     )
 
     description = TextAreaField(

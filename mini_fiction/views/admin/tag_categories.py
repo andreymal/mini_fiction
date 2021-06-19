@@ -66,7 +66,6 @@ def update(pk):
 
     form = TagCategoryForm(data={
         'name': tag_category.name,
-        'color': tag_category.color,
         'description': tag_category.description,
     })
 

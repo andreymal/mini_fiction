@@ -14,7 +14,7 @@
         {% if saved %}<div class="alert-mini green">{{ _('Saved!') }}</div>{% endif %}
 
         {% if edit %}
-        <span class="story-tag" style="background-color: {{ tag_category.color }}">{{ tag_category.name }}</span>
+        <span class="story-tag" data-category-id="{{ tag_category.category_id }}">{{ tag_category.name }}</span>
         {% endif %}
 
         <form class="form-horizontal" method="POST" enctype="multipart/form-data">

@@ -59,7 +59,7 @@
 <p style="color: #999;">
 {%- for st in main_tags -%}
     <a
-        style="margin: 0 4px 2px 0; padding: 2px 7px; color: #fff; display: inline-block; line-height: 16px; text-decoration: none; border-radius: 5px;{% endif %}"
+        style="margin: 0 4px 2px 0; padding: 2px 7px; color: #fff; background-color: #999; display: inline-block; line-height: 16px; text-decoration: none; border-radius: 5px;{% endif %}"
         href="{{ url_for('tags.tag_index', tag_name=st.tag.iname, _external=True) }}">
             {{- st.tag.name -}}
     </a>

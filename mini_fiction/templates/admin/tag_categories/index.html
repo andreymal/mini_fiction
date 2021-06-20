@@ -9,7 +9,7 @@
 
         <ul>
         {% for tag_category in tag_categories %}
-            <li><a class="story-tag" style="background-color: {{ tag_category.color }}" href="{{ url_for('admin_tag_categories.update', pk=tag_category.id) }}">{{ tag_category.name }}</a></li>
+            <li><a class="story-tag" data-category-id="{{ tag_category.category_id }}" href="{{ url_for('admin_tag_categories.update', pk=tag_category.id) }}">{{ tag_category.name }}</a></li>
         {% endfor %}
         </ul>
 

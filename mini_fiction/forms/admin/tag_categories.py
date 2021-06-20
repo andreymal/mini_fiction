@@ -1,6 +1,3 @@
-#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
-
 from flask_babel import lazy_gettext
 from wtforms import TextField, TextAreaField
 
@@ -13,11 +10,6 @@ class TagCategoryForm(Form):
     name = TextField(
         lazy_gettext('Name'),
         render_kw=dict(attrs_dict, maxlength=256),
-    )
-
-    color = TextField(
-        lazy_gettext('Color'),
-        render_kw=dict(attrs_dict, maxlength=7, type='text'),
     )
 
     description = TextAreaField(

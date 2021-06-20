@@ -98,12 +98,12 @@ zip_dump_params = {
         'media': ('image_bundle',),
     },
     'tagcategory': {
-        'include': ('id', 'name', 'color', 'description', 'created_at', 'updated_at'),
+        'include': ('id', 'name', 'description', 'created_at', 'updated_at'),
         'exclude': ('tags',),
     },
     'tag': {
         'include': (
-            'id', 'name', 'iname', 'category', 'color', 'description',
+            'id', 'name', 'iname', 'category', 'description',
             'is_main_tag', 'created_at', 'updated_at', 'is_alias_for',
             'is_hidden_alias', 'is_extreme_tag', 'reason_to_blacklist',
         ),

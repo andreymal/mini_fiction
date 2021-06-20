@@ -138,7 +138,6 @@ def update(pk):
     form = TagForm(data={
         'name': tag.name,
         'category': tag.category.id if tag.category else 0,
-        'color': tag.color,
         'description': tag.description,
         'is_main_tag': tag.is_main_tag,
         'is_alias_for': tag.is_alias_for.name if tag.is_alias_for else '',

@@ -21,7 +21,7 @@ const getSuggestionValue = (suggestion) => suggestion.name;
 
 const synthesizeSuggestion = (value) => ({
   aliases: [],
-  color: '#1D2A4F',
+  category_id: 0,
   description: '',
   id: 0,
   name: value,

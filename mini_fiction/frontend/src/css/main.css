@@ -741,7 +741,7 @@ h1 .alert {
     display: inline-block;
     line-height: 16px;
     margin: 0 4px 4px 0;
-    background-color: #35B450;
+    background-color: var(--default-tag-color);
 }
 
 .story-tag:hover {

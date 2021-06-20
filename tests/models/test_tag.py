@@ -222,7 +222,6 @@ def test_tag_create_normal(factories):
     assert tag.name == 'Тестовый тег'
     assert tag.iname == 'тестовый_тег'
     assert tag.category is None
-    assert tag.color == ''
     assert tag.description == 'Это описание тега'
     assert tag.is_main_tag is False
     assert tag.is_alias is False
@@ -360,7 +359,6 @@ def test_tag_update_normal(factories):
     assert tag.name == 'Обновлённый тег'
     assert tag.iname == 'обновлённый_тег'
     assert tag.category is None
-    assert tag.color == '#ff0000'
     assert tag.description == 'Это новое описание тега'
     assert tag.is_main_tag is False
     assert tag.is_alias is False

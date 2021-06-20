@@ -328,7 +328,6 @@ class TagBL(BaseBL):
             name=data['name'],
             iname=iname,
             category=data.get('category'),
-            color=data.get('color') or '',
             description=data.get('description') or '',
             is_main_tag=data.get('is_main_tag', False),
             created_by=user,
@@ -376,7 +375,7 @@ class TagBL(BaseBL):
             if old_category_id != data['category']:
                 changes['category'] = data['category']
 
-        for key in ('color', 'description', 'is_main_tag', 'is_extreme_tag'):
+        for key in ('description', 'is_main_tag', 'is_extreme_tag'):
             if key in data and data[key] != getattr(tag, key):
                 changes[key] = data[key]
 

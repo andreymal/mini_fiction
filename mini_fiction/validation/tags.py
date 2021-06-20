@@ -22,14 +22,6 @@ TAG = {
         'nullable': True,
         'allowed_func': lambda: [None] + list(orm.select(x.id for x in models.TagCategory)),
     },
-    'color': {
-        'type': 'string',
-        'nullable': True,
-        'regex': r'^(#([0-9A-Fa-f]{3}){1,2})?$',
-        'error_messages': {
-            'regex': lazy_gettext('Color format must be "#HHH" or "#HHHHHH"'),
-        },
-    },
     'description': {
         'type': 'string',
         'coerce': (safe_string_multiline_coerce, 'strip'),

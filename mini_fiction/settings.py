@@ -1,9 +1,19 @@
-import os
 import logging
+import os
+from dataclasses import dataclass
 from pathlib import Path
+from typing import Optional
 
 from celery.schedules import crontab
 from flask_babel import lazy_gettext
+
+
+@dataclass
+class FaviconBundle:
+    legacy: Optional[str] = None
+    main: Optional[str] = None
+    apple: Optional[str] = None
+
 
 
 class Config(object):
@@ -141,7 +151,7 @@ class Config(object):
     SITE_INDEX_TITLE = {'default': ''}
     SITE_DESCRIPTION = {'default': ''}
     SITE_FEEDBACK = '/'
-    FAVICON_URL = None
+    FAVICONS: Optional[FaviconBundle] = None
     APPLE_TOUCH_ICON_URL = None
     APPLE_TOUCH_ICON_PRECOMPOSED_URL = None
     SESSION_COOKIE_DOMAIN = False

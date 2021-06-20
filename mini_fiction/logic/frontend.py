@@ -1,10 +1,13 @@
 import re
 from itertools import chain
 from pathlib import Path
-from typing import Dict, List, Tuple
+from typing import Dict, List, Tuple, Optional
 
 from flask import current_app, g, url_for
 from pydantic import BaseModel, parse_file_as  # pylint: disable=no-name-in-module
+from werkzeug.datastructures import MultiDict
+
+from mini_fiction.settings import FaviconBundle
 
 PLAIN_STYLESHEET = re.compile(r".*\.css$")
 PLAIN_SCRIPT = re.compile(r".*\.js$")
@@ -47,7 +50,7 @@ def get_manifest(*, bundle_type: str, path: Path) -> ResolvedAssets:
     ]
 
 
-def _get_assets() -> ResolvedAssets:
+def _get_assets() -> "MultiDict[str, ResolvedAsset]":
     static_root = Path(current_app.config["STATIC_ROOT"])
     bundled_manifests = chain(
         *(
@@ -66,10 +69,10 @@ def _get_assets() -> ResolvedAssets:
     else:
         localstatic_manifests = chain()
 
-    return [*bundled_manifests, *localstatic_manifests]
+    return MultiDict((*bundled_manifests, *localstatic_manifests))
 
 
-def get_assets() -> List[Tuple[str, ResolvedAsset]]:
+def get_assets() -> "MultiDict[str, ResolvedAsset]":
     if current_app.config["FRONTEND_MANIFESTS_AUTO_RELOAD"]:
         # Always serve assets from fresh manifests
         return _get_assets()
@@ -83,12 +86,33 @@ def get_assets() -> List[Tuple[str, ResolvedAsset]]:
 
 
 def stylesheets() -> List[ResolvedAsset]:
-    return [asset for name, asset in get_assets() if PLAIN_STYLESHEET.match(name)]
+    return [
+        asset
+        for name, asset in get_assets().items(True)
+        if PLAIN_STYLESHEET.match(name)
+    ]
 
 
 def scripts(*, entrypoint: bool = False) -> List[ResolvedAsset]:
     return [
         asset
-        for name, asset in get_assets()
+        for name, asset in get_assets().items(True)
         if (entrypoint and ENTRYPOINT_SCRIPT or PLAIN_SCRIPT).match(name)
     ]
+
+
+def favicon_bundle() -> FaviconBundle:
+    config_favicons: Optional[FaviconBundle] = current_app.config.get("FAVICONS")
+    if config_favicons is not None:
+        return config_favicons
+
+    assets = get_assets()
+    legacy_favicon = assets.get("favicon.ico")
+    main_favicon = assets.get("favicon.png")
+    apple_favicon = assets.get("apple-touch-icon.png")
+
+    return FaviconBundle(
+        legacy=legacy_favicon and legacy_favicon.url or None,
+        main=main_favicon and main_favicon.url or None,
+        apple=apple_favicon and apple_favicon.url or None,
+    )

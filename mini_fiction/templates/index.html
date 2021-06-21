@@ -27,20 +27,6 @@
 {% endblock %}
 
 {% block content %}
-<div class="row welcome-box">
-  <div class="span12 genra">
-    <ul class="mininav">
-        <li class="mininav-item"><a href="{{ url_for('object_lists.top') }}">{{ pgettext('best_stories', 'Best') }}</a></li>
-        <li class="mininav-item"><a href="{{ url_for('tags.index') }}">{{ _('Tags') }}</a></li>
-        {% if current_user.is_staff -%}
-            <li class="mininav-item"><a href="{{ url_for('editlog.index', all='1', staff='1') }}">{{ _('Moderation log') }}</a></li>
-        {% elif current_user.is_authenticated -%}
-            <li class="mininav-item"><a href="{{ url_for('editlog.index') }}">{{ _('Edit log') }}</a></li>
-        {% endif -%}
-    </ul>
-  </div>
-</div>
-
 <div class="row">
     <div class="span8 top-list">
         <h2>{{ _('New stories') }}</h2>

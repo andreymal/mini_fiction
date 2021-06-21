@@ -218,26 +218,6 @@ ul.nav-main-links {
     right: 0;
 }
 
-/* simple text-based nav */
-
-.mininav {
-    list-style: none;
-    display: block;
-    margin: 0;
-    padding: 0;
-}
-
-.mininav-item {
-    display: inline;
-    margin: 0;
-    padding: 0;
-}
-
-.mininav-item + .mininav-item:before {
-    content: ' | ';
-    color: #999;
-}
-
 .bell-popup {
     position: absolute;
     right: 0;
@@ -478,12 +458,8 @@ h4 {
 }
 
 /* Index-specific stuff */
-.welcome-box {
-    margin-top: 16px;
-}
-
-.genra {
-    margin-bottom: 16px;
+#content > div:first-child {
+    margin-top: 1em;
 }
 
 /* Story item */

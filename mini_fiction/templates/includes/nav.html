@@ -62,8 +62,9 @@
 </div><!-- /nav-main-profile -->
 
 <ul id="nav-main-links" class="nav-items nav-main-links">
-    {{ nav_item(_('Index'), url_for('index.index'), 'index.index') }}
+    {{ nav_item(pgettext('best_stories', 'Best'), url_for('object_lists.top'), 'object_lists.') }}
     {{ nav_item(_('Search'), url_for('search.main'), 'search.') }}
+    {{ nav_item(_('Tags'), url_for('tags.index'), 'tags.index') }}
 
     {% if current_user.is_staff %}
         {{ nav_item(
@@ -80,12 +81,9 @@
         ) }}
         {% endif %}{% endwith %}
 
-    {% endif %}
-
-    {{ nav_item(
-        pgettext('help_page', 'Help'),
-        url_for('staticpages.index', name='help'),
-        matched=is_current_endpoint('staticpages.index', name='help')
-    ) }}
+        {{ nav_item(_('Moderation log'), url_for('editlog.index', all='1', staff='1'), 'editlog.index') }}
+    {% elif current_user.is_authenticated -%}
+        {{ nav_item(_('Edit log'), url_for('editlog.index'), 'editlog.index') }}
+    {% endif -%}
     {{ hook('nav') }}
 </ul>

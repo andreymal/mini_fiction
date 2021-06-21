@@ -701,8 +701,7 @@ def download_json(story_id):
     ):
         result.write(je.encode(x) + '\n')
 
-    # TODO: определиться с mimetype
-    response = Response(result.getvalue(), mimetype='text/plain')
+    response = Response(result.getvalue(), mimetype='application/json-l')
     response.headers['X-Robots-Tag'] = 'noindex'
     return response
 
@@ -723,7 +722,6 @@ def download_json_full(story_id):
     for x in story.bl.dump_full(dump_collections=False):
         result.write(je.encode(x) + '\n')
 
-    # TODO: определиться с mimetype
-    response = Response(result.getvalue(), mimetype='text/plain')
+    response = Response(result.getvalue(), mimetype='application/json-l')
     response.headers['X-Robots-Tag'] = 'noindex'
     return response

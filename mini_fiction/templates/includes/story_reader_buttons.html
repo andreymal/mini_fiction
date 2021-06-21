@@ -8,7 +8,4 @@
 {%- for d in story.list_downloads() -%}
     <a title="Скачать в {{ d.format.name }}" href="{{ d.url }}" class="get {{ d.cls }}" data-noajax="1"></a>
 {%- endfor -%}
-{%- if show_jsonl_link -%}
-    <a title="Скачать дамп JSON Lines" href="{{ url_for('story.download_json', story_id=story.id) }}" class="get jsonl" download data-noajax="1"></a>
-{%- endif -%}
 </span>

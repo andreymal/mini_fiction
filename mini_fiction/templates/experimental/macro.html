@@ -41,8 +41,8 @@
 {%- endmacro %}
 
 {% macro tag_link(tag) -%}
-    {# FIXME rework tag color #}
-    <a {%- if tag.get_color() %} style="background-color: {{- tag.get_color() -}}"{%- endif %}
+    <a class="story-tag{% if tag.is_extreme_tag %} extreme-tag{% endif %}"
+       data-category-id="{{ tag.category.id if tag.category else 0 }}"
        href="{{ url_for('tags.tag_index', tag_name=tag.iname) }}">
         {{- tag.name -}}
     </a>

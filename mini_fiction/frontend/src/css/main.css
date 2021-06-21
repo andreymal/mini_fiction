@@ -1328,28 +1328,12 @@ select.select-size {
     vertical-align: middle;
 }
 
-.pdf {
-    background: transparent url(../images/pdf.png) no-repeat 0 0;
-}
-
-.txt {
-    background: transparent url(../images/txt.png) no-repeat 0 0;
-}
-
 .html {
     background: transparent url(../images/html.png) no-repeat 0 0;
 }
 
 .fb2, .fb2-zip {
     background: transparent url(../images/fb2.png) no-repeat 0 0;
-}
-
-.mobi {
-    background: transparent url(../images/epub.png) no-repeat 0 0;
-}
-
-.jsonl {
-    background: transparent url(../images/jsonl.png) no-repeat 0 0;
 }
 
 .up {

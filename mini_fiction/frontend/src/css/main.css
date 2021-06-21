@@ -2842,9 +2842,6 @@ ul.editlog .editlog-item:nth-child(2n+1) {
 
 /* 320 px screens */
 @media ( max-width : 320px) {
-    .main-menu .logolink {
-        display: none;
-    }
     .nav-pills>li>a {
         padding: 4px;
         font-size: 13px;

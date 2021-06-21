@@ -116,3 +116,7 @@ def favicon_bundle() -> FaviconBundle:
         main=main_favicon and main_favicon.url or None,
         apple=apple_favicon and apple_favicon.url or None,
     )
+
+
+def webpack_asset(name: str) -> ResolvedAsset:
+    return get_assets().get(name)

@@ -266,12 +266,6 @@
         </li>
         {%- endif %}
 
-        <li>
-            <a href="{{ url_for('feeds.accounts', user_id=author.id) }}" title="Новые рассказы автора" data-noajax="1">
-                RSS
-            </a>
-        </li>
-
         {% if current_user.is_superuser -%}
         <li><hr style="margin: 13px 0;"/></li>
         <li>

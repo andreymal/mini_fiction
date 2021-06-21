@@ -51,6 +51,8 @@
     {{ html_block('head') }}
 {%- endblock -%}
 
+<link rel="alternate" type="application/atom+xml" title="{{ SITE_NAME }}" href="{{ url_for('feeds.stories') }}" />
+
 {% block extrahead %}{% endblock %}
 </head>
 

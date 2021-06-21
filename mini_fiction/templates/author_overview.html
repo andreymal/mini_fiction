@@ -3,7 +3,7 @@
 
 {% block extrahead %}
     {{- super() }}
-    <link rel="alternate" type="application/rss+xml" title="Новые рассказы автора {{ author.username }} &mdash; {{ SITE_NAME }}" href="{{ url_for('feeds.accounts', user_id=author.id) }}" />
+    <link rel="alternate" type="application/atom+xml" title="Новые рассказы автора {{ author.username }} — {{ SITE_NAME }}" href="{{ url_for('feeds.accounts', user_id=author.id) }}" />
 {% endblock %}
 
 {% block content %}

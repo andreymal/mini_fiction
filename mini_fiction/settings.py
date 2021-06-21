@@ -147,6 +147,10 @@ class Config(object):
         'default': 'Library',
         'ru': 'Библиотека'
     }
+    COPYRIGHT = {
+        'default': 'Copyright',
+        'ru': 'Copyright'
+    }
     EMAIL_SITE_NAME = None  # SITE_NAME by default
     SITE_INDEX_TITLE = {'default': ''}
     SITE_DESCRIPTION = {'default': ''}

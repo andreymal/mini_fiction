@@ -18,6 +18,10 @@
                 {%- endfilter %}{% endfilter %},
             "content": {% filter safe %}{% filter tojson_raw -%}
                 {%- block content %}{% endblock %}
+                {%- endfilter %}{% endfilter %},
+            "footer-links": {% filter safe %}{% filter tojson_raw -%}
+                {%- block feeds_footer %}{% endblock -%}
+                {{- html_block('footer_links') -}}
                 {%- endfilter %}{% endfilter %}
         }
     }

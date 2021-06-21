@@ -32,12 +32,12 @@
 {% endfor %}
 
 {# Include all stylesheets, internal and external #}
-{% for stylesheet in stylesheets() %}
+{% for stylesheet in stylesheets() if "experimental" not in stylesheet.url %}
     <link rel="stylesheet" href="{{ stylesheet.url }}" integrity="{{ stylesheet.integrity }}" crossorigin="anonymous"/>
 {% endfor %}
 
 {# Include all internal and external entrypoints #}
-{% for script in scripts(entrypoint=True) %}
+{% for script in scripts(entrypoint=True) if "experimental" not in script.url %}
     <script defer src="{{ script.url }}" integrity="{{ script.integrity }}" crossorigin="anonymous"></script>
 {% endfor %}
 

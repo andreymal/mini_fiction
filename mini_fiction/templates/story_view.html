@@ -22,6 +22,12 @@
     {% endif %}
 {% endblock %}
 
+{% block feeds_footer %}
+    {% if story.status_string != 'finished' %}
+        <li>{{ atom_feed(url_for('feeds.story', story_id=story.id), story.title, True) }}</li>
+    {% endif %}
+{% endblock %}
+
 {% block content %}
 <div class="row">
     <div class="span12 story-page{% if story.nsfw %} story-nsfw{% endif %}" id="story_{{ story.id }}">

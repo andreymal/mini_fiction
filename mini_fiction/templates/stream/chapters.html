@@ -7,6 +7,10 @@
     {{ atom_feed(url_for('feeds.chapters'), _('Updates feed'), False) }}
 {% endblock %}
 
+{% block feeds_footer %}
+    <li>{{ atom_feed(url_for('feeds.chapters'), _('Updates feed'), False) }}</li>
+{% endblock %}
+
 <div class="row">
     <div class="span8">
         {{- breadcrumbs() }}

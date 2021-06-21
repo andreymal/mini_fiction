@@ -316,7 +316,7 @@
 
 {% macro atom_feed(url, name, inline) -%}
     {% if inline %}
-        <a class="atom" href="{{ url }}" title="{{ name }} — {{ SITE_NAME }}">RSS</a>
+        <a class="atom" href="{{ url }}" title="{{ name }} — {{ SITE_NAME }}" data-noajax="1">RSS</a>
     {% else %}
         <link rel="alternate" type="application/atom+xml" title="{{ name }} — {{ SITE_NAME }}" href="{{ url }}" />
     {% endif %}

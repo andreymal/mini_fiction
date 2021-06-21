@@ -22,6 +22,10 @@
     {{ atom_feed(url_for('feeds.stories'), _('New stories'), False) }}
 {% endblock %}
 
+{% block feeds_footer %}
+    <li>{{ atom_feed(url_for('feeds.stories'), _('New stories'), True) }}</li>
+{% endblock %}
+
 {% block content %}
 <div class="row welcome-box">
   <div class="span12 genra">

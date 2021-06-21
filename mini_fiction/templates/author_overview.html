@@ -6,6 +6,10 @@
     {{ atom_feed(url_for('feeds.accounts', user_id=author.id), "Новые рассказы автора {}".format(author.username), False) }}
 {% endblock %}
 
+{% block feeds_footer %}
+    <li>{{ atom_feed(url_for('feeds.accounts', user_id=author.id), "Новые рассказы автора {}".format(author.username), True) }}</li>
+{% endblock %}
+
 {% block content %}
 
 <div class="row">

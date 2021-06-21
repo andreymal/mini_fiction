@@ -7,6 +7,10 @@
     {{ atom_feed(url_for('feeds.top', period=period or None), 'Топ рассказов', False) }}
 {% endblock %}
 
+{% block feeds_footer %}
+    <li>{{ atom_feed(url_for('feeds.top', period=period or None), 'Топ рассказов', False) }}</li>
+{% endblock %}
+
 {% block before_list %}
 <div>
     {% if period != 7 %}<a href="{{ modified_url(period='7', page=1) }}">{% endif -%}

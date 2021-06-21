@@ -2,7 +2,7 @@
 {% from 'macro.html' import breadcrumbs, paginator with context %}
 {% block content %}
 
-{% block extrahead %}
+{% block feeds %}
     <link rel="alternate" type="application/atom+xml" title="{{ _('Updates feed')  }} — {{ SITE_NAME }}" href="{{ url_for('feeds.chapters') }}" />
 {% endblock %}
 

@@ -2,8 +2,7 @@
 
 {% from 'macro.html' import paginator with context %}
 
-{% block extrahead %}
-    {{- super() }}
+{% block feeds %}
     <link rel="alternate" type="application/atom+xml" title="Топ рассказов — {{ SITE_NAME }}" href="{{ url_for('feeds.top', period=period or None) }}" />
 {% endblock %}
 

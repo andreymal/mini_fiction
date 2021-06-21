@@ -13,6 +13,9 @@
     {% if show_meta_description -%}
         <meta name="description" content="{{ story.summary|striptags }}" />
     {%- endif -%}
+{% endblock %}
+
+{% block feeds %}
     {% if story.status_string != 'finished' %}
         <link rel="alternate" type="application/atom+xml" title="{{ story.title }} — {{ SITE_NAME }}" href="{{ url_for('feeds.story', story_id=story.id) }}" />
     {% endif %}

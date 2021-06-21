@@ -15,6 +15,9 @@
     {% if site_description -%}
         <meta name="description" content="{{ site_description }}" />
     {%- endif -%}
+{% endblock %}
+
+{% block feeds %}
     <link rel="alternate" type="application/atom+xml" title="{{ _('New stories') }} — {{ SITE_NAME }}" href="{{ url_for('feeds.stories') }}" />
 {% endblock %}
 

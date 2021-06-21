@@ -1,8 +1,7 @@
 {% extends base %}
 {% from 'macro.html' import breadcrumbs, user_avatar, author_profile_links with context %}
 
-{% block extrahead %}
-    {{- super() }}
+{% block feeds %}
     <link rel="alternate" type="application/atom+xml" title="Новые рассказы автора {{ author.username }} — {{ SITE_NAME }}" href="{{ url_for('feeds.accounts', user_id=author.id) }}" />
 {% endblock %}
 

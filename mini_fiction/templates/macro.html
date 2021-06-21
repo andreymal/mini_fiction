@@ -266,12 +266,6 @@
         </li>
         {%- endif %}
 
-        <li>
-            <a href="{{ url_for('feeds.accounts', user_id=author.id) }}" title="Новые рассказы автора" data-noajax="1">
-                RSS
-            </a>
-        </li>
-
         {% if current_user.is_superuser -%}
         <li><hr style="margin: 13px 0;"/></li>
         <li>
@@ -317,4 +311,13 @@
              alt="{{ character.name }}"
              title="{{ character.name }}">
     </picture>
+{%- endmacro %}
+
+
+{% macro atom_feed(url, name, inline) -%}
+    {% if inline %}
+        <a class="atom" href="{{ url }}" title="{{ name }} — {{ SITE_NAME }}" data-noajax="1">RSS</a>
+    {% else %}
+        <link rel="alternate" type="application/atom+xml" title="{{ name }} — {{ SITE_NAME }}" href="{{ url }}" />
+    {% endif %}
 {%- endmacro %}

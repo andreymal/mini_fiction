@@ -1,10 +1,14 @@
 {% extends "stories_list_common.html" %}
 
+{% from 'macro.html' import atom_feed with context %}
 {% from 'macro.html' import paginator with context %}
 
-{% block extrahead %}
-    {{- super() }}
-    <link rel="alternate" type="application/rss+xml" title="Топ рассказов &mdash; {{ SITE_NAME }}" href="{{ url_for('feeds.top', period=period or None) }}" />
+{% block feeds %}
+    {{ atom_feed(url_for('feeds.top', period=period or None), 'Топ рассказов', False) }}
+{% endblock %}
+
+{% block feeds_footer %}
+    <li>{{ atom_feed(url_for('feeds.top', period=period or None), 'Топ рассказов', False) }}</li>
 {% endblock %}
 
 {% block before_list %}
@@ -25,7 +29,6 @@
         За всё время
     {%- if period != 0 %}</a>{% endif %}
     &nbsp; &nbsp;
-    <a href="{{ url_for('feeds.top', period=period or None) }}" data-noajax="1">RSS</a>
 </div>
 {% endblock %}
 

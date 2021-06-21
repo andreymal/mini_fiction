@@ -1,5 +1,6 @@
 {% extends base %}
 
+{% from 'macro.html' import atom_feed with context %}
 {% from 'macro.html' import paginator with context %}
 
 {% block fulltitle %}
@@ -15,7 +16,14 @@
     {% if site_description -%}
         <meta name="description" content="{{ site_description }}" />
     {%- endif -%}
-    <link rel="alternate" type="application/rss+xml" title="{{ _('New stories') }} &mdash; {{ SITE_NAME }}" href="{{ url_for('feeds.stories') }}" />
+{% endblock %}
+
+{% block feeds %}
+    {{ atom_feed(url_for('feeds.stories'), _('New stories'), False) }}
+{% endblock %}
+
+{% block feeds_footer %}
+    <li>{{ atom_feed(url_for('feeds.stories'), _('New stories'), True) }}</li>
 {% endblock %}
 
 {% block content %}
@@ -29,7 +37,6 @@
         {% elif current_user.is_authenticated -%}
             <li class="mininav-item"><a href="{{ url_for('editlog.index') }}">{{ _('Edit log') }}</a></li>
         {% endif -%}
-        <li class="mininav-item"><a href="{{ url_for('feeds.stories') }}" data-noajax="1">RSS</a></li>
     </ul>
   </div>
 </div>

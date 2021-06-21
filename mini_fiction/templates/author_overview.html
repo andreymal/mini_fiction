@@ -1,9 +1,13 @@
 {% extends base %}
+{% from 'macro.html' import atom_feed with context %}
 {% from 'macro.html' import breadcrumbs, user_avatar, author_profile_links with context %}
 
-{% block extrahead %}
-    {{- super() }}
-    <link rel="alternate" type="application/rss+xml" title="Новые рассказы автора {{ author.username }} &mdash; {{ SITE_NAME }}" href="{{ url_for('feeds.accounts', user_id=author.id) }}" />
+{% block feeds %}
+    {{ atom_feed(url_for('feeds.accounts', user_id=author.id), "Новые рассказы автора {}".format(author.username), False) }}
+{% endblock %}
+
+{% block feeds_footer %}
+    <li>{{ atom_feed(url_for('feeds.accounts', user_id=author.id), "Новые рассказы автора {}".format(author.username), True) }}</li>
 {% endblock %}
 
 {% block content %}

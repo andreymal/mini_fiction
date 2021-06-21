@@ -1,6 +1,15 @@
 {% extends base %}
+{% from 'macro.html' import atom_feed with context %}
 {% from 'macro.html' import breadcrumbs, paginator with context %}
 {% block content %}
+
+{% block feeds %}
+    {{ atom_feed(url_for('feeds.chapters'), _('Updates feed'), False) }}
+{% endblock %}
+
+{% block feeds_footer %}
+    <li>{{ atom_feed(url_for('feeds.chapters'), _('Updates feed'), False) }}</li>
+{% endblock %}
 
 <div class="row">
     <div class="span8">

@@ -51,6 +51,8 @@
     {{ html_block('head') }}
 {%- endblock -%}
 
+{% block feeds %}{% endblock %}
+
 {% block extrahead %}{% endblock %}
 </head>
 
@@ -65,7 +67,13 @@
 
     </main>
     <!-- Content end -->
-    <footer class="footer">{{ html_block('footer') }}</footer>
+    <footer class="footer">
+        <span class="copyright">{{ COPYRIGHT }}</span>
+        <ul class="nav-items nav-items-right" id="footer-links">
+            {%- block feeds_footer %}{% endblock -%}
+            {{ html_block('footer_links') }}
+        </ul>
+    </footer>
     </div>
     <!-- Container end -->
 

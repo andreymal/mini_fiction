@@ -152,6 +152,10 @@ def sitename():
     return current_app.config['SITE_NAME'].get(g.locale.language) or current_app.config['SITE_NAME'].get('default', 'Library')
 
 
+def copyright():
+    return current_app.config['COPYRIGHT'].get(g.locale.language) or current_app.config['COPYRIGHT'].get('default', 'Copyright')
+
+
 def emailsitename():
     if current_app.config['EMAIL_SITE_NAME'] is None:
         return sitename()

@@ -68,13 +68,34 @@ a {
 /* Footer */
 
 .footer {
-    font-size: 16px;
-    line-height: 30px;
     padding: 10px 20px;
     background: #1D2A4F no-repeat 0 0;
     color: #FAFAE8;
     border-radius: 0 0 8px 8px;
-    overflow: hidden;
+    /* Flexin' like a pro */
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+#footer-links {
+    display: flex;
+    flex-wrap: wrap;
+    text-align: center;
+
+    & > li {
+        flex-grow: 1;
+    }
+}
+
+@media (max-width: 660px) {
+    .footer {
+        flex-flow: column-reverse;
+        gap: 0.25em;
+
+        & > .copyright {
+            font-size: small;
+        }
+    }
 }
 
 .footer a {
@@ -368,11 +389,6 @@ ul.nav-profile-menu-content > li > a {
 
     ul.nav-main-links.nav-items > li {
         display: block;
-    }
-
-    ul.nav-items > li > a {
-        width: 100%;
-        box-sizing: border-box;
     }
 
     .mobile-menu-btn {

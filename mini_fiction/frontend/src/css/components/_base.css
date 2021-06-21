@@ -71,12 +71,6 @@ footer {
     grid-template-areas: "links";
 }
 
-@media (min-width: 85em) {
-    footer {
-        @mixin overhang;
-    }
-}
-
 @media (max-width: 75em) {
     .container {
         margin: 0;

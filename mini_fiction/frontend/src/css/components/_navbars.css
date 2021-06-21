@@ -89,9 +89,3 @@
     }
 
 }
-
-@media (min-width: 85em) {
-    .roof {
-        @mixin overhang;
-    }
-}

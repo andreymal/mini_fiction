@@ -1,3 +1,17 @@
+@define-mixin centered-mask {
+    mask-position: center;
+    mask-repeat: no-repeat;
+    -webkit-mask-position: center;
+    -webkit-mask-repeat: no-repeat;
+}
+
+@define-mixin mask $image, $color {
+    mask-image: $image;
+    -webkit-mask-image: $image;
+    background-image: none;
+    background-color: $color;
+}
+
 /* Body, base and containers */
 body {
     background-color: #dde;
@@ -1851,16 +1865,16 @@ a.btn {
     height: 16px;
     display: inline-block;
     cursor: pointer;
-    opacity: 0.5;
+    opacity: 0.7;
     vertical-align: middle;
 }
 
 .comment-vote-area .vote-up:hover, .comment-vote-area .vote-down:hover {
-    opacity: 0.9;
+    opacity: 1;
 }
 
 .comment-vote-area .vote-up.vote-disabled, .comment-vote-area .vote-down.vote-disabled {
-    opacity: 0.1;
+    opacity: 0.2;
     cursor: default;
 }
 
@@ -1869,11 +1883,13 @@ a.btn {
 }
 
 .comment-vote-area .vote-up {
-    background: url(../images/upvote.png) center center no-repeat;
+    @mixin centered-mask;
+    @mixin mask url(../images/assets/upvote.svg), #000;
 }
 
 .comment-vote-area .vote-down {
-    background: url(../images/downvote.png) center center no-repeat;
+    @mixin centered-mask;
+    @mixin mask url(../images/assets/downvote.svg), #000;
 }
 
 .comment-abuse-area {

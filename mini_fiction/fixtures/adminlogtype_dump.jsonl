@@ -38,3 +38,5 @@
 {"_entity": "adminlogtype", "id": 45, "model": "notification"}
 {"_entity": "adminlogtype", "id": 46, "model": "subscription"}
 {"_entity": "adminlogtype", "id": 47, "model": "adminlog"}
+{"_entity": "adminlogtype", "id": 48, "model": "tag"}
+{"_entity": "adminlogtype", "id": 49, "model": "tagcategory"}

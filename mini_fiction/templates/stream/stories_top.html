@@ -1,9 +1,10 @@
 {% extends "stories_list_common.html" %}
 
+{% from 'macro.html' import atom_feed with context %}
 {% from 'macro.html' import paginator with context %}
 
 {% block feeds %}
-    <link rel="alternate" type="application/atom+xml" title="Топ рассказов — {{ SITE_NAME }}" href="{{ url_for('feeds.top', period=period or None) }}" />
+    {{ atom_feed(url_for('feeds.top', period=period or None), 'Топ рассказов', False) }}
 {% endblock %}
 
 {% block before_list %}

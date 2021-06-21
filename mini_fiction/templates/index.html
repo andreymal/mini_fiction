@@ -1,5 +1,6 @@
 {% extends base %}
 
+{% from 'macro.html' import atom_feed with context %}
 {% from 'macro.html' import paginator with context %}
 
 {% block fulltitle %}
@@ -18,7 +19,7 @@
 {% endblock %}
 
 {% block feeds %}
-    <link rel="alternate" type="application/atom+xml" title="{{ _('New stories') }} — {{ SITE_NAME }}" href="{{ url_for('feeds.stories') }}" />
+    {{ atom_feed(url_for('feeds.stories'), _('New stories'), False) }}
 {% endblock %}
 
 {% block content %}

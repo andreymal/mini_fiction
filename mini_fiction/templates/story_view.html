@@ -1,4 +1,5 @@
 {% extends base %}
+{% from 'macro.html' import atom_feed with context %}
 {% from 'macro.html' import breadcrumbs, tag_link with context %}
 {% from 'macro.html' import character_picture %}
 
@@ -17,7 +18,7 @@
 
 {% block feeds %}
     {% if story.status_string != 'finished' %}
-        <link rel="alternate" type="application/atom+xml" title="{{ story.title }} — {{ SITE_NAME }}" href="{{ url_for('feeds.story', story_id=story.id) }}" />
+        {{ atom_feed(url_for('feeds.story', story_id=story.id), story.title, False) }}
     {% endif %}
 {% endblock %}
 

@@ -26,10 +26,8 @@
         <meta name="csrf-token" content="{{ csrf_token() }}"/>
     {% endblock -%}
 
-    {%- block head_css %}
-        {% set index_css = webpack_asset('experimental_index.css') %}
-        <link rel="stylesheet" href="{{ index_css.url }}" integrity="{{ index_css.integrity }}" crossorigin="anonymous"/>
-    {% endblock -%}
+    {% set index_css = webpack_asset('experimental_index.css') %}
+    <link rel="stylesheet" href="{{ index_css.url }}" integrity="{{ index_css.integrity }}" crossorigin="anonymous"/>
 
     {% set index_js = webpack_asset('experimental_index.js') %}
     <script defer src="{{ index_js.url }}" integrity="{{ index_js.integrity }}" crossorigin="anonymous"></script>

@@ -292,31 +292,6 @@ class Character(db.Entity):
         return self.image.resized
 
 
-class Category(db.Entity):
-    """ Модель жанра """
-
-    description = orm.Optional(orm.LongStr)
-    name = orm.Required(str, 256)
-    color = orm.Required(str, 7, default='#808080')
-
-    stories = orm.Set('Story')
-
-    def __str__(self):
-        return self.name
-
-
-class Classifier(db.Entity):
-    """ Модель события """
-
-    description = orm.Optional(orm.LongStr)
-    name = orm.Required(str, 256)
-
-    stories = orm.Set('Story')
-
-    def __str__(self):
-        return self.name
-
-
 class Rating(db.Entity):
     """ Модель рейтинга """
 
@@ -463,8 +438,6 @@ class Story(db.Entity):
     title = orm.Required(str, 512, autostrip=False)
     contributors = orm.Set('StoryContributor')
     characters = orm.Set(Character)
-    categories = orm.Set(Category)
-    classifications = orm.Set(Classifier)
     tags = orm.Set(StoryTag)
     tags_log = orm.Set(StoryTagLog)
     cover = orm.Required(bool, default=False)

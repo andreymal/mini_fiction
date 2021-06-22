@@ -5,7 +5,7 @@ from wtforms import Form
 from wtforms import SelectField, SelectMultipleField, TextField, BooleanField, IntegerField, RadioField, validators
 from pony import orm
 
-from mini_fiction.models import Category, Character, Rating, Classifier
+from mini_fiction.models import Character, Rating
 from mini_fiction.forms.fields import LazySelectMultipleField, GroupedModelChoiceField, StringListField
 from mini_fiction.widgets import StoriesCharacterSelect, StoriesButtons, ButtonWidget, TagsInput
 

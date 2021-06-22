@@ -5,7 +5,7 @@ from flask_babel import lazy_gettext, lazy_pgettext
 from wtforms import SelectField, TextField, TextAreaField, BooleanField
 from pony import orm
 
-from mini_fiction.models import Category, Character, Rating, Classifier
+from mini_fiction.models import Character, Rating
 from mini_fiction.forms.fields import LazySelectField, LazySelectMultipleField, GroupedModelChoiceField, StringListField
 from mini_fiction.widgets import StoriesCharacterSelect, StoriesButtons, TagsInput
 from mini_fiction.forms.form import Form

@@ -8,7 +8,6 @@ from flask_babel import lazy_gettext
 from wtforms import TextField, TextAreaField, PasswordField, SelectField, IntegerField
 from wtforms import BooleanField, FileField, FieldList, FormField, validators
 
-from mini_fiction.models import Category
 from mini_fiction.forms.form import Form
 from mini_fiction.forms.fields import LazySelectField, LazySelectMultipleField
 from mini_fiction.widgets import StoriesButtons, ContactsWidget

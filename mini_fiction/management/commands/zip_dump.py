@@ -9,7 +9,7 @@ from mini_fiction.management.manager import cli
 
 @cli.command(short_help='Makes a dump of website config from DB.', help=(
     'Makes a zipped dump of some that are part of the configuration: '
-    'logopic, charactergroup, character, category, classifier, rating, '
+    'logopic, charactergroup, character, tag, tagcategory, rating, '
     'staticpage, htmlblock, adminlogtype and system user (without password). '
     'Stories, comments, news and other user content will not be added.'
 ))

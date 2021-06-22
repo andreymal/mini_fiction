@@ -1,12 +1,9 @@
-#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
-
 import os
 import sys
 import random
 from pathlib import Path
 
-from mini_fiction import models
+from mini_fiction import models, ratelimit
 
 class ANSI:
     RESET = '\x1b[0m'
@@ -86,6 +83,8 @@ class ProjectStatus(Status):
     labels = {
         'cache': 'Cache type',
         'cache_working': 'Cache working',
+        'ratelimit': 'Rate limit backend',
+        'ratelimit_working': 'Rate limit working',
         'email': 'E-Mail',
         'hasher': 'Password hasher',
         'media_root': 'Media directory',
@@ -93,14 +92,12 @@ class ProjectStatus(Status):
         'localstatic_root': 'Custom static files directory',
         'localtemplates': 'Custom templates directory',
         'sphinx': 'Sphinx search',
-        'avatars': 'Avatars uploading',
         'celery': 'Celery',
         'diff': 'google-diff-match-patch',
         'linter': 'Chapter linter',
         'captcha': 'Captcha',
-        'genres': 'Genres count',
+        'tags': 'Tags count',
         'characters': 'Characters count',
-        'classifications': 'Classifications count',
         'ratings': 'Ratings count',
         'nsfw_ratings': 'NSFW ratings count',
         'premoderation': 'Premoderation',
@@ -118,11 +115,50 @@ class ProjectStatus(Status):
 
         k = ''.join(random.choice('abcdefghijklmnopqrstuvwxyz') for _ in range(10))
         k += 'ё©™😊🔒'  # check unicode support
-        self.app.cache.set('test_minifiction_status', k, timeout=30)
+
+        try:
+            self.app.cache.set('test_minifiction_status', k, timeout=30)
+        except Exception as exc:
+            return self._fail('cache_working', f'fail ({exc})')
 
         if self.app.cache.get('test_minifiction_status') == k:
             return self._ok('cache_working', 'yes')
         return self._warn('cache_working', 'no')
+
+    def ratelimit(self):
+        return self._ok('ratelimit', type(self.app.rate_limiter))
+
+    def ratelimit_working(self):
+        limiter: ratelimit.BaseRateLimiter = self.app.rate_limiter
+        if isinstance(limiter, ratelimit.NullRateLimiter):
+            return self._ok('ratelimit_working', 'disabled')
+
+        interval = 3600
+        key = limiter.make_key(
+            'ratelimit_test',
+            target=''.join(random.choice('abcdefghijklmnopqrstuvwxyz') for _ in range(20)),
+            interval=interval,
+        )
+
+        try:
+            states = [
+                limiter.check_key(key, max_count=2, interval=interval, incr=True),
+                limiter.check_key(key, max_count=2, interval=interval, incr=True),
+                limiter.check_key(key, max_count=2, interval=interval, incr=True),
+            ]
+        except Exception as exc:
+            return self._fail('ratelimit_working', f'fail ({exc})')
+
+        if states != [
+            # (success, count)
+            (True, 1),
+            (True, 2),
+            (False, 2),
+        ]:
+            return self._fail('ratelimit_working', 'no')
+
+        return self._ok('ratelimit_working', 'yes')
+
 
     def email(self):
         if not self.app.config['ERROR_EMAIL_HANDLER_PARAMS'] and not self.app.config['EMAIL_HOST']:
@@ -296,17 +332,11 @@ class ProjectStatus(Status):
             return self._fail('captcha', self.app.config['CAPTCHA_CLASS'] + ' (fail: {})'.format(exc))
         return self._ok('captcha', self.app.config['CAPTCHA_CLASS'])
 
-    def genres(self):
-        cnt = models.Category.select().count()
-        if cnt < 1:
-            return self._fail('genres', '0 (please create at least one genre using administration page)')
-        return self._ok('genres', str(cnt))
+    def tags(self):
+        return self._ok('tags', str(models.Tag.select().count()))
 
     def characters(self):
         return self._ok('characters', str(models.Character.select().count()))
-
-    def classifications(self):
-        return self._ok('classifications', str(models.Classifier.select().count()))
 
     def ratings(self):
         cnt = models.Rating.select().count()
@@ -361,6 +391,8 @@ class ProjectStatus(Status):
     def generate(self):
         yield self.cache()
         yield self.cache_working()
+        yield self.ratelimit()
+        yield self.ratelimit_working()
         yield self.email()
         yield self.hasher()
         yield self.media_root()
@@ -372,9 +404,8 @@ class ProjectStatus(Status):
         yield self.diff()
         yield self.linter()
         yield self.captcha()
-        yield self.genres()
+        yield self.tags()
         yield self.characters()
-        yield self.classifications()
         yield self.ratings()
         yield self.nsfw_ratings()
         yield self.premoderation()

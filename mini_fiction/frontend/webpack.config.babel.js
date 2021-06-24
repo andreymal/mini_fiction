@@ -71,7 +71,10 @@ const defaultPlugins = [
 ];
 
 const devPlugins = [
-  new BundleAnalyzerPlugin({ analyzerMode: 'static', openAnalyzer: false }),
+  new BundleAnalyzerPlugin({
+    analyzerMode: 'static',
+    openAnalyzer: false,
+  }),
 ];
 
 const productionPlugins = [
@@ -128,15 +131,27 @@ module.exports = {
         exclude: /node_modules/,
         use: [
           { loader: 'babel-loader' },
-          { loader: 'webpack-remove-block-loader', options: { active: !isDev } },
+          {
+            loader: 'webpack-remove-block-loader',
+            options: { active: !isDev },
+          },
         ],
       },
       {
         test: /\.css$/,
         use: [
-          { loader: MiniCssExtractPlugin.loader, options: extractLoaderOptions },
-          { loader: 'css-loader', options: cssLoaderOptions },
-          { loader: 'postcss-loader', options: { postcssOptions: postCSSOptions } },
+          {
+            loader: MiniCssExtractPlugin.loader,
+            options: extractLoaderOptions,
+          },
+          {
+            loader: 'css-loader',
+            options: cssLoaderOptions,
+          },
+          {
+            loader: 'postcss-loader',
+            options: { postcssOptions: postCSSOptions },
+          },
         ],
       },
       {

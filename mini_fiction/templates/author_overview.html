@@ -1,6 +1,6 @@
 {% extends base %}
 {% from 'macro.html' import atom_feed with context %}
-{% from 'macro.html' import breadcrumbs, user_avatar, author_profile_links with context %}
+{% from 'macro.html' import user_avatar, author_profile_links with context %}
 
 {% block feeds %}
     {{ atom_feed(url_for('feeds.accounts', user_id=author.id), "Новые рассказы автора {}".format(author.username), False) }}
@@ -11,12 +11,6 @@
 {% endblock %}
 
 {% block content %}
-
-<div class="row">
-    <div class="span12">
-        {{- breadcrumbs(current=('Автор: ' if author.stories.count() > 0 else 'Читатель: ') + author.username) }}
-    </div>
-</div>
 <div class="row">
     <div class="{% if not is_system_user %}span8{% else %}span12{% endif %}">
         {% if not is_system_user %}
@@ -84,9 +78,5 @@
             </div>
         {% endif %}
     </div>
-
-      <div class="span12">
-        {{- breadcrumbs(current=('Автор: ' if author.stories.count() > 0 else 'Читатель: ') + author.username) }}
-      </div>
 </div>
 {% endblock %}

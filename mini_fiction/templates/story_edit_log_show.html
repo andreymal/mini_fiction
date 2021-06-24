@@ -1,11 +1,9 @@
 {% extends base %}
-{% from 'macro.html' import breadcrumbs with context %}
 
 {% block content %}
 
 <div class="row">
 <div class="span12 story-page">
-{{- breadcrumbs() }}
 
 <div class="editlog-item" id="edit_log_{{ item.id }}">
     {%- include 'includes/edit_log_item.html' with context -%}
@@ -16,9 +14,6 @@
 {% endif %}
 </div>
 
-<div class="span12">
-{{- breadcrumbs() }}
-</div>
 </div>
 
 {% endblock %}

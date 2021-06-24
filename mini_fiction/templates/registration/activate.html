@@ -1,19 +1,10 @@
 {% extends base %}
-{% from 'macro.html' import breadcrumbs with context %}
 {% block content %}
 <div class="row">
-    <div class="span12">
-        {{- breadcrumbs() }}
-    </div>
-
     <div class="span12 reg-complete">
     <h1>Учетная запись не активирована</h1>
     <p>Приветствуем!</p>
     <p>Активация вашей учетной записи пошла не совсем так, как планировалось. Пожалуйста, <a href="{{ config.SITE_FEEDBACK }}">свяжитесь</a> с нами, указав свой почтовый адрес для регистрации, логин и время.</p>
   </div>
-
-    <div class="span12">
-        {{- breadcrumbs() }}
-    </div>
 </div>
 {% endblock %}

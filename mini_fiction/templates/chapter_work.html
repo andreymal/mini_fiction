@@ -1,13 +1,6 @@
 {% extends base %}
-{% from 'macro.html' import breadcrumbs with context %}
 {% block content %}
 <div class="row">
-    <div class="span12">
-        {{- breadcrumbs([
-            [url_for('author.info'), _("Author's cabinet")],
-            [url_for('story.edit_chapters', pk=(story or chapter.story).id), 'Редактирование глав «{}»'.format((story or chapter.story).title)]
-        ]) }}
-    </div>
     <div class="span12">
         {% if not chapter -%}
             {{ html_block('chapter_add') }}
@@ -159,13 +152,6 @@
     {%- elif chapter -%}
         {%- with story=chapter.story, chapter_edit_mode=True %}{% include "includes/chapter_single.html" %}{% endwith -%}
     {%- endif -%}
-    </div>
-
-    <div class="span12">
-        {{- breadcrumbs([
-            [url_for('author.info'), _("Author's cabinet")],
-            [url_for('story.edit_chapters', pk=(story or chapter.story).id), 'Редактирование глав «{}»'.format((story or chapter.story).title)]
-        ]) }}
     </div>
 </div>
 {% endblock %}

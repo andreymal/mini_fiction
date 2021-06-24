@@ -1,13 +1,9 @@
 {% extends base %}
-{% from 'macro.html' import breadcrumbs, form_fields, tag_link, admin_tag_link with context %}
+{% from 'macro.html' import form_fields, tag_link, admin_tag_link with context %}
 {% block content %}
 
 <div class="row">
     <div class="span12">
-        {{- breadcrumbs([
-            [url_for('admin_index.index'), _('Administration')],
-            [url_for('admin_tags.index'), _('Tags')]
-        ]) }}
         <h1>
             {% if edit %}
                 {%- if tag.is_blacklisted %}<s>{% endif -%}
@@ -101,11 +97,6 @@
             {% endif %}
         </div>
         </form>
-
-        {{- breadcrumbs([
-            [url_for('admin_index.index'), _('Administration')],
-            [url_for('admin_tags.index'), _('Tags')]
-        ]) }}
     </div>
 </div>
 {% endblock %}

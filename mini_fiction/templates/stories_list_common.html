@@ -1,10 +1,6 @@
 {% extends base %}
-{% from 'macro.html' import breadcrumbs with context %}
 {% block content %}
 <div class="row">
-    <div class="span12">
-        {{- breadcrumbs() }}
-    </div>
 </div>
 
 <div class="row">
@@ -19,8 +15,5 @@
     {% block after_list_block %}{% endblock %}
 </div>
 <div class="row">
-    <div class="span12">
-        {{- breadcrumbs() }}
-    </div>
 </div>
 {% endblock %}

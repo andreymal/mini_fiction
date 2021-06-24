@@ -1,13 +1,7 @@
 {% extends base %}
-{% from 'macro.html' import breadcrumbs with context %}
 {% block content %}
 <div class="row">
     <div class="span12">
-        {{- breadcrumbs([
-            [url_for('admin_index.index'), _('Administration')],
-            [url_for('admin_charactergroups.index'), _('Character groups')],
-            [url_for('admin_charactergroups.update', pk=charactergroup.id), charactergroup.name]
-        ]) }}
     <h1>{{ charactergroup.name }}</h1>
 
     <p>{{ _('Delete this character group?') }}</p>
@@ -20,11 +14,6 @@
             </div>
         </div>
     </form>
-        {{- breadcrumbs([
-            [url_for('admin_index.index'), _('Administration')],
-            [url_for('admin_charactergroups.index'), _('Character groups')],
-            [url_for('admin_charactergroups.update', pk=charactergroup.id), charactergroup.name]
-        ]) }}
     </div>
 </div>
 {% endblock %}

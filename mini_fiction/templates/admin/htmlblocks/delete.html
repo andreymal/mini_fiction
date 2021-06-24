@@ -1,15 +1,8 @@
 {% extends base %}
-{% from 'macro.html' import breadcrumbs with context %}
 {% block content %}
 <div class="row">
     <div class="span12">
-        {% set block_title = '{} ({})'.format(htmlblock.name, htmlblock.lang) %}
-        {{- breadcrumbs([
-            [url_for('admin_index.index'), _('Administration')],
-            [url_for('admin_htmlblocks.index'), _('HTML Blocks')],
-            [url_for('admin_htmlblocks.update', name=htmlblock.name, lang=htmlblock.lang), block_title]
-        ]) }}
-    <h1>{{ block_title }}</h1>
+    <h1>{{ htmlblock.name }} ({{ htmlblock.lang }})</h1>
 
     <p>{{ _('Delete this HTML Block?') }}</p>
 
@@ -21,11 +14,6 @@
             </div>
         </div>
     </form>
-        {{- breadcrumbs([
-            [url_for('admin_index.index'), _('Administration')],
-            [url_for('admin_htmlblocks.index'), _('HTML Blocks')],
-            [url_for('admin_htmlblocks.update', name=htmlblock.name, lang=htmlblock.lang), block_title]
-        ]) }}
     </div>
 </div>
 {% endblock %}

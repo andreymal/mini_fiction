@@ -1,12 +1,8 @@
 {% extends base %}
-{% from 'macro.html' import breadcrumbs with context %}
 {% block title %}Некорректный CSRF-токен{% endblock %}
 {% block content %}
 
 <div class="row page-500">
-    <div class="span12">
-        {{- breadcrumbs(current='Некорректный CSRF-токен') }}
-    </div>
     <div class="span12 message-500">
         <h1>Некорректный CSRF-токен</h1>
         <p>
@@ -14,9 +10,6 @@
             Возможно, страница была открыта слишком долго; попробуйте обновить её и повторить запрос.
             Некоторые расширения браузера могут мешать корректной работе сайта; попробуйте отключить их, если обновление страницы не помогает.
         </p>
-    </div>
-    <div class="span12">
-        {{- breadcrumbs(current='Некорректный CSRF-токен') }}
     </div>
 </div>
 {% endblock %}

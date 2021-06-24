@@ -1,12 +1,8 @@
 {% extends base %}
-{% from 'macro.html' import breadcrumbs, tag_link with context %}
+{% from 'macro.html' import tag_link with context %}
 {% block content %}
 
 <div class="row">
-    <div class="span12">
-        {{- breadcrumbs() }}
-    </div>
-
     <div class="span12">
         <h2>{{ page_title }}</h2>
 
@@ -47,10 +43,6 @@
                 </ul>
             </li>
         {% endfor %}</ul>
-    </div>
-
-    <div class="span12">
-        {{- breadcrumbs() }}
     </div>
 </div>
 {% endblock %}

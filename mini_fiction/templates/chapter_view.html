@@ -1,5 +1,4 @@
 {% extends base %}
-{% from 'macro.html' import breadcrumbs with context %}
 
 {% block extrahead %}
     {{- super() }}
@@ -18,12 +17,6 @@
 
 {% block content %}
 <div class="row">
-    <div class="span12 story-chapter-page{% if story.nsfw %} story-nsfw{% endif %}" id="story_{{ story.id }}">
-    {{- breadcrumbs(
-        [[url_for('story.view', pk=story.id), story.title]],
-        current='Все главы' if allchapters else chapter.autotitle
-    ) }}
-    </div>
     {% if allchapters %}
         <div class="span12 story-chapter-page">
             {% include "includes/story_panel.html" %}
@@ -40,12 +33,6 @@
             {% include "includes/chapter_single.html" %}
         </div>
     {% endif %}
-    <div class="span12">
-    {{- breadcrumbs(
-        [[url_for('story.view', pk=story.id), story.title]],
-        current='Все главы' if allchapters else chapter.autotitle
-    ) }}
-    </div>
 </div>
 {% endblock %}
 

@@ -1,12 +1,9 @@
 {% extends base %}
-{% from 'macro.html' import breadcrumbs with context %}
-
 {% block content %}
 
 <div class="row search-page">
     <!-- Навигация -->
     <div class="span12">
-        {{- breadcrumbs() }}
         <h1>Поиск рассказов</h1>
         <div>
         <form action="{{ url_for('search.main') }}" method="GET" name="search" id="searchform" class="form-horizontal">
@@ -178,11 +175,5 @@
     </div>
     {% endif %}
     <!-- Результаты: конец вывода -->
-
-    <!-- Навигация: начало вывода -->
-    <div class="span12">
-        {{- breadcrumbs() }}
-    </div>
-    <!-- Навигация: конец вывода -->
 </div>
 {% endblock %}

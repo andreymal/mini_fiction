@@ -1,13 +1,7 @@
 {% extends base %}
-{% from 'macro.html' import breadcrumbs with context %}
 {% block content %}
 <div class="row">
     <div class="span12">
-        {{- breadcrumbs([
-            [url_for('admin_index.index'), _('Administration')],
-            [url_for('admin_tag_categories.index'), _('Tag categories')],
-            [url_for('admin_tag_categories.update', pk=tag_category.id), tag_category.name]
-        ]) }}
     <h1>{{ tag_category.name }}</h1>
 
     <p>{{ _('Delete this tag category?') }}</p>
@@ -20,11 +14,6 @@
             </div>
         </div>
     </form>
-        {{- breadcrumbs([
-            [url_for('admin_index.index'), _('Administration')],
-            [url_for('admin_tag_categories.index'), _('Tag categories')],
-            [url_for('admin_tag_categories.update', pk=tag_category.id), tag_category.name]
-        ]) }}
     </div>
 </div>
 {% endblock %}

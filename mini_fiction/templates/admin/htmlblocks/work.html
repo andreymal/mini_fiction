@@ -1,14 +1,9 @@
 {% extends base %}
-{% from 'macro.html' import breadcrumbs with context %}
 {% from 'macro.html' import form_fields with context %}
 {% block content %}
 
 <div class="row">
     <div class="span12">
-        {{- breadcrumbs([
-            [url_for('admin_index.index'), _('Administration')],
-            [url_for('admin_htmlblocks.index'), _('HTML Blocks')]
-        ]) }}
         <h1>{{ page_title }}</h1>
 
         {% if saved %}<div class="alert-mini green">{{ _('Saved!') }}</div>{% endif %}
@@ -24,11 +19,6 @@
             {% endif %}
         </div>
         </form>
-
-        {{- breadcrumbs([
-            [url_for('admin_index.index'), _('Administration')],
-            [url_for('admin_htmlblocks.index'), _('HTML Blocks')]
-        ]) }}
     </div>
 </div>
 {% endblock %}

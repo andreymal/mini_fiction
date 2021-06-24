@@ -1,4 +1,4 @@
-{% macro common_buttons(story, with_abuse=False) %}
+{% macro common_buttons(story, with_downloads=True, with_abuse=False) %}
     <div class="icon-group">
         {%- if current_user.is_authenticated -%}
             {%- set favorited = (story.id in favorited_ids) if favorited_ids is defined else story.favorited(current_user.id) -%}
@@ -16,12 +16,14 @@
                    class="story_bookmark js-story-bookmark-{{ story.id }} scon bookmark {% if bookmarked %}active{% else %}inactive{% endif %}"></a>
             {% endif %}
         {% endif %}
-        {%- for d in story.list_downloads() -%}
-            <a title="Скачать в {{ d.format.name }}"
-               aria-label="Скачать в {{ d.format.name }}"
-               href="{{ d.url }}"
-               class="scon {{ d.cls }}" data-noajax="1"></a>
-        {%- endfor -%}
+        {% if with_downloads %}
+            {%- for d in story.list_downloads() -%}
+                <a title="Скачать в {{ d.format.name }}"
+                   aria-label="Скачать в {{ d.format.name }}"
+                   href="{{ d.url }}"
+                   class="scon {{ d.cls }}" data-noajax="1"></a>
+            {%- endfor -%}
+        {% endif %}
         {%- if with_abuse and current_user.is_authenticated and not is_editor -%}
             <a title="Пожаловаться на рассказ"
                aria-label="Пожаловаться на рассказ"

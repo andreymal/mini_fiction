@@ -39,6 +39,11 @@
     float: right;
     display: inline-flex;
     gap: 1.4em;
+
+    &.small .scon {
+        width: 1.25em;
+        height: 1.25em;
+    }
 }
 
 .favorite {

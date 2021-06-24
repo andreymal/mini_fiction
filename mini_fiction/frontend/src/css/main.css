@@ -579,9 +579,18 @@ a.authorlink:hover,a.edit-link:hover {
     color: #999;
 }
 
-.character-list img {
-    border-radius: 2px;
-    margin-right: 4px;
+.character-list {
+    display: inline-flex;
+    gap: 0.5em;
+
+    & a {
+        text-decoration: none;
+    }
+
+    & img {
+        border-radius: .25em;
+        box-shadow: .1em .1em .2em rgba(0, 0, 0, 0.4);
+    }
 }
 
 .more {
@@ -709,16 +718,12 @@ h1 .alert {
 }
 
 /* Thumbnails */
-.thumbnail,.characters-select img,.story-thumbnails img {
+.thumbnail,.characters-select img {
     border-radius: 4px;
     box-shadow: 0 1px 3px rgba(0, 0, 0, 0.055);
     border: 1px solid #eee;
     padding: 4px;
     background: rgba(255, 255, 255, 0.7)
-}
-
-.story-page .thumbnail,.story-thumbnails img {
-    margin-right: 4px;
 }
 
 .characters-select img {
@@ -1647,10 +1652,6 @@ a.invisible-link:hover {
 
 .story-page .story-genres {
     margin-bottom: 4px;
-}
-
-.story-page .story-thumbnails {
-    margin-bottom: 6px;
 }
 
 img.ui-selected {

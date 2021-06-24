@@ -67,7 +67,7 @@
                     {% endfor %}</span>
                 {%- endif %}
             </p>
-            <p class="story-thumbnails">
+            <p class="character-list">
                 {%- for character in story.characters.order_by('c.id') -%}
                     <a href="{{ url_for('search.simple', search_type='character', search_id=character.id) }}">{{ character_picture(character) }}</a>
                 {%- endfor -%}

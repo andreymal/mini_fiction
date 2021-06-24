@@ -1,18 +1,11 @@
 {% extends base %}
-{% from 'macro.html' import breadcrumbs with context %}
 {% block title %}404 — книга не найдена{% endblock %}
 {% block content %}
 <div class="row page-404">
-    <div class="span12">
-        {{- breadcrumbs(current='404 — книга не найдена') }}
-    </div>
     <div class="span12 message-404">
         <h1>404 — книга не найдена</h1>
         <p>Кажется, такого рассказа нет. Быть может, удалён или ещё не написан. Или ссылка содержит опечатки.</p>
         <p>Можете попробовать воспользоваться <a href="{{ url_for('search.main') }}">поиском</a> или вернуться на <a href="{{ url_for('index.index') }}">главную</a>.</p>
-    </div>
-    <div class="span12">
-        {{- breadcrumbs(current='404 — книга не найдена') }}
     </div>
 </div>
 {% endblock %}

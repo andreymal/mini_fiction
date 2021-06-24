@@ -1,13 +1,3 @@
-{% macro breadcrumbs(items=[], current=None) %}
-        <ul class="breadcrumb">
-            <li><a href="{{ url_for('index.index') }}">{{ SITE_NAME }}</a> <span class="divider">/</span></li>
-            {%- for itemlink, itemtitle in items %}
-            <li><a href="{{ itemlink }}">{{ itemtitle }}</a> <span class="divider">/</span></li>
-            {%- endfor %}
-            <li class="active">{{ current if current != None else page_title }}</li>
-        </ul>
-{% endmacro %}
-
 {% macro nav_item(title, link, match_endpoint=None, matched=None, right=False, noajax=False) -%}
     {%- if matched == None -%}
         {%- set matched = match_endpoint != None and request.endpoint != None and (request.endpoint == match_endpoint or match_endpoint.endswith('.') and request.endpoint.startswith(match_endpoint)) -%}

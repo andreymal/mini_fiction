@@ -1,18 +1,11 @@
 {% extends base %}
-{% from 'macro.html' import breadcrumbs with context %}
 {% block title %}429 — слишком много запросов{% endblock %}
 {% block content %}
 
 <div class="row page-429">
-    <div class="span12">
-        {{- breadcrumbs(current='429 — слишком много запросов') }}
-    </div>
     <div class="span12 message-429">
         <h1>429 — слишком много запросов</h1>
         <p>Похоже, вы слишком быстры! Отдохните, попейте чаю{% if error.ttl %} и возвращайтесь {{ timesince(delta=-error.ttl) }}{% endif %}.</p>
-    </div>
-    <div class="span12">
-        {{- breadcrumbs(current='429 — слишком много запросов') }}
     </div>
 </div>
 {% endblock %}

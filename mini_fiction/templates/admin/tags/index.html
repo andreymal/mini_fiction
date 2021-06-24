@@ -1,9 +1,8 @@
 {% extends base %}
-{% from 'macro.html' import breadcrumbs, paginator, admin_tag_link with context %}
+{% from 'macro.html' import paginator, admin_tag_link with context %}
 {% block content %}
 
 <div class="row"><div class="span12">
-    {{- breadcrumbs([[url_for('admin_index.index'), _('Administration')]]) }}
     <h1>{{ page_title }}</h1>
 
     <div class="admin-index">
@@ -115,7 +114,5 @@
     {{ paginator(page_obj) }}
 
     <a href="{{ url_for('admin_tags.create') }}">{{ _('Create') }}</a>
-
-    {{- breadcrumbs([[url_for('admin_index.index'), _('Administration')]]) }}
 </div></div>
 {% endblock %}

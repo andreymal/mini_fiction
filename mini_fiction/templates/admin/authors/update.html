@@ -1,16 +1,10 @@
 {% extends base %}
 {% from 'macro.html' import user_avatar %}
-{% from 'macro.html' import breadcrumbs with context %}
 {% from 'macro.html' import form_fields with context %}
 {% block content %}
 
 <div class="row">
     <div class="span12">
-        {{- breadcrumbs([
-            [url_for('admin_index.index'), _('Administration')],
-            [url_for('admin_authors.index'), _('Authors')]
-        ]) }}
-
         <h1 id="author-name">
             {{- user_avatar(author, large=True) }}
             {% if not author.is_active %}
@@ -121,11 +115,6 @@
         </div>
         </form>
         {% endif %}
-
-        {{- breadcrumbs([
-            [url_for('admin_index.index'), _('Administration')],
-            [url_for('admin_authors.index'), _('Authors')]
-        ]) }}
     </div>
 </div>
 {% endblock %}

@@ -1,5 +1,4 @@
 {% extends base %}
-{% from 'macro.html' import breadcrumbs with context %}
 
 {% block extrahead %}
     {{- super() }}
@@ -8,10 +7,6 @@
 
 {% block content %}
 <div class="row login-page">
-    <div class="span12">
-        {{- breadcrumbs() }}
-    </div>
-
     {% if current_user.is_authenticated %}
         <div class="span12 login-text">
             Что такое, {{ current_user.username }}? Вы же уже авторизованы.
@@ -73,8 +68,5 @@
         </form>
     </div>
     {% endif %}
-    <div class="span12">
-        {{- breadcrumbs() }}
-    </div>
 </div>
 {% endblock %}

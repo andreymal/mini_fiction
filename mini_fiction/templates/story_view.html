@@ -1,6 +1,6 @@
 {% extends base %}
 {% from 'macro.html' import atom_feed with context %}
-{% from 'macro.html' import breadcrumbs, tag_link with context %}
+{% from 'macro.html' import tag_link with context %}
 {% from 'macro.html' import character_picture %}
 
 {% block extrahead %}
@@ -31,8 +31,6 @@
 {% block content %}
 <div class="row">
     <div class="span12 story-page{% if story.nsfw %} story-nsfw{% endif %}" id="story_{{ story.id }}">
-        {{- breadcrumbs() }}
-
         <div class="story-info" itemscope itemtype="http://schema.org/Book">
         {% include 'includes/story_control_buttons.html' %}
         <h1 id="story_title">

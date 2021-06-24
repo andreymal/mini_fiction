@@ -1,12 +1,7 @@
 {% extends base %}
-{% from 'macro.html' import breadcrumbs with context %}
 
 {% block content %}
 <div class="row">
-    <div class="span12">
-        {{- breadcrumbs([[url_for('author.info'), _("Author's cabinet")]]) }}
-    </div>
-
     <div class="span12"{% if not story_add %} id="story_{{ story.id }}"{% endif %}>
         {% include 'includes/story_control_buttons.html' %}
         <h1>Редактирование <a class="invisible-link" href="{{ url_for('story.view', pk=story.id, _external=True) }}">«{{ story.title }}»</a></h1>
@@ -33,9 +28,5 @@
     </div>
 
     {% block story_edit_content %}{% endblock %}
-
-    <div class="span12">
-        {{- breadcrumbs([[url_for('author.info'), _("Author's cabinet")]]) }}
-    </div>
 </div>
 {% endblock %}

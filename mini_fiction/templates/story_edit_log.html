@@ -1,11 +1,10 @@
 {% extends base %}
-{% from 'macro.html' import breadcrumbs, paginator with context %}
+{% from 'macro.html' import paginator with context %}
 
 {% block content %}
 
 <div class="row">
 <div class="span12">
-{{- breadcrumbs() }}
 <h1>{{ page_title }}</h1>
 </div>
 
@@ -57,8 +56,5 @@
 {% if page_obj %}{{ paginator(page_obj) }}{% endif %}
 </div>
 
-<div class="span12">
-{{- breadcrumbs() }}
-</div>
 </div>
 {% endblock %}

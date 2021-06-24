@@ -1,13 +1,8 @@
 {% extends base %}
-{% from 'macro.html' import breadcrumbs, tag_link, admin_tag_link with context %}
+{% from 'macro.html' import tag_link, admin_tag_link with context %}
 {% block content %}
 <div class="row">
     <div class="span12">
-        {{- breadcrumbs([
-            [url_for('admin_index.index'), _('Administration')],
-            [url_for('admin_tags.index'), _('Tags')],
-            [url_for('admin_tags.delete', pk=tag.id), tag.name]
-        ]) }}
     <h1>{{ tag.name }}</h1>
     {{ tag_link(tag) }}
     {% if tag.is_alias %}
@@ -25,11 +20,6 @@
             </div>
         </div>
     </form>
-        {{- breadcrumbs([
-            [url_for('admin_index.index'), _('Administration')],
-            [url_for('admin_tags.index'), _('Tags')],
-            [url_for('admin_tags.delete', pk=tag.id), tag.name]
-        ]) }}
     </div>
 </div>
 {% endblock %}

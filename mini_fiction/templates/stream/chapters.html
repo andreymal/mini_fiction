@@ -1,6 +1,6 @@
 {% extends base %}
 {% from 'macro.html' import atom_feed with context %}
-{% from 'macro.html' import breadcrumbs, paginator with context %}
+{% from 'macro.html' import paginator with context %}
 {% block content %}
 
 {% block feeds %}
@@ -13,13 +13,11 @@
 
 <div class="row">
     <div class="span8">
-        {{- breadcrumbs() }}
         <h1>{{ page_title }}</h1>
         <div id="chapters-list">
             {% include "includes/chapters_excerpts.html" %}
         </div>
         {% if chapters %}{{ paginator(page_obj) }}{% endif %}
-        {{- breadcrumbs() }}
     </div>
 </div>
 {% endblock %}

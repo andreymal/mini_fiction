@@ -1,13 +1,9 @@
 {% extends base %}
-{% from 'macro.html' import user_avatar, form_fields, breadcrumbs with context %}
+{% from 'macro.html' import user_avatar, form_fields with context %}
 {% block content %}
 
 <div class="row">
     <div class="span12">
-        {{- breadcrumbs([
-            [url_for('admin_index.index'), _('Administration')],
-            [url_for('admin_registrations.index'), _('Registrations')]
-        ]) }}
         <h1>{{ page_title }}</h1>
 
         <form class="form-horizontal" method="POST" enctype="multipart/form-data">
@@ -58,11 +54,6 @@
             </div>
         {% endif %}
         </form>
-
-        {{- breadcrumbs([
-            [url_for('admin_index.index'), _('Administration')],
-            [url_for('admin_registrations.index'), _('Registrations')]
-        ]) }}
     </div>
 </div>
 {% endblock %}

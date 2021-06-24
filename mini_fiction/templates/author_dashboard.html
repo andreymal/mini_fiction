@@ -1,11 +1,8 @@
 {% extends base %}
-{% from 'macro.html' import user_avatar, breadcrumbs with context %}
+{% from 'macro.html' import user_avatar with context %}
 {% block content %}
 
 <div class="row">
-    <div class="span12">
-        {{- breadcrumbs(current=('Кабинет автора ' if author.stories.count() > 0 else 'Кабинет потенциального автора ') + author.username) }}
-    </div>
     <!-- Вывод шапки -->
     <div class="span8">
         <h1 id="author-name">
@@ -70,10 +67,6 @@
                 {%- include "includes/comments_pagination_author_dashboard.html" -%}
             </div>
         {% endif %}
-    </div>
-
-    <div class="span12">
-        {{- breadcrumbs(current=('Кабинет автора ' if author.stories.count() > 0 else 'Читательский билет ') + author.username) }}
     </div>
 </div>
 {% endblock %}

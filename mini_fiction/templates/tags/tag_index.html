@@ -1,13 +1,7 @@
 {% extends base %}
-{% from 'macro.html' import paginator, breadcrumbs, tag_link with context %}
+{% from 'macro.html' import paginator, tag_link with context %}
 
 {% block content %}
-<div class="row">
-    <div class="span12">
-        {{- breadcrumbs([[url_for('tags.index'), 'Теги']]) }}
-    </div>
-</div>
-
 <div class="row"><div class="span8">
     <div class="tag-page">
         {{ tag_link(tag) }}
@@ -32,10 +26,4 @@
 
     {% if stories %}{{ paginator(page_obj) }}{% endif %}
 </div></div>
-
-<div class="row">
-    <div class="span12">
-        {{- breadcrumbs([[url_for('tags.index'), 'Теги']]) }}
-    </div>
-</div>
 {% endblock %}

@@ -1,16 +1,9 @@
 {% extends base %}
-{% from 'macro.html' import breadcrumbs with context %}
 {% block title %}403 — доступ запрещён{% endblock %}
 {% block content %}
 <div class="row page-403">
-    <div class="span12">
-        {{- breadcrumbs(current='403 — доступ запрещён') }}
-    </div>
     <div class="span12 message-403">
         <h1>403 — доступ запрещён</h1>
-    </div>
-    <div class="span12">
-        {{- breadcrumbs(current='403 — доступ запрещён') }}
     </div>
 </div>
 {% endblock %}

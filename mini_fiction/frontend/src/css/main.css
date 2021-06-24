@@ -427,13 +427,7 @@ ul.nav-profile-menu-content > li > a {
     display: inline-block;
     vertical-align: middle;
 }
-
-/* Breadcrumbs */
-.breadcrumb {
-    margin-bottom: 0;
-    padding: 14px 0 8px;
-}
-/* End Header, Menus, Login Form and Breadcrumbs */
+/* End Header, Menus, Login Form */
 
 /* Headings and stuff inside them */
 h1 {

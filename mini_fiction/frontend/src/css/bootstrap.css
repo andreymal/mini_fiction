@@ -2869,23 +2869,6 @@ border-color: rgba(0, 0, 0, 0.1) rgba(0, 0, 0, 0.1) rgba(0, 0, 0, 0.25);
 color: #ffffff;
 background-color: #040404;
 }
-.breadcrumb {
-padding: 8px 15px;
-margin: 0 0 20px;
-list-style: none;
-}
-.breadcrumb > li {
-display: inline-block;
-/* IE7 inline-block hack */
-text-shadow: 0 1px 0 #ffffff;
-}
-.breadcrumb > li > .divider {
-padding: 0 5px;
-color: #ccc;
-}
-.breadcrumb > .active {
-color: #999999;
-}
 .pagination {
 margin: 20px 0;
 }

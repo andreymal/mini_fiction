@@ -1,15 +1,9 @@
 {% extends base %}
-{% from 'macro.html' import breadcrumbs with context %}
 {% from 'macro.html' import form_fields with context %}
 {% block content %}
 
 <div class="row">
     <div class="span12">
-        {{- breadcrumbs([
-            [url_for('admin_index.index'), _('Administration')],
-            [url_for('admin_abuse_reports.index'), 'Жалобы']
-        ]) }}
-
         {% if target %}
         <h1>
             Жалоба на
@@ -81,11 +75,6 @@
 
             <button type="submit" class="btn btn-primary">Сохранить</button>
         </form>
-
-        {{- breadcrumbs([
-            [url_for('admin_index.index'), _('Administration')],
-            [url_for('admin_abuse_reports.index'), 'Жалобы']
-        ]) }}
     </div>
 </div>
 {% endblock %}

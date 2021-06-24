@@ -6,4 +6,12 @@
     --bullets-size: 0.75em;
     --bullets-color-main: #999;
     --bullets-color-accent: #555;
+    --formatting-color: #555;
+
+    --color-red: #a64e3a;
+    --color-yellow: #edb647;
+    --color-orange: #ed9a47;
+    --color-green: #6a9929;
+    --color-blue: #4f67a8;
+    --color-violet: #644fa8;
 }

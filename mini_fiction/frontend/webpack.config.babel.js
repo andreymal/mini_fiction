@@ -159,7 +159,7 @@ module.exports = {
         type: 'asset/source',
       },
       {
-        test: /\.svg(\?.*)?$/, // match img.svg and img.svg?param=value
+        test: /images\/assets\/.*\.svg(\?.*)?$/, // match img.svg and img.svg?param=value
         use: [
           'svg-url-loader', // or file-loader or svg-url-loader
           'svg-transform-loader',

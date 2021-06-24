@@ -30,7 +30,7 @@
 <div class="row">
     <div class="span8 top-list">
         <h2>{{ _('New stories') }}</h2>
-        {% include "includes/stories.html" %}
+        {% with buttons='common' %}{% include "includes/stories.html" %}{% endwith %}
         {% if stories %}{{ paginator(page_obj) }}{% endif %}
     </div>
 

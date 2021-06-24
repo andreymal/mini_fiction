@@ -1,12 +1,15 @@
 {% from 'macro.html' import character_picture %}
+{% from 'includes/story_buttons.html' import common_buttons, edit_buttons with context %}
 
 {% for story in stories %}
     <div id="story_{{ story.id }}" class="story-item">
-        {% if story.bl.editable_by(current_user) and story.bl.is_editor(current_user) %}
-            <div class="story-control-btn btn-group js-story-list-control-{{ story.id }}">
-                <a class="btn btn-warning btn-mini" href="{{ url_for('story.edit', pk=story.id) }}">{{ pgettext('story_control_buttons', 'Edit') }}</a>
-            </div>
-        {% endif %}
+        <div class="icon-metagroup">
+            {% if buttons == 'common' %}
+                {{ common_buttons(story) }}
+            {% elif buttons == 'edit' %}
+                {{ edit_buttons(story) }}
+            {% endif %}
+        </div>
         <h3>
             <a href="{{ url_for('story.view', pk=story.id) }}">{{ story.title }}</a>
             {% if story.pinned -%}
@@ -16,7 +19,6 @@
             {% include 'includes/story_marks.html' with context %}
         </h3>
         <p class="meta">
-            {% include 'includes/story_reader_buttons.html' with context %}
                 <span class="story-tags-list">
                     {%- include 'includes/story_main_tags.html' -%}
                 </span>

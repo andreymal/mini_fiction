@@ -139,7 +139,7 @@
             </div>
             {% endif -%}
             {% with stories = story_results.stories %}
-                {% include "includes/stories.html" %}
+                {% with buttons='common' %}{% include "includes/stories.html" %}{% endwith %}
             {% endwith %}
             <!-- Рассказы: конец вывода -->
         {% endif %}

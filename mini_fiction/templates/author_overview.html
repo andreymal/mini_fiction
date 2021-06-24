@@ -63,7 +63,7 @@
 
         {% if not is_system_user or stories %}
             <h2>{% if not is_system_user %}Рассказы автора{% else %}Чьи-то рассказы{% endif %} ({{ stories|length }})</h2>
-            {% include "includes/stories.html" %}
+            {% with buttons='common' %}{% include "includes/stories.html" %}{% endwith %}
         {% endif %}
     </div>
 

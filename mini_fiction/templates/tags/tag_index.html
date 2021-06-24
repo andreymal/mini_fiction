@@ -21,7 +21,7 @@
     </div>
 
     <div id="stories-list">
-        {% include "includes/stories.html" %}
+        {% with buttons='common' %}{% include "includes/stories.html" %}{% endwith %}
     </div>
 
     {% if stories %}{{ paginator(page_obj) }}{% endif %}

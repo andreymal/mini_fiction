@@ -8,9 +8,9 @@
         <h3><a href="{{ url_for('story.view', pk=random_story.id) }}">{{ random_story.title }}</a></h3>
         <p class="meta">
                 {%- if current_user.is_authenticated -%}
-                <span class="chapter-controls">
+                <span class="icon-group">
                     {%- set bookmarked = random_story.bookmarked(current_user.id) -%}
-                    <a title="Прочитать позже" href="{{ url_for('story.bookmark', pk=random_story.id, action='delete' if bookmarked else 'add') }}" class="story_bookmark js-story-bookmark-{{ random_story.id }} scon bookmark{% if bookmarked %} bookmarked{% endif %}"></a>
+                    <a title="Прочитать позже" aria-label="Прочитать позже" href="{{ url_for('story.bookmark', pk=random_story.id, action='delete' if bookmarked else 'add') }}" class="story_bookmark js-story-bookmark-{{ random_story.id }} scon bookmark{% if bookmarked %} bookmarked{% endif %}"></a>
                 </span>
                 {%- endif -%}
                 <span class="story-tags-list">{%- for st in random_story.bl.get_tags_list(sort=True) %}{% if st.tag.is_main_tag %}

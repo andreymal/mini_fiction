@@ -373,7 +373,7 @@ var comments = {
 
     _voteEvent: function(event) {
         event.preventDefault();
-        if (this.classList.contains('vote-disabled')) {
+        if (this.classList.contains('disabled')) {
             return false;
         }
         comments.vote(this.parentNode, this.classList.contains('vote-down') ? -1 : 1);
@@ -389,7 +389,7 @@ var comments = {
         formData.append('value', value);
 
         var href = voteArea.getAttribute('data-href');
-        voteArea.classList.add('voting');
+        voteArea.classList.add('disabled');
         post(href, formData)
             .then(function(response) {
                 return response.json();
@@ -404,7 +404,7 @@ var comments = {
                     notifyError(data.error || 'Не удалось проголосовать');
                 }
             }).then(null, core.handleError).then(function() {
-                voteArea.classList.remove('voting');
+                voteArea.classList.remove('disabled');
             });
         return true;
     },

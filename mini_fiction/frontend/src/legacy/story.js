@@ -250,13 +250,18 @@ var story = {
         }
         var btn = story.querySelector('.js-story-publish-btn');
         if (btn) {
+            let message;
             if (published) {
-                btn.classList.remove('btn-primary');
-                btn.textContent = 'В черновики';
+                btn.classList.remove('entity-publish');
+                btn.classList.add('entity-draft');
+                message = 'В черновики';
             } else {
-                btn.classList.add('btn-primary');
-                btn.textContent = 'Опубликовать';
+                btn.classList.remove('entity-draft');
+                btn.classList.add('entity-publish');
+                message = 'Опубликовать';
             }
+            btn.title = message;
+            btn.ariaLabel = message;
             return true;
         } else {
             return false;
@@ -285,13 +290,18 @@ var story = {
         }
         var btn = story.querySelector('.js-story-approve-btn');
         if (btn) {
+            let message;
             if (approved) {
-                btn.classList.remove('btn-success');
-                btn.textContent = 'Отозвать';
+                message = 'Отозвать';
+                btn.classList.remove('entity-approve');
+                btn.classList.add('entity-revoke');
             } else {
-                btn.classList.add('btn-success');
-                btn.textContent = 'Одобрить';
+                message = 'Одобрить';
+                btn.classList.remove('entity-revoke');
+                btn.classList.add('entity-approve');
             }
+            btn.title = message;
+            btn.ariaLabel = message;
             return true;
         } else {
             return false;
@@ -308,9 +318,11 @@ var story = {
         for (var i = 0; i < btns.length; i++) {
             var btn = btns[i];
             if (favorited) {
-                btn.classList.add('favorited');
+                btn.classList.remove('inactive');
+                btn.classList.add('active');
             } else {
-                btn.classList.remove('favorited');
+                btn.classList.remove('active');
+                btn.classList.add('inactive');
             }
             if (changeUrl) {
                 btn.href = changeUrl;
@@ -331,9 +343,11 @@ var story = {
         for (var i = 0; i < btns.length; i++) {
             var btn = btns[i];
             if (bookmarked) {
-                btn.classList.add('bookmarked');
+                btn.classList.remove('inactive');
+                btn.classList.add('active');
             } else {
-                btn.classList.remove('bookmarked');
+                btn.classList.remove('active');
+                btn.classList.add('inactive');
             }
             if (changeUrl) {
                 btn.href = changeUrl;

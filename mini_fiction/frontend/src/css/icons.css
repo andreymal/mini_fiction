@@ -1,0 +1,135 @@
+.scon {
+    background-repeat: no-repeat;
+    background-position: center;
+    filter: drop-shadow(.1em .1em .1em rgba(32, 32, 32, .4));
+
+    width: 1.5em;
+    height: 1.5em;
+    cursor: pointer;
+
+    &:hover {
+        filter: saturate(105%) brightness(110%) drop-shadow(.1em .1em .1em rgba(64, 64, 64, .2));
+    }
+
+    &.disabled {
+        opacity: 0.2;
+        cursor: default;
+    }
+
+}
+
+.icon-group {
+    display: inline-flex;
+    gap: 0.6em;
+
+    &.disabled {
+        opacity: 0.2;
+        cursor: default;
+    }
+}
+
+.icon-metagroup {
+    float: right;
+    display: inline-flex;
+    gap: 1em;
+}
+
+.favorite {
+    background-image: url(../images/assets/favorite.svg);
+    -svg-mixer-fill: var(--color-yellow);
+}
+
+.bookmark {
+    background-image: url(../images/assets/bookmark.svg);
+    -svg-mixer-fill: var(--color-green);
+}
+
+.html {
+    background-image: url(../images/assets/html.svg);
+    -svg-mixer-fill: var(--color-blue);
+}
+
+.fb2 {
+    background-image: url(../images/assets/fb2.svg);
+    -svg-mixer-fill: var(--color-blue);
+}
+
+.abuse {
+    background-image: url(../images/assets/abuse.svg);
+    -svg-mixer-fill: var(--color-red);
+}
+
+.vote-up {
+    background-image: url(../images/assets/upvote.svg);
+    -svg-mixer-fill: var(--color-green);
+}
+
+.up {
+    background-image: url(../images/assets/upvote.svg);
+    -svg-mixer-fill: var(--formatting-color);
+}
+
+.vote-down {
+    background-image: url(../images/assets/downvote.svg);
+    -svg-mixer-fill: var(--color-red);
+}
+
+.down {
+    background-image: url(../images/assets/downvote.svg);
+    -svg-mixer-fill: var(--formatting-color);
+}
+
+.formatting {
+    background-image: url(../images/assets/formatting.svg);
+    -svg-mixer-fill: var(--formatting-color);
+}
+
+.entity-abuse {
+    background-image: url(../images/assets/abuse.svg);
+    -svg-mixer-fill: var(--color-red);
+}
+
+.entity-edit {
+    background-image: url(../images/assets/edit.svg);
+    -svg-mixer-fill: var(--color-orange);
+}
+
+.entity-delete {
+    background-image: url(../images/assets/delete.svg);
+    -svg-mixer-fill: var(--color-red);
+}
+
+.entity-restore {
+    background-image: url(../images/assets/restore.svg);
+    -svg-mixer-fill: var(--color-green);
+}
+
+.entity-draft {
+    background-image: url(../images/assets/draft.svg);
+    -svg-mixer-fill: var(--color-orange);
+}
+
+.entity-approve {
+    background-image: url(../images/assets/approve.svg);
+    -svg-mixer-fill: var(--color-violet);
+}
+
+.entity-revoke {
+    background-image: url(../images/assets/revoke.svg);
+    -svg-mixer-fill: var(--color-violet);
+}
+
+.entity-publish {
+    background-image: url(../images/assets/publish.svg);
+    -svg-mixer-fill: var(--color-green);
+}
+
+.entity-pin {
+    background-image: url(../images/assets/pin.svg);
+    -svg-mixer-fill: var(--color-violet);
+}
+
+.entity-journal {
+    background-image: url(../images/assets/journal.svg);
+    -svg-mixer-fill: var(--color-blue);
+}

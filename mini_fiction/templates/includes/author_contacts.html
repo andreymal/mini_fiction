@@ -1,23 +1,23 @@
 <p class="contact-links">
-{% for contact in contacts %}
-    <span class="contact contact-{{ contact.name }}">
-    {%- set typ = contact_types.get(contact.name) -%}
-    {%- if typ -%}
-        {{ typ['label'].get(g.locale.language) or typ['label']['default'] }}:
-        {% if typ['link_template'] -%}
-            <a href="{{ typ['link_template'].format(value=contact.value) }}">
-        {%- endif -%}
+    {% for contact in contacts %}
+        <span class="contact-{{ contact.name }}">
+        {%- set typ = contact_types.get(contact.name) -%}
+        {%- if typ -%}
+            <span>{{ typ['label'].get(g.locale.language) or typ['label']['default'] }}:</span>
+            {% if typ['link_template'] -%}
+                <a href="{{ typ['link_template'].format(value=contact.value) }}">
+            {%- endif -%}
 
-        {%- if typ['title_template'] -%}
-            {{ typ['title_template'].format(value=contact.value) }}
+            {%- if typ['title_template'] -%}
+                {{ typ['title_template'].format(value=contact.value) }}
+            {%- else -%}
+                {{ contact.value }}
+            {%- endif -%}
+
+            {%- if typ['link_template'] %}</a>{% endif %}
         {%- else -%}
-            {{ contact.value }}
+            {{ contact.name }}: {{ contact.value }}
         {%- endif -%}
-
-        {%- if typ['link_template'] %}</a>{% endif %}
-    {%- else -%}
-        {{ contact.name }}: {{ contact.value }}
-    {%- endif -%}
-    </span><br/>
-{% endfor %}
+        </span>
+    {% endfor %}
 </p>

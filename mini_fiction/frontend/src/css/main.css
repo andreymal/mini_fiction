@@ -1624,12 +1624,9 @@ a.btn {
 }
 
 .contact-links {
-    line-height: 30px;
-}
-
-.contact-links a {
-    line-height: 16px;
-    height: 16px;
+    display: flex;
+    flex-direction: column;
+    gap: .5em;
 }
 
 /* === Bottom of the page stuff === */

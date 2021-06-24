@@ -7,15 +7,15 @@
     cursor: pointer;
 
     &.inactive {
-        filter: grayscale(0.7) drop-shadow(.1em .1em .1em rgba(32, 32, 32, .2));
+        filter: saturate(0) brightness(85%) drop-shadow(0 0 .05em rgba(32, 32, 32, .4));
     }
 
     &, &.active, &.inactive:hover {
-        filter: drop-shadow(.1em .1em .1em rgba(32, 32, 32, .2));
+        filter: drop-shadow(0 0 .05em rgba(32, 32, 32, .4));
     }
 
     &:hover {
-        filter: saturate(105%) brightness(110%) drop-shadow(.1em .1em .1em rgba(64, 64, 64, .2));
+        filter: saturate(105%) brightness(110%) drop-shadow(0 0 .05em rgba(32, 32, 32, .2));;
     }
 
     &.disabled {

@@ -1,13 +1,20 @@
 .scon {
     background-repeat: no-repeat;
     background-position: center;
-    filter: drop-shadow(.1em .1em .1em rgba(32, 32, 32, .4));
 
     width: 1.5em;
     height: 1.5em;
     cursor: pointer;
 
-    &:hover {
+    &.inactive {
+        filter: grayscale(0.7) drop-shadow(.1em .1em .1em rgba(32, 32, 32, .2));
+    }
+
+    &, &.active, &.inactive:hover {
+        filter: drop-shadow(.1em .1em .1em rgba(32, 32, 32, .2));
+    }
+
+    &.active:hover {
         filter: saturate(105%) brightness(110%) drop-shadow(.1em .1em .1em rgba(64, 64, 64, .2));
     }
 

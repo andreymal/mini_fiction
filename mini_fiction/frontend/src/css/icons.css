@@ -14,7 +14,7 @@
         filter: drop-shadow(.1em .1em .1em rgba(32, 32, 32, .2));
     }
 
-    &.active:hover {
+    &:hover {
         filter: saturate(105%) brightness(110%) drop-shadow(.1em .1em .1em rgba(64, 64, 64, .2));
     }
 

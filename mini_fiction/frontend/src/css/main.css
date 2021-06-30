@@ -2404,6 +2404,16 @@ ul.editlog .editlog-item:nth-child(2n+1) {
 
 /* === Adaptive overrides === */
 
+@media (max-width: 1000px) {
+    .container {
+        margin-bottom: 0;
+        border-radius: 0;
+    }
+    .footer {
+        border-radius: 0;
+    }
+}
+
 @media (min-width: 1200px) {
     .container {
         width: 1170px;

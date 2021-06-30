@@ -1281,11 +1281,11 @@ class StoryBL(BaseBL, Commentable):
             result.sort(key=lambda x: (x.tag.category.id if x.tag.category else 2 ** 31, x.tag.iname))
         return result
 
-    def get_main_tags(self, sort=False):
-        return [x for x in self.get_tags_list(sort=sort) if x.tag.is_main_tag]
+    def get_main_tags(self):
+        return [x for x in self.get_tags_list(sort=True)][0:5]
 
-    def get_more_tags(self, sort=False):
-        return [x for x in self.get_tags_list(sort=sort) if not x.tag.is_main_tag]
+    def get_more_tags(self):
+        return [x for x in self.get_tags_list(sort=True)][5:]
 
     def get_extreme_tags(self, sort=False):
         return [x for x in self.get_tags_list(sort=sort) if x.tag.is_extreme_tag]

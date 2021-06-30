@@ -27,7 +27,7 @@ TAG = {
         'coerce': (safe_string_multiline_coerce, 'strip'),
         'maxlength': 4096,
     },
-    'is_main_tag': {
+    'is_spoiler': {
         'type': 'boolean',
         'coerce': bool_coerce,
     },

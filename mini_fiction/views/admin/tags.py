@@ -57,12 +57,12 @@ def index(page):
         args['is_alias'] = '1'
         objects = objects.filter(lambda x: x.is_alias)
 
-    if request.args.get('is_main_tag') == '0':
-        args['is_main_tag'] = '0'
-        objects = objects.filter(lambda x: not x.is_main_tag)
-    elif request.args.get('is_main_tag') == '1':
-        args['is_main_tag'] = '1'
-        objects = objects.filter(lambda x: x.is_main_tag)
+    if request.args.get('is_spoiler') == '0':
+        args['is_spoiler'] = '0'
+        objects = objects.filter(lambda x: not x.is_spoiler)
+    elif request.args.get('is_spoiler') == '1':
+        args['is_spoiler'] = '1'
+        objects = objects.filter(lambda x: x.is_spoiler)
 
     if request.args.get('is_extreme_tag') == '0':
         args['is_extreme_tag'] = '0'
@@ -139,7 +139,7 @@ def update(pk):
         'name': tag.name,
         'category': tag.category.id if tag.category else 0,
         'description': tag.description,
-        'is_main_tag': tag.is_main_tag,
+        'is_spoiler': tag.is_spoiler,
         'is_alias_for': tag.is_alias_for.name if tag.is_alias_for else '',
         'is_hidden_alias': tag.is_hidden_alias,
         'is_extreme_tag': tag.is_extreme_tag,

@@ -104,7 +104,7 @@ zip_dump_params = {
     'tag': {
         'include': (
             'id', 'name', 'iname', 'category', 'description',
-            'is_main_tag', 'created_at', 'updated_at', 'is_alias_for',
+            'is_spoiler', 'created_at', 'updated_at', 'is_alias_for',
             'is_hidden_alias', 'is_extreme_tag', 'reason_to_blacklist',
         ),
         'exclude': (

@@ -51,8 +51,8 @@
             {{- story.bl.vote_area_2_html(user=current_user, user_vote=vote)|safe -}}
         </div>
             <p class="story-genres">
-                {%- set main_tags = story.bl.get_main_tags(sort=True) -%}
-                {%- set more_tags = story.bl.get_more_tags(sort=True) -%}
+                {%- set main_tags = story.bl.get_main_tags() -%}
+                {%- set more_tags = story.bl.get_more_tags() -%}
                 {% for st in main_tags %}
                     {{ tag_link(st.tag) -}}
                 {% endfor %}

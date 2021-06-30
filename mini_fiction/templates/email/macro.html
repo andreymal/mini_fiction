@@ -39,7 +39,7 @@
 
 
 {% macro story_info_html(story) -%}
-{%- set main_tags = story.bl.get_main_tags(sort=True) -%}
+{%- set main_tags = story.bl.get_main_tags() -%}
 
 <h3 style="font-family: 'Trebuchet MS', Arial, sans-serif; font-weight: 400; font-size: 20px; line-height: 20px; margin: 0 0 5px;">
     <a href="{{ url_for('story.view', pk=story.id, _external=True) }}" style="color: #0086e5;">{{ story.title }}</a>

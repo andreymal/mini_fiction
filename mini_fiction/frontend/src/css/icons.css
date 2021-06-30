@@ -27,7 +27,8 @@
 
 .icon-group {
     display: inline-flex;
-    gap: 0.6em;
+    align-items: center;
+    gap: 0.5rem;
 
     &.disabled {
         opacity: 0.2;
@@ -38,7 +39,7 @@
 .icon-metagroup {
     float: right;
     display: inline-flex;
-    gap: 1.4em;
+    gap: 1.25rem;
 
     &.small .scon {
         width: 1rem;

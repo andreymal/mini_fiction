@@ -1,3 +1,7 @@
+@define-mixin box-shadow {
+    box-shadow: .1em .1em .2em rgba(0, 0, 0, 0.4);
+}
+
 /* Body, base and containers */
 body {
     background-color: #dde;
@@ -575,7 +579,7 @@ a.authorlink:hover,a.edit-link:hover {
 
     & img {
         border-radius: .25em;
-        box-shadow: .1em .1em .2em rgba(0, 0, 0, 0.4);
+        @mixin box-shadow;
     }
 }
 

@@ -103,7 +103,7 @@
 
 .entity-edit {
     background-image: url(../images/assets/edit.svg);
-    -svg-mixer-fill: var(--color-orange);
+    -svg-mixer-fill: var(--color-yellow);
 }
 
 .entity-delete {
@@ -118,7 +118,7 @@
 
 .entity-draft {
     background-image: url(../images/assets/draft.svg);
-    -svg-mixer-fill: var(--color-orange);
+    -svg-mixer-fill: var(--color-yellow);
 }
 
 .entity-approve {

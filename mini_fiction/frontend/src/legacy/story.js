@@ -164,7 +164,7 @@ var story = {
         });
 
         // Закрепление на главной
-        core.bind('#content .story_pin', 'click', function(event) {
+        core.bind('#content .js-story-pin-btn', 'click', function(event) {
             event.stopImmediatePropagation();
             event.preventDefault();
             var url = this.href;

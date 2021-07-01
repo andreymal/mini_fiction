@@ -49,7 +49,7 @@
             <a title="{{ publish_title }}"
                aria-label="{{ publish_title }}"
                role="button"
-               class="scon {{ 'entity-publish' if story.bl.is_publishable() and story.draft else 'entity-draft' }} js-story-publish-btn"
+               class="scon {{ 'entity-publish' if story.draft else 'entity-draft' }} {{ 'inactive' if not story.bl.is_publishable() else '' }} js-story-publish-btn"
                href="{{ url_for('story.publish', pk=story.id) }}"></a>
         {% endif %}
 

@@ -1,6 +1,6 @@
 {% extends base %}
 {% from 'macro.html' import atom_feed with context %}
-{% from 'macro.html' import tag_link with context %}
+{% from 'macro/story.html' import tags_block %}
 {% from 'macro.html' import character_picture %}
 {% from 'includes/story_buttons.html' import common_buttons, edit_buttons with context %}
 
@@ -50,16 +50,8 @@
         <div class="vote-area-2 js-vote-area-2-{{ story.id }}">
             {{- story.bl.vote_area_2_html(user=current_user, user_vote=vote)|safe -}}
         </div>
-            <p class="story-genres">
-                {% for tag in story.prepared_tags.primary %}
-                    {{ tag_link(tag) -}}
-                {% endfor %}
-                {% if story.prepared_tags.secondary -%}
-                    <a href="#" class="show-more-tags-link js-show-more-tags">показать все теги</a>
-                    <span class="js-story-more-tags" style="display: none;">{% for tag in story.prepared_tags.secondary %}
-                        {{ tag_link(tag) -}}
-                    {% endfor %}</span>
-                {%- endif %}
+            <p>
+                {{ tags_block(story.prepared_tags, story.id) }}
             </p>
             <p class="character-list">
                 {%- for character in story.characters.order_by('c.id') -%}

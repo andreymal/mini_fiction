@@ -727,29 +727,26 @@ h1 .alert {
 
 .story-item .meta .story-tag {
     padding: 2px 7px;
-    margin: 0 4px 2px 0;
 }
 
-.story-tag.more-tags-btn {
-  background-color: #ddd;
+.more-tags {
+    display: none;
 }
 
-.story-tag.more-tags-btn:hover {
-  background-color: #bbb;
-}
+input.more-tags-trigger {
+    display: none;
 
-.story-item .meta .story-tag.more-tags-btn {
-  padding: 2px 4px;
-}
+    & + label {
+        display: inline-block;
+    }
 
-.show-more-tags-link {
-    display: inline-block;
-    margin: 0 4px 4px 0;
-    padding: 4px 2px;
-    line-height: 16px;
+    &:checked + label {
+        display: none;
+    }
 
-    text-decoration: underline;
-    text-decoration-style: dotted;
+    &:checked + label + .more-tags {
+        display: inline-block;
+    }
 }
 
 /* Tags list page */

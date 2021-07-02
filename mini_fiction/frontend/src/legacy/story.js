@@ -79,7 +79,6 @@ var story = {
     },
 
     load: function() {
-        this.moreTagsLinkStuff();
         this.panelStuff();
         this.chapterPreviewStuff();
         this.chapterLinterStuff();
@@ -240,7 +239,6 @@ var story = {
         }
         this.removeChapterPreviewStuff();
         this.removePanel();
-        this.removeMoreTagsLinkStuff();
     },
 
     setPublished: function(storyId, published) {
@@ -415,35 +413,6 @@ var story = {
 
         notify('Ваш голос учтен!');
         return true;
-    },
-
-    moreTagsLinkStuff: function() {
-        var links = document.getElementsByClassName('js-show-more-tags');
-        for (var i = 0; i < links.length; i++) {
-            var link = links[i];
-            if (this._moreTagsLinks.indexOf(link) >= 0) {
-                continue;
-            }
-            link.addEventListener('click', this._moreTagsLinkClickEvent);
-            this._moreTagsLinks.push(link);
-        }
-    },
-
-    removeMoreTagsLinkStuff: function() {
-        for (var i = 0; i < this._moreTagsLinks.length; i++) {
-            this._moreTagsLinks[i].removeEventListener('click', this._moreTagsLinkClickEvent);
-        }
-        this._moreTagsLinks = [];
-    },
-
-    _moreTagsLinkClickEvent: function(event) {
-        var link = event.currentTarget;
-        var genresCont = link.parentNode;
-        var moreTags = genresCont.getElementsByClassName('js-story-more-tags')[0];
-        moreTags.style.display = '';
-        link.style.display = 'none';
-        event.preventDefault();
-        return false;
     },
 
     contributorsStuff: function() {

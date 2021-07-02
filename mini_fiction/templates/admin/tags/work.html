@@ -1,5 +1,5 @@
 {% extends base %}
-{% from 'macro.html' import form_fields, tag_link, admin_tag_link with context %}
+{% from 'macro.html' import form_fields, tag_link with context %}
 {% block content %}
 
 <div class="row">
@@ -20,7 +20,7 @@
             {{ tag_link(tag) }}
             {% if tag.is_alias %}
                 →
-                {{ admin_tag_link(tag.is_alias_for) }}
+                {{ tag_link(tag.is_alias_for, admin=True) }}
             {% endif %}
         {% endif %}
 
@@ -66,7 +66,7 @@
             <div class="controls">
                 <span style="display: inline-block; padding-top: 5px;">
                     {% for alias in visible_tag_aliases -%}
-                        {{ admin_tag_link(alias) }}
+                        {{ tag_link(alias, admin=True) }}
                     {% endfor %}
                 </span>
             </div>
@@ -79,7 +79,7 @@
             <div class="controls">
                 <span style="display: inline-block; padding-top: 5px;">
                     {% for alias in hidden_tag_aliases -%}
-                        {{ admin_tag_link(alias) }}
+                        {{ tag_link(alias, admin=True) }}
                     {% endfor %}
                 </span>
             </div>

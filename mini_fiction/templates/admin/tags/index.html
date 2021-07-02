@@ -1,5 +1,5 @@
 {% extends base %}
-{% from 'macro.html' import paginator, admin_tag_link with context %}
+{% from 'macro.html' import paginator, tag_link with context %}
 {% block content %}
 
 <div class="row"><div class="span12">
@@ -19,10 +19,10 @@
         <tbody>
         {%- for tag in tags %}<tr>
             <td class="col-tag-iname">
-                {{ admin_tag_link(tag) }}
+                {{ tag_link(tag, admin=True) }}
                 {% if tag.is_alias %}
                     →
-                    {{ admin_tag_link(tag.is_alias_for) }}
+                    {{ tag_link(tag.is_alias_for, admin=True) }}
                 {% endif %}
             </td>
 

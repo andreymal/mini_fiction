@@ -711,7 +711,6 @@ h1 .alert {
     text-decoration: none;
     display: inline-block;
     line-height: 16px;
-    margin: 0 4px 4px 0;
     background-color: var(--default-tag-color);
     @mixin box-shadow;
 
@@ -719,17 +718,16 @@ h1 .alert {
         text-decoration: line-through;
         opacity: 0.5;
     }
-}
-
-.story-tag:hover {
-    color: #fff;
+    &:hover {
+        color: #fff;
+    }
 }
 
 .story-item .meta .story-tag {
     padding: 2px 7px;
 }
 
-.more-tags {
+.more-tag {
     display: none;
 }
 
@@ -738,15 +736,22 @@ input.more-tags-trigger {
 
     & + label {
         display: inline-block;
+        margin: 0;
     }
 
     &:checked + label {
         display: none;
     }
 
-    &:checked + label + .more-tags {
+    &:checked + label ~ .more-tag {
         display: inline-block;
     }
+}
+
+.tags-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: .5em;
 }
 
 /* Tags list page */

@@ -1,16 +1,16 @@
 {% from 'macro.html' import tag_link with context %}
 
 {% macro tags_block(prepared_tags, story_id) %}
-    {% for tag in prepared_tags.primary %}
-        {{ tag_link(tag) -}}
-    {% endfor %}
-    {% if prepared_tags.secondary -%}
-        <input role="button" id="more-tags-{{ story_id }}" type="checkbox" class="more-tags-trigger" />
-        <label aria-label="Показать все теги" title="Показать все теги" class="story-tag" for="more-tags-{{ story_id }}">…</label>
-        <span class="more-tags">
+    <span class="tags-list">
+        {% for tag in prepared_tags.primary %}
+            {{ tag_link(tag) -}}
+        {% endfor %}
+        {% if prepared_tags.secondary -%}
+            <input role="button" id="more-tags-{{ story_id }}" type="checkbox" class="more-tags-trigger"/>
+            <label aria-label="Показать все теги" title="Показать все теги" class="story-tag" for="more-tags-{{ story_id }}">…</label>
             {% for tag in prepared_tags.secondary %}
-                {{ tag_link(tag) -}}
+                {{ tag_link(tag, more=True) -}}
             {% endfor %}
-        </span>
-    {%- endif %}
+        {%- endif %}
+    </span>
 {% endmacro %}

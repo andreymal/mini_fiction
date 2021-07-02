@@ -20,9 +20,7 @@
             {% include 'includes/story_marks.html' with context %}
         </h3>
         <p class="meta">
-            <span>
-                {{ tags_block(story.prepared_tags, story.id) }}
-            </span>
+            {{ tags_block(story.prepared_tags, story.id) }}
                 {{ ngettext("%(num)d word", "%(num)d words", story.words) }} {{ pgettext('story_by', 'by') }} {% include 'includes/story_authors_list.html' %}
                 <br/>
                 <span>

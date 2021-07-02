@@ -1,4 +1,4 @@
-{%- from 'macro.html' import tag_link with context -%}
+{% from 'macro/story.html' import tags_block %}
 {% from 'macro.html' import character_picture %}
 {% from 'includes/story_buttons.html' import common_buttons with context %}
 
@@ -9,11 +9,7 @@
         {{ common_buttons(story, with_downloads=False) }}
         <h3><a href="{{ url_for('story.view', pk=story.id) }}">{{ story.title }}</a></h3>
         <p class="meta">
-            <span class="story-tags-list">
-                {%- for tag in story.prepared_tags.primary -%}
-                    {{- tag_link(tag) -}}
-                {%- endfor -%}
-            </span>
+            {{ tags_block(story.prepared_tags, story.id) }}
         </p>
         <p class="story-summary">{{ story.summary|striptags }}</p>
         <p class="meta">

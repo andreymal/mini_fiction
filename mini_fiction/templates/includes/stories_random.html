@@ -1,5 +1,5 @@
 {% from 'macro/story.html' import tags_block %}
-{% from 'macro.html' import character_picture %}
+{% from 'macro/story.html' import characters_block %}
 {% from 'includes/story_buttons.html' import common_buttons with context %}
 
 {% for story in random_stories %}
@@ -13,11 +13,7 @@
         </p>
         <p class="story-summary">{{ story.summary|striptags }}</p>
         <p class="meta">
-                <span class="character-list">
-                    {%- for character in story.characters|sort(attribute='id') -%}
-                        <a href="{{ url_for('search.simple', search_type='character', search_id=character.id) }}">{{ character_picture(character) }}</a>
-                    {%- endfor -%}
-                </span>
+            {{ characters_block(story.prepared_characters) }}
         </p>
     </div>
 {% endfor %}

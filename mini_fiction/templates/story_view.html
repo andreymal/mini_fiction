@@ -1,7 +1,7 @@
 {% extends base %}
 {% from 'macro.html' import atom_feed with context %}
 {% from 'macro/story.html' import tags_block %}
-{% from 'macro.html' import character_picture %}
+{% from 'macro/story.html' import characters_block %}
 {% from 'includes/story_buttons.html' import common_buttons, edit_buttons with context %}
 
 {% block extrahead %}
@@ -53,10 +53,8 @@
             <p>
                 {{ tags_block(story.prepared_tags, story.id) }}
             </p>
-            <p class="character-list">
-                {%- for character in story.characters.order_by('c.id') -%}
-                    <a href="{{ url_for('search.simple', search_type='character', search_id=character.id) }}">{{ character_picture(character) }}</a>
-                {%- endfor -%}
+            <p>
+                {{ characters_block(story.prepared_characters) }}
             </p>
 
         <p>{{ pgettext('story_written_by', 'Written by:') }} {% include 'includes/story_authors_list_microdata.html' %}</p>

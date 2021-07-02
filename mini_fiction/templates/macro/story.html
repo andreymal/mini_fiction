@@ -1,4 +1,5 @@
-{% from 'macro.html' import tag_link with context %}
+{% from 'macro.html' import tag_link %}
+{% from 'macro.html' import character_picture %}
 
 {% macro tags_block(prepared_tags, story_id, with_secondary=True) %}
     <span class="tags-list">
@@ -19,5 +20,13 @@
                 {{ tag_link(tag, spoiler=True) -}}
             {% endfor %}
         {%- endif %}
+    </span>
+{% endmacro %}
+
+{% macro characters_block(prepared_characters) %}
+    <span class="character-list">
+        {%- for character in prepared_characters -%}
+            <a href="{{ url_for('search.simple', search_type='character', search_id=character.id) }}">{{ character_picture(character) }}</a>
+        {%- endfor -%}
     </span>
 {% endmacro %}

@@ -727,24 +727,45 @@ h1 .alert {
     padding: 2px 7px;
 }
 
-.more-tag {
+.secondary-tag, .spoiler-tag {
     display: none;
 }
 
-input.more-tags-trigger {
+input.show-tags-trigger {
     display: none;
 
     & + label {
         display: inline-block;
         margin: 0;
     }
+    & + label ~ label {
+        display: none;
+    }
 
     &:checked + label {
         display: none;
     }
 
-    &:checked + label ~ .more-tag {
+    &:checked + label ~ label {
         display: inline-block;
+        margin: 0;
+    }
+
+    &:checked + label ~ input:checked + label {
+        display: none;
+    }
+
+    &:checked + label ~ .secondary-tag {
+        display: inline-block;
+    }
+}
+
+input.show-spoiler-trigger {
+    display: none;
+
+    &:checked + label ~ .spoiler-tag {
+        display: inline-block;
+        opacity: 0.5;
     }
 }
 

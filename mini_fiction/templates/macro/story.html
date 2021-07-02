@@ -6,10 +6,17 @@
             {{ tag_link(tag) -}}
         {% endfor %}
         {% if prepared_tags.secondary -%}
-            <input role="button" id="more-tags-{{ story_id }}" type="checkbox" class="more-tags-trigger"/>
-            <label aria-label="Показать все теги" title="Показать все теги" class="story-tag" for="more-tags-{{ story_id }}">…</label>
+            <input id="secondary-tags-{{ story_id }}" type="checkbox" class="show-tags-trigger"/>
+            <label role="button" aria-label="Показать все теги" title="Показать все теги" class="story-tag" for="secondary-tags-{{ story_id }}">…</label>
             {% for tag in prepared_tags.secondary %}
-                {{ tag_link(tag, more=True) -}}
+                {{ tag_link(tag, secondary=True) -}}
+            {% endfor %}
+        {%- endif %}
+        {% if prepared_tags.spoiler -%}
+            <input id="spoiler-tags-{{ story_id }}" type="checkbox" class="show-spoiler-trigger"/>
+            <label role="button" aria-label="Показать спойлеры" title="Показать спойлеры" class="story-tag" for="spoiler-tags-{{ story_id }}">…</label>
+            {% for tag in prepared_tags.spoiler %}
+                {{ tag_link(tag, spoiler=True) -}}
             {% endfor %}
         {%- endif %}
     </span>

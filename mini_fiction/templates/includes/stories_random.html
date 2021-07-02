@@ -9,11 +9,11 @@
         {{ common_buttons(story, with_downloads=False) }}
         <h3><a href="{{ url_for('story.view', pk=story.id) }}">{{ story.title }}</a></h3>
         <p class="meta">
-                <span class="story-tags-list">
-                    {%- for st in story.bl.get_main_tags() -%}
-                        {{- tag_link(st.tag) -}}
-                    {%- endfor -%}
-                </span>
+            <span class="story-tags-list">
+                {%- for tag in story.prepared_tags.primary -%}
+                    {{- tag_link(tag) -}}
+                {%- endfor -%}
+            </span>
         </p>
         <p class="story-summary">{{ story.summary|striptags }}</p>
         <p class="meta">

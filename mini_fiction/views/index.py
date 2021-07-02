@@ -5,6 +5,7 @@ from flask import Blueprint, current_app, render_template
 from flask_babel import gettext
 from pony.orm import db_session
 
+from mini_fiction.bl.migration import enrich_stories
 from mini_fiction.models import Story, StoryContributor, StoryTag, Tag
 from mini_fiction.utils.views import cached_lists
 from mini_fiction.utils.misc import IndexPaginator, indextitle, sitedescription
@@ -34,6 +35,7 @@ def index():
         Story.select_published().filter(lambda x: x.pinned).order_by(Story.first_published_at.desc())
     )
     stories = pinned_stories + list(stories)
+    enrich_stories(stories)
 
     sidebar_blocks = []
     for block_name in current_app.config['INDEX_SIDEBAR_ORDER']:

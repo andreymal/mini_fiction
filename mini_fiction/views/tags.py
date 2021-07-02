@@ -7,6 +7,7 @@ from flask import Blueprint, current_app, request, render_template, abort, redir
 from flask_login import current_user
 from pony.orm import db_session
 
+from mini_fiction.bl.migration import enrich_stories
 from mini_fiction.models import Story, Tag, StoryContributor, StoryTag
 from mini_fiction.utils.views import cached_lists
 from mini_fiction.utils.misc import Paginator, normalize_tag
@@ -49,6 +50,8 @@ def tag_index(tag_name, page):
 
     page_obj = Paginator(page, objects.count(), per_page=current_app.config['STORIES_COUNT']['tags'])
     objects = page_obj.slice_or_404(objects)
+
+    enrich_stories(objects)
 
     return render_template(
         'tags/tag_index.html',

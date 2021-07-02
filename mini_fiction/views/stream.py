@@ -7,6 +7,7 @@ from flask import Blueprint, current_app, render_template, abort, request
 from flask_babel import gettext
 from flask_login import current_user
 
+from mini_fiction.bl.migration import enrich_stories
 from mini_fiction.models import Story, Chapter, StoryContributor, StoryComment, StoryLocalComment, NewsComment, StoryTag, Tag
 from mini_fiction.utils.views import cached_lists
 from mini_fiction.utils.misc import Paginator, IndexPaginator
@@ -42,6 +43,8 @@ def stories(page):
 
     if not objects and page != 1:
         abort(404)
+
+    enrich_stories(objects)
 
     return render_template(
         'stream/stories.html',

@@ -6,6 +6,7 @@ from flask import Blueprint, current_app, abort, render_template, request
 from flask_login import current_user, login_required
 from flask_babel import gettext, ngettext
 
+from mini_fiction.bl.migration import enrich_stories
 from mini_fiction.models import Author, Story, StoryContributor, Favorites, Bookmark, StoryView, StoryTag, Tag
 from mini_fiction.utils.misc import Paginator
 from mini_fiction.utils.views import cached_lists
@@ -35,6 +36,7 @@ def favorites(user_id, page):
 
     page_obj = Paginator(page, objects.count(), per_page=current_app.config['STORIES_COUNT']['lists'])
     stories = page_obj.slice_or_404(objects)
+    enrich_stories(stories)
 
     data = dict(
         stories=stories,
@@ -57,6 +59,7 @@ def submitted(page):
     objects = Story.select_submitted()
     page_obj = Paginator(page, objects.count(), per_page=current_app.config['STORIES_COUNT']['lists'])
     stories = page_obj.slice_or_404(objects)
+    enrich_stories(stories)
 
     data = dict(
         stories=stories,
@@ -77,6 +80,7 @@ def bookmarks(page):
     objects = select(x.story for x in Bookmark if x.author.id == current_user.id).without_distinct().order_by('-x.id')
     page_obj = Paginator(page, objects.count(), per_page=current_app.config['STORIES_COUNT']['lists'])
     stories = page_obj.slice_or_404(objects)
+    enrich_stories(stories)
 
     data = dict(
         stories=stories,
@@ -103,6 +107,7 @@ def viewed(page):
     page_obj = Paginator(page, views.count(), per_page=current_app.config['STORIES_COUNT']['lists'])
 
     stories = [x[0] for x in page_obj.slice_or_404(views)]
+    enrich_stories(stories)
 
     return render_template(
         'viewed.html',
@@ -136,6 +141,7 @@ def top(page):
     )
 
     stories = page_obj.slice_or_404(objects)
+    enrich_stories(stories)
 
     if period == 7:
         page_title = gettext('Top stories for the week')

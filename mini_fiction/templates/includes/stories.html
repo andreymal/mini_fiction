@@ -1,4 +1,5 @@
 {% from 'macro.html' import character_picture %}
+{% from 'macro.html' import tag_link with context %}
 {% from 'includes/story_buttons.html' import common_buttons, edit_buttons with context %}
 
 {% for story in stories %}
@@ -20,7 +21,16 @@
         </h3>
         <p class="meta">
                 <span class="story-tags-list">
-                    {%- include 'includes/story_main_tags.html' -%}
+                    {%- for tag in story.prepared_tags.primary -%}
+                        {{ tag_link(tag) }}
+                    {% endfor -%}
+
+                    {% if story.prepared_tags.secondary -%}
+                        <a href="#" class="story-tag more-tags-btn js-show-more-tags" title="Показать все теги">...</a>
+                        <span class="js-story-more-tags" style="display: none;">{% for tag in story.prepared_tags.secondary -%}
+                            {{ tag_link(tag) }}
+                        {% endfor %}</span>
+                    {%- endif %}
                 </span>
                 {{ ngettext("%(num)d word", "%(num)d words", story.words) }} {{ pgettext('story_by', 'by') }} {% include 'includes/story_authors_list.html' %}
                 <br/>

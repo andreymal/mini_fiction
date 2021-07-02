@@ -9,6 +9,7 @@ from flask_babel import gettext
 from flask_login import current_user, login_required, logout_user
 from pony.orm import db_session
 
+from mini_fiction.bl.migration import enrich_stories
 from mini_fiction.models import Author, Story, StoryComment, Contact, ChangeEmailProfile
 from mini_fiction.utils.misc import Paginator
 from mini_fiction.utils.views import cached_lists
@@ -100,6 +101,8 @@ def info(user_id=None, comments_page=1):
     comments = paged.slice(comments_list)
     if not comments and comments_page != 1:
         abort(404)
+
+    enrich_stories(stories)
 
     data.update({
         'author': author,

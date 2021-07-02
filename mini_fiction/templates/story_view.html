@@ -51,15 +51,13 @@
             {{- story.bl.vote_area_2_html(user=current_user, user_vote=vote)|safe -}}
         </div>
             <p class="story-genres">
-                {%- set main_tags = story.bl.get_main_tags() -%}
-                {%- set more_tags = story.bl.get_more_tags() -%}
-                {% for st in main_tags %}
-                    {{ tag_link(st.tag) -}}
+                {% for tag in story.prepared_tags.primary %}
+                    {{ tag_link(tag) -}}
                 {% endfor %}
-                {% if more_tags -%}
+                {% if story.prepared_tags.secondary -%}
                     <a href="#" class="show-more-tags-link js-show-more-tags">показать все теги</a>
-                    <span class="js-story-more-tags" style="display: none;">{% for st in more_tags %}
-                        {{ tag_link(st.tag) -}}
+                    <span class="js-story-more-tags" style="display: none;">{% for tag in story.prepared_tags.secondary %}
+                        {{ tag_link(tag) -}}
                     {% endfor %}</span>
                 {%- endif %}
             </p>

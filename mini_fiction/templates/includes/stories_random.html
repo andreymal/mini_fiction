@@ -9,7 +9,7 @@
         {{ common_buttons(story, with_downloads=False) }}
         <h3><a href="{{ url_for('story.view', pk=story.id) }}">{{ story.title }}</a></h3>
         <p class="meta">
-            {{ tags_block(story.prepared_tags, story.id) }}
+            {{ tags_block(story.prepared_tags, story.id, with_secondary=False) }}
         </p>
         <p class="story-summary">{{ story.summary|striptags }}</p>
         <p class="meta">

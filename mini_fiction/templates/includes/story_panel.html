@@ -1,36 +1,32 @@
+{% from 'includes/story_buttons.html' import common_buttons with context %}
+
 <div class="story-panel story-panel-sticky no-js" id="story_panel">
-    <span class="js-required btn btn-mini btn-mini-formatting js-formatting-btn" title="Настройки форматирования главы"></span>
+    <div>
+        {{ common_buttons(story, with_abuse=True) }}
+        <span class="icon-group">
+            {% if chapter or chapters %}
+                {#
+                    <a title="Вниз" aria-label="Вниз" href="#" class="scon down" id="toDown"></a>
+                #}
+                <a title="Вверх" aria-label="Вверх" role="button" href="#" class="scon up" id="toTop"></a>
+            {% endif %}
+        </span>
 
-    {% if current_user.is_authenticated %}
-        {%- set favorited = story.favorited(current_user.id) -%}
-        {%- set bookmarked = story.bookmarked(current_user.id) %}
-        <a title="В избранное" href="{{ url_for('story.favorite', pk=story.id, action='delete' if favorited else 'add') }}" class="js-required story_favorite js-story-favorite-{{ story.id }} scon favorite{% if favorited %} favorited{% endif %}"></a>
-        <a title="Прочитать позже" href="{{ url_for('story.bookmark', pk=story.id, action='delete' if bookmarked else 'add') }}" class="js-required story_bookmark js-story-bookmark-{{ story.id }} scon bookmark{% if bookmarked %} bookmarked{% endif %}"></a>
-    {% endif %}
+        {% if not chapter and not allchapters %}
+            <a href="{{ url_for('chapter.view', story_id=story.id) }}" class="chapters-all-link">Все главы одной страницей</a>
+        {% endif %}
 
-    <span class="chapter-controls">
-        {% for d in story.list_downloads() %}
-            <a title="Скачать в {{ d.format.name }}" href="{{ d.url }}" class="get {{ d.format.slug }}" data-noajax="1"></a>
-        {% endfor %}
-    </span>
-
-    {% if chapter or chapters %}
-    <span class="chapter-controls">
-    {#
-        <a title="Вниз" href="#" class="scon down" id="toDown"></a>
-    #}
-        <a title="Вверх" href="#" class="scon up" id="toTop"></a>
-    </span>
-    {% endif %}
-
-    {% if not chapter and not allchapters %}
-        <a href="{{ url_for('chapter.view', story_id=story.id) }}" class="chapters-all-link">Все главы одной страницей</a>
-    {% endif %}
-
-    {% if prev_chapter or next_chapter %}
-    <span class="chapter-switch">
-        {% if prev_chapter %}← <a class="left" href="{{ url_for('chapter.view', story_id=story.id, chapter_order=prev_chapter.order) }}">{{ prev_chapter.autotitle }}</a>{% endif %}
-        {% if next_chapter %}<a href="{{ url_for('chapter.view', story_id=story.id, chapter_order=next_chapter.order) }}">{{ next_chapter.autotitle }}</a> →{% endif %}
-    </span>
-    {% endif %}
+        {% if prev_chapter or next_chapter %}
+            <span class="chapter-switch">
+                {% if prev_chapter %}<span>← <a href="{{ url_for('chapter.view', story_id=story.id, chapter_order=prev_chapter.order) }}">{{ prev_chapter.autotitle }}</a></span>{% endif %}
+                {% if next_chapter %}<span><a href="{{ url_for('chapter.view', story_id=story.id, chapter_order=next_chapter.order) }}">{{ next_chapter.autotitle }}</a> →</span>{% endif %}
+            </span>
+        {% endif %}
+    </div>
+    <div>
+        <span title="Настройки форматирования главы"
+              aria-label="Настройки форматирования главы"
+              role="button"
+              class="js-required js-formatting-btn scon formatting"></span>
+    </div>
 </div>

@@ -136,19 +136,42 @@
             {%- endif -%}
         </div>
     {%- else -%}
-        {% if with_vote and comment.bl.can_vote %}
-        <div class="comment-vote-area" data-href="{{ comment.bl.get_vote_link() }}">
-            {% include 'includes/comment_vote.html' %}
+        <div class="icon-metagroup small">
+            <div class="icon-group">
+                {% set can_abuse = not comment.deleted and comment.bl.can_abuse and current_user.is_authenticated and not comment.bl.can_delete_by(current_user) %}
+                {% if with_controls and can_abuse %}
+                    <a role="button" title="Пожаловаться на комментарий" aria-label="Пожаловаться на комментарий" href="{{ comment.bl.get_abuse_link() }}" class="scon entity-abuse"></a>
+                {% endif %}
+                {% if with_controls %}
+                    {%- if comment.bl.can_update_by(current_user) %}
+                        <a title="{{ pgettext('comment_controls', 'Edit') }}"
+                           aria-label="{{ pgettext('comment_controls', 'Edit') }}"
+                           role="button"
+                           class="scon entity-edit"
+                           href="{{ comment.bl.get_update_link() }}"></a>
+                    {%- endif -%}
+                    {%- if comment.deleted and comment.bl.can_restore_by(current_user) %}
+                        <a title="{{ pgettext('comment_controls', 'Restore') }}"
+                           aria-label="{{ pgettext('comment_controls', 'Restore') }}"
+                           role="button"
+                           class="scon entity-restore"
+                           href="{{ comment.bl.get_restore_link() }}"></a>
+                    {%- endif -%}
+                    {%- if not comment.deleted and comment.bl.can_delete_by(current_user) %}
+                        <a title="{{ pgettext('comment_controls', 'Delete') }}"
+                           aria-label="{{ pgettext('comment_controls', 'Delete') }}"
+                           role="button"
+                           class="scon entity-delete"
+                           href="{{ comment.bl.get_delete_link() }}"></a>
+                    {%- endif %}
+                {% endif %}
+            </div>
+            {% if with_vote and comment.bl.can_vote %}
+                <div class="icon-group" data-href="{{ comment.bl.get_vote_link() }}">
+                    {% include 'includes/comment_vote.html' %}
+                </div>
+            {% endif %}
         </div>
-        {% endif %}
-        {% if with_controls and not comment.deleted and comment.bl.can_abuse and current_user.is_authenticated %}
-        <div class="comment-abuse-area">
-            <a href="{{ comment.bl.get_abuse_link() }}" title="Пожаловаться на комментарий" class="abuse-icon comment-abuse-icon">!</a>
-        </div>
-        {% endif %}
-        {% if with_controls %}
-            {% include 'includes/comment_controls.html' %}
-        {% endif %}
 
         {%- if comment_spoiler_threshold is not defined -%}
             {%- set comment_spoiler_threshold = get_comment_threshold() -%}

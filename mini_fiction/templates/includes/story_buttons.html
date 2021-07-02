@@ -1,0 +1,98 @@
+{% macro common_buttons(story, with_downloads=True, with_abuse=False) %}
+    <div class="icon-group">
+        {%- if current_user.is_authenticated -%}
+            {%- set favorited = (story.id in favorited_ids) if favorited_ids is defined else story.favorited(current_user.id) -%}
+            {%- set bookmarked = (story.id in bookmarked_ids) if bookmarked_ids is defined else story.bookmarked(current_user.id) -%}
+            {%- set is_editor = story.bl.editable_by(current_user) and story.bl.is_editor(current_user) -%}
+
+            {%- if not is_editor -%}
+                <a title="В избранное"
+                   aria-label="В избранное"
+                   href="{{ url_for('story.favorite', pk=story.id, action='delete' if favorited else 'add') }}"
+                   class="story_favorite js-story-favorite-{{ story.id }} scon favorite {% if favorited %}active{% else %}inactive{% endif %}"></a>
+                <a title="Прочитать позже"
+                   aria-label="Прочитать позже"
+                   href="{{ url_for('story.bookmark', pk=story.id, action='delete' if bookmarked else 'add') }}"
+                   class="story_bookmark js-story-bookmark-{{ story.id }} scon bookmark {% if bookmarked %}active{% else %}inactive{% endif %}"></a>
+            {% endif %}
+        {% endif %}
+        {% if with_downloads %}
+            {%- for d in story.list_downloads() -%}
+                <a title="Скачать в {{ d.format.name }}"
+                   aria-label="Скачать в {{ d.format.name }}"
+                   href="{{ d.url }}"
+                   class="scon {{ d.cls }}" data-noajax="1"></a>
+            {%- endfor -%}
+        {% endif %}
+        {%- if with_abuse and current_user.is_authenticated and not is_editor -%}
+            <a title="Пожаловаться на рассказ"
+               aria-label="Пожаловаться на рассказ"
+               href="{{ url_for('abuse.abuse_story', story_id=story.id) }}"
+               class="scon abuse inactive"></a>
+        {% endif %}
+    </div>
+{% endmacro %}
+
+{% macro edit_buttons(story, with_edit=True) %}
+    <div class="icon-group">
+
+        {% if with_edit and story.bl.editable_by(current_user) %}
+            <a title="{{ pgettext('story_control_buttons', 'Edit') }}"
+               aria-label="{{ pgettext('story_control_buttons', 'Edit') }}"
+               role="button"
+               class="scon entity-edit"
+               href="{{ url_for('story.edit', pk=story.id) }}"></a>
+        {% endif %}
+
+        {% if story.bl.publishable_by(current_user) %}
+            {% set publish_title = 'Опубликовать' if story.draft else 'В черновики' %}
+            <a title="{{ publish_title }}"
+               aria-label="{{ publish_title }}"
+               role="button"
+               class="scon {{ 'entity-publish' if story.draft else 'entity-draft' }} {{ 'inactive' if not story.bl.is_publishable() else '' }} js-story-publish-btn"
+               href="{{ url_for('story.publish', pk=story.id) }}"></a>
+        {% endif %}
+
+        {% if story.bl.can_view_editlog(current_user) -%}
+            <a title="{{ _('Edit log') }}"
+               aria-label="{{ _('Edit log') }}"
+               role="button"
+               class="scon entity-journal"
+               href="{{ url_for('story.edit_log', pk=story.id) }}"></a>
+        {% endif %}
+    </div>
+
+    {% if current_user.is_staff -%}
+        <div class="icon-group">
+            {% set approve_title = 'Отозвать' if story.approved else 'Одобрить' %}
+            {% set pin_title = 'Открепить' if story.pinned else 'Закрепить на главной' %}
+            <a title="{{ approve_title }}"
+               role="button"
+               aria-label="{{ approve_title }}"
+               class="scon {{ 'entity-revoke' if story.approved else 'entity-approve' }} js-story-approve-btn"
+               href="{{ url_for('story.approve', pk=story.id) }}"></a>
+
+            <a title="{{ pin_title }}"
+               aria-label="{{ pin_title }}"
+               role="button"
+               class="scon entity-pin {{ 'inactive' if not story.pinned else '' }} js-story-pin-btn"
+               href="{{ url_for('story.pin', pk=story.id) }}"></a>
+        </div>
+    {% endif -%}
+{% endmacro %}
+
+
+{% macro delete_buttons(story) %}
+    {% if story.bl.editable_by(current_user) and story.bl.deletable_by(current_user) -%}
+        <div class="icon-group">
+            <a title="{{ pgettext('delete_story', 'Delete') }}"
+               aria-label="{{ pgettext('delete_story', 'Delete') }}"
+               class="scon entity-delete"
+               href="{{ url_for('story.delete', pk=story.id) }}"></a>
+        </div>
+    {% endif -%}
+{% endmacro %}
+
+
+
+

@@ -10,6 +10,8 @@ import postCSSAutoPrefixer from 'autoprefixer';
 import postCSSNesting from 'postcss-nesting';
 import postCSSMixins from 'postcss-mixins';
 import postCSSNano from 'cssnano';
+import postCSSCustomProperties from 'postcss-custom-properties';
+import postCSSMoveProps from 'postcss-move-props-to-bg-image-query';
 
 const { BundleAnalyzerPlugin } = require('webpack-bundle-analyzer');
 
@@ -29,6 +31,12 @@ const postCSSOptions = {
     postCSSAutoPrefixer(),
     postCSSMixins(),
     postCSSNesting(),
+    postCSSMoveProps({
+      computeCustomProps: postCSSCustomProperties({
+        preserve: false,
+        importFrom: path.resolve(__dirname, 'src', 'css', 'variables.css'),
+      }).Once,
+    }),
     postCSSNano({
       preset: ['default', {
         discardComments: !isDev,
@@ -63,7 +71,10 @@ const defaultPlugins = [
 ];
 
 const devPlugins = [
-  new BundleAnalyzerPlugin({ analyzerMode: 'static', openAnalyzer: false }),
+  new BundleAnalyzerPlugin({
+    analyzerMode: 'static',
+    openAnalyzer: false,
+  }),
 ];
 
 const productionPlugins = [
@@ -120,15 +131,27 @@ module.exports = {
         exclude: /node_modules/,
         use: [
           { loader: 'babel-loader' },
-          { loader: 'webpack-remove-block-loader', options: { active: !isDev } },
+          {
+            loader: 'webpack-remove-block-loader',
+            options: { active: !isDev },
+          },
         ],
       },
       {
         test: /\.css$/,
         use: [
-          { loader: MiniCssExtractPlugin.loader, options: extractLoaderOptions },
-          { loader: 'css-loader', options: cssLoaderOptions },
-          { loader: 'postcss-loader', options: { postcssOptions: postCSSOptions } },
+          {
+            loader: MiniCssExtractPlugin.loader,
+            options: extractLoaderOptions,
+          },
+          {
+            loader: 'css-loader',
+            options: cssLoaderOptions,
+          },
+          {
+            loader: 'postcss-loader',
+            options: { postcssOptions: postCSSOptions },
+          },
         ],
       },
       {
@@ -136,7 +159,14 @@ module.exports = {
         type: 'asset/source',
       },
       {
-        test: /\.(png|jpg|gif|eot|ttf|woff|woff2)$/,
+        test: /images\/assets\/.*\.svg(\?.*)?$/, // match img.svg and img.svg?param=value
+        use: [
+          'svg-url-loader', // or file-loader or svg-url-loader
+          'svg-transform-loader',
+        ],
+      },
+      {
+        test: /\.(png|webp|jpg|gif|eot|ttf|woff|woff2)$/,
         type: 'asset',
         parser: {
           dataUrlCondition: {

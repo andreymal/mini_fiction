@@ -1,9 +1,13 @@
 {% extends base %}
+{% from 'includes/story_buttons.html' import edit_buttons, delete_buttons with context %}
 
 {% block content %}
 <div class="row">
     <div class="span12"{% if not story_add %} id="story_{{ story.id }}"{% endif %}>
-        {% include 'includes/story_control_buttons.html' %}
+        <div class="icon-metagroup">
+            {{ edit_buttons(story, with_edit=False) }}
+            {{ delete_buttons(story) }}
+        </div>
         <h1>Редактирование <a class="invisible-link" href="{{ url_for('story.view', pk=story.id, _external=True) }}">«{{ story.title }}»</a></h1>
 
         <ul class="nav nav-pills nav-simple">

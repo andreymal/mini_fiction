@@ -49,11 +49,11 @@
         <a class="btn btn-success btn-small" href="{{ url_for('story.add') }}">Добавить рассказ</a>
 
         <div class="tab-author-stories">
-            {% include "includes/stories.html" %}
+            {% with buttons='edit' %}{% include "includes/stories.html" %}{% endwith %}
         </div>
 
         <div class="tab-contributing-stories">{% with stories = contributing_stories %}
-            {% include "includes/stories.html" %}
+            {% with buttons='edit' %}{% include "includes/stories.html" %}{% endwith %}
         {% endwith %}</div>
     </div>
 

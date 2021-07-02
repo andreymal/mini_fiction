@@ -1,27 +1,23 @@
 {%- from 'macro.html' import tag_link with context -%}
 {% from 'macro.html' import character_picture %}
+{% from 'includes/story_buttons.html' import common_buttons with context %}
 
-{% for random_story in random_stories %}
+{% for story in random_stories %}
     <input type="radio" id="slide-trigger-{{ loop.index }}" name="slider" {% if loop.index == 1 %}checked autofocus{% endif %}>
     <label for="slide-trigger-{{ loop.index }}"></label>
     <div class="story-item slide">
-        <h3><a href="{{ url_for('story.view', pk=random_story.id) }}">{{ random_story.title }}</a></h3>
+        {{ common_buttons(story, with_downloads=False) }}
+        <h3><a href="{{ url_for('story.view', pk=story.id) }}">{{ story.title }}</a></h3>
         <p class="meta">
-                {%- if current_user.is_authenticated -%}
-                <span class="chapter-controls">
-                    {%- set bookmarked = random_story.bookmarked(current_user.id) -%}
-                    <a title="Прочитать позже" href="{{ url_for('story.bookmark', pk=random_story.id, action='delete' if bookmarked else 'add') }}" class="story_bookmark js-story-bookmark-{{ random_story.id }} scon bookmark{% if bookmarked %} bookmarked{% endif %}"></a>
-                </span>
-                {%- endif -%}
-                <span class="story-tags-list">{%- for st in random_story.bl.get_tags_list(sort=True) %}{% if st.tag.is_main_tag %}
+                <span class="story-tags-list">{%- for st in story.bl.get_tags_list(sort=True) %}{% if st.tag.is_main_tag %}
                     {{ tag_link(st.tag) -}}
                 {% endif %}{% endfor -%}
                 </span>
         </p>
-        <p class="story-summary">{{ random_story.summary|striptags }}</p>
+        <p class="story-summary">{{ story.summary|striptags }}</p>
         <p class="meta">
                 <span class="character-list">
-                    {%- for character in random_story.characters|sort(attribute='id') -%}
+                    {%- for character in story.characters|sort(attribute='id') -%}
                         <a href="{{ url_for('search.simple', search_type='character', search_id=character.id) }}">{{ character_picture(character) }}</a>
                     {%- endfor -%}
                 </span>

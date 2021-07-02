@@ -1,11 +1,14 @@
 {% extends base %}
+{% from 'includes/story_buttons.html' import edit_buttons with context %}
 
 {% block title %}Обсуждение рассказа «{{ story.title }}»{% endblock %}
 
 {% block content %}
 <div class="row">
     <div class="span12 story-page" id="story_{{ story.id }}">
-        {% include 'includes/story_control_buttons.html' %}
+        <div class="icon-metagroup">
+            {{ edit_buttons(story, with_edit=False) }}
+        </div>
         <h1 id="story_title">
             <a class="invisible-link" href="{{ url_for('story.view', pk=story.id, _external=True) }}">{{ story.title }}</a>
             {% include 'includes/story_marks.html' %}

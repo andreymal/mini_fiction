@@ -75,7 +75,7 @@
             <a title="{{ pin_title }}"
                aria-label="{{ pin_title }}"
                role="button"
-               class="scon entity-pin js-story-pin-btn"
+               class="scon entity-pin {{ 'inactive' if not story.pinned else '' }} js-story-pin-btn"
                href="{{ url_for('story.pin', pk=story.id) }}"></a>
         </div>
     {% endif -%}

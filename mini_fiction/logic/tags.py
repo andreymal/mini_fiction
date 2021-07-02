@@ -6,6 +6,8 @@ from typing import List, Tuple
 
 from mini_fiction.models import Story, StoryTag, Tag, TagCategory
 
+MAX_TAGS = 5
+
 
 @dataclass
 class PreparedTags:
@@ -36,7 +38,7 @@ def _group_tags(tags: List[Tag]) -> Tuple[List[Tag], List[Tag]]:
         grouped[tag.category].append(tag)
 
     primary: List[Tag] = []
-    for tag_group in islice(grouped.values(), 0, 5):
+    for tag_group in islice(grouped.values(), 0, MAX_TAGS):
         primary.append(tag_group.pop(0))
 
     secondary = list(chain.from_iterable(grouped.values()))
@@ -50,14 +52,22 @@ def _get_prepared_tags(story_tags: List[StoryTag]) -> PreparedTags:
     )
     main_tags, spoiler = _extract_spoilers(sorted_tags)
     extreme = [t for t in sorted_tags if t.is_extreme_tag]
-    primary, secondary = _group_tags(main_tags)
 
-    return PreparedTags(
-        primary=primary,
-        secondary=secondary,
-        extreme=extreme,
-        spoiler=spoiler,
-    )
+    if len(main_tags) <= MAX_TAGS:
+        return PreparedTags(
+            primary=main_tags,
+            secondary=[],
+            extreme=extreme,
+            spoiler=spoiler,
+        )
+    else:
+        primary, secondary = _group_tags(main_tags)
+        return PreparedTags(
+            primary=primary,
+            secondary=secondary,
+            extreme=extreme,
+            spoiler=spoiler,
+        )
 
 
 def get_prepared_tags(story: Story) -> PreparedTags:

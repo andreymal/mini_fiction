@@ -60,14 +60,13 @@ def _get_prepared_tags(story_tags: List[StoryTag]) -> PreparedTags:
             extreme=extreme,
             spoiler=spoiler,
         )
-    else:
-        primary, secondary = _group_tags(main_tags)
-        return PreparedTags(
-            primary=primary,
-            secondary=secondary,
-            extreme=extreme,
-            spoiler=spoiler,
-        )
+    primary, secondary = _group_tags(main_tags)
+    return PreparedTags(
+        primary=primary,
+        secondary=secondary,
+        extreme=extreme,
+        spoiler=spoiler,
+    )
 
 
 def get_prepared_tags(story: Story) -> PreparedTags:

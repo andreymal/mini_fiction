@@ -763,6 +763,14 @@ input.show-tags-trigger {
 input.show-spoiler-trigger {
     display: none;
 
+    & + label {
+        margin: 0;
+    }
+
+    &:checked + label {
+        display: none;
+    }
+
     &:checked + label ~ .spoiler-tag {
         display: inline-block;
         opacity: 0.5;

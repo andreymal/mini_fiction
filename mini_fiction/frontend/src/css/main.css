@@ -714,6 +714,11 @@ h1 .alert {
     margin: 0 4px 4px 0;
     background-color: var(--default-tag-color);
     @mixin box-shadow;
+
+    &.blacklisted-tag {
+        text-decoration: line-through;
+        opacity: 0.5;
+    }
 }
 
 .story-tag:hover {

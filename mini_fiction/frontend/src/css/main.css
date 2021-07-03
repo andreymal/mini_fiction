@@ -714,6 +714,10 @@ h1 .alert {
     background-color: var(--default-tag-color);
     @mixin box-shadow;
 
+    /* override bootstrap styles for <label> */
+    font-size: inherit;
+    font-weight: inherit;
+
     &.blacklisted-tag {
         text-decoration: line-through;
         opacity: 0.5;

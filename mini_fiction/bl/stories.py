@@ -62,10 +62,8 @@ class StoryBL(BaseBL, Commentable):
 
     _contributors = None
 
-    def _validate_and_get_tags(self, tags, key, user=None):
-        from mini_fiction.models import Tag
-
-        tags_info = tags.get_tags_objects(tags, should_create=bool(user), user=user)
+    def _validate_and_get_tags(self, raw_tags, key, user=None):
+        tags_info = tags.get_tags_objects(raw_tags, should_create=bool(user), user=user)
         if not tags_info['success']:
             tags_errors = []
             if tags_info['nonexisting']:
@@ -86,7 +84,7 @@ class StoryBL(BaseBL, Commentable):
         return tags_info['tags']
 
     def create(self, authors, data):
-        from mini_fiction.models import Character, StoryContributor, Tag
+        from mini_fiction.models import Character, StoryContributor
 
         if not authors:
             raise ValueError('Authors are required')
@@ -104,7 +102,7 @@ class StoryBL(BaseBL, Commentable):
 
         data = Validator(STORY).validated(data)
 
-        tags = self._validate_and_get_tags(data['tags'], 'tags', user=authors[0])
+        created_tags = self._validate_and_get_tags(data['tags'], 'tags', user=authors[0])
 
         approved = not current_app.config['PREMODERATION']
         if authors[0].premoderation_mode == 'on':
@@ -131,7 +129,7 @@ class StoryBL(BaseBL, Commentable):
         )
         story.flush()  # получаем id у базы данных
         story.characters.add(list(Character.select(lambda x: x.id in data['characters'])))
-        story.bl.set_tags(authors[0], tags, update_search=False)
+        story.bl.set_tags(authors[0], created_tags, update_search=False)
         for author in authors:
             StoryContributor(
                 story=story,
@@ -162,14 +160,14 @@ class StoryBL(BaseBL, Commentable):
         return sl
 
     def update(self, editor, data, minor=False):
-        from mini_fiction.models import Character, Rating, Tag, StoryTag
+        from mini_fiction.models import Character, Rating
 
         if minor and (not editor or not editor.is_staff):
             minor = False
 
         data = Validator(STORY).validated(data, update=True)
 
-        tags = self._validate_and_get_tags(data['tags'], 'tags', user=editor)
+        updated_tags = self._validate_and_get_tags(data['tags'], 'tags', user=editor)
 
         story = self.model
         old_published = story.published  # for chapters
@@ -213,7 +211,7 @@ class StoryBL(BaseBL, Commentable):
                 story.characters.add(list(Character.select(lambda x: x.id in data['characters'])))
                 changed_sphinx_fields.add('character')
 
-        add_tags, rm_tags = self.set_tags(editor, tags, update_search=False)  # у тегов отдельный лог изменений, если что
+        add_tags, rm_tags = self.set_tags(editor, updated_tags, update_search=False)  # у тегов отдельный лог изменений, если что
         if add_tags or rm_tags:
             changed_sphinx_fields.add('tag')
 
@@ -958,8 +956,6 @@ class StoryBL(BaseBL, Commentable):
         extended_syntax: bool = True,
         **filters: Any,
     ) -> StorySearchResult:
-        from mini_fiction.models import Tag
-
         if current_app.config['SPHINX_DISABLED']:
             return StorySearchResult(matches=[])
 
@@ -983,17 +979,17 @@ class StoryBL(BaseBL, Commentable):
             else:
                 sphinx_filters['character__in_all'] = filters['character']
 
-        tags = filters.get('tags') or None
-        if tags:
-            tags_info = tags.get_tags_objects(tags, create=False)
+        filter_tags = filters.get('tags') or None
+        if filter_tags:
+            tags_info = tags.get_tags_objects(filter_tags, create=False)
             if not tags_info['success']:
                 return StorySearchResult(matches=[])
-            tags = [x.id for x in tags_info['tags']]
-        if tags:
+            filter_tags = [x.id for x in tags_info['tags']]
+        if filter_tags:
             if filters.get('tags_mode') == 'any':
-                sphinx_filters['tag__in_any'] = tags
+                sphinx_filters['tag__in_any'] = filter_tags
             else:
-                sphinx_filters['tag__in_all'] = tags
+                sphinx_filters['tag__in_all'] = filter_tags
 
 
         exclude_tags = filters.get('exclude_tags') or None
@@ -1369,7 +1365,7 @@ class StoryBL(BaseBL, Commentable):
 
         return story_tag_log
 
-    def set_tags(self, user, tags, log=True, update_search=True):
+    def set_tags(self, user, new_tags, log=True, update_search=True):
         from mini_fiction.models import Tag
 
         add_tags = []
@@ -1378,17 +1374,17 @@ class StoryBL(BaseBL, Commentable):
         old_tags = [x.tag for x in self.get_tags_list()]
 
         # Переводим все теги-строки в объекты Tag, создавая их в базе по необходимости
-        tags_info = tags.get_tags_objects(tags, should_create=True, user=user)
+        tags_info = tags.get_tags_objects(new_tags, should_create=True, user=user)
         if not tags_info['success']:
             raise ValueError('Some tags are invalid')
-        tags = tags_info['tags']
-        for x in tags:
+        updated_tags = tags_info['tags']
+        for x in updated_tags:
             assert isinstance(x, Tag)
 
         # Собираем список тегов, которые нужно добавить
         # (учитываем, что из-за особенностей работы get_tags_objects
         # в списке tags могут быть дубликаты)
-        for tag in tags:
+        for tag in updated_tags:
             if tag not in old_tags and tag not in add_tags:
                 add_tags.append(tag)
 
@@ -1409,7 +1405,7 @@ class StoryBL(BaseBL, Commentable):
         return add_tags, rm_tags
 
     def select_by_tag(self, tag, user=None):
-        from mini_fiction.models import Tag, StoryTag
+        from mini_fiction.models import StoryTag
 
         tag = tags.get_tags_objects([tag], should_create=False)['tags'][0]
         if not tag:
@@ -1555,7 +1551,7 @@ class StoryBL(BaseBL, Commentable):
         return stories
 
     def get_unread_chapters_count(self, user, story_ids):
-        from mini_fiction.models import Chapter, StoryView
+        from mini_fiction.models import StoryView
 
         if isinstance(story_ids, int):
             story_ids = [story_ids]
@@ -2194,8 +2190,6 @@ class ChapterBL(BaseBL):
         extended_syntax: bool = True,
         **filters: Any,
     ) -> ChapterSearchResult:
-        from mini_fiction.models import Tag
-
         if current_app.config['SPHINX_DISABLED']:
             return ChapterSearchResult(matches=[])
 
@@ -2220,17 +2214,17 @@ class ChapterBL(BaseBL):
             else:
                 sphinx_filters['character__in_all'] = filters['character']
 
-        tags = filters.get('tags') or None
-        if tags:
-            tags_info = tags.get_tags_objects(tags, create=False)
+        filter_tags = filters.get('tags') or None
+        if filter_tags:
+            tags_info = tags.get_tags_objects(filter_tags, create=False)
             if not tags_info['success']:
                 return ChapterSearchResult(matches=[])
-            tags = [x.id for x in tags_info['tags']]
-        if tags:
+            filter_tags = [x.id for x in tags_info['tags']]
+        if filter_tags:
             if filters.get('tags_mode') == 'any':
-                sphinx_filters['tag__in_any'] = tags
+                sphinx_filters['tag__in_any'] = filter_tags
             else:
-                sphinx_filters['tag__in_all'] = tags
+                sphinx_filters['tag__in_all'] = filter_tags
 
         exclude_tags = filters.get('exclude_tags') or None
         if exclude_tags:

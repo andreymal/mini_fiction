@@ -8,7 +8,7 @@ import factory
 from pony import orm
 
 from mini_fiction import models
-from mini_fiction.utils.misc import normalize_tag
+from mini_fiction.logic.tags import normalize_tag
 
 
 class PonyFactory(factory.Factory):

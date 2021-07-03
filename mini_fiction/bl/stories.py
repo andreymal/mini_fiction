@@ -1,8 +1,3 @@
-#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
-
-# pylint: disable=unexpected-keyword-arg,no-value-for-parameter
-
 import os
 import sys
 import json
@@ -25,8 +20,9 @@ from mini_fiction.ratelimit import RateLimitExceeded
 from mini_fiction.apis.amsphinxql import SphinxSearchResult
 from mini_fiction.bl.utils import BaseBL
 from mini_fiction.bl.commentable import Commentable
+from mini_fiction.logic import tags
 from mini_fiction.utils.converter import convert
-from mini_fiction.utils.misc import words_count, normalize_tag, call_after_request as later
+from mini_fiction.utils.misc import words_count, call_after_request as later
 from mini_fiction.utils.misc import normalize_text_for_search_index, normalize_text_for_search_query
 from mini_fiction.utils import diff as utils_diff
 from mini_fiction.validation import Validator, ValidationError
@@ -69,7 +65,7 @@ class StoryBL(BaseBL, Commentable):
     def _validate_and_get_tags(self, tags, key, user=None):
         from mini_fiction.models import Tag
 
-        tags_info = Tag.bl.get_tags_objects(tags, create=bool(user), user=user)
+        tags_info = tags.get_tags_objects(tags, should_create=bool(user), user=user)
         if not tags_info['success']:
             tags_errors = []
             if tags_info['nonexisting']:
@@ -989,7 +985,7 @@ class StoryBL(BaseBL, Commentable):
 
         tags = filters.get('tags') or None
         if tags:
-            tags_info = Tag.bl.get_tags_objects(tags, create=False)
+            tags_info = tags.get_tags_objects(tags, create=False)
             if not tags_info['success']:
                 return StorySearchResult(matches=[])
             tags = [x.id for x in tags_info['tags']]
@@ -1002,7 +998,7 @@ class StoryBL(BaseBL, Commentable):
 
         exclude_tags = filters.get('exclude_tags') or None
         if exclude_tags:
-            exclude_tags = [x.id for x in Tag.bl.get_tags_objects(exclude_tags, create=False)['tags'] if x is not None]
+            exclude_tags = [x.id for x in tags.get_tags_objects(exclude_tags, create=False)['tags'] if x is not None]
         if exclude_tags:
             sphinx_filters['tag__not_in'] = exclude_tags
 
@@ -1281,7 +1277,7 @@ class StoryBL(BaseBL, Commentable):
     def get_tags_list(self):
         return list(self.model.tags)  # Не используем select, потому что во вьюхах уже мог быть prefetch
 
-    def add_tag(self, user, tag, check_blacklist=True, log=True, update_search=True):
+    def add_tag(self, user, tag, log=True, update_search=True):
         from mini_fiction.models import Tag, StoryTag, StoryTagLog
 
         if not user or not user.is_authenticated:
@@ -1290,7 +1286,7 @@ class StoryBL(BaseBL, Commentable):
         story = self.model
 
         if not isinstance(tag, Tag):
-            tag_info = Tag.bl.get_tags_objects([tag], create=True, user=user)
+            tag_info = tags.get_tags_objects([tag], should_create=True, user=user)
             if not tag_info['success']:
                 raise ValueError('Tag is invalid')
             tag = tag_info['tags'][0]
@@ -1336,7 +1332,7 @@ class StoryBL(BaseBL, Commentable):
         story = self.model
 
         if not isinstance(tag, Tag):
-            iname = normalize_tag(tag)
+            iname = tags.normalize_tag(tag)
             if not iname:
                 return None
             # Проверяем существование удаляемого тега
@@ -1382,7 +1378,7 @@ class StoryBL(BaseBL, Commentable):
         old_tags = [x.tag for x in self.get_tags_list()]
 
         # Переводим все теги-строки в объекты Tag, создавая их в базе по необходимости
-        tags_info = Tag.bl.get_tags_objects(tags, create=True, user=user)
+        tags_info = tags.get_tags_objects(tags, should_create=True, user=user)
         if not tags_info['success']:
             raise ValueError('Some tags are invalid')
         tags = tags_info['tags']
@@ -1415,7 +1411,7 @@ class StoryBL(BaseBL, Commentable):
     def select_by_tag(self, tag, user=None):
         from mini_fiction.models import Tag, StoryTag
 
-        tag = Tag.bl.get_tags_objects([tag], create=False)['tags'][0]
+        tag = tags.get_tags_objects([tag], should_create=False)['tags'][0]
         if not tag:
             return orm.select(x.story for x in StoryTag if False)  # pylint: disable=W0125
 
@@ -2226,7 +2222,7 @@ class ChapterBL(BaseBL):
 
         tags = filters.get('tags') or None
         if tags:
-            tags_info = Tag.bl.get_tags_objects(tags, create=False)
+            tags_info = tags.get_tags_objects(tags, create=False)
             if not tags_info['success']:
                 return ChapterSearchResult(matches=[])
             tags = [x.id for x in tags_info['tags']]
@@ -2238,7 +2234,7 @@ class ChapterBL(BaseBL):
 
         exclude_tags = filters.get('exclude_tags') or None
         if exclude_tags:
-            exclude_tags = [x.id for x in Tag.bl.get_tags_objects(exclude_tags, create=False)['tags'] if x is not None]
+            exclude_tags = [x.id for x in tags.get_tags_objects(exclude_tags, create=False)['tags'] if x is not None]
         if exclude_tags:
             sphinx_filters['tag__not_in'] = exclude_tags
 

@@ -1,11 +1,6 @@
-#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
-
-# pylint: disable=redefined-outer-name,unused-variable
-
 import pytest
-from pony import orm
 
+from mini_fiction.logic import tags
 from mini_fiction import models
 from mini_fiction.validation import ValidationError
 
@@ -15,7 +10,7 @@ def test_get_tags_objects_existing_strings(app, factories):
     tag2 = factories.TagFactory()
     tag3 = factories.TagFactory()
 
-    tags_info = models.Tag.bl.get_tags_objects([tag1.name, tag3.name, tag2.name])
+    tags_info = tags.get_tags_objects([tag1.name, tag3.name, tag2.name])
 
     assert tags_info['success'] is True
     assert tags_info['tags'] == [tag1, tag3, tag2]  # Порядок должен сохраняться
@@ -31,7 +26,7 @@ def test_get_tags_objects_existing_tagobjects(app, factories):
     tag2 = factories.TagFactory()
     tag3 = factories.TagFactory()
 
-    tags_info = models.Tag.bl.get_tags_objects([tag1, tag3, tag2])
+    tags_info = tags.get_tags_objects([tag1, tag3, tag2])
 
     assert tags_info['success'] is True
     assert tags_info['tags'] == [tag1, tag3, tag2]
@@ -44,7 +39,7 @@ def test_get_tags_objects_existing_mixed(app, factories):
     tag2 = factories.TagFactory()
     tag3 = factories.TagFactory()
 
-    tags_info = models.Tag.bl.get_tags_objects([tag1, tag3.iname, tag2])
+    tags_info = tags.get_tags_objects([tag1, tag3.iname, tag2])
 
     assert tags_info['success'] is True
     assert tags_info['tags'] == [tag1, tag3, tag2]
@@ -56,7 +51,7 @@ def test_get_tags_objects_existing_duplicated(app, factories):
     tag1 = factories.TagFactory()
     tag2 = factories.TagFactory()
 
-    tags_info = models.Tag.bl.get_tags_objects([tag2, tag1.iname + ' ', tag2.iname, tag1])
+    tags_info = tags.get_tags_objects([tag2, tag1.iname + ' ', tag2.iname, tag1])
 
     assert tags_info['success'] is True
     assert tags_info['tags'] == [tag2, tag1, tag2, tag1]
@@ -69,7 +64,7 @@ def test_get_tags_objects_aliases_enabled_tagobj(app, factories):
     tag1 = factories.TagFactory()
     tag1_alias = factories.TagFactory(name='Просто тег', is_alias_for=tag1)
 
-    tags_info = models.Tag.bl.get_tags_objects([tag1_alias])
+    tags_info = tags.get_tags_objects([tag1_alias])
 
     assert tags_info['success'] is True
     assert tags_info['tags'] == [tag1]
@@ -82,7 +77,7 @@ def test_get_tags_objects_aliases_enabled_string(app, factories):
     tag1 = factories.TagFactory()
     tag1_alias = factories.TagFactory(name='Просто тег', is_alias_for=tag1)
 
-    tags_info = models.Tag.bl.get_tags_objects(['просто_тег'])
+    tags_info = tags.get_tags_objects(['просто_тег'])
 
     assert tags_info['success'] is True
     assert tags_info['tags'] == [tag1]
@@ -95,7 +90,7 @@ def test_get_tags_objects_aliases_disabled(app, factories):
     tag1 = factories.TagFactory()
     tag1_alias = factories.TagFactory(name='Просто тег', is_alias_for=tag1)
 
-    tags_info = models.Tag.bl.get_tags_objects(['просто_тег'], resolve_aliases=False)
+    tags_info = tags.get_tags_objects(['просто_тег'], resolve_aliases=False)
 
     assert tags_info['success'] is True
     assert tags_info['tags'] == [tag1_alias]
@@ -107,7 +102,7 @@ def test_get_tags_objects_blacklist_enabled(app, factories):
     tag1 = factories.TagFactory()
     bad_tag = factories.TagFactory(name='Ужасный тег', reason_to_blacklist='Потому что ужасный')
 
-    tags_info = models.Tag.bl.get_tags_objects([tag1.name, 'ужасный тег'])
+    tags_info = tags.get_tags_objects([tag1.name, 'ужасный тег'])
 
     assert tags_info['success'] is False
     assert tags_info['tags'] == [tag1, None]
@@ -116,23 +111,11 @@ def test_get_tags_objects_blacklist_enabled(app, factories):
         assert tags_info[k] == []
 
 
-def test_get_tags_objects_blacklist_disabled(app, factories):
-    tag1 = factories.TagFactory()
-    bad_tag = factories.TagFactory(name='Ужасный тег', reason_to_blacklist='Потому что ужасный')
-
-    tags_info = models.Tag.bl.get_tags_objects([tag1.name, 'ужасный тег'], resolve_blacklisted=False)
-
-    assert tags_info['success'] is True
-    assert tags_info['tags'] == [tag1, bad_tag]
-    for k in ('aliases', 'blacklisted', 'invalid', 'created', 'nonexisting'):
-        assert tags_info[k] == []
-
-
 def test_get_tags_objects_nonexisting_create(app, factories):
     tag1 = factories.TagFactory()
     user = factories.AuthorFactory()
 
-    tags_info = models.Tag.bl.get_tags_objects([tag1, 'Новый \nтег '], create=True, user=user)
+    tags_info = tags.get_tags_objects([tag1, 'Новый \nтег '], should_create=True, user=user)
 
     new_tag = models.Tag.get(iname='новый_тег')
     assert new_tag is not None
@@ -150,7 +133,7 @@ def test_get_tags_objects_nonexisting_create_duplicated(app, factories):
     tag1 = factories.TagFactory()
     user = factories.AuthorFactory()
 
-    tags_info = models.Tag.bl.get_tags_objects([tag1, 'Новый \nтег ', 'новЫй     ТЕГ    '], create=True, user=user)
+    tags_info = tags.get_tags_objects([tag1, 'Новый \nтег ', 'новЫй     ТЕГ    '], should_create=True, user=user)
 
     new_tag = models.Tag.get(iname='новый_тег')
     assert new_tag is not None
@@ -168,7 +151,7 @@ def test_get_tags_objects_nonexisting_create_invalid(app, factories):
     tag1 = factories.TagFactory()
     user = factories.AuthorFactory()
 
-    tags_info = models.Tag.bl.get_tags_objects([tag1, 'Новый \nтег ', '×', ' '], create=True, user=user)
+    tags_info = tags.get_tags_objects([tag1, 'Новый \nтег ', '×', ' '], should_create=True, user=user)
 
     new_tag = models.Tag.get(iname='новый_тег')
     assert new_tag is None  # При любой ошибке теги не создаются
@@ -186,7 +169,7 @@ def test_get_tags_objects_nonexisting_create_without_user(app, factories):
     tag1 = factories.TagFactory()
 
     with pytest.raises(ValueError) as excinfo:
-        models.Tag.bl.get_tags_objects([tag1, 'Новый \nтег '], create=True)
+        tags.get_tags_objects([tag1, 'Новый \nтег '], should_create=True)
     assert str(excinfo.value) == 'Not authenticated'
 
     new_tag = models.Tag.get(iname='новый_тег')
@@ -197,7 +180,7 @@ def test_get_tags_objects_nonexisting_nocreate(app, factories):
     tag1 = factories.TagFactory()
     user = factories.AuthorFactory()
 
-    tags_info = models.Tag.bl.get_tags_objects([tag1, 'Новый \nтег '], create=False, user=user)
+    tags_info = tags.get_tags_objects([tag1, 'Новый \nтег '], should_create=False, user=user)
 
     new_tag = models.Tag.get(iname='новый_тег')
     assert new_tag is None
@@ -212,7 +195,7 @@ def test_get_tags_objects_nonexisting_nocreate(app, factories):
 def test_tag_create_normal(factories):
     admin = factories.AuthorFactory(is_staff=True)
 
-    tag = models.Tag.bl.create(admin, {
+    tag = tags.create(admin, {
         'name': 'Тестовый тег',
         'category': None,
         'color': None,
@@ -236,7 +219,7 @@ def test_tag_create_noadmin(factories):
     old_tags_count = models.Tag.select().count()
 
     with pytest.raises(ValueError) as excinfo:
-        models.Tag.bl.create(admin, {'name': 'Тестовый тег'})
+        tags.create(admin, {'name': 'Тестовый тег'})
 
     assert str(excinfo.value) == 'Not authorized'
     assert models.Tag.select().count() == old_tags_count
@@ -249,7 +232,7 @@ def test_tag_create_fail_conflict(factories):
     old_tags_count = models.Tag.select().count()
 
     with pytest.raises(ValueError) as excinfo:
-        models.Tag.bl.create(admin, {'name': ' СтАРЫй  \nТеГ '})
+        tags.create(admin, {'name': ' СтАРЫй  \nТеГ '})
 
     assert str(excinfo.value.errors['name'][0]) == 'Тег уже существует'
     assert models.Tag.select().count() == old_tags_count
@@ -261,7 +244,7 @@ def test_tag_create_fail_invalid(factories):
     old_tags_count = models.Tag.select().count()
 
     with pytest.raises(ValueError) as excinfo:
-        models.Tag.bl.create(admin, {'name': '×××'})
+        tags.create(admin, {'name': '×××'})
 
     assert str(excinfo.value.errors['name'][0]) == 'Пустой тег'
     assert models.Tag.select().count() == old_tags_count
@@ -272,7 +255,7 @@ def test_tag_create_alias_ok(factories):
     admin = factories.AuthorFactory(is_staff=True)
     canonical_tag = factories.TagFactory(name='Существующий тег')
 
-    tag = models.Tag.bl.create(admin, {
+    tag = tags.create(admin, {
         'name': 'Тестовый тег',
         'is_alias_for': canonical_tag.name,
     })
@@ -290,7 +273,7 @@ def test_tag_create_alias_fail_nonexisting(factories):
     old_tags_count = models.Tag.select().count()
 
     with pytest.raises(ValidationError) as excinfo:
-        models.Tag.bl.create(admin, {
+        tags.create(admin, {
             'name': 'Тестовый тег',
             'is_alias_for': 'dssdfdsfdhskjsdhcyuierchefvdg',
         })
@@ -304,7 +287,7 @@ def test_tag_create_alias_fail_nonexisting(factories):
 def test_tag_create_blacklist_ok(factories):
     admin = factories.AuthorFactory(is_staff=True)
 
-    tag = models.Tag.bl.create(admin, {
+    tag = tags.create(admin, {
         'name': 'Тестовый тег',
         'reason_to_blacklist': 'Плохой тег',
     })
@@ -321,7 +304,7 @@ def test_tag_create_with_category_ok(factories):
     admin = factories.AuthorFactory(is_staff=True)
     category = factories.TagCategoryFactory()
 
-    tag = models.Tag.bl.create(admin, {
+    tag = tags.create(admin, {
         'name': 'Тестовый тег',
         'category': category.id,
     })
@@ -335,7 +318,7 @@ def test_tag_create_with_category_fail_nonexisting(factories):
     old_tags_count = models.Tag.select().count()
 
     with pytest.raises(ValidationError) as excinfo:
-        models.Tag.bl.create(admin, {
+        tags.create(admin, {
             'name': 'Тестовый тег',
             'category': 345345345,
         })
@@ -350,7 +333,7 @@ def test_tag_update_normal(factories):
     admin = factories.AuthorFactory(is_staff=True)
     tag = factories.TagFactory()
 
-    tag.bl.update(admin, {
+    tags.update(tag, admin, {
         'name': 'Обновлённый тег',
         'color': '#ff0000',
         'description': 'Это новое описание тега',
@@ -373,7 +356,7 @@ def test_tag_update_noadmin(factories):
     tag = factories.TagFactory()
 
     with pytest.raises(ValueError) as excinfo:
-        tag.bl.update(admin, {'name': 'Тестовый тег'})
+        tags.update(tag, admin, {'name': 'Тестовый тег'})
 
 
 def test_tag_update_fail_conflict(factories):
@@ -386,7 +369,7 @@ def test_tag_update_fail_conflict(factories):
     assert tag.stories_count == 1
 
     with pytest.raises(ValidationError) as excinfo:
-        tag.bl.update(admin, {
+        tags.update(tag, admin, {
             'name': 'СущестВУЮЩиЙ\n тег ',
         })
 
@@ -404,7 +387,7 @@ def test_tag_update_fail_invalid(factories):
     story.bl.add_tag(admin, tag, log=False)
 
     with pytest.raises(ValidationError) as excinfo:
-        tag.bl.update(admin, {
+        tags.update(tag, admin, {
             'name': '× ×',
         })
 
@@ -422,7 +405,7 @@ def test_tag_update_alias_ok(factories):
     story.bl.add_tag(admin, tag, log=False)
     assert tag.stories_count == 1
 
-    tag.bl.update(admin, {
+    tags.update(tag, admin, {
         'is_alias_for': canonical_tag.name,
     })
 
@@ -452,7 +435,7 @@ def test_tag_update_alias_ok_when_story_already_contains_tag(factories):
     assert canonical_tag.stories_count == 1
     assert tag3.stories_count == 1
 
-    tag.bl.update(admin, {
+    tags.update(tag, admin, {
         'is_alias_for': canonical_tag.name,
     })
 
@@ -478,7 +461,7 @@ def test_tag_update_alias_fail_nonexisting(factories):
     story.bl.add_tag(admin, tag, log=False)
 
     with pytest.raises(ValidationError) as excinfo:
-        tag.bl.update(admin, {
+        tags.update(tag, admin, {
             'is_alias_for': 'dssdfdsfdhskjsdhcyuierchefvdg',
         })
 
@@ -499,7 +482,7 @@ def test_tag_update_alias_fail_self_reference(factories):
     story.bl.add_tag(admin, tag, log=False)
 
     with pytest.raises(ValidationError) as excinfo:
-        tag.bl.update(admin, {
+        tags.update(tag, admin, {
             'is_alias_for': tag.name,
         })
 
@@ -517,7 +500,7 @@ def test_tag_update_alias_fail_self_reference_through_another_alias(factories):
     tag_alias = factories.TagFactory(name='Синоним тега', is_alias_for=tag)
 
     with pytest.raises(ValidationError) as excinfo:
-        tag.bl.update(admin, {
+        tags.update(tag, admin, {
             'is_alias_for': tag_alias.name,
         })
 
@@ -533,7 +516,7 @@ def test_tag_update_alias_remove_ok(factories):
     canonical_tag = factories.TagFactory(name='Существующий тег')
     tag = factories.TagFactory(is_alias_for=canonical_tag)
 
-    tag.bl.update(admin, {
+    tags.update(tag, admin, {
         'is_alias_for': None,
         'is_hidden_alias': True,
     })
@@ -556,7 +539,7 @@ def test_tag_update_blacklist_ok(factories):
     assert tag.stories_count == 1
     assert tag2.stories_count == 1
 
-    tag.bl.update(admin, {
+    tags.update(tag, admin, {
         'reason_to_blacklist': 'Плохой тег',
     })
 
@@ -577,7 +560,7 @@ def test_tag_update_alias_to_blacklist(factories):
     canonical_tag = factories.TagFactory(name='Существующий тег')
     tag = factories.TagFactory(is_alias_for=canonical_tag)
 
-    tag.bl.update(admin, {
+    tags.update(tag, admin, {
         'reason_to_blacklist': 'Синоним тоже так себе',
     })
 
@@ -593,7 +576,7 @@ def test_tag_update_alias_to_hidden(factories):
     canonical_tag = factories.TagFactory(name='Существующий тег')
     tag = factories.TagFactory(is_alias_for=canonical_tag, is_hidden_alias=False)
 
-    tag.bl.update(admin, {
+    tags.update(tag, admin, {
         'is_hidden_alias': True,
     })
 

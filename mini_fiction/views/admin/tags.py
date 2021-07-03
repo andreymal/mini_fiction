@@ -1,17 +1,15 @@
-#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
-
 from flask import Blueprint, render_template, abort, url_for, redirect, request
 from flask_babel import gettext
 from flask_login import current_user
 from pony.orm import db_session
 
+from mini_fiction.logic import tags
 from mini_fiction.utils.views import admin_required
 from mini_fiction.validation import ValidationError
 from mini_fiction.forms.admin.tag import TagForm
 from mini_fiction.models import Tag, TagCategory
 from mini_fiction.utils.views import admin_sort
-from mini_fiction.utils.misc import Paginator, normalize_tag
+from mini_fiction.utils.misc import Paginator
 
 bp = Blueprint('admin_tags', __name__)
 
@@ -30,7 +28,7 @@ def index(page):
     }
 
     if request.args.get('name'):
-        iname = normalize_tag(request.args['name'])
+        iname = tags.normalize_tag(request.args['name'])
         args['name'] = iname
         objects = objects.filter(lambda x: iname in x.iname)
 
@@ -103,7 +101,7 @@ def create():
         if data.get('category') == 0:
             data['category'] = None
         try:
-            tag = Tag.bl.create(current_user, data)
+            tag = tags.create(current_user, data)
         except ValidationError as exc:
             form.set_errors(exc.errors)
         else:
@@ -122,7 +120,7 @@ def create():
 @admin_required
 def update(pk):
     if not pk.isdigit():
-        iname = normalize_tag(pk)
+        iname = tags.normalize_tag(pk)
         if not iname:
             abort(404)
         tag = Tag.get(iname=iname)
@@ -153,7 +151,7 @@ def update(pk):
         if data.get('category') == 0:
             data['category'] = None
         try:
-            tag.bl.update(current_user, data)
+            tags.update(tag, current_user, data)
         except ValidationError as exc:
             form.set_errors(exc.errors)
         else:

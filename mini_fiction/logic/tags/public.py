@@ -1,0 +1,369 @@
+from datetime import datetime
+from operator import attrgetter
+from typing import Collection, Dict, List, Literal, Optional, Tuple, TypedDict, Union
+
+from flask import current_app
+from flask_babel import lazy_gettext
+
+from mini_fiction.logic.adminlog import log_addition, log_changed_fields
+from mini_fiction.models import Author, Tag, TagCategory
+from mini_fiction.validation import RawData, ValidationError, Validator
+from mini_fiction.validation.tags import TAG
+from mini_fiction.validation.utils import safe_string_coerce
+
+from .private import make_alias_for, normalize_tag, set_blacklist, validate_tag_name
+
+TAG_SORTING = {
+    "stories": ("published_stories_count", True),
+    "date": ("created_at", True),
+    "name": ("iname", False),
+}
+
+TagsSortType = Union[Literal["stories"], Literal["date"], Literal["name"]]
+TagsCreationRequest = Tuple[int, str, str]
+
+
+class CategorizedTag(TypedDict):
+    category: Optional[TagCategory]
+    tags: List[Tag]
+
+
+class TagsResponse(TypedDict):
+    """
+    success
+        True, если всё хорошо (в списке tags гарантированно отсутствуют None);
+    tags
+        список из объектов Tag, которые были успешно найдены (соответствует порядку исходному списку tags, вместо
+        ненайденных тегов стоит None);
+    aliases
+        список тегов, оказавшихся алиасами и заменённых на каноничные теги;
+    blacklisted
+        список заблокированных тегов, не попавших в tags;
+    invalid
+        список строк, которые не являются синтаксически корректными тегами (например, пустая строка), и причин
+        некорректности (кортежи из двух элементов);
+    created
+        список свежесозданных тегов, если они создавались (при create=True);
+    nonexisting
+        список из строк, для которых тегов не нашлось (при create=False).
+    """
+
+    success: bool
+    tags: List[Optional[Tag]]
+    aliases: List[Tag]
+    blacklisted: List[Tag]
+    invalid: List[Union[Tag, str]]
+    created: List[Tag]
+    nonexisting: List[str]
+
+
+def get_tags_objects(
+    tags: Collection[Union[Tag, str]],
+    should_create: bool = False,
+    user: Optional[Author] = None,
+) -> TagsResponse:
+    """
+    Если скормить несколько одинаковых тегов, то в списке tags могут
+    появиться дубликаты.
+    """
+
+    # Достаём список строк для поиска тегов
+    tags_search = [x for x in tags if not isinstance(x, Tag)]
+    tags_db = {x.iname: x for x in tags if isinstance(x, Tag)}
+
+    # Ищем недостающие теги в базе
+    inames = [normalize_tag(x) for x in tags_search]
+    inames = [x for x in inames if x]
+    if inames:
+        tags_db.update(
+            {
+                x.iname: x
+                for x in Tag.select(lambda t: t.iname in inames).prefetch(
+                    Tag.is_alias_for
+                )
+            }
+        )
+
+    result = {
+        "success": True,
+        "tags": [None] * len(tags),
+        "aliases": [],
+        "blacklisted": [],
+        "invalid": [],
+        "created": [],
+        "nonexisting": [],
+    }
+
+    create_tags: List[TagsCreationRequest] = []  # [(index, name, iname), ...]
+
+    # Анализируем каждый запрошенный тег
+    for i, possible_tag in enumerate(tags):
+        tag: Optional[Tag]
+        if isinstance(possible_tag, Tag):
+            name = possible_tag.name
+            iname = possible_tag.iname
+            tag = possible_tag
+        else:
+            name = safe_string_coerce(possible_tag.strip())
+            iname = normalize_tag(name)
+            tag = None
+            if iname:
+                tag = tags_db.get(iname)
+                assert iname == normalize_tag(possible_tag)
+
+        if tag:
+            # Если тег существует, проверяем, что его можно использовать
+            if tag.is_alias_for:
+                if tag.is_alias_for.is_alias_for:
+                    raise RuntimeError(
+                        f"Tag alias {tag.id} refers to another alias {tag.is_alias_for.id}!"
+                    )
+                result["aliases"].append(tag)
+                tag = tag.is_alias_for
+            if tag.is_blacklisted:
+                result["blacklisted"].append(tag)
+                result["success"] = False
+                tag = None
+
+        elif should_create:
+            # Если не существует — создаём
+            if not user or not user.is_authenticated:
+                raise ValueError("Not authenticated")
+            reason = validate_tag_name(name)
+            if reason is not None:
+                result["invalid"].append((possible_tag, reason))
+                result["success"] = False
+            else:
+                create_tags.append((i, name, iname))  # Отложенное создание тегов
+
+        else:
+            result["nonexisting"].append(possible_tag)
+            result["success"] = False
+
+        if tag:
+            result["tags"][i] = tag
+
+    # Если нужно создать теги, то создаём их только при отсутствии других
+    # ошибок, чтобы зазря не мусорить в базу данных
+    if create_tags and result["success"]:
+        for i, name, iname in create_tags:
+            if iname in tags_db:
+                # На случай, если пользователь пропихнул дублирующиеся теги
+                result["tags"][i] = tags_db[iname]
+                continue
+            tag = Tag(name=name, iname=iname, created_by=user)
+            tag.flush()  # получаем id у базы данных
+            tags_db[
+                tag.iname
+            ] = tag  # На случай, если у следующего тега в цикле совпадёт iname
+            result["created"].append(tag)
+            result["tags"][i] = tag
+
+        current_app.cache.delete("tags_autocomplete_default")
+
+    return result
+
+
+def get_all_tags(*, sort: TagsSortType) -> List[Tag]:
+    field, reverse = TAG_SORTING[sort]
+    return sorted(
+        Tag.select()
+        .filter(lambda x: not x.is_blacklisted and not x.is_alias)
+        .prefetch(Tag.category),
+        key=attrgetter(field),
+        reverse=reverse,
+    )
+
+
+def get_tags_with_categories(sort: TagsSortType = "name") -> List[CategorizedTag]:
+    tags = get_all_tags(sort=sort)
+
+    categories_dict: Dict[int, CategorizedTag] = {}
+    others: CategorizedTag = {"category": None, "tags": []}
+    for tag in tags:
+        if not tag.category:
+            others["tags"].append(tag)
+            continue
+        if tag.category.id not in categories_dict:
+            categories_dict[tag.category.id] = {
+                "category": tag.category,
+                "tags": [],
+            }
+        categories_dict[tag.category.id]["tags"].append(tag)
+
+    result = sorted(
+        categories_dict.values(), key=lambda x: x["category"].id if x else 0
+    )
+    result.append(others)
+    return result
+
+
+###
+
+
+def search_by_prefix(name: str, limit: int = 20) -> List[Tag]:
+    iname = normalize_tag(name)
+    if not iname or limit < 1:
+        return []
+    limit = min(limit, 100)
+    result = []
+
+    # Ищем точное совпадение
+    exact_tag = Tag.get(iname=iname, is_alias_for=None, reason_to_blacklist="")
+    if exact_tag:
+        result.append(exact_tag)
+    tag_alias = Tag.get(iname=iname, reason_to_blacklist="")
+    if tag_alias:
+        exact_tag = tag_alias.is_alias_for
+        result.append(exact_tag)
+
+    # Ищем остальные теги по префиксу
+    if len(result) < limit:
+        tags = set(
+            Tag.select(
+                lambda x: x.iname.startswith(iname)
+                and not x.is_alias
+                and not x.is_blacklisted
+            ).order_by(Tag.published_stories_count.desc())[: limit + len(result)]
+        )
+        # Подключаем синонимы отдельным запросом, чтоб были по порядку ниже несинонимов)
+        tags = tags | set(
+            Tag.select(
+                lambda x: x.iname.startswith(iname)
+                and x.is_alias
+                and not x.is_blacklisted
+            )
+        )
+        tags = sorted(tags, key=lambda x: x.published_stories_count, reverse=True)
+        result.extend([x for x in tags if x not in result])
+
+    return result[:limit]
+
+
+def get_aliases_for(
+    tags: Collection[Tag], hidden: bool = False
+) -> Dict[int, List[Tag]]:
+    for tag in tags:
+        if tag.is_alias or tag.is_blacklisted:
+            raise ValueError(
+                "Only valid canonical tags are allowed for get_aliases_for"
+            )
+
+    result = {x.id: [] for x in tags}
+    query = Tag.select(lambda x: x.is_alias_for in tags)
+    if not hidden:
+        query = query.filter(lambda x: not x.is_hidden_alias)
+    for ts in query:
+        result[ts.is_alias_for.id].append(ts)
+    return result
+
+
+def create(user: Optional[Author], data: RawData) -> Tag:
+    if not user or not user.is_staff:
+        raise ValueError("Not authorized")
+
+    data = Validator(TAG).validated(data)
+
+    errors = {}
+
+    bad_reason = validate_tag_name(data["name"])
+    if bad_reason:
+        errors["name"] = [bad_reason]
+
+    iname = normalize_tag(data["name"])
+    if not bad_reason and Tag.get(iname=iname):
+        errors["name"] = [lazy_gettext("Tag already exists")]
+
+    canonical_tag = None
+    if data.get("is_alias_for"):
+        canonical_tag = Tag.get(iname=normalize_tag(data["is_alias_for"]))
+        if not canonical_tag:
+            errors["is_alias_for"] = [lazy_gettext("Tag not found")]
+
+    if errors:
+        raise ValidationError(errors)
+
+    tag = Tag(
+        name=data["name"],
+        iname=iname,
+        category=data.get("category"),
+        color=data.get("color") or "",
+        description=data.get("description") or "",
+        is_spoiler=data.get("is_spoiler", False),
+        created_by=user,
+        is_alias_for=None,
+        reason_to_blacklist="",
+    )
+    tag.flush()
+
+    log_addition(by=user, what=tag)
+
+    if data.get("reason_to_blacklist"):
+        set_blacklist(tag, user, data["reason_to_blacklist"])
+    elif canonical_tag:
+        make_alias_for(
+            tag, user, canonical_tag, hidden=data.get("is_hidden_alias", False)
+        )
+
+    return tag
+
+
+def update(tag: Tag, user: Optional[Author], data: RawData) -> None:
+    if not user or not user.is_staff:
+        raise ValueError("Not authorized")
+
+    data = Validator(TAG).validated(data, update=True)
+    changes = {}
+    errors = {}
+
+    if "name" in data and data["name"] != tag.name:
+        bad_reason = validate_tag_name(data["name"])
+        if bad_reason:
+            errors["name"] = [bad_reason]
+
+        iname = normalize_tag(data["name"])
+        if not bad_reason and iname != tag.iname and Tag.get(iname=iname):
+            errors["name"] = [lazy_gettext("Tag already exists")]
+
+        changes["name"] = data["name"]
+        if iname != tag.iname:
+            changes["iname"] = iname
+
+    if "category" in data:
+        old_category_id = tag.category.id if tag.category else None
+        if old_category_id != data["category"]:
+            changes["category"] = data["category"]
+
+    for key in ("color", "description", "is_spoiler", "is_extreme_tag"):
+        if key in data and data[key] != getattr(tag, key):
+            changes[key] = data[key]
+
+    canonical_tag = tag.is_alias_for
+    if "is_alias_for" in data:
+        if data.get("is_alias_for"):
+            canonical_tag = Tag.get(iname=normalize_tag(data["is_alias_for"]))
+            if not canonical_tag:
+                errors["is_alias_for"] = [lazy_gettext("Tag not found")]
+            elif (
+                canonical_tag == tag
+                or canonical_tag.is_alias_for
+                and canonical_tag.is_alias_for == tag
+            ):
+                errors["is_alias_for"] = [lazy_gettext("Tag cannot refer to itself")]
+        else:
+            canonical_tag = None
+
+    if errors:
+        raise ValidationError(errors)
+    if changes:
+        changes["updated_at"] = datetime.utcnow()
+        tag.set(**changes)
+
+        log_changed_fields(by=user, what=tag, fields=set(changes) - {"updated_at"})
+
+    if "reason_to_blacklist" in data:
+        set_blacklist(tag, user, data["reason_to_blacklist"])
+    if not tag.is_blacklisted and ("is_alias_for" in data or "is_hidden_alias" in data):
+        make_alias_for(
+            tag, user, canonical_tag, data.get("is_hidden_alias", tag.is_hidden_alias)
+        )

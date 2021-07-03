@@ -1,6 +1,3 @@
-#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
-
 import json
 
 from flask import Blueprint, current_app, request, render_template, abort, redirect, url_for
@@ -8,9 +5,10 @@ from flask_login import current_user
 from pony.orm import db_session, desc
 
 from mini_fiction.bl.migration import enrich_stories
+from mini_fiction.logic import tags
 from mini_fiction.models import Story, Tag, StoryContributor, StoryTag
 from mini_fiction.utils.views import cached_lists
-from mini_fiction.utils.misc import Paginator, normalize_tag
+from mini_fiction.utils.misc import Paginator
 
 bp = Blueprint('tags', __name__)
 
@@ -18,11 +16,9 @@ bp = Blueprint('tags', __name__)
 @bp.route('/tags/')
 @db_session
 def index():
-    sort = request.args.get('sort')
-    if sort not in ('stories', 'date', 'name'):
-        sort = 'name'
-
-    categories = Tag.bl.get_tags_with_categories(sort=sort)
+    sort_raw = request.args.get('sort')
+    sort = sort_raw in tags.TAG_SORTING and sort_raw or 'name'
+    categories = tags.get_tags_with_categories(sort=sort)
     return render_template('tags/index.html', page_title='Теги', categories=categories, sort=sort)
 
 
@@ -31,7 +27,7 @@ def index():
 @bp.route('/tag/<tag_name>/page/<int:page>/')
 @db_session
 def tag_index(tag_name, page):
-    iname = normalize_tag(tag_name)
+    iname = tags.normalize_tag(tag_name)
     if not iname:
         abort(404)
     tag = Tag.get(iname=iname)
@@ -57,7 +53,7 @@ def tag_index(tag_name, page):
         'tags/tag_index.html',
         page_title=tag.name,
         tag=tag,
-        aliases=[x.name for x in Tag.bl.get_aliases_for([tag])[tag.id]],
+        aliases=[x.name for x in tags.get_aliases_for([tag])[tag.id]],
         category=tag.category,
         stories=objects,
         page_obj=page_obj,
@@ -70,23 +66,23 @@ def tag_index(tag_name, page):
 def autocomplete():
     tag_name = (request.args.get('tag') or '').strip()
 
-    tags = []
+    result_tags = []
     is_default = False
     data = None
 
     if len(tag_name) < 2:
-        # Предложения по умолчанию, чтобы пусто не было
-        # (кэшируются)
+        # Предложения по умолчанию, чтобы пусто не было (кэшируются)
         is_default = True
         data = current_app.cache.get('tags_autocomplete_default')
         if not data:
-            tags = get_default_tags_for_autocomplete()
+            # Отдаём все теги, отсортированные по популярности
+            result_tags = tags.get_all_tags(sort="stories")
 
     else:
-        tags = Tag.bl.search_by_prefix(tag_name)
+        result_tags = tags.search_by_prefix(tag_name)
 
     if not data:
-        data = build_tags_autocomplete_json(tags)
+        data = build_tags_autocomplete_json(result_tags)
         data['success'] = True
         data = json.dumps(data, ensure_ascii=False, sort_keys=True)
         if is_default:
@@ -97,29 +93,22 @@ def autocomplete():
     return response
 
 
-def build_tags_autocomplete_json(tags=None):
-    if tags is None:
-        tags = get_default_tags_for_autocomplete()
-    aliases = Tag.bl.get_aliases_for(tags, hidden=True)
+def build_tags_autocomplete_json(tags_for_autocomplete):
+    aliases = tags.get_aliases_for(tags_for_autocomplete, hidden=True)
 
-    result = {
-        'tags': [{
-            'id': tag.id,
-            'name': tag.name,
-            'url': url_for('tags.tag_index', tag_name=tag.iname),
-            'is_spoiler': tag.is_spoiler,
-            'description': tag.description,
-            'stories_count': tag.published_stories_count,
-            'aliases': [x.iname for x in aliases[tag.id]],
-            'category_id': tag.category.id if tag.category else 0,
-        } for tag in tags],
+    return {
+        'tags': [
+            {
+                'id': tag.id,
+                'name': tag.name,
+                'url': url_for('tags.tag_index', tag_name=tag.iname),
+                'is_spoiler': tag.is_spoiler,
+                'description': tag.description,
+                'stories_count': tag.published_stories_count,
+                'aliases': [x.iname for x in aliases[tag.id]],
+                'category_id': tag.category.id if tag.category else 0,
+            }
+            for tag
+            in tags_for_autocomplete
+        ],
     }
-
-    return result
-
-
-def get_default_tags_for_autocomplete():
-    # Отдаём все теги, отсортированные по популярности
-    tags = list(Tag.bl.get_all_tags())
-    tags.sort(key=lambda x: x.published_stories_count, reverse=True)
-    return tags

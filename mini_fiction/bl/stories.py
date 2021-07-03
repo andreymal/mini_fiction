@@ -981,7 +981,7 @@ class StoryBL(BaseBL, Commentable):
 
         filter_tags = filters.get('tags') or None
         if filter_tags:
-            tags_info = tags.get_tags_objects(filter_tags, create=False)
+            tags_info = tags.get_tags_objects(filter_tags, should_create=False)
             if not tags_info['success']:
                 return StorySearchResult(matches=[])
             filter_tags = [x.id for x in tags_info['tags']]
@@ -994,7 +994,7 @@ class StoryBL(BaseBL, Commentable):
 
         exclude_tags = filters.get('exclude_tags') or None
         if exclude_tags:
-            exclude_tags = [x.id for x in tags.get_tags_objects(exclude_tags, create=False)['tags'] if x is not None]
+            exclude_tags = [x.id for x in tags.get_tags_objects(exclude_tags, should_create=False)['tags'] if x is not None]
         if exclude_tags:
             sphinx_filters['tag__not_in'] = exclude_tags
 
@@ -2216,7 +2216,7 @@ class ChapterBL(BaseBL):
 
         filter_tags = filters.get('tags') or None
         if filter_tags:
-            tags_info = tags.get_tags_objects(filter_tags, create=False)
+            tags_info = tags.get_tags_objects(filter_tags, should_create=False)
             if not tags_info['success']:
                 return ChapterSearchResult(matches=[])
             filter_tags = [x.id for x in tags_info['tags']]
@@ -2228,7 +2228,7 @@ class ChapterBL(BaseBL):
 
         exclude_tags = filters.get('exclude_tags') or None
         if exclude_tags:
-            exclude_tags = [x.id for x in tags.get_tags_objects(exclude_tags, create=False)['tags'] if x is not None]
+            exclude_tags = [x.id for x in tags.get_tags_objects(exclude_tags, should_create=False)['tags'] if x is not None]
         if exclude_tags:
             sphinx_filters['tag__not_in'] = exclude_tags
 

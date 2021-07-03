@@ -14,7 +14,7 @@
         {%- endif %}
         {% if with_secondary and prepared_tags.spoiler -%}
             <input id="spoiler-tags-{{ story_id }}" type="checkbox" class="show-spoiler-trigger"/>
-            <label role="button" aria-label="Показать спойлеры" title="Показать спойлеры" class="story-tag" for="spoiler-tags-{{ story_id }}">…</label>
+            <label role="button" class="story-tag" for="spoiler-tags-{{ story_id }}">Показать спойлеры</label>
             {% for tag in prepared_tags.spoiler %}
                 {{ tag_link(tag, spoiler=True) -}}
             {% endfor %}

@@ -6,12 +6,21 @@ from flask import current_app
 from flask_babel import lazy_gettext
 
 from mini_fiction.logic.adminlog import log_addition, log_changed_fields
-from mini_fiction.models import Author, Tag, TagCategory
+from mini_fiction.models import Author, Story, StoryTag, Tag, TagCategory
 from mini_fiction.validation import RawData, ValidationError, Validator
 from mini_fiction.validation.tags import TAG
 from mini_fiction.validation.utils import safe_string_coerce
 
-from .private import make_alias_for, normalize_tag, set_blacklist, validate_tag_name
+from .private import (
+    MAX_TAGS,
+    PreparedTags,
+    extract_spoilers,
+    group_tags,
+    make_alias_for,
+    normalize_tag,
+    set_blacklist,
+    validate_tag_name,
+)
 
 TAG_SORTING = {
     "stories": ("published_stories_count", True),
@@ -367,3 +376,30 @@ def update(tag: Tag, user: Optional[Author], data: RawData) -> None:
         make_alias_for(
             tag, user, canonical_tag, data.get("is_hidden_alias", tag.is_hidden_alias)
         )
+
+
+def _get_prepared_tags(story_tags: List[StoryTag]) -> PreparedTags:
+    sorted_tags: List[Tag] = sorted(
+        (st.tag for st in story_tags), key=attrgetter("category", "iname")
+    )
+    main_tags, spoiler = extract_spoilers(sorted_tags)
+    extreme = [t for t in sorted_tags if t.is_extreme_tag]
+
+    if len(main_tags) <= MAX_TAGS:
+        return PreparedTags(
+            primary=main_tags,
+            secondary=[],
+            extreme=extreme,
+            spoiler=spoiler,
+        )
+    primary, secondary = group_tags(main_tags)
+    return PreparedTags(
+        primary=primary,
+        secondary=secondary,
+        extreme=extreme,
+        spoiler=spoiler,
+    )
+
+
+def get_prepared_tags(story: Story) -> PreparedTags:
+    return _get_prepared_tags(story.tags)

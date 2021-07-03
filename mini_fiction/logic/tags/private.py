@@ -1,6 +1,9 @@
 import re
+from collections import defaultdict
+from dataclasses import dataclass
 from datetime import datetime
-from typing import Collection, Optional
+from itertools import chain, islice
+from typing import Collection, List, Optional, Tuple
 
 from flask import current_app
 from flask_babel import lazy_gettext
@@ -10,6 +13,16 @@ from mini_fiction.logic.adminlog import log_changed_fields, log_changed_generic
 from mini_fiction.models import Author, StoryTag, StoryTagLog, Tag
 from mini_fiction.utils.misc import call_after_request as later
 from mini_fiction.validation.utils import safe_string_coerce
+
+MAX_TAGS = 5
+
+
+@dataclass
+class PreparedTags:
+    primary: List[Tag]
+    secondary: List[Tag]
+    extreme: List[Tag]
+    spoiler: List[Tag]
 
 
 def normalize_tag(
@@ -181,3 +194,24 @@ def validate_tag_name(raw_tag_name: str) -> Optional[str]:
             return reason
 
     return None
+
+
+def extract_spoilers(tags: List[Tag]) -> Tuple[List[Tag], List[Tag]]:
+    result = defaultdict(list)
+    for tag in tags:
+        result[tag.is_spoiler].append(tag)
+    return result.get(False, []), result.get(True, [])
+
+
+def group_tags(tags: List[Tag]) -> Tuple[List[Tag], List[Tag]]:
+    grouped = defaultdict(list)
+    for tag in tags:
+        grouped[tag.category].append(tag)
+
+    primary: List[Tag] = []
+    for tag_group in islice(grouped.values(), 0, MAX_TAGS):
+        primary.append(tag_group.pop(0))
+
+    secondary = list(chain.from_iterable(grouped.values()))
+
+    return primary, secondary

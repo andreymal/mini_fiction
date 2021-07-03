@@ -1,7 +1,7 @@
 import re
 from itertools import chain
 from pathlib import Path
-from typing import Dict, List, Tuple, Optional
+from typing import Dict, List, Optional, Tuple
 
 from flask import current_app, g, url_for
 from pydantic import BaseModel, parse_file_as  # pylint: disable=no-name-in-module

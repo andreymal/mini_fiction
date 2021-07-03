@@ -28,10 +28,10 @@ class TagForm(Form):
         render_kw=attrs_dict,
     )
 
-    is_main_tag = BooleanField(
-        'Основной тег',
+    is_spoiler = BooleanField(
+        'Спойлерный тег',
         render_kw=attrs_dict,
-        description='Основные теги не скрываются за многоточием в списке тегов рассказа',
+        description='Спойлерные теги скрываются в списке тегов рассказа',
     )
 
     is_alias_for = TextField(

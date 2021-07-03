@@ -1,6 +1,6 @@
 {%- from 'macro.html' import tag_link with context -%}
 
-{% set extreme_tags = story.bl.get_extreme_tags() %}
+{% set extreme_tags = story.prepared_tags.extreme %}
 {%- if extreme_tags %}
     {% set nsfw_block = html_block('nsfw_extreme_warning') %}
 {%- else %}
@@ -16,8 +16,8 @@
 
     {%- if extreme_tags %}
     <p>
-    {%- for st in extreme_tags %}
-        {{ tag_link(st.tag) }}
+    {%- for tag in extreme_tags %}
+        {{ tag_link(tag) }}
     {%- endfor %}
     </p>
     {%- endif %}

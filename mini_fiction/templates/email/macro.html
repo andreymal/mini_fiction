@@ -39,7 +39,6 @@
 
 
 {% macro story_info_html(story) -%}
-{%- set main_tags = story.bl.get_main_tags(sort=True) -%}
 
 <h3 style="font-family: 'Trebuchet MS', Arial, sans-serif; font-weight: 400; font-size: 20px; line-height: 20px; margin: 0 0 5px;">
     <a href="{{ url_for('story.view', pk=story.id, _external=True) }}" style="color: #0086e5;">{{ story.title }}</a>
@@ -57,11 +56,11 @@
 </h3>
 
 <p style="color: #999;">
-{%- for st in main_tags -%}
+{%- for tag in story.prepared_tags.primary  -%}
     <a
         style="margin: 0 4px 2px 0; padding: 2px 7px; color: #fff; background-color: #999; display: inline-block; line-height: 16px; text-decoration: none; border-radius: 5px;"
-        href="{{ url_for('tags.tag_index', tag_name=st.tag.iname, _external=True) }}">
-            {{- st.tag.name -}}
+        href="{{ url_for('tags.tag_index', tag_name=tag.iname, _external=True) }}">
+            {{- tag.name -}}
     </a>
 {% endfor -%}
 {{ ngettext("%(num)d word", "%(num)d words", story.words) }}

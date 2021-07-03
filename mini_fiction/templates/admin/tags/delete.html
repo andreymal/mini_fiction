@@ -1,5 +1,5 @@
 {% extends base %}
-{% from 'macro.html' import tag_link, admin_tag_link with context %}
+{% from 'macro.html' import tag_link with context %}
 {% block content %}
 <div class="row">
     <div class="span12">
@@ -7,7 +7,7 @@
     {{ tag_link(tag) }}
     {% if tag.is_alias %}
         →
-        {{ admin_tag_link(tag.is_alias_for) }}
+        {{ tag_link(tag.is_alias_for, admin=True) }}
     {% endif %}
 
     <p>{{ _('Delete this tag?') }}</p>

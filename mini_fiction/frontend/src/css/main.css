@@ -711,40 +711,80 @@ h1 .alert {
     text-decoration: none;
     display: inline-block;
     line-height: 16px;
-    margin: 0 4px 4px 0;
     background-color: var(--default-tag-color);
     @mixin box-shadow;
-}
 
-.story-tag:hover {
-    color: #fff;
+    /* override bootstrap styles for <label> */
+    font-size: inherit;
+    font-weight: inherit;
+
+    &.blacklisted-tag {
+        text-decoration: line-through;
+        opacity: 0.5;
+    }
+    &:hover {
+        color: #fff;
+    }
 }
 
 .story-item .meta .story-tag {
     padding: 2px 7px;
-    margin: 0 4px 2px 0;
 }
 
-.story-tag.more-tags-btn {
-  background-color: #ddd;
+.secondary-tag, .spoiler-tag {
+    display: none;
 }
 
-.story-tag.more-tags-btn:hover {
-  background-color: #bbb;
+input.show-tags-trigger {
+    display: none;
+
+    & + label {
+        display: inline-block;
+        margin: 0;
+    }
+    & + label ~ label {
+        display: none;
+    }
+
+    &:checked + label {
+        display: none;
+    }
+
+    &:checked + label ~ label {
+        display: inline-block;
+        margin: 0;
+    }
+
+    &:checked + label ~ input:checked + label {
+        display: none;
+    }
+
+    &:checked + label ~ .secondary-tag {
+        display: inline-block;
+    }
 }
 
-.story-item .meta .story-tag.more-tags-btn {
-  padding: 2px 4px;
+input.show-spoiler-trigger {
+    display: none;
+
+    & + label {
+        margin: 0;
+    }
+
+    &:checked + label {
+        display: none;
+    }
+
+    &:checked + label ~ .spoiler-tag {
+        display: inline-block;
+        opacity: 0.5;
+    }
 }
 
-.show-more-tags-link {
-    display: inline-block;
-    margin: 0 4px 4px 0;
-    padding: 4px 2px;
-    line-height: 16px;
-
-    text-decoration: underline;
-    text-decoration-style: dotted;
+.tags-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: .5em;
 }
 
 /* Tags list page */

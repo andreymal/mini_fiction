@@ -31,21 +31,13 @@
 {% endmacro %}
 
 
-{% macro tag_link(tag) -%}
-    <a class="story-tag{% if tag.is_extreme_tag %} extreme-tag{% endif %}"
-        data-category-id="{{ tag.category.id if tag.category else 0 }}"
-        href="{{ url_for('tags.tag_index', tag_name=tag.iname) }}">
-        {{- tag.name -}}
-    </a>
-{%- endmacro %}
-
-
-{% macro admin_tag_link(tag) -%}
-    <a class="story-tag{% if tag.is_extreme_tag %} extreme-tag{% endif %}"
-        href="{{ url_for('admin_tags.update', pk=tag.id) }}">
-        {%- if tag.is_blacklisted %}<s>{% endif -%}
-        {{ tag.name }}
-        {%- if tag.is_blacklisted %}</s>{% endif -%}
+{% macro tag_link(tag, secondary=False, spoiler=False, admin=False) -%}
+    {% set url = url_for('admin_tags.update', pk=tag.id) if admin else url_for('tags.tag_index', tag_name=tag.iname) %}
+    <a class="story-tag{% if tag.is_extreme_tag %} extreme-tag{% endif %}{% if secondary %} secondary-tag{% endif %}{% if spoiler %} spoiler-tag{% endif %}{% if admin and tag.is_blacklisted %} blacklisted-tag{% endif %}"
+       data-category-id="{{ tag.category.id if tag.category else 0 }}"
+       title="{{ tag.description }}"
+       href="{{ url }}">
+       {{- tag.name -}}
     </a>
 {%- endmacro %}
 

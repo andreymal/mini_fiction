@@ -1,5 +1,5 @@
 {% extends base %}
-{% from 'macro.html' import paginator, admin_tag_link with context %}
+{% from 'macro.html' import paginator, tag_link with context %}
 {% block content %}
 
 <div class="row"><div class="span12">
@@ -19,10 +19,10 @@
         <tbody>
         {%- for tag in tags %}<tr>
             <td class="col-tag-iname">
-                {{ admin_tag_link(tag) }}
+                {{ tag_link(tag, admin=True) }}
                 {% if tag.is_alias %}
                     →
-                    {{ admin_tag_link(tag.is_alias_for) }}
+                    {{ tag_link(tag.is_alias_for, admin=True) }}
                 {% endif %}
             </td>
 
@@ -60,7 +60,7 @@
 
         <div class="admin-index-filters">
             <form action="{{ url_for('admin_tags.index') }}" method="GET">
-                {% for k, v in args.items() if k not in ['page', 'name', 'category', 'is_blacklisted', 'is_alias', 'is_main_tag', 'is_extreme_tag'] %}
+                {% for k, v in args.items() if k not in ['page', 'name', 'category', 'is_blacklisted', 'is_alias', 'is_spoiler', 'is_extreme_tag'] %}
                     <input type="hidden" name="{{ k }}" value="{{ v }}" />
                 {%- endfor %}
 
@@ -90,11 +90,11 @@
                     <option value="0"{% if args.is_alias == "0" %} selected{% endif %}>{{ _('No') }}</option>
                 </select><br/>
 
-                <label for="is_main_tag">Основной тег:</label>
-                <select name="is_main_tag" id="is_main_tag" class="admin-input-select-full">
+                <label for="is_spoiler">Спойлерный тег:</label>
+                <select name="is_spoiler" id="is_spoiler" class="admin-input-select-full">
                     <option value="">{{ _('All') }}</option>
-                    <option value="1"{% if args.is_main_tag == "1" %} selected{% endif %}>{{ _('Yes') }}</option>
-                    <option value="0"{% if args.is_main_tag == "0" %} selected{% endif %}>{{ _('No') }}</option>
+                    <option value="1"{% if args.is_spoiler == "1" %} selected{% endif %}>{{ _('Yes') }}</option>
+                    <option value="0"{% if args.is_spoiler == "0" %} selected{% endif %}>{{ _('No') }}</option>
                 </select><br/>
 
                 <label for="is_extreme_tag">Экстремальный тег:</label>

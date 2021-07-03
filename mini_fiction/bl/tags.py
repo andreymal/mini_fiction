@@ -147,18 +147,14 @@ class TagBL(BaseBL):
 
         return result
 
-    def get_all_tags(self, only_main=False, sort=False):
+    def get_all_tags(self):
         from mini_fiction.models import Tag
 
         q = Tag.select()
         q = q.filter(lambda x: not x.is_blacklisted and not x.is_alias)
-        if only_main:
-            q = q.filter(lambda x: x.is_main_tag)
 
         q = q.prefetch(Tag.category)
         tags = list(q)
-        if sort:
-            tags.sort(key=lambda x: (x.category.id if x.category else 2 ** 31, x.iname))
         return tags
 
     def get_categories(self, prefetch_tags=True):
@@ -329,7 +325,7 @@ class TagBL(BaseBL):
             iname=iname,
             category=data.get('category'),
             description=data.get('description') or '',
-            is_main_tag=data.get('is_main_tag', False),
+            is_spoiler=data.get('is_spoiler', False),
             created_by=user,
             is_alias_for=None,
             reason_to_blacklist='',
@@ -375,7 +371,7 @@ class TagBL(BaseBL):
             if old_category_id != data['category']:
                 changes['category'] = data['category']
 
-        for key in ('description', 'is_main_tag', 'is_extreme_tag'):
+        for key in ('description', 'is_spoiler', 'is_extreme_tag'):
             if key in data and data[key] != getattr(tag, key):
                 changes[key] = data[key]
 

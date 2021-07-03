@@ -7,6 +7,7 @@ from flask_babel import gettext
 from flask_login import current_user, login_required
 from pony.orm import db_session
 
+from mini_fiction.bl.migration import enrich_story
 from mini_fiction.forms.story import StoryForm
 from mini_fiction.forms.comment import CommentForm
 from mini_fiction.models import Author, Story, Chapter, Rating, StoryLog, Favorites, Bookmark, Subscription
@@ -78,6 +79,8 @@ def view(pk, comments_page):
     chapter_subscriptions_count = Subscription.select().filter(
         lambda x: x.type == 'story_chapter' and x.target_id == story.id
     ).count()
+
+    enrich_story(story)
 
     data = {
         'story': story,

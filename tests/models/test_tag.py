@@ -223,7 +223,7 @@ def test_tag_create_normal(factories):
     assert tag.iname == 'тестовый_тег'
     assert tag.category is None
     assert tag.description == 'Это описание тега'
-    assert tag.is_main_tag is False
+    assert tag.is_spoiler is False
     assert tag.is_alias is False
     assert tag.is_alias_for is None
     assert tag.is_hidden_alias is False
@@ -360,7 +360,7 @@ def test_tag_update_normal(factories):
     assert tag.iname == 'обновлённый_тег'
     assert tag.category is None
     assert tag.description == 'Это новое описание тега'
-    assert tag.is_main_tag is False
+    assert tag.is_spoiler is False
     assert tag.is_alias is False
     assert tag.is_alias_for is None
     assert tag.is_hidden_alias is False

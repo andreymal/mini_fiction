@@ -19,6 +19,7 @@ import lxml.etree
 from pony import orm
 from flask import Markup, current_app
 
+from mini_fiction.bl.migration import enrich_stories
 from mini_fiction.ratelimit import RateLimitExceeded
 from mini_fiction.apis.amsphinxql import SphinxSearchResult
 from mini_fiction.bl.utils import BaseBL
@@ -1034,6 +1035,7 @@ class StoryBL(BaseBL, Commentable):
         ids: List[int] = [x['id'] for x in result_orig.matches]
         stories_dict: Dict[int, "Story"] = {x.id: x for x in self.model.select(lambda x: x.id in ids)}
         stories = [stories_dict[i] for i in ids if i in stories_dict]
+        enrich_stories(stories)
 
         return StorySearchResult(
             matches=result_orig.matches,
@@ -1275,20 +1277,8 @@ class StoryBL(BaseBL, Commentable):
 
     # tags
 
-    def get_tags_list(self, sort=False):
-        result = list(self.model.tags)  # Не используем select, потому что во вьюхах уже мог быть prefetch
-        if sort:
-            result.sort(key=lambda x: (x.tag.category.id if x.tag.category else 2 ** 31, x.tag.iname))
-        return result
-
-    def get_main_tags(self, sort=False):
-        return [x for x in self.get_tags_list(sort=sort) if x.tag.is_main_tag]
-
-    def get_more_tags(self, sort=False):
-        return [x for x in self.get_tags_list(sort=sort) if not x.tag.is_main_tag]
-
-    def get_extreme_tags(self, sort=False):
-        return [x for x in self.get_tags_list(sort=sort) if x.tag.is_extreme_tag]
+    def get_tags_list(self):
+        return list(self.model.tags)  # Не используем select, потому что во вьюхах уже мог быть prefetch
 
     def add_tag(self, user, tag, check_blacklist=True, log=True, update_search=True):
         from mini_fiction.models import Tag, StoryTag, StoryTagLog
@@ -1550,7 +1540,6 @@ class StoryBL(BaseBL, Commentable):
 
     def get_random(self, count=10, prefetch=()):
         # это быстрее, чем RAND() в MySQL
-        from mini_fiction.models import Story
 
         Story = self.model
         ids = current_app.cache.get('all_story_ids')
@@ -1565,6 +1554,7 @@ class StoryBL(BaseBL, Commentable):
             q = q.prefetch(*prefetch)
         stories = list(q)
         random.shuffle(stories)
+        enrich_stories(stories)
         return stories
 
     def get_unread_chapters_count(self, user, story_ids):

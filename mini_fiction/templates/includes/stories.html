@@ -1,4 +1,5 @@
 {% from 'macro.html' import character_picture %}
+{% from 'macro/story.html' import tags_block %}
 {% from 'includes/story_buttons.html' import common_buttons, edit_buttons with context %}
 
 {% for story in stories %}
@@ -19,9 +20,7 @@
             {% include 'includes/story_marks.html' with context %}
         </h3>
         <p class="meta">
-                <span class="story-tags-list">
-                    {%- include 'includes/story_main_tags.html' -%}
-                </span>
+            {{ tags_block(story.prepared_tags, story.id) }}
                 {{ ngettext("%(num)d word", "%(num)d words", story.words) }} {{ pgettext('story_by', 'by') }} {% include 'includes/story_authors_list.html' %}
                 <br/>
                 <span>

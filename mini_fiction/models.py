@@ -328,7 +328,7 @@ class Tag(db.Entity):
     iname = orm.Required(str, 32, unique=True)  # normalized lowercase name
     category = orm.Optional(TagCategory)
     description = orm.Optional(orm.LongStr)
-    is_main_tag = orm.Required(bool, default=False)
+    is_spoiler = orm.Required(bool, default=False)
     created_at = orm.Required(datetime, 6, default=datetime.utcnow)
     updated_at = orm.Required(datetime, 6, default=datetime.utcnow)
     created_by = orm.Optional(Author)

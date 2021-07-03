@@ -570,8 +570,9 @@ a.authorlink:hover,a.edit-link:hover {
 }
 
 .character-list {
-    display: inline-flex;
+    display: flex;
     gap: 0.5em;
+    flex-wrap: wrap;
 
     & a {
         text-decoration: none;

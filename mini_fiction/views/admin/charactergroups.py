@@ -42,7 +42,7 @@ def create():
 
     if form.validate_on_submit():
         try:
-            charactergroup = character_groups.create(current_user._get_current_object(), form.data)
+            charactergroup = character_groups.create(current_user, form.data)
         except ValidationError as exc:
             form.set_errors(exc.errors)
         else:
@@ -73,7 +73,7 @@ def update(pk):
 
     if form.validate_on_submit():
         try:
-            character_groups.update(charactergroup, current_user._get_current_object(), form.data)
+            character_groups.update(charactergroup, current_user, form.data)
         except ValidationError as exc:
             form.set_errors(exc.errors)
         else:
@@ -99,7 +99,7 @@ def delete(pk):
 
     if request.method == 'POST':
         try:
-            character_groups.delete(charactergroup, current_user._get_current_object())
+            character_groups.delete(charactergroup, current_user)
         except ValidationError:
             abort(403)
         else:

@@ -35,7 +35,7 @@ def show(story_id, local_id):
     if not story:
         abort(404)
 
-    if not story.bl.has_comments_access(current_user._get_current_object()):
+    if not story.bl.has_comments_access(current_user):
         abort(403)
 
     comment = StoryComment.get(story=story_id, local_id=local_id)

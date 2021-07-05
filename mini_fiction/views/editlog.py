@@ -19,18 +19,16 @@ bp = Blueprint('editlog', __name__)
 @db_session
 @login_required
 def index(page):
-    user = current_user._get_current_object()
-
     view_args = {'page': page}
 
     if request.args.get('all') == '1':
-        if not user.is_staff:
+        if not current_user.is_staff:
             abort(403)
         view_args['all'] = '1'
         queryset = StoryLog.select()
     else:
         queryset = StoryLog.select(
-            lambda l: l.story in select(c.story for c in StoryContributor if c.user == user)
+            lambda l: l.story in select(c.story for c in StoryContributor if c.user == current_user)
         )
 
     if request.args.get('staff') == '1':
@@ -74,7 +72,7 @@ def show(editlog_id):
     edit_log = StoryLog.select(lambda x: x.id == editlog_id).prefetch(StoryLog.story, StoryLog.user).first()
     if not edit_log:
         abort(404)
-    if not edit_log.story.bl.can_view_editlog(current_user._get_current_object()):
+    if not edit_log.story.bl.can_view_editlog(current_user):
         abort(403)
 
     extra = get_editlog_extra_info(edit_log, prepare_chapter_diff=True, show_newlines=True)

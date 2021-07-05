@@ -56,7 +56,7 @@ def show(name, comments_page):
 
     comment_ids = [x[0].id for x in comments_tree_list]
     if current_user.is_authenticated:
-        comment_votes_cache = newsitem.bl.select_comment_votes(current_user._get_current_object(), comment_ids)
+        comment_votes_cache = newsitem.bl.select_comment_votes(current_user, comment_ids)
     else:
         comment_votes_cache = {i: 0 for i in comment_ids}
 
@@ -69,7 +69,7 @@ def show(name, comments_page):
         'comments_tree_list': comments_tree_list,
         'comment_form': CommentForm(),
         'comment_votes_cache': comment_votes_cache,
-        'sub_comments': newsitem.bl.get_comments_subscription(current_user._get_current_object()),
+        'sub_comments': newsitem.bl.get_comments_subscription(current_user),
     }
 
     return render_template('news/show.html', **data)
@@ -79,13 +79,12 @@ def show(name, comments_page):
 @db_session
 @login_required
 def comments_subscribe(name):
-    user = current_user._get_current_object()
     newsitem = NewsItem.get(name=name)
     if not newsitem:
         abort(404)
 
     newsitem.bl.subscribe_to_comments(
-        user,
+        current_user,
         email=request.form.get('email') == '1',
         tracker=request.form.get('tracker') == '1',
     )

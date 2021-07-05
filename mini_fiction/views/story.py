@@ -25,7 +25,7 @@ def get_story(pk, for_update=False):
         story = Story.get(id=pk)
     if not story:
         abort(404)
-    if not story.bl.has_access(current_user._get_current_object()):
+    if not story.bl.has_access(current_user):
         abort(403)
     return story
 
@@ -34,22 +34,21 @@ def get_story(pk, for_update=False):
 @bp.route('/<int:pk>/comments/page/<int:comments_page>/')
 @db_session
 def view(pk, comments_page):
-    user = current_user._get_current_object()
     story = get_story(pk)
 
-    per_page = user.comments_per_page or current_app.config['COMMENTS_COUNT']['page']
-    maxdepth = None if request.args.get('fulltree') == '1' else calc_maxdepth(user)
+    per_page = current_user.comments_per_page or current_app.config['COMMENTS_COUNT']['page']
+    maxdepth = None if request.args.get('fulltree') == '1' else calc_maxdepth(current_user)
 
-    last_viewed_comment = story.bl.last_viewed_comment_by(user)
+    last_viewed_comment = story.bl.last_viewed_comment_by(current_user)
     comments_count, paged, comments_tree_list = story.bl.paginate_comments(comments_page, per_page, maxdepth, last_viewed_comment=last_viewed_comment)
     if not comments_tree_list and paged.number != 1:
         abort(404)
 
-    act = story.bl.get_activity(user)
+    act = story.bl.get_activity(current_user)
 
     local_comments_count = 0
     new_local_comments_count = 0
-    if story.local and ((user and user.is_staff) or story.bl.is_contributor(user)):
+    if story.local and ((current_user and current_user.is_staff) or story.bl.is_contributor(current_user)):
         local_comments_count = story.bl.get_or_create_local_thread().comments_count
         new_local_comments_count = (
             (story.bl.get_or_create_local_thread().comments_count - act.last_local_comments)
@@ -57,22 +56,22 @@ def view(pk, comments_page):
         )
 
     chapters = list(story.chapters.select().order_by(Chapter.order, Chapter.id))
-    if not user.is_staff and not story.bl.is_contributor(user):
+    if not current_user.is_staff and not story.bl.is_contributor(current_user):
         chapters = [x for x in chapters if not x.draft]
 
     show_first_chapter = len(chapters) == 1 and not chapters[0].draft
 
-    if user.is_authenticated:
-        story.bl.viewed(user)
+    if current_user.is_authenticated:
+        story.bl.viewed(current_user)
         if show_first_chapter:
-            chapters[0].bl.viewed(user)
-        user_vote = story.votes.select(lambda x: x.author == user).first()
+            chapters[0].bl.viewed(current_user)
+        user_vote = story.votes.select(lambda x: x.author == current_user).first()
     else:
         user_vote = None
 
     comment_ids = [x[0].id for x in comments_tree_list]
-    if user.is_authenticated:
-        comment_votes_cache = story.bl.select_comment_votes(user, comment_ids)
+    if current_user.is_authenticated:
+        comment_votes_cache = story.bl.select_comment_votes(current_user, comment_ids)
     else:
         comment_votes_cache = {i: 0 for i in comment_ids}
 
@@ -98,8 +97,8 @@ def view(pk, comments_page):
         'page_title': story.title,
         'comment_form': CommentForm(),
         'page_obj': paged,
-        'sub': story.bl.get_subscription(user),
-        'sub_comments': story.bl.get_comments_subscription(user),
+        'sub': story.bl.get_subscription(current_user),
+        'sub_comments': story.bl.get_comments_subscription(current_user),
         'robots_noindex': not story.published or story.robots_noindex,
         'favorites_count': story.favorites.select().count(),
         'show_meta_description': comments_page == -1,
@@ -113,10 +112,9 @@ def view(pk, comments_page):
 @db_session
 @login_required
 def subscribe(pk):
-    user = current_user._get_current_object()
     story = get_story(pk)
     story.bl.subscribe(
-        user,
+        current_user,
         email=request.form.get('email') == '1',
         tracker=request.form.get('tracker') == '1',
     )
@@ -130,10 +128,9 @@ def subscribe(pk):
 @db_session
 @login_required
 def comments_subscribe(pk):
-    user = current_user._get_current_object()
     story = get_story(pk)
     story.bl.subscribe_to_comments(
-        user,
+        current_user,
         email=request.form.get('email') == '1',
         tracker=request.form.get('tracker') == '1',
     )
@@ -147,13 +144,12 @@ def comments_subscribe(pk):
 @db_session
 @login_required
 def local_comments_subscribe(pk):
-    user = current_user._get_current_object()
     story = get_story(pk)
-    if not user.is_staff and not story.bl.is_contributor(user):
+    if not current_user.is_staff and not story.bl.is_contributor(current_user):
         abort(403)
 
     story.bl.subscribe_to_local_comments(
-        user,
+        current_user,
         email=request.form.get('email') == '1',
         tracker=request.form.get('tracker') == '1',
     )
@@ -170,13 +166,12 @@ def local_comments_subscribe(pk):
 @db_session
 @login_required
 def approve(pk):
-    user = current_user._get_current_object()
-    if not user.is_staff:
+    if not current_user.is_staff:
         abort(403)  # TODO: refactor exceptions and move to bl
     story = Story.get(id=pk)
     if not story:
         abort(404)
-    story.bl.approve(user, not story.approved)
+    story.bl.approve(current_user, not story.approved)
     if g.is_ajax:
         return jsonify({'success': True, 'story_id': story.id, 'approved': story.approved})
     return redirect(url_for('story.view', pk=story.id))
@@ -186,8 +181,7 @@ def approve(pk):
 @db_session
 @login_required
 def pin(pk):
-    user = current_user._get_current_object()
-    if not user.is_staff:
+    if not current_user.is_staff:
         abort(403)  # TODO: refactor exceptions and move to bl
     story = Story.get(id=pk)
     if not story:
@@ -208,8 +202,7 @@ def publish(pk):
     if not story:
         abort(404)
 
-    user = current_user._get_current_object()
-    if not user.is_staff and not story.bl.publishable_by(user):
+    if not current_user.is_staff and not story.bl.publishable_by(current_user):
         abort(403)
 
     modal = None
@@ -224,7 +217,7 @@ def publish(pk):
         data['page_title'] = 'Неудачная попытка публикации'
         modal = render_template('includes/ajax/story_ajax_publish_blocked.html', **data)
 
-    elif not story.bl.publish(user, story.draft):  # draft == not published
+    elif not story.bl.publish(current_user, story.draft):  # draft == not published
         data['page_title'] = 'Неудачная попытка публикации'
         modal = render_template('includes/ajax/story_ajax_publish_warning.html', **data)
 
@@ -250,14 +243,13 @@ def favorite(pk, action):
     if action not in ('add', 'delete'):
         abort(404)
 
-    user = current_user._get_current_object()
-    f = Favorites.select(lambda x: x.author == user and x.story.id == pk).for_update().first()
+    f = Favorites.select(lambda x: x.author == current_user and x.story.id == pk).for_update().first()
     if f and action == 'delete':
         f.delete()  # без проверки доступа
         f = None
     elif action == 'add':
         story = get_story(pk)  # проверка доступа
-        f = Favorites(author=user, story=story)
+        f = Favorites(author=current_user, story=story)
     if g.is_ajax:
         return jsonify({
             'success': True,
@@ -275,14 +267,13 @@ def bookmark(pk, action):
     if action not in ('add', 'delete'):
         abort(404)
 
-    user = current_user._get_current_object()
-    b = Bookmark.select(lambda x: x.author == user and x.story.id == pk).for_update().first()
+    b = Bookmark.select(lambda x: x.author == current_user and x.story.id == pk).for_update().first()
     if b and action == 'delete':
         b.delete()  # без проверки доступа
         b = None
     elif action == 'add':
         story = get_story(pk)  # проверка доступа
-        b = Bookmark(author=user, story=story)
+        b = Bookmark(author=current_user, story=story)
     if g.is_ajax:
         return jsonify({
             'success': True,
@@ -298,11 +289,10 @@ def bookmark(pk, action):
 @login_required
 def vote(pk):
     story = get_story(pk, for_update=True)
-    user = current_user._get_current_object()
 
     try:
         value = int(request.form.get('vote_value') or '')
-        vote_obj = story.bl.vote(user, value, ip=request.remote_addr)
+        vote_obj = story.bl.vote(current_user, value, ip=request.remote_addr)
     except ValueError as exc:  # TODO: refactor exceptions
         if request.form.get('vote_ajax') == '1':
             return jsonify({'error': str(exc), 'success': False, 'story_id': story.id}), 403
@@ -313,9 +303,9 @@ def vote(pk):
             'success': True,
             'story_id': story.id,
             'value': value,
-            'vote_view_html': current_app.story_voting.vote_view_html(story, user=user, full=True),
-            'vote_area_1_html': current_app.story_voting.vote_area_1_html(story, user=user, user_vote=vote_obj),
-            'vote_area_2_html': current_app.story_voting.vote_area_2_html(story, user=user, user_vote=vote_obj),
+            'vote_view_html': current_app.story_voting.vote_view_html(story, user=current_user, full=True),
+            'vote_area_1_html': current_app.story_voting.vote_area_1_html(story, user=current_user, user_vote=vote_obj),
+            'vote_area_2_html': current_app.story_voting.vote_area_2_html(story, user=current_user, user_vote=vote_obj),
         })
     return redirect(url_for('story.view', pk=story.id))
 
@@ -323,12 +313,10 @@ def vote(pk):
 @bp.route('/<int:pk>/editlog/')
 @db_session
 def edit_log(pk):
-    user = current_user._get_current_object()
-
     story = Story.get(id=pk)
     if not story:
         abort(404)
-    if not story.bl.can_view_editlog(user):
+    if not story.bl.can_view_editlog(current_user):
         abort(403)
 
     edit_log_items = story.edit_log.select().order_by(StoryLog.created_at.desc()).prefetch(StoryLog.user)
@@ -363,7 +351,6 @@ def favorites(pk):
 @db_session
 @login_required
 def add():
-    user = current_user._get_current_object()
     rating = Rating.select().order_by(Rating.id.desc()).first()
     form = StoryForm(data={'status': 0, 'original': 1, 'rating': rating.id if rating else 1})
 
@@ -385,7 +372,7 @@ def add():
             formdata['status'] = 'freezed'
 
         try:
-            story = Story.bl.create([user], formdata)
+            story = Story.bl.create([current_user], formdata)
         except ValidationError as exc:
             form.set_errors(exc.errors)
             ctx['not_saved'] = True
@@ -399,14 +386,13 @@ def add():
 @db_session
 @login_required
 def edit(pk):
-    user = current_user._get_current_object()
     if request.method == 'POST':
         story = Story.get_for_update(id=pk)
     else:
         story = Story.get(id=pk)
     if not story:
         abort(404)
-    if not story.bl.editable_by(user):
+    if not story.bl.editable_by(current_user):
         abort(403)
 
     story_data = {
@@ -451,7 +437,7 @@ def edit(pk):
             minor = formdata.pop('minor', False)
 
             try:
-                story = story.bl.update(user, formdata, minor=minor)
+                story = story.bl.update(current_user, formdata, minor=minor)
             except ValidationError as exc:
                 form.set_errors(exc.errors)
                 ctx['not_saved'] = True
@@ -469,14 +455,13 @@ def edit(pk):
 @db_session
 @login_required
 def edit_chapters(pk):
-    user = current_user._get_current_object()
     if request.method == 'POST':
         story = Story.get_for_update(id=pk)
     else:
         story = Story.get(id=pk)
     if not story:
         abort(404)
-    if not story.bl.editable_by(user):
+    if not story.bl.editable_by(current_user):
         abort(403)
 
     ctx = {
@@ -493,14 +478,13 @@ def edit_chapters(pk):
 @db_session
 @login_required
 def edit_contributors(pk):
-    user = current_user._get_current_object()
     if request.method == 'POST':
         story = Story.get_for_update(id=pk)
     else:
         story = Story.get(id=pk)
     if not story:
         abort(404)
-    if not story.bl.can_edit_contributors(user):
+    if not story.bl.can_edit_contributors(current_user):
         abort(403)
 
     ctx = {
@@ -534,7 +518,7 @@ def edit_contributors(pk):
             else:
                 continue
 
-            if not user.is_staff and acc_user.id == current_user.id:
+            if not current_user.is_staff and acc_user.id == current_user.id:
                 continue
 
             if not v:
@@ -560,7 +544,7 @@ def edit_contributors(pk):
                 return jsonify({'page_content': {'modal': html, 'title': page_title}})
 
         else:
-            story.bl.edit_contributors(user, access)
+            story.bl.edit_contributors(current_user, access)
             ctx['contr_saved'] = True
 
         if request.args.get('short') == '1':
@@ -574,14 +558,13 @@ def edit_contributors(pk):
 @db_session
 @login_required
 def edit_staff(pk):
-    user = current_user._get_current_object()
     if request.method == 'POST':
         story = Story.get_for_update(id=pk)
     else:
         story = Story.get(id=pk)
     if not story:
         abort(404)
-    if not user.is_staff or not story.bl.editable_by(user):
+    if not current_user.is_staff or not story.bl.editable_by(current_user):
         abort(403)
 
     ctx = {
@@ -610,12 +593,11 @@ def delete(pk):
     story = Story.get(id=pk)
     if not story:
         abort(404)
-    user = current_user._get_current_object()
-    if not story.bl.deletable_by(user):
+    if not story.bl.deletable_by(current_user):
         abort(403)
 
     if request.method == 'POST' and (not story.first_published_at or request.form.get('agree') == '1'):
-        story.bl.delete(user=user)
+        story.bl.delete(user=current_user)
         return redirect(url_for('index.index'))
 
     page_title = 'Подтверждение удаления рассказа'

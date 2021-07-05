@@ -42,7 +42,7 @@ def create():
 
     if form.validate_on_submit():
         try:
-            staticpage = staticpages.create(current_user._get_current_object(), form.data)
+            staticpage = staticpages.create(current_user, form.data)
         except ValidationError as exc:
             form.set_errors(exc.errors)
         else:
@@ -82,7 +82,7 @@ def update(name, lang):
 
     if can_edit and form.validate_on_submit():
         try:
-            staticpages.update(staticpage, current_user._get_current_object(), form.data)
+            staticpages.update(staticpage, current_user, form.data)
         except ValidationError as exc:
             form.set_errors(exc.errors)
         else:
@@ -113,7 +113,7 @@ def delete(name, lang):
 
     if request.method == 'POST':
         try:
-            staticpages.delete(staticpage, current_user._get_current_object())
+            staticpages.delete(staticpage, current_user)
         except ValidationError:
             abort(403)
         else:

@@ -40,7 +40,7 @@ def create():
 
     if form.validate_on_submit():
         try:
-            logopic = logopics.create(current_user._get_current_object(), form.data)
+            logopic = logopics.create(current_user, form.data)
         except ValidationError as exc:
             form.set_errors(exc.errors)
         else:
@@ -73,7 +73,7 @@ def update(pk):
 
     if form.validate_on_submit():
         try:
-            logopics.update(logopic, current_user._get_current_object(), form.data)
+            logopics.update(logopic, current_user, form.data)
         except ValidationError as exc:
             form.set_errors(exc.errors)
         else:
@@ -99,7 +99,7 @@ def delete(pk):
 
     if request.method == 'POST':
         try:
-            logopics.delete(logopic, current_user._get_current_object())
+            logopics.delete(logopic, current_user)
         except ValidationError:
             abort(403)
         else:

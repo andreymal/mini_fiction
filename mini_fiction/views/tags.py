@@ -44,7 +44,7 @@ def tag_index(tag_name, page):
     if tag.iname != tag_name:
         return redirect(url_for('tags.tag_index', tag_name=tag.iname, page=page))
 
-    objects = Story.bl.select_by_tag(tag, user=current_user._get_current_object())
+    objects = Story.bl.select_by_tag(tag, user=current_user)
     objects = objects.prefetch(Story.characters, Story.contributors, StoryContributor.user, Story.tags, StoryTag.tag, Tag.category)
     objects = objects.order_by(Story.first_published_at.desc(), Story.id.desc())
 

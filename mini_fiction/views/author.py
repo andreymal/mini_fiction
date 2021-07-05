@@ -65,7 +65,7 @@ def info(user_id=None, comments_page=1):
     if user_id is None:
         if not current_user.is_authenticated:
             abort(403)
-        author = current_user._get_current_object()
+        author = current_user
         comments_list = StoryComment.bl.select_by_story_author(author)
         comments_list = comments_list.order_by(StoryComment.id.desc())
         stories = list(author.stories)
@@ -107,7 +107,7 @@ def info(user_id=None, comments_page=1):
     data.update({
         'author': author,
         'is_system_user': author.id == current_app.config['SYSTEM_USER_ID'],
-        'sub': author.bl.get_stories_subscription(current_user._get_current_object()),
+        'sub': author.bl.get_stories_subscription(current_user),
         'stories': stories,
         'contributing_stories': contributing_stories,
         'series': series,
@@ -162,7 +162,7 @@ def edit_general(user_id=None):
             try:
                 user.bl.update(
                     form.data,
-                    modified_by_user=current_user._get_current_object(),
+                    modified_by_user=current_user,
                     fill_admin_log=user.id != current_user.id,
                 )
             except ValidationError as exc:
@@ -304,7 +304,7 @@ def edit_personal(user_id=None):
                 prefs_data.pop('header_mode', None)
             user.bl.update(
                     prefs_data,
-                    modified_by_user=current_user._get_current_object(),
+                    modified_by_user=current_user,
                     fill_admin_log=user.id != current_user.id,
                 )
             if user.id == current_user.id:
@@ -368,14 +368,14 @@ def edit_subscriptions(user_id=None):
                 'story_reply': form.email_story_reply.data,
                 'story_lreply': form.email_story_lreply.data,
                 'news_reply': form.email_news_reply.data,
-            }, modified_by_user=current_user._get_current_object(), fill_admin_log=user.id != current_user.id)
+            }, modified_by_user=current_user, fill_admin_log=user.id != current_user.id)
             user.bl.update_tracker_subscriptions({
                 'story_publish': form.tracker_story_publish.data,
                 'story_draft': form.tracker_story_draft.data,
                 'story_reply': form.tracker_story_reply.data,
                 'story_lreply': form.tracker_story_lreply.data,
                 'news_reply': form.tracker_news_reply.data,
-            }, modified_by_user=current_user._get_current_object(), fill_admin_log=user.id != current_user.id)
+            }, modified_by_user=current_user, fill_admin_log=user.id != current_user.id)
             ctx['saved'] = True
 
     return render_template('profile_edit_subscriptions.html', **ctx)
@@ -395,7 +395,7 @@ def ban(user_id):
             abort(404)
         author.bl.update(
             {'is_active': not author.is_active},
-            modified_by_user=current_user._get_current_object(),
+            modified_by_user=current_user,
             fill_admin_log=True,
         )
         return redirect(url_for('author.info', user_id=user_id))
@@ -417,7 +417,7 @@ def subscribe(user_id):
         abort(404)
 
     author.bl.subscribe_to_new_stories(
-        current_user._get_current_object(),
+        current_user,
         email=request.form.get('email') == '1',
         tracker=request.form.get('tracker') == '1',
     )

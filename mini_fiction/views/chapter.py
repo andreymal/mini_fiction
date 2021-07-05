@@ -29,9 +29,8 @@ bp = Blueprint('chapter', __name__)
 def view(story_id, chapter_order=None):
     story = get_story(story_id)
     enrich_story(story)
-    user = current_user._get_current_object()
 
-    allow_draft = user.is_staff or story.bl.is_contributor(user)
+    allow_draft = current_user.is_staff or story.bl.is_contributor(current_user)
 
     if chapter_order is not None:
         chapter = Chapter.get(story=story_id, order=chapter_order)
@@ -42,8 +41,8 @@ def view(story_id, chapter_order=None):
         page_title = chapter.autotitle[:80] + ' : ' + story.title
         prev_chapter = chapter.get_prev_chapter(allow_draft)
         next_chapter = chapter.get_next_chapter(allow_draft)
-        if user.is_authenticated:
-            chapter.bl.viewed(user)
+        if current_user.is_authenticated:
+            chapter.bl.viewed(current_user)
         data = {
             'story': story,
             'chapter': chapter,
@@ -56,13 +55,13 @@ def view(story_id, chapter_order=None):
         }
     else:
         chapters = list(
-            story.bl.select_accessible_chapters(user)
+            story.bl.select_accessible_chapters(current_user)
             .order_by(Chapter.order, Chapter.id)
         )
         page_title = story.title + ' – все главы'
-        if user.is_authenticated:
+        if current_user.is_authenticated:
             for c in chapters:
-                c.bl.viewed(user)
+                c.bl.viewed(current_user)
         data = {
             'story': story,
             'chapters': chapters,
@@ -131,8 +130,7 @@ def add(story_id):
         story = Story.get(id=story_id)
     if not story:
         abort(404)
-    user = current_user._get_current_object()
-    if not story.bl.editable_by(user):
+    if not story.bl.editable_by(current_user):
         abort(403)
 
     preview_data = {'preview_title': None, 'preview_html': None, 'notes_preview_html': None}
@@ -153,7 +151,7 @@ def add(story_id):
         preview_data = _gen_preview(
             form=request.form,
             only_selected=request.form.get('act') == 'preview_selected',
-            formatted=user.text_source_behaviour
+            formatted=current_user.text_source_behaviour
         )
 
         if request.form.get('ajax') == '1':
@@ -172,7 +170,7 @@ def add(story_id):
             data = Validator(CHAPTER_FORM).validated(form['data'].copy())
             chapter = Chapter.bl.create(
                 story=story,
-                editor=user,
+                editor=current_user,
                 data={
                     'title': data['title'],
                     'notes': data['notes'],
@@ -185,7 +183,7 @@ def add(story_id):
             form['not_saved'] = True
 
         else:
-            _update_publication_status(chapter, user, data)
+            _update_publication_status(chapter, current_user, data)
 
             redir_url = url_for('chapter.edit', pk=chapter.id)
 
@@ -194,7 +192,7 @@ def add(story_id):
             error_codes = set(linter.lint() if linter else [])
 
             # Те ошибки, которые пользователь просил не показывать, не показываем
-            error_codes = error_codes - set(user.bl.get_extra('hidden_chapter_linter_errors') or [])
+            error_codes = error_codes - set(current_user.bl.get_extra('hidden_chapter_linter_errors') or [])
 
             if error_codes:
                 redir_url += '?lint={}'.format(_encode_linter_codes(error_codes))
@@ -226,8 +224,7 @@ def edit(pk):
     if not chapter:
         abort(404)
 
-    user = current_user._get_current_object()
-    if not chapter.story.bl.editable_by(user):
+    if not chapter.story.bl.editable_by(current_user):
         abort(403)
 
     # Параметром ?l=1 просят запустить линтер.
@@ -267,7 +264,7 @@ def edit(pk):
         preview_data = _gen_preview(
             form=request.form,
             only_selected=request.form.get('act') == 'preview_selected',
-            formatted=user.text_source_behaviour
+            formatted=current_user.text_source_behaviour
         )
 
         if request.form.get('ajax') == '1':
@@ -302,7 +299,7 @@ def edit(pk):
             minor = data.pop('minor')
             try:
                 chapter.bl.update(
-                    editor=user,
+                    editor=current_user,
                     data=data,
                     minor=minor,
                 )
@@ -310,7 +307,7 @@ def edit(pk):
                 form['errors'] = exc.errors
 
         if not form['errors']:
-            _update_publication_status(chapter, user, data)
+            _update_publication_status(chapter, current_user, data)
             form['saved'] = True
             form['data']['text'] = chapter.text
         else:
@@ -330,11 +327,11 @@ def edit(pk):
 
         # Интересуемся, отображались эти ошибки раньше. Если ни одной новой,
         # разрешаем пользователя попросить больше не показывать
-        old_error_codes = set(user.bl.get_extra('shown_chapter_linter_errors') or [])
+        old_error_codes = set(current_user.bl.get_extra('shown_chapter_linter_errors') or [])
         if not (error_codes - old_error_codes):
-            linter_allow_hide = ','.join(str(x) for x in (error_codes | set(user.bl.get_extra('hidden_chapter_linter_errors') or [])))
+            linter_allow_hide = ','.join(str(x) for x in (error_codes | set(current_user.bl.get_extra('hidden_chapter_linter_errors') or [])))
         else:
-            user.bl.set_extra('shown_chapter_linter_errors', list(error_codes | old_error_codes))
+            current_user.bl.set_extra('shown_chapter_linter_errors', list(error_codes | old_error_codes))
 
     # Радиокнопки выбора статуса публикации генерируются динамически
     # в зависимости от текущего состояния рассказа
@@ -383,8 +380,7 @@ def hidelinter(pk):
     chapter = Chapter.get(id=pk)
     if not chapter:
         abort(404)
-    user = current_user._get_current_object()
-    if not chapter.story.bl.editable_by(user):
+    if not chapter.story.bl.editable_by(current_user):
         abort(403)
 
     if request.method == 'POST':
@@ -401,7 +397,7 @@ def hidelinter(pk):
         error_codes = set(error_codes)
         if len(error_codes) > 1024:
             error_codes = set()
-        user.bl.set_extra('hidden_chapter_linter_errors', list(error_codes))
+        current_user.bl.set_extra('hidden_chapter_linter_errors', list(error_codes))
 
     return redirect(url_for('chapter.edit', pk=chapter.id))
 
@@ -413,14 +409,13 @@ def delete(pk):
     chapter = Chapter.get(id=pk)
     if not chapter:
         abort(404)
-    user = current_user._get_current_object()
-    if not chapter.story.bl.editable_by(user):
+    if not chapter.story.bl.editable_by(current_user):
         abort(403)
 
     story = chapter.story
 
     if request.method == 'POST':
-        chapter.bl.delete(editor=user)
+        chapter.bl.delete(editor=current_user)
         return redirect(url_for('story.edit_chapters', pk=story.id))
 
     page_title = 'Подтверждение удаления главы'
@@ -443,11 +438,10 @@ def publish(pk):
     chapter = Chapter.get(id=pk)
     if not chapter:
         abort(404)
-    user = current_user._get_current_object()
-    if not chapter.story.bl.editable_by(user):
+    if not chapter.story.bl.editable_by(current_user):
         abort(403)
 
-    chapter.bl.publish(user, chapter.draft)  # draft == not published
+    chapter.bl.publish(current_user, chapter.draft)  # draft == not published
     if g.is_ajax:
         return jsonify({'success': True, 'story_id': chapter.story.id, 'chapter_id': chapter.id, 'published': not chapter.draft})
     return redirect(url_for('story.edit', pk=chapter.story.id))
@@ -460,7 +454,7 @@ def sort(story_id):
     story = Story.get(id=story_id)
     if not story:
         abort(404)
-    if not story.bl.editable_by(current_user._get_current_object()):
+    if not story.bl.editable_by(current_user):
         abort(403)
 
     if not request.json or not request.json.get('chapters'):

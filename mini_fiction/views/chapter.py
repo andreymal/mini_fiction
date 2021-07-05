@@ -9,6 +9,7 @@ from flask_login import current_user, login_required
 from flask_babel import gettext
 from pony.orm import db_session
 
+from mini_fiction.bl.migration import enrich_story
 from mini_fiction.models import Story, Chapter
 from mini_fiction.utils.misc import diff2html, words_count
 from mini_fiction.linters import create_chapter_linter
@@ -27,6 +28,7 @@ bp = Blueprint('chapter', __name__)
 @db_session
 def view(story_id, chapter_order=None):
     story = get_story(story_id)
+    enrich_story(story)
     user = current_user._get_current_object()
 
     allow_draft = user.is_staff or story.bl.is_contributor(user)

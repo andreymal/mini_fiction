@@ -44,7 +44,7 @@ def create():
 
     if form.validate_on_submit():
         try:
-            newsitem = NewsItem.bl.create(current_user._get_current_object(), form.data)
+            newsitem = NewsItem.bl.create(current_user, form.data)
         except ValidationError as exc:
             form.set_errors(exc.errors)
         else:
@@ -83,7 +83,7 @@ def update(pk):
 
     if can_edit and form.validate_on_submit():
         try:
-            newsitem.bl.update(current_user._get_current_object(), form.data)
+            newsitem.bl.update(current_user, form.data)
         except ValidationError as exc:
             form.set_errors(exc.errors)
         else:
@@ -114,7 +114,7 @@ def delete(pk):
 
     if request.method == 'POST':
         try:
-            newsitem.bl.delete(current_user._get_current_object())
+            newsitem.bl.delete(current_user)
         except ValidationError:
             abort(403)
         else:

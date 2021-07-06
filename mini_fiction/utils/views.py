@@ -44,10 +44,8 @@ def paginate_view(template, objlist, page=None, objlistname='objects', endpoint=
 
 
 def cached_lists(story_ids):
-    user = current_user._get_current_object()
-
     data = {}
-    if not user.is_authenticated:
+    if not current_user.is_authenticated:
         data.update({
             'favorited_ids': [],
             'bookmarked_ids': [],
@@ -56,10 +54,10 @@ def cached_lists(story_ids):
         })
     else:
         data.update({
-            'favorited_ids': list(orm.select(x.story.id for x in models.Favorites if x.author == user and x.story.id in story_ids)),
-            'bookmarked_ids': list(orm.select(x.story.id for x in models.Bookmark if x.author == user and x.story.id in story_ids)),
-            'unread_chapters_count': models.Story.bl.get_unread_chapters_count(user, story_ids),
-            'unread_comments_count': models.Story.bl.get_unread_comments_count(user, story_ids),
+            'favorited_ids': list(orm.select(x.story.id for x in models.Favorites if x.author == current_user and x.story.id in story_ids)),
+            'bookmarked_ids': list(orm.select(x.story.id for x in models.Bookmark if x.author == current_user and x.story.id in story_ids)),
+            'unread_chapters_count': models.Story.bl.get_unread_chapters_count(current_user, story_ids),
+            'unread_comments_count': models.Story.bl.get_unread_comments_count(current_user, story_ids),
         })
     return data
 

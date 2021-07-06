@@ -107,7 +107,7 @@ def manyupdate():
     abuse_ids = [int(x) for x in request.form.getlist('abuse') if x and x.isdigit()]
     all_abuses = list(models.AbuseReport.select(lambda x: x.id in abuse_ids))
 
-    _update_abuses(all_abuses, user=current_user._get_current_object(), status=request.form.get('status'))
+    _update_abuses(all_abuses, user=current_user, status=request.form.get('status'))
 
     return redirect(return_path)
 
@@ -139,7 +139,7 @@ def show(abuse_id):
 
         saved = bool(_update_abuses(
             edited_abuses,
-            user=current_user._get_current_object(),
+            user=current_user,
             status=request.form.get('status'),
         ))
         if saved and abuse.ignored:

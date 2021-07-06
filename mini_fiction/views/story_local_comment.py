@@ -28,20 +28,19 @@ def get_local_thread(story_id, user):
 @bp.route('/story/<int:story_id>/localcomments/page/<int:comments_page>/')
 @db_session
 def view(story_id, comments_page):
-    user = current_user._get_current_object()
-    local = get_local_thread(story_id, user)
+    local = get_local_thread(story_id, current_user)
     story = local.story
 
-    per_page = user.comments_per_page or current_app.config['COMMENTS_COUNT']['page']
-    maxdepth = None if request.args.get('fulltree') == '1' else calc_maxdepth(user)
+    per_page = current_user.comments_per_page or current_app.config['COMMENTS_COUNT']['page']
+    maxdepth = None if request.args.get('fulltree') == '1' else calc_maxdepth(current_user)
 
-    last_viewed_comment = story.bl.last_viewed_local_comment_by(user)
+    last_viewed_comment = story.bl.last_viewed_local_comment_by(current_user)
     comments_count, paged, comments_tree_list = local.bl.paginate_comments(comments_page, per_page, maxdepth, last_viewed_comment=last_viewed_comment)
     if not comments_tree_list and paged.number != 1:
         abort(404)
 
     if comments_page < 0 or comments_page == paged.num_pages:
-        story.bl.viewed_localcomments(user)
+        story.bl.viewed_localcomments(current_user)
 
     data = {
         'story': story,
@@ -52,7 +51,7 @@ def view(story_id, comments_page):
         'page_title': 'Обсуждение',
         'comment_form': CommentForm(),
         'page_obj': paged,
-        'sub_comments': story.bl.get_local_comments_subscription(user),
+        'sub_comments': story.bl.get_local_comments_subscription(current_user),
     }
     return render_template('story_localcomments.html', **data)
 
@@ -60,7 +59,7 @@ def view(story_id, comments_page):
 @bp.route('/story/<int:story_id>/localcomments/add/', methods=('GET', 'POST'))
 @db_session
 def add(story_id):
-    local = get_local_thread(story_id, current_user._get_current_object())
+    local = get_local_thread(story_id, current_user)
 
     # Все проверки доступа там
     return common_comment.add(
@@ -73,7 +72,7 @@ def add(story_id):
 @bp.route('/story/<int:story_id>/localcomments/<int:local_id>/')
 @db_session
 def show(story_id, local_id):
-    local = get_local_thread(story_id, current_user._get_current_object())
+    local = get_local_thread(story_id, current_user)
     comment = StoryLocalComment.get(local=local, local_id=local_id)
     if not comment or (comment.deleted and not current_user.is_staff):
         abort(404)
@@ -84,7 +83,7 @@ def show(story_id, local_id):
 @bp.route('/story/<int:story_id>/localcomments/<int:local_id>/edit/', methods=('GET', 'POST'))
 @db_session
 def edit(story_id, local_id):
-    local = get_local_thread(story_id, current_user._get_current_object())
+    local = get_local_thread(story_id, current_user)
     comment = StoryLocalComment.get(local=local, local_id=local_id, deleted=False)
     if not comment:
         abort(404)
@@ -99,7 +98,7 @@ def edit(story_id, local_id):
 @bp.route('/story/<int:story_id>/localcomments/<int:local_id>/delete/', methods=('GET', 'POST'))
 @db_session
 def delete(story_id, local_id):
-    local = get_local_thread(story_id, current_user._get_current_object())
+    local = get_local_thread(story_id, current_user)
     comment = StoryLocalComment.get(local=local, local_id=local_id, deleted=False)
     if not comment:
         abort(404)
@@ -116,7 +115,7 @@ def delete(story_id, local_id):
 @bp.route('/story/<int:story_id>/localcomments/<int:local_id>/restore/', methods=('GET', 'POST'))
 @db_session
 def restore(story_id, local_id):
-    local = get_local_thread(story_id, current_user._get_current_object())
+    local = get_local_thread(story_id, current_user)
     comment = StoryLocalComment.get(local=local, local_id=local_id, deleted=True)
     if not comment:
         abort(404)
@@ -133,7 +132,7 @@ def restore(story_id, local_id):
 @bp.route('/ajax/story/<int:story_id>/localcomments/page/<int:page>/')
 @db_session
 def ajax(story_id, page):
-    local = get_local_thread(story_id, current_user._get_current_object())
+    local = get_local_thread(story_id, current_user)
 
     per_page = current_user.comments_per_page or current_app.config['COMMENTS_COUNT']['page']
     link = url_for('story_local_comment.view', story_id=local.story.id, comments_page=page)
@@ -157,7 +156,7 @@ def ajax(story_id, page):
 @bp.route('/ajax/story/<int:story_id>/localcomments/tree/<int:local_id>/')
 @db_session
 def ajax_tree(story_id, local_id):
-    local = get_local_thread(story_id, current_user._get_current_object())
+    local = get_local_thread(story_id, current_user)
 
     comment = local.comments.select(lambda x: x.local_id == local_id).first()
     if not comment:

@@ -27,7 +27,7 @@ def build_comment_tree_response(comment, target_attr, target):
         'comment': comment.local_id,
         'global_id': comment.id,
         'deleted': comment.deleted,
-        'link': comment.bl.get_paged_link(current_user._get_current_object()),
+        'link': comment.bl.get_paged_link(current_user),
         'html': html
     }
 
@@ -40,14 +40,12 @@ def build_comment_response(comment, target_attr, target):
         'comment': comment.local_id,
         'global_id': comment.id,
         'deleted': comment.deleted,
-        'link': comment.bl.get_paged_link(current_user._get_current_object()),
+        'link': comment.bl.get_paged_link(current_user),
         'html': html
     })
 
 
 def add(target_attr, target, template, template_ajax=None, template_ajax_modal=False):
-    user = current_user._get_current_object()
-
     # Получаем комментарий, ответом на который является создаваемый
     parent_id = request.form.get('parent') or request.args.get('parent')
     if parent_id and parent_id.isdigit() and parent_id != '0':
@@ -60,15 +58,15 @@ def add(target_attr, target, template, template_ajax=None, template_ajax_modal=F
 
     # Проверки доступа (дублируются в Comment.bl.create, но здесь они тоже нужны,
     # чтобы пользователь не получил содержимое parent, когда доступа не должно быть)
-    if parent and not parent.bl.access_for_answer_by(user):
+    if parent and not parent.bl.access_for_answer_by(current_user):
         if request.method != 'POST':
-            return redirect(parent.bl.get_paged_link(user))
+            return redirect(parent.bl.get_paged_link(current_user))
         abort(403)
 
-    reqs = target.bl.access_for_commenting_by(user)
+    reqs = target.bl.access_for_commenting_by(current_user)
     if not reqs:
         if parent and request.method != 'POST':
-            return redirect(parent.bl.get_paged_link(user))
+            return redirect(parent.bl.get_paged_link(current_user))
         abort(403)
 
     extra_ajax = g.is_ajax and request.form.get('extra_ajax') == '1'
@@ -99,10 +97,10 @@ def add(target_attr, target, template, template_ajax=None, template_ajax_modal=F
         # Проверяем, что точно такого же коммента не отправлялось ранее
         # (тащим coerce из валидатора, так как данные могут меняться после валидации)
         comment = None
-        if user.is_authenticated:
+        if current_user.is_authenticated:
             coerced_text = safe_string_multiline_coerce(data['text'].strip())
             comment = target.comments.select(
-                lambda c: c.author == user and c.parent == parent and c.text == coerced_text and not c.deleted
+                lambda c: c.author == current_user and c.parent == parent and c.text == coerced_text and not c.deleted
             ).first()
 
         created = not comment
@@ -112,7 +110,7 @@ def add(target_attr, target, template, template_ajax=None, template_ajax_modal=F
             try:
                 # FIXME: здесь проверяется капча, а надо перед валидацией формы,
                 # чтобы не оставалось висячих капч (ох уж эти рефакторинги)
-                comment = target.bl.create_comment(user, request.remote_addr, data)
+                comment = target.bl.create_comment(current_user, request.remote_addr, data)
             except CaptchaError:
                 captcha_error = 'Вы не доказали, что вы не робот'
             except ValidationError as exc:
@@ -128,7 +126,7 @@ def add(target_attr, target, template, template_ajax=None, template_ajax_modal=F
                 response = jsonify(result)
             else:
                 # Иначе редиректим на страницу с комментарием
-                response = redirect(comment.bl.get_paged_link(current_user._get_current_object()))
+                response = redirect(comment.bl.get_paged_link(current_user))
 
             response.set_cookie('formsaving_clear', 'comment', max_age=None)
             return response
@@ -171,20 +169,18 @@ def add(target_attr, target, template, template_ajax=None, template_ajax_modal=F
 
 def show(target_attr, comment):
     # В эту вьюху направляет ссылка из метода get_permalink
-    user = current_user._get_current_object()
     target = getattr(comment, target_attr)
 
-    if not comment.bl.has_comments_access(target, user):
+    if not comment.bl.has_comments_access(target, current_user):
         abort(403)
 
-    return redirect(comment.bl.get_paged_link(current_user._get_current_object()))
+    return redirect(comment.bl.get_paged_link(current_user))
 
 
 def edit(target_attr, comment, template, template_ajax=None, template_ajax_modal=False):
-    user = current_user._get_current_object()
     target = getattr(comment, target_attr)
 
-    if not comment.bl.can_update_by(user):
+    if not comment.bl.can_update_by(current_user):
         abort(403)
 
     extra_ajax = g.is_ajax and request.form.get('extra_ajax') == '1'
@@ -202,14 +198,14 @@ def edit(target_attr, comment, template, template_ajax=None, template_ajax_modal
 
     elif form.validate_on_submit():
         try:
-            comment.bl.update(user, request.remote_addr, form.data)
+            comment.bl.update(current_user, request.remote_addr, form.data)
         except ValidationError as exc:
             form.set_errors(exc.errors)
         else:
             if extra_ajax:
                 response = build_comment_response(comment, target_attr, target)
             else:
-                response = redirect(comment.bl.get_paged_link(user))
+                response = redirect(comment.bl.get_paged_link(current_user))
             response.set_cookie('formsaving_clear', 'comment', max_age=None)
             return response
 
@@ -236,18 +232,17 @@ def edit(target_attr, comment, template, template_ajax=None, template_ajax_modal
 
 
 def delete(target_attr, comment, template, template_ajax=None, template_ajax_modal=False):
-    user = current_user._get_current_object()
     target = getattr(comment, target_attr)
 
-    if not comment.bl.can_delete_by(user):
+    if not comment.bl.can_delete_by(current_user):
         abort(403)
 
     extra_ajax = g.is_ajax and request.form.get('extra_ajax') == '1'
     if request.method == 'POST':
-        comment.bl.delete(user)  # из БД не удаляется!
+        comment.bl.delete(current_user)  # из БД не удаляется!
         if extra_ajax:
             return build_comment_response(comment, target_attr, target)
-        return redirect(comment.bl.get_paged_link(user))
+        return redirect(comment.bl.get_paged_link(current_user))
 
     data = {
         'page_title': gettext('Confirm delete comment'),
@@ -264,19 +259,18 @@ def delete(target_attr, comment, template, template_ajax=None, template_ajax_mod
 
 
 def restore(target_attr, comment, template, template_ajax=None, template_ajax_modal=False):
-    user = current_user._get_current_object()
     target = getattr(comment, target_attr)
 
-    if not comment.bl.can_restore_by(user):
+    if not comment.bl.can_restore_by(current_user):
         abort(403)
 
     extra_ajax = g.is_ajax and request.form.get('extra_ajax') == '1'
     if request.method == 'POST':
-        comment.bl.restore(user)
+        comment.bl.restore(current_user)
         if extra_ajax:
             return build_comment_response(comment, target_attr, target)
         else:
-            return redirect(comment.bl.get_paged_link(user))
+            return redirect(comment.bl.get_paged_link(current_user))
 
     data = {
         'page_title': gettext('Confirm restore comment'),
@@ -293,15 +287,13 @@ def restore(target_attr, comment, template, template_ajax=None, template_ajax_mo
 
 
 def vote(target_attr, comment):
-    user = current_user._get_current_object()
-
     try:
         value = int(request.form.get('value', 0))
     except ValueError:
         value = 0
 
     try:
-        comment.bl.vote(user, value)
+        comment.bl.vote(current_user, value)
     except ValidationError as exc:
         errors = sum(exc.errors.values(), [])
         return jsonify({'success': False, 'error': '; '.join(str(x) for x in errors)})
@@ -324,7 +316,7 @@ def vote(target_attr, comment):
 
 
 def ajax(target_attr, target, link, page, per_page, template_pagination, last_viewed_comment=None, extra_data=None):
-    if not target.bl.has_comments_access(current_user._get_current_object()):
+    if not target.bl.has_comments_access(current_user):
         abort(403)
 
     maxdepth = None if request.args.get('fulltree') == '1' else calc_maxdepth(current_user)
@@ -335,7 +327,7 @@ def ajax(target_attr, target, link, page, per_page, template_pagination, last_vi
 
     comment_ids = [x[0].id for x in comments_tree_list]
     if current_user.is_authenticated:
-        comment_votes_cache = target.bl.select_comment_votes(current_user._get_current_object(), comment_ids)
+        comment_votes_cache = target.bl.select_comment_votes(current_user, comment_ids)
     else:
         comment_votes_cache = {i: 0 for i in comment_ids}
 
@@ -360,7 +352,7 @@ def ajax(target_attr, target, link, page, per_page, template_pagination, last_vi
 def ajax_tree(target_attr, comment, target=None, last_viewed_comment=None, extra_data=None):
     if not target:
         target = getattr(comment, target_attr)
-    if not target.bl.has_comments_access(current_user._get_current_object()):
+    if not target.bl.has_comments_access(current_user):
         abort(403)
 
     # Проще получить все комментарии и потом выбрать оттуда нужные
@@ -393,7 +385,7 @@ def ajax_tree(target_attr, comment, target=None, last_viewed_comment=None, extra
 
     comment_ids = [x[0].id for x in tree]
     if current_user.is_authenticated:
-        comment_votes_cache = target.bl.select_comment_votes(current_user._get_current_object(), comment_ids)
+        comment_votes_cache = target.bl.select_comment_votes(current_user, comment_ids)
     else:
         comment_votes_cache = {i: 0 for i in comment_ids}
 

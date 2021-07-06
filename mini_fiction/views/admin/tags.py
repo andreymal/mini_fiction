@@ -103,7 +103,7 @@ def create():
         if data.get('category') == 0:
             data['category'] = None
         try:
-            tag = Tag.bl.create(current_user._get_current_object(), data)
+            tag = Tag.bl.create(current_user, data)
         except ValidationError as exc:
             form.set_errors(exc.errors)
         else:
@@ -153,7 +153,7 @@ def update(pk):
         if data.get('category') == 0:
             data['category'] = None
         try:
-            tag.bl.update(current_user._get_current_object(), data)
+            tag.bl.update(current_user, data)
         except ValidationError as exc:
             form.set_errors(exc.errors)
         else:
@@ -185,7 +185,7 @@ def delete(pk):
 
     if request.method == 'POST':
         try:
-            tag.bl.delete(current_user._get_current_object())
+            tag.bl.delete(current_user)
         except ValidationError:
             abort(403)
         else:

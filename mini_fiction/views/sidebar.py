@@ -72,7 +72,7 @@ def chapters_updates(params):
     # Число непрочитанных глав у текущего пользователя
     if current_user.is_authenticated:
         unread_chapters_count = Story.bl.get_unread_chapters_count(
-            current_user._get_current_object(), [x['story']['id'] for x in chapters]
+            current_user, [x['story']['id'] for x in chapters]
         )
     else:
         unread_chapters_count = {x['story']['id']: 0 for x in chapters}

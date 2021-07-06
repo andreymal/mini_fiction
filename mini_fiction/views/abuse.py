@@ -16,8 +16,7 @@ bp = Blueprint('abuse', __name__)
 def abuse_common(target_type, target):
     # FIXME: это всё не в bl, нехорошо (но при переносе надо не забыть про проверки доступа)
 
-    user = current_user._get_current_object()
-    if not target or not user.is_authenticated:
+    if not target or not current_user.is_authenticated:
         abort(404)
 
     data = {
@@ -33,7 +32,7 @@ def abuse_common(target_type, target):
 
     # Если пользователь уже отправлял жалобу, то он не может отправить её ещё раз
     abuse = list(AbuseReport.select(
-        lambda x: x.target_type == target_type and x.target_id == target.id and x.user.id == user.id and not x.ignored
+        lambda x: x.target_type == target_type and x.target_id == target.id and x.user.id == current_user.id and not x.ignored
     ))
     abuse.sort(key=lambda x: -x.id)
     abuse = abuse[0] if abuse else None
@@ -55,7 +54,7 @@ def abuse_common(target_type, target):
             abuse = AbuseReport(
                 target_type=target_type,
                 target_id=target.id,
-                user=user,
+                user=current_user,
                 reason=request.form['reason'],
             )
             abuse.flush()

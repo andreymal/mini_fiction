@@ -102,7 +102,7 @@ def comments(page):
     objects = [('story', x) for x in page_obj.slice_or_404(objects)]
 
     comment_votes_cache = Story.bl.select_comment_votes(
-        current_user._get_current_object(),
+        current_user,
         [x[1].id for x in objects]
     ) if current_user.is_authenticated else {}
 

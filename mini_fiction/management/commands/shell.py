@@ -25,7 +25,7 @@ def shell(command):
 
         local = {
             'mini_fiction': mini_fiction,
-            'app': current_app._get_current_object(),
+            'app': current_app,
             'g': g,
             'm': models,
             'system_user': models.Author.get(id=current_app.config['SYSTEM_USER_ID']),

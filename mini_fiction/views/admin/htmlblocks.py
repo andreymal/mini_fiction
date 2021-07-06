@@ -37,7 +37,7 @@ def create():
 
     if form.validate_on_submit():
         try:
-            htmlblock = htmlblocks.create(current_user._get_current_object(), form.data)
+            htmlblock = htmlblocks.create(current_user, form.data)
         except ValidationError as exc:
             form.set_errors(exc.errors)
         else:
@@ -77,7 +77,7 @@ def update(name, lang):
 
     if can_edit and form.validate_on_submit():
         try:
-            htmlblocks.update(htmlblock, current_user._get_current_object(), form.data)
+            htmlblocks.update(htmlblock, current_user, form.data)
         except ValidationError as exc:
             form.set_errors(exc.errors)
         else:
@@ -108,7 +108,7 @@ def delete(name, lang):
 
     if request.method == 'POST':
         try:
-            htmlblocks.delete(htmlblock, current_user._get_current_object())
+            htmlblocks.delete(htmlblock, current_user)
         except ValidationError:
             abort(403)
         else:

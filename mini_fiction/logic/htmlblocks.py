@@ -1,10 +1,9 @@
 from dataclasses import dataclass
-from typing import Optional, Union
+from typing import Optional, Union, TypedDict
 
 from flask import current_app, render_template
 from flask_babel import lazy_gettext
 from markupsafe import Markup
-from typing_extensions import TypedDict
 
 from mini_fiction.logic.adminlog import log_addition, log_changed_fields, log_deletion
 from mini_fiction.logic.caching import get_cache

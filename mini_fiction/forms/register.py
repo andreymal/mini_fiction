@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 from flask_babel import lazy_gettext
-from wtforms import TextField, PasswordField, validators
+from wtforms import StringField, PasswordField, validators
 
 from mini_fiction.forms.form import Form
 
@@ -11,11 +11,11 @@ attrs_dict = {'class': 'required input-xlarge'}
 
 
 class AuthorRegistrationForm(Form):
-    username = TextField(
+    username = StringField(
         'Логин',
         render_kw=dict(attrs_dict, maxlength=32),
     )
-    email = TextField(
+    email = StringField(
         'Электропочта',
         render_kw=dict(attrs_dict, maxlength=75),
         description='Адрес электронной почты для активации аккаунта'
@@ -35,7 +35,7 @@ class AuthorRegistrationForm(Form):
 
 
 class AuthorPasswordResetForm(Form):
-    email = TextField(
+    email = StringField(
         'Ваш e-mail',
         [
             validators.DataRequired(),

@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 from flask_babel import lazy_gettext
-from wtforms import BooleanField, TextField, TextAreaField
+from wtforms import BooleanField, StringField, TextAreaField
 from flask_wtf.file import FileField
 
 from mini_fiction.forms.form import Form
@@ -26,7 +26,7 @@ class LogopicForm(Form):
         render_kw=attrs_dict,
     )
 
-    original_link = TextField(
+    original_link = StringField(
         lazy_gettext('Link to original'),
         render_kw=dict(attrs_dict, maxlength=255),
     )

@@ -5,7 +5,7 @@ import pytz
 from pony import orm
 from flask import current_app, g
 from flask_babel import lazy_gettext
-from wtforms import TextField, TextAreaField, PasswordField, SelectField, IntegerField
+from wtforms import StringField, TextAreaField, PasswordField, SelectField, IntegerField
 from wtforms import BooleanField, FileField, FieldList, FormField, validators
 
 from mini_fiction.forms.form import Form
@@ -22,7 +22,7 @@ class ContactForm(Form):
             for x in current_app.config['CONTACTS']
         ],
     )
-    value = TextField(
+    value = StringField(
         '',
         [validators.Optional()],
     )
@@ -63,15 +63,15 @@ class AuthorEditPrefsForm(Form):
     attrs_dict = {'class': 'input-small'}
     checkbox_attrs = {
         'btn_attrs': {'type': 'button', 'class': 'btn'},
-        'data_attrs': {'class': 'hidden'},
+        'input_attrs': {'class': 'hidden'},
         'btn_container_attrs': {'class': 'btn-group buttons-visible', 'data-toggle': 'buttons-checkbox'},
-        'data_container_attrs': {'class': 'buttons-data'},
+        'input_container_attrs': {'class': 'buttons-data'},
     }
     radio_attrs = {
         'btn_attrs': {'type': 'button', 'class': 'btn'},
-        'data_attrs': {'class': 'hidden'},
+        'input_attrs': {'class': 'hidden'},
         'btn_container_attrs': {'class': 'btn-group buttons-visible', 'data-toggle': 'buttons-radio'},
-        'data_container_attrs': {'class': 'buttons-data'},
+        'input_container_attrs': {'class': 'buttons-data'},
     }
 
     # excluded_categories = LazySelectMultipleField(
@@ -157,7 +157,7 @@ class AuthorEditPrefsForm(Form):
 class AuthorEditEmailForm(Form):
     attrs_dict = {'class': 'input-xlarge'}
 
-    email = TextField(
+    email = StringField(
         'Электропочта',
         [
             validators.DataRequired(),

@@ -1,5 +1,5 @@
 from flask_babel import lazy_gettext
-from wtforms import TextField, TextAreaField, BooleanField
+from wtforms import StringField, TextAreaField, BooleanField
 
 from pony import orm
 
@@ -12,7 +12,7 @@ class TagForm(Form):
     attrs_dict = {'class': 'input-xxlarge'}
     attrs_tags_dict = {'class': 'input-xxxlarge', 'autocomplete': 'off'}
 
-    name = TextField(
+    name = StringField(
         'Название',
         render_kw=dict(attrs_dict, maxlength=256),
     )
@@ -34,7 +34,7 @@ class TagForm(Form):
         description='Спойлерные теги скрываются в списке тегов рассказа',
     )
 
-    is_alias_for = TextField(
+    is_alias_for = StringField(
         'Синоним для',
         render_kw=dict(attrs_tags_dict, maxlength=512),
         description='Впишите название основного тега. На него будет заменён тег-синоним у всех рассказов',
@@ -52,7 +52,7 @@ class TagForm(Form):
         description='Этим тегом обозначается что-то совсем жёсткое',
     )
 
-    reason_to_blacklist = TextField(
+    reason_to_blacklist = StringField(
         'Блокировка тега',
         render_kw=dict(attrs_dict, maxlength=256),
         description='Впишите причину, чтобы заблокировать тег. Тег будет удалён у всех рассказов',

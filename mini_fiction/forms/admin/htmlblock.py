@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 from flask_babel import lazy_gettext
-from wtforms import BooleanField, IntegerField, TextField, TextAreaField, validators
+from wtforms import BooleanField, IntegerField, StringField, TextAreaField, validators
 
 from mini_fiction.forms.form import Form
 
@@ -12,12 +12,12 @@ class HtmlBlockForm(Form):
     attrs_dict_short = {'class': 'input'}
     attrs_markitup_dict = {'class': 'input-xxlarge', 'data-bazooka': 'RichEditor'}
 
-    name = TextField(
+    name = StringField(
         lazy_gettext('Name'),
         render_kw=dict(attrs_dict, maxlength=64),
     )
 
-    lang = TextField(
+    lang = StringField(
         lazy_gettext('Language (leave empty to make this block default)'),
         render_kw=dict(attrs_dict, maxlength=4, placeholder='en / ru / jp etc.'),
     )
@@ -44,7 +44,7 @@ class HtmlBlockForm(Form):
         )
     )
 
-    title = TextField(
+    title = StringField(
         lazy_gettext('Title'),
         render_kw=dict(attrs_dict, maxlength=255),
     )

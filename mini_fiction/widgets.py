@@ -55,13 +55,13 @@ class StoriesImgSelect(Select):
 
     def render_custom_option(self, field, value, label, selected, **kwargs):
         container_attrs = kwargs['container_attrs']
-        data_attrs = kwargs['data_attrs']
+        input_attrs = kwargs['input_attrs']
         img_url = self.get_img_url(field, value)
         img_class = 'ui-selected' if selected else ''
         # NOTE: hardcoded width and height are added to prevent FOOC and will be removed ASAP with this piece of crap
         item_image = '<img width="32" height="32" class="%s" src="%s" alt="%s" title="%s" />' % (img_class, img_url, label, label)
         cb = Input('checkbox' if self.multiple else 'radio')
-        rendered_cb = cb(field, id=False, value=value, checked=selected, **data_attrs)
+        rendered_cb = cb(field, id=False, value=value, checked=selected, **input_attrs)
         return '<span %s>%s%s</span>' % (html_params(**container_attrs), rendered_cb, item_image)
 
 
@@ -78,11 +78,11 @@ class StoriesButtons(Select):
     def __call__(self, field, **kwargs):
         attrs = dict(kwargs)
         btn_attrs = attrs.pop('btn_attrs', {})
-        data_attrs = attrs.pop('data_attrs', {})
+        input_attrs = attrs.pop('input_attrs', {})
         btn_container_attrs = attrs.pop('btn_container_attrs', {})
-        data_container_attrs = attrs.pop('data_container_attrs', {})
+        input_container_attrs = attrs.pop('input_container_attrs', {})
         btn_container = []
-        data_container = []
+        input_container = []
         output = []
         for (option_value, option_label, selected) in field.iter_choices():
             btn = ButtonWidget()
@@ -90,13 +90,13 @@ class StoriesButtons(Select):
             btn_container.append(rendered_btn)
             rb = Input('checkbox' if self.multiple else 'radio')
             if selected:
-                rb_attrs = dict(data_attrs, value=option_value, checked='checked')
+                rb_attrs = dict(input_attrs, value=option_value, checked='checked')
             else:
-                rb_attrs = dict(data_attrs, value=option_value)
+                rb_attrs = dict(input_attrs, value=option_value)
             rendered_rb = rb(field, id='{}_{}'.format(field.id, option_value), **rb_attrs)
-            data_container.append(rendered_rb)
+            input_container.append(rendered_rb)
         btn = '<div %s>%s</div>' % (html_params(**btn_container_attrs), ' '.join(btn_container))
-        data = '<div %s>%s</div>' % (html_params(**data_container_attrs), ' '.join(data_container))
+        data = '<div %s>%s</div>' % (html_params(**input_container_attrs), ' '.join(input_container))
         output.append(btn)
         output.append(data)
         return '\n'.join(output)

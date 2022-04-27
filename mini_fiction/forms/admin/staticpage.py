@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 from flask_babel import lazy_gettext
-from wtforms import BooleanField, TextField, TextAreaField
+from wtforms import BooleanField, StringField, TextAreaField
 
 from mini_fiction.forms.form import Form
 
@@ -11,17 +11,17 @@ class StaticPageForm(Form):
     attrs_dict = {'class': 'input-xxlarge'}
     attrs_markitup_dict = {'class': 'input-xxlarge', 'data-bazooka': 'RichEditor'}
 
-    name = TextField(
+    name = StringField(
         lazy_gettext('Name'),
         render_kw=dict(attrs_dict, maxlength=64),
     )
 
-    lang = TextField(
+    lang = StringField(
         lazy_gettext('Language (leave empty to make this page default)'),
         render_kw=dict(attrs_dict, maxlength=4, placeholder='en / ru / jp etc.'),
     )
 
-    title = TextField(
+    title = StringField(
         lazy_gettext('Title'),
         render_kw=dict(attrs_dict, maxlength=192),
     )

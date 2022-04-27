@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 from wtforms import Form
-from wtforms import SelectField, SelectMultipleField, TextField, BooleanField, IntegerField, RadioField, validators
+from wtforms import SelectField, SelectMultipleField, StringField, BooleanField, IntegerField, RadioField, validators
 from pony import orm
 
 from mini_fiction.models import Character, Rating
@@ -13,25 +13,25 @@ from mini_fiction.widgets import StoriesCharacterSelect, StoriesButtons, ButtonW
 class SearchForm(Form):
     checkbox_attrs = {
         'btn_attrs': {'type': 'button', 'class': 'btn'},
-        'data_attrs': {'class': 'hidden'},
+        'input_attrs': {'class': 'hidden'},
         'btn_container_attrs': {'class': 'btn-group btn-group-wrap buttons-visible', 'data-toggle': 'buttons-checkbox'},
-        'data_container_attrs': {'class': 'buttons-data'},
+        'input_container_attrs': {'class': 'buttons-data'},
     }
     radio_attrs = {
         'btn_attrs': {'type': 'button', 'class': 'btn'},
-        'data_attrs': {'class': 'hidden'},
+        'input_attrs': {'class': 'hidden'},
         'btn_container_attrs': {'class': 'btn-group btn-group-wrap buttons-visible', 'data-toggle': 'buttons-radio'},
-        'data_container_attrs': {'class': 'buttons-data'},
+        'input_container_attrs': {'class': 'buttons-data'},
     }
     img_attrs = {
         'group_container_class': 'characters-group group-',
-        'data_attrs': {'class': 'hidden'},
+        'input_attrs': {'class': 'hidden'},
         'container_attrs': {'class': 'character-item'}
     }
     attrs_tags_dict = {'class': 'input-xxxlarge', 'autocomplete': 'off'}
 
     # Строка поиска
-    q = TextField(
+    q = StringField(
         '',
         [
             validators.Length(max=128)

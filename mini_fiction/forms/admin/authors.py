@@ -4,7 +4,7 @@
 from __future__ import unicode_literals
 
 from flask_babel import lazy_gettext
-from wtforms import BooleanField, TextField, SelectField, PasswordField, validators
+from wtforms import BooleanField, StringField, SelectField, PasswordField, validators
 
 from mini_fiction.forms.form import Form
 
@@ -12,7 +12,7 @@ from mini_fiction.forms.form import Form
 class AdminAuthorForm(Form):
     attrs_dict = {'class': 'input-xxlarge'}
 
-    email = TextField(
+    email = StringField(
         lazy_gettext('Email'),
         render_kw=dict(attrs_dict, maxlength=75),
     )
@@ -44,7 +44,7 @@ class AdminAuthorForm(Form):
         ]
     )
 
-    ban_reason = TextField(
+    ban_reason = StringField(
         lazy_gettext('Ban reason'),
         render_kw=dict(attrs_dict, placeholder=lazy_gettext('This text will be displayed when a user tries to log into an inactive account')),
     )

@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 from flask_babel import lazy_gettext, lazy_pgettext
-from wtforms import SelectField, TextField, TextAreaField, BooleanField
+from wtforms import SelectField, StringField, TextAreaField, BooleanField
 from pony import orm
 
 from mini_fiction.models import Character, Rating
@@ -20,25 +20,25 @@ class StoryForm(Form):
     attrs_tags_dict = {'class': 'input-xxxlarge', 'autocomplete': 'off'}
     img_attrs = {
            'group_container_class': 'characters-group group-',
-           'data_attrs': {'class': 'hidden'},
+           'input_attrs': {'class': 'hidden'},
            'container_attrs': {'class': 'character-item'}
     }
 
     radio_attrs = {
        'btn_attrs': {'type': 'button', 'class': 'btn'},
-       'data_attrs': {'class': 'hidden'},
+       'input_attrs': {'class': 'hidden'},
        'btn_container_attrs': {'class': 'btn-group buttons-visible', 'data-toggle': 'buttons-radio'},
-       'data_container_attrs': {'class': 'buttons-data'},
+       'input_container_attrs': {'class': 'buttons-data'},
     }
 
     checkbox_attrs = {
        'btn_attrs': {'type': 'button', 'class': 'btn'},
-       'data_attrs': {'class': 'hidden'},
+       'input_attrs': {'class': 'hidden'},
        'btn_container_attrs': {'class': 'btn-group buttons-visible', 'data-toggle': 'buttons-checkbox'},
-       'data_container_attrs': {'class': 'buttons-data'},
+       'input_container_attrs': {'class': 'buttons-data'},
     }
 
-    title = TextField(
+    title = StringField(
         lazy_gettext('Name'),
         render_kw=dict(attrs_dict, maxlength=512, placeholder=lazy_gettext('Title of the new story'))
     )
@@ -78,18 +78,18 @@ class StoryForm(Form):
         render_kw=dict(attrs_markitup_dict, id='id_notes', cols=40, rows=10, maxlength=4096, placeholder=lazy_gettext('Notes to the story')),
     )
 
-    original_url = TextField(
+    original_url = StringField(
         lazy_gettext('Link to original (if any)'),
         render_kw=dict(attrs_dict, maxlength=255, placeholder='http://'),
         description=lazy_gettext("Don't forget to add it if you are not a direct author of the story"),
     )
 
-    original_title = TextField(
+    original_title = StringField(
         lazy_gettext('Original title'),
         render_kw=dict(attrs_dict, maxlength=255),
     )
 
-    original_author = TextField(
+    original_author = StringField(
         lazy_gettext('Original author'),
         render_kw=dict(attrs_dict, maxlength=255),
     )

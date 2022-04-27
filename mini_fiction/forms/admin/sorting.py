@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 from flask_babel import lazy_gettext
-from wtforms import TextField, TextAreaField
+from wtforms import StringField, TextAreaField
 from flask_wtf.file import FileField
 
 from pony import orm
@@ -15,7 +15,7 @@ from mini_fiction.forms.fields import LazySelectField
 class CharacterForm(Form):
     attrs_dict = {'class': 'input-xxlarge'}
 
-    name = TextField(
+    name = StringField(
         lazy_gettext('Name'),
         render_kw=dict(attrs_dict, maxlength=256),
     )
@@ -40,7 +40,7 @@ class CharacterForm(Form):
 class CharacterGroupForm(Form):
     attrs_dict = {'class': 'input-xxlarge'}
 
-    name = TextField(
+    name = StringField(
         lazy_gettext('Name'),
         render_kw=dict(attrs_dict, maxlength=256),
     )

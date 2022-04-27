@@ -2,12 +2,7 @@ import traceback
 from queue import Queue
 from threading import Lock, local
 from dataclasses import dataclass
-import typing
 from typing import Any, TypeVar, Union, Optional, Sequence, Tuple, List, Dict
-
-if typing.TYPE_CHECKING:
-    from MySQLdb.cursors import Cursor
-
 
 T = TypeVar("T", bound="SphinxConnection")
 
@@ -75,7 +70,7 @@ class SphinxConnection:
         self,
         sql: str,
         args: Optional[Sequence[Union[str, bytes]]] = None,
-    ) -> Cursor:
+    ):
         cursor = self.mysql_conn.cursor()
         cursor.execute(sql, args)
         return cursor

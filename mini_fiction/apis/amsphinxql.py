@@ -75,7 +75,7 @@ class SphinxConnection:
         self,
         sql: str,
         args: Optional[Sequence[Union[str, bytes]]] = None,
-    ) -> "Cursor":
+    ) -> Cursor:
         cursor = self.mysql_conn.cursor()
         cursor.execute(sql, args)
         return cursor
@@ -391,7 +391,7 @@ class SphinxPool:
         self,
         conn: Dict[str, Any],
         max_conns: int = 5,
-        conn_queue: "Optional[Queue[SphinxConnection]]" = None,
+        conn_queue: Optional[Queue[SphinxConnection]] = None,
     ):
         self.conn = conn
         self.max_conns = max_conns

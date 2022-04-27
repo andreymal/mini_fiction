@@ -1,3 +1,4 @@
+from __future__ import annotations
 import re
 from itertools import chain
 from pathlib import Path

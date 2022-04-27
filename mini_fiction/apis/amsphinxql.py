@@ -391,7 +391,7 @@ class SphinxPool:
         self,
         conn: Dict[str, Any],
         max_conns: int = 5,
-        conn_queue: Optional[Queue[SphinxConnection]] = None,
+        conn_queue: Optional[Queue] = None,
     ):
         self.conn = conn
         self.max_conns = max_conns

@@ -17,5 +17,4 @@ pytz
 python-dotenv
 email_validator
 pydantic
-typing_extensions
-dataclasses; python_version < '3.7'
+

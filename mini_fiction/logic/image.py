@@ -1,14 +1,13 @@
 from datetime import date
 from io import BytesIO
 from pathlib import Path
-from typing import Dict, Optional, Set, Type, Union
+from typing import Dict, Optional, Set, Type, Union, ClassVar, Literal
 from uuid import uuid4
 
 from flask import current_app
 from PIL.Image import LANCZOS, Image, UnidentifiedImageError
 from PIL.Image import open as open_image
 from pydantic import BaseModel  # pylint: disable=no-name-in-module
-from typing_extensions import ClassVar, Literal
 
 IMAGE_QUALITY = 85  # It's enough
 

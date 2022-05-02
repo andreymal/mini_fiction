@@ -1,13 +1,14 @@
 import re
 import sys
 import json
+import hmac
 import math
 import time
 from datetime import timedelta
 from html import escape
 from urllib.request import Request, urlopen
 from urllib.parse import quote, urljoin
-from typing import Optional, List
+from typing import AnyStr, List, Optional
 
 from werkzeug.urls import url_parse
 from flask import current_app, g, render_template, abort, url_for, request, has_request_context
@@ -741,3 +742,10 @@ def check_own_url(url: Optional[str]) -> Optional[str]:
     if url_info.scheme in ("http", "https") and url_info.netloc == base_host:
         return url_abs
     return None
+
+
+def safe_str_cmp(a: AnyStr, b: AnyStr) -> bool:
+    return hmac.compare_digest(
+        a.encode("utf-8") if isinstance(a, str) else a,
+        b.encode("utf-8") if isinstance(b, str) else b,
+    )

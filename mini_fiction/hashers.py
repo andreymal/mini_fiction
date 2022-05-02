@@ -1,10 +1,7 @@
-#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
-
 import os
 from base64 import b64decode, b64encode
 
-from werkzeug.security import safe_str_cmp
+from mini_fiction.utils.misc import safe_str_cmp
 
 
 def pbkdf2_encode(password, salt=None, iterations=200000):

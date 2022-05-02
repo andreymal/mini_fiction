@@ -267,7 +267,7 @@ class ProjectStatus(Status):
         return self._ok('sphinx', 'working')
 
     def celery(self):
-        insp = self.app.celery.control.inspect(timeout=0.5)
+        insp = self.app.celery.control.inspect(timeout=1.5)
 
         if self.app.config['CELERY_CONFIG']['task_always_eager']:
             return self._ok('celery', 'eager')
@@ -284,6 +284,9 @@ class ProjectStatus(Status):
             scheduled_tasks = insp.scheduled()
         except Exception as exc:
             return self._fail('celery', 'failed to get scheduled tasks: ' + str(exc))
+
+        if scheduled_tasks is None:
+            return self._fail('celery', 'failed to get scheduled tasks (timeout?)')
 
         return self._ok('celery', '{} workers, {} tasks active, {} tasks scheduled'.format(
             len(active_tasks or {}),

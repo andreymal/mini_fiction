@@ -17,7 +17,8 @@ from typing import TYPE_CHECKING, Any, Union, Optional, Dict, Tuple, List, Itera
 import lxml.html
 import lxml.etree
 from pony import orm
-from flask import Markup, current_app
+from flask import current_app
+from markupsafe import Markup
 
 from mini_fiction.bl.migration import enrich_stories
 from mini_fiction.ratelimit import RateLimitExceeded

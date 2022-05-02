@@ -3,9 +3,10 @@
 from datetime import datetime, timedelta
 
 import pytz
-from flask import Blueprint, Markup, Response, current_app, url_for, request, abort
+from flask import Blueprint, Response, current_app, url_for, request, abort
 from flask_babel import gettext, ngettext
 from feedgen.feed import FeedGenerator
+from markupsafe import Markup
 from pony.orm import select, db_session
 
 from mini_fiction.models import Story, Chapter, Author

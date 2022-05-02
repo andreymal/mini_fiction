@@ -6,8 +6,9 @@ import traceback
 from datetime import datetime, timedelta
 
 from pony import orm
-from flask import Markup, current_app, url_for
+from flask import current_app, url_for
 from flask_babel import lazy_gettext
+from markupsafe import Markup
 
 from mini_fiction.ratelimit import RateLimitExceeded
 from mini_fiction.bl.utils import BaseBL

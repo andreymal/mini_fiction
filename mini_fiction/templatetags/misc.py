@@ -1,7 +1,8 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-from flask import Markup, escape, request, url_for
+from flask import escape, request, url_for
+from markupsafe import Markup
 
 from mini_fiction.templatetags import registry
 from mini_fiction.utils import misc as utils_misc

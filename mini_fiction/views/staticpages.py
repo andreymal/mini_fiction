@@ -1,7 +1,8 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-from flask import Blueprint, Markup, Response, request, current_app, render_template, g, abort, jsonify
+from flask import Blueprint, Response, request, current_app, render_template, g, abort, jsonify
+from markupsafe import Markup
 from pony.orm import db_session
 
 from mini_fiction.models import StaticPage

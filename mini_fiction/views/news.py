@@ -1,9 +1,10 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-from flask import Blueprint, Markup, current_app, render_template, abort, request, jsonify, redirect, url_for
+from flask import Blueprint, current_app, render_template, abort, request, jsonify, redirect, url_for
 from flask_babel import gettext
 from flask_login import current_user, login_required
+from markupsafe import Markup
 from pony.orm import db_session
 
 from mini_fiction.models import NewsItem

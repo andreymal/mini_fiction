@@ -1,7 +1,8 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-from flask import Markup, current_app
+from flask import current_app
+from markupsafe import Markup
 
 from mini_fiction.templatetags import registry
 

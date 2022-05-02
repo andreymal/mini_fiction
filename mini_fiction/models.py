@@ -5,8 +5,9 @@ from typing import Optional
 
 from pony import orm
 from flask_babel import gettext
-from flask import Markup, url_for, current_app
+from flask import url_for, current_app
 from flask_login import AnonymousUserMixin, UserMixin
+from markupsafe import Markup
 
 from mini_fiction.database import db
 from mini_fiction.bl.registry import Resource

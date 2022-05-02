@@ -1,8 +1,9 @@
 from itertools import chain
 
 from pony import orm
-from flask import Markup, escape, url_for
+from flask import escape, url_for
 from flask_babel import gettext
+from markupsafe import Markup
 from wtforms.widgets import Select, Input, TextInput
 from wtforms.widgets.core import html_params
 

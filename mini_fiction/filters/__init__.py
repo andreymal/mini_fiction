@@ -4,7 +4,8 @@
 import re
 import traceback
 
-from flask import Markup, current_app
+from flask import current_app
+from markupsafe import Markup
 
 from .typographus import typo
 from .base import html_doc_to_string, html_doc_transform, transform_xslt_params

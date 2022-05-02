@@ -3,8 +3,8 @@
 
 from functools import wraps
 
-from jinja2 import Markup
 from flask import render_template
+from markupsafe import Markup
 
 tags = {}
 

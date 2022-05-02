@@ -1,7 +1,8 @@
+from html import escape
 from itertools import chain
 
 from pony import orm
-from flask import escape, url_for
+from flask import url_for
 from flask_babel import gettext
 from markupsafe import Markup
 from wtforms.widgets import Select, Input, TextInput

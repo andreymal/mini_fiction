@@ -4,12 +4,13 @@ import json
 import math
 import time
 from datetime import timedelta
+from html import escape
 from urllib.request import Request, urlopen
 from urllib.parse import quote, urljoin
 from typing import Optional, List
 
 from werkzeug.urls import url_parse
-from flask import current_app, g, escape, render_template, abort, url_for, request, has_request_context
+from flask import current_app, g, render_template, abort, url_for, request, has_request_context
 from flask_babel import pgettext, ngettext
 
 from mini_fiction.utils import diff as utils_diff

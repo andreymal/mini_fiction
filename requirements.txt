@@ -19,3 +19,4 @@ pytz
 python-dotenv
 email_validator
 pydantic
+gunicorn[gevent]==20.1.0

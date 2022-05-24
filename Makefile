@@ -90,7 +90,7 @@ release-sign-test: dist
 dist: clean
 	$(PYTHON) setup.py sdist
 	pybabel compile -d mini_fiction/translations
-	cd mini_fiction/frontend && $(YARN) run build
+	cd mini_fiction/frontend && $(YARN) build
 	$(PYTHON) setup.py bdist_wheel
 	ls -lh dist
 
@@ -102,7 +102,7 @@ develop:
 	$(PIP) install -e .
 	pybabel compile -d mini_fiction/translations
 	cd mini_fiction/frontend && $(YARN)
-	cd mini_fiction/frontend && $(YARN) run webpack
+	cd mini_fiction/frontend && $(YARN) webpack
 	ln -s ../frontend/build mini_fiction/static/ --force
 
 babel-extract:
@@ -123,7 +123,7 @@ babel-compile:
 	pybabel compile -d mini_fiction/translations
 
 frontend:
-	cd mini_fiction/frontend && $(YARN) run webpack
+	cd mini_fiction/frontend && $(YARN) webpack
 
 frontend-build:
-	cd mini_fiction/frontend && $(YARN) run build
+	cd mini_fiction/frontend && $(YARN) build

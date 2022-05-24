@@ -53,7 +53,7 @@
     "postcss-loader": "^5.2.0",
     "postcss-mixins": "^7.0.3",
     "postcss-move-props-to-bg-image-query": "^4.0.0",
-    "postcss-nesting": "^8.0.0",
+    "postcss-nesting": "^10.0.0",
     "source-map-loader": "^2.0.1",
     "style-loader": "^2.0.0",
     "svg-transform-loader": "^2.0.13",

@@ -3,7 +3,7 @@
 PYTHON?=python3
 PIP?=pip3
 FIND?=find
-NPM?=npm
+YARN?=yarn
 
 help:
 	@echo "mini_fiction"
@@ -90,7 +90,7 @@ release-sign-test: dist
 dist: clean
 	$(PYTHON) setup.py sdist
 	pybabel compile -d mini_fiction/translations
-	cd mini_fiction/frontend && $(NPM) run-script build
+	cd mini_fiction/frontend && $(YARN) run build
 	$(PYTHON) setup.py bdist_wheel
 	ls -lh dist
 
@@ -101,8 +101,8 @@ develop:
 	$(PIP) install -r requirements.txt -r optional-requirements.txt -r dev-requirements.txt -r test-requirements.txt
 	$(PIP) install -e .
 	pybabel compile -d mini_fiction/translations
-	cd mini_fiction/frontend && $(NPM) install
-	cd mini_fiction/frontend && $(NPM) run-script webpack
+	cd mini_fiction/frontend && $(YARN)
+	cd mini_fiction/frontend && $(YARN) run webpack
 	ln -s ../frontend/build mini_fiction/static/ --force
 
 babel-extract:
@@ -123,7 +123,7 @@ babel-compile:
 	pybabel compile -d mini_fiction/translations
 
 frontend:
-	cd mini_fiction/frontend && $(NPM) run-script webpack
+	cd mini_fiction/frontend && $(YARN) run webpack
 
 frontend-build:
-	cd mini_fiction/frontend && $(NPM) run-script build
+	cd mini_fiction/frontend && $(YARN) run build

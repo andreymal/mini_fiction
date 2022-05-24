@@ -40,7 +40,7 @@ class SphinxConnection:
         import MySQLdb
 
         self.mysql_conn = MySQLdb.connect(**conn)
-        self.execute("set autocommit=0")
+        self._execute("set autocommit=0")
         self._with_level = 0
 
     def __enter__(self: T) -> T:
@@ -66,7 +66,10 @@ class SphinxConnection:
     def ping(self, reconnect: bool = True) -> None:
         self.mysql_conn.ping(reconnect)
 
-    def execute(
+    def tables(self):
+        return self._execute('show tables').fetchall()
+
+    def _execute(
         self,
         sql: str,
         args: Optional[Sequence[Union[str, bytes]]] = None,
@@ -224,7 +227,7 @@ class SphinxConnection:
 
         # execute
         try:
-            cur = self.execute(sql, tuple(args))
+            cur = self._execute(sql, tuple(args))
         except ProgrammingError as exc:
             if exc.args[0] != 1064:  # error in SQL syntax
                 raise
@@ -261,7 +264,7 @@ class SphinxConnection:
             args.append(value)
         sql += ")"
 
-        cur = self.execute(sql, args)
+        cur = self._execute(sql, args)
         return [str(x[0]) for x in cur.fetchall()]
 
     def call_keywords(
@@ -273,7 +276,7 @@ class SphinxConnection:
         sql = "call keywords(%s, %s, %s)"
         args: List[Any] = [query, index, 1 if hits else 0]
 
-        cur = self.execute(sql, args)
+        cur = self._execute(sql, args)
         result_fields: List[str] = [x[0] for x in cur.description]
         result: List[Dict[str, Any]] = [dict(zip(result_fields, x)) for x in cur.fetchall()]
         return result
@@ -324,7 +327,7 @@ class SphinxConnection:
     def add(self, index: str, items: Sequence[Dict[str, Any]], replace: bool = True) -> None:
         sql, args = self.build_add_sql(index, items, replace=replace)
         if sql:
-            self.execute(sql, args)
+            self._execute(sql, args)
 
     def build_update_sql(self, index: str, fields: Dict[str, Any], **filters: Any) -> Tuple[str, Tuple[Any, ...]]:
         sql = "update `%s` set " % index
@@ -347,7 +350,7 @@ class SphinxConnection:
 
     def update(self, index: str, fields: Dict[str, Any], **filters: Any) -> None:
         sql, args = self.build_update_sql(index, fields, **filters)
-        self.execute(sql, args)
+        self._execute(sql, args)
 
     def build_delete_sql(self, index: str, **filters: Any) -> Tuple[str, Tuple[Any, ...]]:
         sql = "delete from `%s`" % index
@@ -366,7 +369,7 @@ class SphinxConnection:
 
     def delete(self, index: str, **filters: Any) -> None:
         sql, args = self.build_delete_sql(index, **filters)
-        self.execute(sql, args)
+        self._execute(sql, args)
 
     def begin(self) -> None:
         self.mysql_conn.begin()
@@ -378,7 +381,7 @@ class SphinxConnection:
         self.mysql_conn.rollback()
 
     def flush(self, index: str) -> None:
-        self.execute("flush rtindex `%s`" % index)
+        self._execute("flush rtindex `%s`" % index)
 
 
 class SphinxPool:

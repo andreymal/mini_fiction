@@ -255,7 +255,7 @@ class ProjectStatus(Status):
 
         try:
             with self.app.sphinx as sphinx:
-                tables = sphinx.execute('show tables').fetchall()
+                tables = sphinx.tables()
         except Exception as exc:
             return self._fail('sphinx', 'failed: ' + str(exc))
 

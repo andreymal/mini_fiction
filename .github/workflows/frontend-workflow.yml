@@ -1,0 +1,18 @@
+name: frontend
+on: [push]
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+    name: Build and test
+    steps:
+      - uses: actions/checkout@v2
+      - uses: bahmutov/npm-install@v1
+        with:
+          working-directory: mini_fiction/frontend
+      - name: Lint
+        run: yarn run lint
+        working-directory: mini_fiction/frontend
+      - name: Build
+        run: yarn build
+        working-directory: mini_fiction/frontend

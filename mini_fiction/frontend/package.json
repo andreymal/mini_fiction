@@ -6,7 +6,7 @@
     "webpack": "webpack --progress",
     "webpack:watch": "webpack --progress --watch",
     "build": "cross-env NODE_ENV=production webpack --progress",
-    "lint": "eslint src test"
+    "lint": "eslint src"
   },
   "author": {
     "name": "Andriy Kushnir (Orhideous)",

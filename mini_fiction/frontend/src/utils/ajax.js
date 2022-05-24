@@ -32,7 +32,7 @@ const get = (url, headers = []) => request(
 );
 
 const post = (url, body, headers = []) => request(
-  new R(url,{ method: 'POST', body }),
+  new R(url, { method: 'POST', body }),
   headers,
 );
 

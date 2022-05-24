@@ -14,7 +14,7 @@
     "url": "https://orhideous.name/"
   },
   "contributors": [],
-  "license": "GPLv3",
+  "license": "GPL-3.0-only",
   "dependencies": {
     "bazooka": "^0.9.1",
     "classnames": "^2.3.1",

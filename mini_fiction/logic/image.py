@@ -1,7 +1,7 @@
 from datetime import date
 from io import BytesIO
 from pathlib import Path
-from typing import Dict, Optional, Set, Type, Union, ClassVar, Literal
+from typing import ClassVar, Dict, Literal, Optional, Set, Type, Union
 from uuid import uuid4
 
 from flask import current_app

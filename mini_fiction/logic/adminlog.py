@@ -1,7 +1,7 @@
 import ast
 import datetime
 from enum import IntEnum
-from typing import Collection, Dict, List, Optional, Tuple, Union, TypedDict
+from typing import Collection, Dict, List, Optional, Tuple, TypedDict, Union
 
 from flask import url_for
 from pony.orm.core import Entity

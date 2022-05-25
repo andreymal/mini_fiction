@@ -1,5 +1,5 @@
 from dataclasses import dataclass
-from typing import Optional, Union, TypedDict
+from typing import Optional, TypedDict, Union
 
 from flask import current_app, render_template
 from flask_babel import lazy_gettext

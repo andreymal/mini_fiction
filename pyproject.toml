@@ -1,0 +1,113 @@
+[tool.poetry]
+name = "mini_fiction"
+version = "0.1.0"
+description = "CMS for fanfics"
+license = "GPL-3.0-only"
+authors = [
+    "andreymal <andriyano-31@mail.ru>",
+    "Andriy Kushnir (Orhideous) <me@orhideous.name>"
+]
+readme = "README.md"
+homepage = "https://github.com/andreymal/mini_fiction"
+repository = "https://github.com/andreymal/mini_fiction"
+keywords = ["library", "CMS", "books", "fiction", "writing"]
+classifiers = [
+    "Development Status :: 5 - Production/Stable",
+    "Framework :: Flask",
+    "License :: OSI Approved",
+    "License :: OSI Approved :: GNU General Public License v3 (GPLv3)",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3 :: Only",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: Implementation :: CPython",
+    "Topic :: Internet :: WWW/HTTP :: Dynamic Content :: Content Management System"
+]
+include = [
+    "frontend/*.*",
+    "frontend/src/**/*",
+    "mini_fiction/sphinx.conf",
+    "mini_fiction/filters/**/*.xslt",
+    "mini_fiction/fixtures/*.jsonl",
+    "mini_fiction/static/fonts/*",
+    "mini_fiction/static/build/**/*",
+    "mini_fiction/templates/**/*",
+    "mini_fiction/translations/**/*",
+]
+exclude = [
+    "frontend/node_modules/**/*",
+]
+
+[tool.poetry.dependencies]
+python = "^3.8"
+Flask-WTF = ">=1.0,<2.0"
+WTForms = ">=3.0,<4.0"
+Flask-Login = ">=0.5.0"
+Flask-Babel = ">=2.0,<3.0"
+Flask = ">=2.1,<3.0"
+Werkzeug = ">=2.1,<3.0"
+Jinja2 = ">=3.1,<4.0"
+MarkupSafe = ">=2.1,<3.0"
+Flask-Cors = "^3.0.10"
+cachelib = "^0.7.0"
+Cerberus = ">=1.3,<1.4"
+Unidecode = "^1.3.4"
+redis = ">=3.5,<4.0"
+celery = ">=5.2,<6.0"
+pony = "0.7.16"
+feedgen = ">=0.9.0"
+lxml = "^4.8.0"
+pytz = "^2022.1"
+python-dotenv = "^0.20.0"
+email-validator = "^1.2.1"
+pydantic = "^1.9.1"
+Pillow = "^9.1.1"
+bcrypt = { version = "^3.2.2", optional = true }
+scrypt = { version = "^0.8.20", optional = true }
+mysqlclient = { version = ">=2.0,<3.0", optional = true }
+diff-match-patch-python = { version = "^1.0.3", optional = true }
+captcha = { version = "^0.4", optional = true }
+
+[tool.poetry.dev-dependencies]
+Flask-DebugToolbar = "^0.13.1"
+setuptools = ">=38.6.0"
+wheel = "^0.37.1"
+pylint = "^2.13.9"
+flake8 = "^4.0.1"
+flake8-variables-names = "^0.0.5"
+flake8-tidy-imports = "^4.8.0"
+flake8-pie = "^0.15.0"
+mypy = "^0.960"
+black = "^22.3.0"
+isort = "^5.10.1"
+factory-boy = "^3.2.1"
+pytest-runner = "^6.0.0"
+pytest-selenium = "^3.0.0"
+pytest-flask = ">=1.0,<2.0"
+pytest-cov = "^3.0.0"
+pytest-metadata = ">=1.11"
+pytest = ">=6.2,<7.0"
+tox = "^3.25.0"
+tox-poetry = "^0.4.1"
+
+[tool.poetry.extras]
+full = [
+    "bcrypt",
+    "scrypt",
+    "mysqlclient",
+    "diff-match-patch-python",
+    "captcha"
+]
+
+[tool.poetry.scripts]
+mini_fiction = "mini_fiction.management.main:run"
+
+[tool.poetry.urls]
+"Bug Tracker" = "https://github.com/andreymal/mini_fiction/issues"
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"

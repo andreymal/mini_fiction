@@ -18,7 +18,7 @@ const { BundleAnalyzerPlugin } = require('webpack-bundle-analyzer');
 const ENV = process.env.NODE_ENV || 'development';
 const isDev = ENV !== 'production';
 
-const outputPath = path.resolve(__dirname, 'build');
+const outputPath = path.resolve(__dirname, '..', 'mini_fiction', 'static', 'build');
 const outputName = `[name].${isDev ? 'dev' : '[contenthash]'}`;
 
 const reactAliases = {

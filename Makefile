@@ -51,7 +51,7 @@ clean-translations:
 	rm -f mini_fiction/translations/*/LC_MESSAGES/*.mo
 
 clean-frontend:
-	rm -f mini_fiction/frontend/build/*
+	rm -rf mini_fiction/static/build
 
 lint:
 	pylint --rcfile=pylintrc mini_fiction/logic
@@ -90,7 +90,7 @@ release-sign-test: dist
 dist: clean
 	$(PYTHON) setup.py sdist
 	pybabel compile -d mini_fiction/translations
-	cd mini_fiction/frontend && $(YARN) build
+	cd frontend && $(YARN) build
 	$(PYTHON) setup.py bdist_wheel
 	ls -lh dist
 
@@ -101,9 +101,8 @@ develop:
 	$(PIP) install -r requirements.txt -r optional-requirements.txt -r dev-requirements.txt -r test-requirements.txt
 	$(PIP) install -e .
 	pybabel compile -d mini_fiction/translations
-	cd mini_fiction/frontend && $(YARN)
-	cd mini_fiction/frontend && $(YARN) webpack
-	ln -s ../frontend/build mini_fiction/static/ --force
+	cd frontend && $(YARN)
+	cd frontend && $(YARN) webpack
 
 babel-extract:
 	pybabel extract \
@@ -123,7 +122,7 @@ babel-compile:
 	pybabel compile -d mini_fiction/translations
 
 frontend:
-	cd mini_fiction/frontend && $(YARN) webpack
+	cd frontend && $(YARN) webpack
 
 frontend-build:
-	cd mini_fiction/frontend && $(YARN) build
+	cd frontend && $(YARN) build

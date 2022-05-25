@@ -29,7 +29,6 @@ __pycache__/
 *.mo
 
 # Frontend
-/mini_fiction/frontend/build
 /mini_fiction/static/build
 node_modules
 

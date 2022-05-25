@@ -2,10 +2,10 @@ from datetime import datetime
 from operator import attrgetter
 from typing import Collection, Dict, List, Literal, Optional, Tuple, TypedDict, Union
 
-from flask import current_app
 from flask_babel import lazy_gettext
 
 from mini_fiction.logic.adminlog import log_addition, log_changed_fields
+from mini_fiction.logic.caching import get_cache
 from mini_fiction.models import Author, Story, StoryTag, Tag, TagCategory
 from mini_fiction.validation import RawData, ValidationError, Validator
 from mini_fiction.validation.tags import TAG
@@ -168,7 +168,7 @@ def get_tags_objects(
             result["created"].append(tag)
             result["tags"][i] = tag
 
-        current_app.cache.delete("tags_autocomplete_default")
+        get_cache().delete("tags_autocomplete_default")
 
     return result
 

@@ -5,7 +5,7 @@ from typing import ClassVar, Dict, Literal, Optional, Set, Type, Union
 from uuid import uuid4
 
 from flask import current_app
-from PIL.Image import LANCZOS, Image, UnidentifiedImageError
+from PIL.Image import Resampling, Image, UnidentifiedImageError
 from PIL.Image import open as open_image
 from pydantic import BaseModel  # pylint: disable=no-name-in-module
 
@@ -87,12 +87,12 @@ def _resize_image(
     png_buffer = BytesIO()
     jpeg_buffer = BytesIO()
     with image.convert("RGBA").resize(
-        (desired_width, desired_height), resample=LANCZOS
+        (desired_width, desired_height), resample=Resampling.LANCZOS
     ) as resized:
         resized.save(webp_buffer, format="WEBP", quality=IMAGE_QUALITY)
         resized.save(png_buffer, format="PNG", quality=IMAGE_QUALITY)
     with image.convert("RGB").resize(
-        (desired_width, desired_height), resample=LANCZOS
+        (desired_width, desired_height), resample=Resampling.LANCZOS
     ) as resized:
         resized.save(jpeg_buffer, format="JPEG", quality=IMAGE_QUALITY)
 

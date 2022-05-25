@@ -1,5 +1,0 @@
-bcrypt
-scrypt
-mysqlclient>=2.0,<3.0
-diff_match_patch_python
-captcha

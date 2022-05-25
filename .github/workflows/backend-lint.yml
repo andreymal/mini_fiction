@@ -1,0 +1,37 @@
+name: backend-lint
+on: [push]
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: ['3.8', '3.9', '3.10']
+    name: Lint on ${{ matrix.python-version }}
+    steps:
+      - uses: actions/checkout@v3
+      - name: Install poetry
+        run: pipx install poetry
+
+      - name: Setup Python
+        uses: actions/setup-python@v3
+        with:
+          python-version: ${{ matrix.python-version }}
+          cache: "poetry"
+      # See: https://github.com/actions/setup-python/issues/374
+      - name: Install dependencies
+        run: |
+          poetry env use ${{ matrix.python-version }}
+          poetry install --no-interaction
+      - name: Lint checks
+        run: |
+          poetry env use ${{ matrix.python-version }}
+          poetry run pylint mini_fiction/logic
+      - name: Type checks
+        run: |
+          poetry env use ${{ matrix.python-version }}
+          poetry run mypy
+      - name: Style checks
+        run: |
+          poetry env use ${{ matrix.python-version }}
+          poetry run flake8 mini_fiction/logic

@@ -54,7 +54,7 @@ clean-frontend:
 	rm -rf mini_fiction/static/build
 
 lint:
-	pylint --rcfile=pylintrc mini_fiction/logic
+	pylint mini_fiction/logic
 	mypy
 	flake8 mini_fiction/logic
 

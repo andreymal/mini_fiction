@@ -42,7 +42,7 @@ exclude = [
 ]
 
 [tool.poetry.dependencies]
-python = "^3.8"
+python = ">=3.8,<3.11.0"
 Flask-WTF = ">=1.0,<2.0"
 WTForms = ">=3.0,<4.0"
 Flask-Login = ">=0.5.0"
@@ -88,7 +88,7 @@ pytest-runner = "^6.0.0"
 pytest-selenium = "^3.0.0"
 pytest-flask = ">=1.0,<2.0"
 pytest-cov = "^3.0.0"
-pytest-metadata = ">=1.11"
+pytest-metadata = "^2.0.1"
 pytest = ">=6.2,<7.0"
 tox = "^3.25.0"
 tox-poetry = "^0.4.1"
@@ -111,3 +111,66 @@ mini_fiction = "mini_fiction.management.main:run"
 [build-system]
 requires = ["poetry-core>=1.0.0"]
 build-backend = "poetry.core.masonry.api"
+
+[tool.pytest.ini_options]
+minversion = "6.1"
+addopts = "--driver=Remote"
+testpaths = ["tests"]
+markers = ["nodbcleaner"]
+
+[tool.isort]
+profile = "black"
+multi_line_output = 3
+
+[tool.mypy]
+ignore_missing_imports = true
+no_implicit_reexport = true
+check_untyped_defs = true
+disallow_any_generics = true
+disallow_untyped_defs = true
+follow_imports = "silent"
+strict_optional = true
+warn_redundant_casts = true
+warn_unused_ignores = true
+files = ["mini_fiction/logic/*.py"]
+plugins = ["pydantic.mypy"]
+
+[tool.pydantic-mypy]
+init_forbid_extra = true
+init_typed = true
+warn_required_dynamic_aliases = true
+warn_untyped_fields = true
+
+[tool.pylint.MASTER]
+jobs = 0
+[tool.pylint."MESSAGES CONTROL"]
+disable = [
+    "invalid-name",
+    "missing-module-docstring",
+    "missing-class-docstring",
+    "missing-function-docstring",
+    "too-many-ancestors",
+    "too-few-public-methods",
+    "too-many-public-methods",
+    "too-many-branches",
+    "too-many-arguments",
+    "too-many-locals",
+    "line-too-long"
+]
+[tool.pylint.TYPECHECK]
+generated-members = "flush"
+
+[tool.tox]
+# See: https://github.com/tox-dev/tox/issues/999
+legacy_tox_ini = """
+[tox]
+envlist = py38, py39, py310
+isolated_build = True
+
+[testenv]
+whitelist_externals = make
+commands =
+    make lint
+setenv =
+    MINIFICTION_SETTINGS = mini_fiction.settings.Test
+"""

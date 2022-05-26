@@ -5,7 +5,7 @@ from datetime import datetime
 
 from flask import Blueprint, current_app, render_template, abort, request, redirect, url_for
 from flask_login import current_user
-from pony.orm import db_session, select
+from pony.orm import db_session, select, desc
 
 from mini_fiction.models import Author, Vote
 from mini_fiction.utils.misc import Paginator
@@ -21,7 +21,7 @@ def index(page):
     if not current_user.is_staff:
         abort(403)
 
-    objects = Vote.select().order_by(Vote.id.desc())
+    objects = Vote.select().sort_by(desc(Vote.id))
 
     args = {
         'page': page,

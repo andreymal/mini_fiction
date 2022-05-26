@@ -6,6 +6,7 @@ from datetime import datetime, timedelta
 import pytz
 from flask import current_app, render_template
 from flask_babel import lazy_gettext
+from pony import orm
 
 from mini_fiction import hashers
 from mini_fiction.logic.adminlog import log_changed_fields, log_changed_generic
@@ -733,7 +734,7 @@ class AuthorBL(BaseBL):
 
         # Забираем уведомления
         items = user.notifications.filter(lambda x: x.id < older) if older is not None else user.notifications
-        items = items.order_by(Notification.id.desc()).prefetch(Notification.caused_by_user)[offset:offset + count]
+        items = items.sort_by(orm.desc(Notification.id)).prefetch(Notification.caused_by_user)[offset:offset + count]
 
         # Группируем таргеты по типам, чтобы брать их одним sql-запросом
         story_ids = set()
@@ -878,7 +879,7 @@ class AuthorBL(BaseBL):
 
         user = self.model
 
-        last_item = user.notifications.select().order_by(Notification.id.desc()).first()
+        last_item = user.notifications.select().sort_by(orm.desc(Notification.id)).first()
         if last_item:
             if nid > last_item.id:
                 nid = last_item.id

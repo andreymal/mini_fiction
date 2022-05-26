@@ -255,7 +255,7 @@ class TagBL(BaseBL):
         if len(result) < limit:
             tags = set(Tag.select(
                 lambda x: x.iname.startswith(iname) and not x.is_alias and not x.is_blacklisted
-            ).order_by(Tag.published_stories_count.desc())[:limit + len(result)])
+            ).sort_by(orm.desc(Tag.published_stories_count))[:limit + len(result)])
             if with_aliases:
                 # Подключаем синонимы, если разрешили
                 # (отдельным запросом, чтоб были по порядку ниже несинонимов)

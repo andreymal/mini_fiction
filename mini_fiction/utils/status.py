@@ -4,6 +4,8 @@ import random
 from pathlib import Path
 
 from mini_fiction import models, ratelimit
+from pony import orm
+
 
 class ANSI:
     RESET = '\x1b[0m'
@@ -429,7 +431,7 @@ class UsersStatus(Status):
     }
 
     def last(self):
-        last_user = models.Author.select().order_by(models.Author.id.desc()).first()
+        last_user = models.Author.select().sort_by(orm.desc(models.Author.id)).first()
         if not last_user:
             return self._ok('last', 'none')
         return self._ok('last', '{}, {}'.format(last_user.username, last_user.date_joined))

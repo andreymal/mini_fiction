@@ -5,7 +5,7 @@ from datetime import datetime
 
 from flask import Blueprint, render_template, abort, url_for, redirect, request
 from flask_login import current_user
-from pony.orm import select, db_session
+from pony.orm import select, db_session, desc
 
 from mini_fiction.logic.adminlog import log_changed_fields
 from mini_fiction.utils.views import admin_required
@@ -22,7 +22,7 @@ bp = Blueprint('admin_abuse_reports', __name__)
 @db_session
 @admin_required
 def index(page):
-    objects = models.AbuseReport.select().order_by(models.AbuseReport.id.desc())
+    objects = models.AbuseReport.select().sort_by(desc(models.AbuseReport.id))
 
     args = {
         'page': page,

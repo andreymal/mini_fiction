@@ -5,6 +5,7 @@ from typing import Collection, Dict, List, Optional, Tuple, TypedDict, Union
 
 from flask import url_for
 from pony.orm.core import Entity
+from pony.orm import desc
 
 from mini_fiction.models import AdminLog, AdminLogType, Author
 
@@ -82,7 +83,7 @@ def get_list(offset: int = 0, limit: int = 20, order_desc: bool = True) -> Rende
 
     objects = AdminLog.select()
     if order_desc:
-        objects = objects.order_by(AdminLog.id.desc())
+        objects = objects.sort_by(desc(AdminLog.id))
     else:
         objects = objects.order_by(AdminLog.id)
 

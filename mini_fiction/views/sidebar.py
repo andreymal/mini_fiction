@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-from pony.orm import select
+from pony.orm import select, desc
 from flask import current_app, render_template
 from flask_login import current_user
 
@@ -12,7 +12,7 @@ from mini_fiction.models import Chapter, Story, StoryContributor, StoryComment, 
 def chapters_updates(params):
     # Старая логика, при которой могли выводиться много глав одного рассказа подряд
     # chapters = select(c for c in Chapter if not c.draft and c.story_published and c.order != 1)
-    # chapters = chapters.order_by(Chapter.first_published_at.desc(), Chapter.order.desc())
+    # chapters = chapters.sort_by(desc(Chapter.first_published_at), desc(Chapter.order))
     # chapters = chapters[:current_app.config['CHAPTERS_COUNT']['main']]
     # story_ids = [y.story.id for y in chapters]
     # chapters_stories = select(x for x in Story if x.id in story_ids).prefetch(Story.contributors, StoryContributor.user)[:]
@@ -88,19 +88,19 @@ def comments_updates(params):
     if not comments_html:
         # Старая логика, при которой могли появляться несколько комментариев одной сущности
 
-        # story_comments = StoryComment.select(lambda x: x.story_published and not x.deleted).order_by(StoryComment.id.desc())
+        # story_comments = StoryComment.select(lambda x: x.story_published and not x.deleted).sort_by(desc(StoryComment.id))
         # story_comments = story_comments[:current_app.config['COMMENTS_COUNT']['main']]
 
-        # news_comments = NewsComment.select(lambda x: not x.deleted).order_by(NewsComment.id.desc())
+        # news_comments = NewsComment.select(lambda x: not x.deleted).sort_by(desc(NewsComment.id))
         # news_comments = news_comments[:current_app.config['COMMENTS_COUNT']['main']]
 
-        stories = select(x for x in Story if x.published and x.last_comment_id > 0).order_by(Story.last_comment_id.desc())[:current_app.config['COMMENTS_COUNT']['main']]
+        stories = select(x for x in Story if x.published and x.last_comment_id > 0).sort_by(desc(Story.last_comment_id))[:current_app.config['COMMENTS_COUNT']['main']]
         story_comment_ids = [x.last_comment_id for x in stories]
-        story_comments = StoryComment.select(lambda x: x.id in story_comment_ids).order_by(StoryComment.id.desc())[:current_app.config['COMMENTS_COUNT']['main']]
+        story_comments = StoryComment.select(lambda x: x.id in story_comment_ids).sort_by(desc(StoryComment.id))[:current_app.config['COMMENTS_COUNT']['main']]
 
-        news_list = select(x for x in NewsItem if x.last_comment_id > 0).order_by(NewsItem.last_comment_id.desc())[:current_app.config['COMMENTS_COUNT']['main']]
+        news_list = select(x for x in NewsItem if x.last_comment_id > 0).sort_by(desc(NewsItem.last_comment_id))[:current_app.config['COMMENTS_COUNT']['main']]
         news_comment_ids = [x.last_comment_id for x in news_list]
-        news_comments = NewsComment.select(lambda x: x.id in news_comment_ids).order_by(NewsComment.id.desc())[:current_app.config['COMMENTS_COUNT']['main']]
+        news_comments = NewsComment.select(lambda x: x.id in news_comment_ids).sort_by(desc(NewsComment.id))[:current_app.config['COMMENTS_COUNT']['main']]
 
         comments = [('story', x) for x in story_comments]
         comments += [('news', x) for x in news_comments]
@@ -127,5 +127,5 @@ def comments_updates(params):
 
 
 def news(params):
-    news_list = list(NewsItem.select().order_by(NewsItem.id.desc())[:3])
+    news_list = list(NewsItem.select().sort_by(desc(NewsItem.id))[:3])
     return render_template('sidebar/news.html', news=news_list)

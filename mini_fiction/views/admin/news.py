@@ -4,7 +4,7 @@
 from flask import Blueprint, render_template, abort, url_for, redirect, request
 from flask_babel import gettext
 from flask_login import current_user
-from pony.orm import db_session
+from pony.orm import db_session, desc
 
 from mini_fiction.utils.views import admin_required
 from mini_fiction.validation import ValidationError
@@ -21,7 +21,7 @@ bp = Blueprint('admin_news', __name__)
 @db_session
 @admin_required
 def index(page):
-    objects = NewsItem.select().order_by(NewsItem.id.desc())
+    objects = NewsItem.select().sort_by(desc(NewsItem.id))
 
     return paginate_view(
         'admin/news/index.html',

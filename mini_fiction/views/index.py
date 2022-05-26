@@ -3,7 +3,7 @@
 
 from flask import Blueprint, current_app, render_template
 from flask_babel import gettext
-from pony.orm import db_session
+from pony.orm import db_session, desc
 
 from mini_fiction.bl.migration import enrich_stories
 from mini_fiction.models import Story, StoryContributor, StoryTag, Tag
@@ -19,7 +19,7 @@ def index():
     page_title = gettext('Index')
 
     stories = Story.select_published().filter(lambda x: not x.pinned)
-    stories = stories.order_by(Story.first_published_at.desc(), Story.id.desc())
+    stories = stories.sort_by(desc(Story.first_published_at), desc(Story.id))
     stories = stories.prefetch(
         Story.characters, Story.contributors, StoryContributor.user,
         Story.tags, StoryTag.tag, Tag.category,
@@ -32,7 +32,7 @@ def index():
     stories = page_obj.slice(stories)
 
     pinned_stories = list(
-        Story.select_published().filter(lambda x: x.pinned).order_by(Story.first_published_at.desc())
+        Story.select_published().filter(lambda x: x.pinned).sort_by(desc(Story.first_published_at))
     )
     stories = pinned_stories + list(stories)
     enrich_stories(stories)

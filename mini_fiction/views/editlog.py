@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-from pony.orm import select, db_session
+from pony.orm import select, db_session, desc
 from flask_login import current_user, login_required
 from flask_babel import gettext as _
 from flask import Blueprint, current_app, abort, render_template, g, jsonify, request
@@ -43,7 +43,7 @@ def index(page):
         view_args['published'] = '0'
         queryset = queryset.filter(lambda l: not l.story.approved or l.story.draft)
 
-    queryset = queryset.order_by(StoryLog.created_at.desc()).prefetch(StoryLog.story, StoryLog.user)
+    queryset = queryset.sort_by(desc(StoryLog.created_at)).prefetch(StoryLog.story, StoryLog.user)
 
     page_obj = Paginator(
         page, queryset.count(),

@@ -5,7 +5,7 @@ from flask import Blueprint, current_app, render_template, abort, request, jsoni
 from flask_babel import gettext
 from flask_login import current_user, login_required
 from markupsafe import Markup
-from pony.orm import db_session
+from pony.orm import db_session, desc
 
 from mini_fiction.models import NewsItem
 from mini_fiction.forms.comment import CommentForm
@@ -20,7 +20,7 @@ bp = Blueprint('news', __name__)
 @bp.route('/page/<int:page>/')
 @db_session
 def index(page):
-    objects = NewsItem.select().order_by(NewsItem.id.desc())
+    objects = NewsItem.select().sort_by(desc(NewsItem.id))
 
     return paginate_view(
         'news/index.html',

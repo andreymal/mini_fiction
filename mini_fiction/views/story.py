@@ -5,7 +5,7 @@ from pathlib import Path
 from flask import Blueprint, Response, current_app, request, render_template, abort, redirect, url_for, send_file, jsonify, g
 from flask_babel import gettext
 from flask_login import current_user, login_required
-from pony.orm import db_session
+from pony.orm import db_session, desc
 
 from mini_fiction.bl.migration import enrich_story
 from mini_fiction.forms.story import StoryForm
@@ -319,7 +319,7 @@ def edit_log(pk):
     if not story.bl.can_view_editlog(current_user):
         abort(403)
 
-    edit_log_items = story.edit_log.select().order_by(StoryLog.created_at.desc()).prefetch(StoryLog.user)
+    edit_log_items = story.edit_log.select().sort_by(desc(StoryLog.created_at)).prefetch(StoryLog.user)
 
     data = dict(
         edit_log=edit_log_items,
@@ -351,7 +351,7 @@ def favorites(pk):
 @db_session
 @login_required
 def add():
-    rating = Rating.select().order_by(Rating.id.desc()).first()
+    rating = Rating.select().sort_by(desc(Rating.id)).first()
     form = StoryForm(data={'status': 0, 'original': 1, 'rating': rating.id if rating else 1})
 
     ctx = {

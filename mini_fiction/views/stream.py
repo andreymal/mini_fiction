@@ -22,7 +22,7 @@ bp = Blueprint('stream', __name__)
 @db_session
 def stories(page):
     objects = Story.select_published().filter(lambda x: not x.pinned)
-    objects = objects.order_by(Story.first_published_at.desc(), Story.id.desc())
+    objects = objects.sort_by(orm.desc(Story.first_published_at), orm.desc(Story.id))
     objects = objects.prefetch(
         Story.characters, Story.contributors, StoryContributor.user,
         Story.tags, StoryTag.tag, Tag.category,
@@ -37,7 +37,7 @@ def stories(page):
 
     if page == 1:
         pinned_stories = list(
-            Story.select_published().filter(lambda x: x.pinned).order_by(Story.first_published_at.desc())
+            Story.select_published().filter(lambda x: x.pinned).sort_by(orm.desc(Story.first_published_at))
         )
         objects = pinned_stories + objects
 
@@ -63,7 +63,7 @@ def stories(page):
 def chapters(page):
     objects = orm.select(c for c in Chapter if not c.draft and c.story_published and c.order != 1)
     objects = objects.prefetch(Chapter.text, Chapter.story, Story.contributors, StoryContributor.user)
-    objects = objects.order_by(Chapter.first_published_at.desc(), Chapter.order.desc())
+    objects = objects.sort_by(orm.desc(Chapter.first_published_at), orm.desc(Chapter.order))
 
     page_obj = Paginator(page, objects.count(), per_page=current_app.config['CHAPTERS_COUNT']['stream'])
     objects = page_obj.slice_or_404(objects)
@@ -86,9 +86,9 @@ def comments(page):
     objects = StoryComment.select(lambda x: x.story_published)
     filter_deleted = current_user.is_staff and request.args.get('deleted') == '1'
     if filter_deleted:
-        objects = objects.filter(lambda x: x.deleted).order_by(StoryComment.last_deleted_at.desc())
+        objects = objects.filter(lambda x: x.deleted).sort_by(orm.desc(StoryComment.last_deleted_at))
     else:
-        objects = objects.filter(lambda x: not x.deleted).order_by(StoryComment.id.desc())
+        objects = objects.filter(lambda x: not x.deleted).sort_by(orm.desc(StoryComment.id))
 
     view_args = dict(request.view_args)
     if filter_deleted:
@@ -131,9 +131,9 @@ def storylocalcomments(page):
     objects = StoryLocalComment.select()
     filter_deleted = current_user.is_staff and request.args.get('deleted') == '1'
     if filter_deleted:
-        objects = objects.filter(lambda x: x.deleted).order_by(StoryLocalComment.last_deleted_at.desc())
+        objects = objects.filter(lambda x: x.deleted).sort_by(orm.desc(StoryLocalComment.last_deleted_at))
     else:
-        objects = objects.filter(lambda x: not x.deleted).order_by(StoryLocalComment.id.desc())
+        objects = objects.filter(lambda x: not x.deleted).sort_by(orm.desc(StoryLocalComment.id))
 
     view_args = dict(request.view_args)
     if filter_deleted:
@@ -169,9 +169,9 @@ def newscomments(page):
     objects = NewsComment.select()
     filter_deleted = current_user.is_staff and request.args.get('deleted') == '1'
     if filter_deleted:
-        objects = objects.filter(lambda x: x.deleted).order_by(NewsComment.last_deleted_at.desc())
+        objects = objects.filter(lambda x: x.deleted).sort_by(orm.desc(NewsComment.last_deleted_at))
     else:
-        objects = objects.filter(lambda x: not x.deleted).order_by(NewsComment.id.desc())
+        objects = objects.filter(lambda x: not x.deleted).sort_by(orm.desc(NewsComment.id))
 
     view_args = dict(request.view_args)
     if filter_deleted:

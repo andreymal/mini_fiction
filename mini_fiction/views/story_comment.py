@@ -3,7 +3,7 @@
 
 from flask import Blueprint, current_app, request, render_template, abort, url_for, jsonify
 from flask_login import current_user
-from pony.orm import db_session
+from pony.orm import db_session, desc
 
 from mini_fiction.models import Story, StoryComment, Author
 from mini_fiction.utils.misc import Paginator
@@ -163,7 +163,7 @@ def ajax_author_dashboard(page):
         abort(403)
 
     comments_list = StoryComment.bl.select_by_story_author(current_user)
-    comments_list = comments_list.order_by(StoryComment.id.desc())
+    comments_list = comments_list.sort_by(desc(StoryComment.id))
     comments_count = comments_list.count()
 
     paged = Paginator(
@@ -199,7 +199,7 @@ def ajax_author_overview(user_id, page):
         abort(404)
 
     comments_list = StoryComment.select(lambda x: x.author == author and not x.deleted and x.story_published)
-    comments_list = comments_list.order_by(StoryComment.id.desc())
+    comments_list = comments_list.sort_by(desc(StoryComment.id))
     comments_count = comments_list.count()
 
     paged = Paginator(

@@ -91,4 +91,4 @@ def admin_sort(sorting, objects, fields_map, default='id'):
 
     if not desc:
         return objects.order_by(*fields)
-    return objects.order_by(*[x.desc() for x in fields])
+    return objects.order_by(*[orm.desc(x) for x in fields])

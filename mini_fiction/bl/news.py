@@ -87,7 +87,7 @@ class NewsItemBL(BaseBL, Commentable):
         # Да-да, поне надо помогать с удалением комментов
         orm.select(c for c in NewsCommentVote if c.comment in newsitem.comments).delete(bulk=True)
         orm.select(c for c in NewsCommentEdit if c.comment in newsitem.comments).delete(bulk=True)
-        newsitem.comments.select().order_by(NewsComment.id.desc()).delete()
+        newsitem.comments.select().sort_by(orm.desc(NewsComment.id)).delete()
 
         log_deletion(by=author, what=newsitem)
         newsitem.delete()

@@ -507,7 +507,7 @@ class StoryBL(BaseBL, Commentable):
         # Да-да, поне надо помогать
         orm.select(c for c in StoryCommentVote if c.comment in story.comments).delete(bulk=True)
         orm.select(c for c in StoryCommentEdit if c.comment in story.comments).delete(bulk=True)
-        story.comments.select().order_by(StoryComment.id.desc()).delete(bulk=False)  # поня не может bulk
+        story.comments.select().sort_by(orm.desc(StoryComment.id)).delete(bulk=False)  # поня не может bulk
 
         if local_thread_id is not None:
             local_comment_ids = list(orm.select(x.id for x in StoryLocalComment if x.local.id == local_thread_id))
@@ -515,7 +515,7 @@ class StoryBL(BaseBL, Commentable):
                 lambda x: x.type in ('story_lreply', 'story_lcomment') and x.target_id in local_comment_ids
             ).delete(bulk=True)
             orm.select(c for c in StoryLocalCommentEdit if c.comment.id in local_comment_ids).delete(bulk=True)
-            story.local.comments.select().order_by(StoryLocalComment.id.desc()).delete(bulk=False)  # не может в bulk, ага
+            story.local.comments.select().sort_by(orm.desc(StoryLocalComment.id)).delete(bulk=False)  # не может в bulk, ага
 
         # Не помню почему, но почему-то там Optional
         story.story_views_set.select().delete(bulk=True)
@@ -647,7 +647,7 @@ class StoryBL(BaseBL, Commentable):
     def select_top(self, period=0):
         queryset = self.model.select(
             lambda x: x.approved and not x.draft and x.vote_total >= current_app.config['MINIMUM_VOTES_FOR_VIEW']
-        ).order_by(self.model.vote_value.desc(), self.model.id.desc())
+        ).sort_by(orm.desc(self.model.vote_value), orm.desc(self.model.id))
 
         if period > 0:
             since = datetime.utcnow() - timedelta(days=period)
@@ -1991,7 +1991,7 @@ class ChapterBL(BaseBL):
 
         if text_md5:
             log_item = StoryLog.select(lambda x: x.chapter == chapter and x.chapter_md5 == text_md5)
-            log_item = log_item.order_by(StoryLog.id.desc()).first()
+            log_item = log_item.sort_by(orm.desc(StoryLog.id)).first()
             if not log_item:
                 return None
         else:

@@ -189,7 +189,7 @@ class BaseCommentBL(BaseBL):
         else:
             data['root_id'] = 0  # заполним после flush
 
-        last_comment = target.comments.select().order_by(self.model.id.desc()).first()
+        last_comment = target.comments.select().sort_by(orm.desc(self.model.id)).first()
         data['local_id'] = (last_comment.local_id + 1) if last_comment else 1
 
         data.update(self._attributes_for(data))

@@ -7,7 +7,7 @@ from flask import Blueprint, current_app, request, render_template, abort, redir
 import flask_babel
 from flask_babel import gettext
 from flask_login import current_user, login_required, logout_user
-from pony.orm import db_session
+from pony.orm import db_session, desc
 
 from mini_fiction.bl.migration import enrich_stories
 from mini_fiction.models import Author, Story, StoryComment, Contact, ChangeEmailProfile
@@ -67,7 +67,7 @@ def info(user_id=None, comments_page=1):
             abort(403)
         author = current_user
         comments_list = StoryComment.bl.select_by_story_author(author)
-        comments_list = comments_list.order_by(StoryComment.id.desc())
+        comments_list = comments_list.sort_by(desc(StoryComment.id))
         stories = list(author.stories)
         stories.sort(key=lambda x: x.first_published_at or x.date, reverse=True)
         contributing_stories = list(author.contributing_stories)
@@ -83,7 +83,7 @@ def info(user_id=None, comments_page=1):
             abort(404)
         author_id = author.id  # обход утечки памяти
         comments_list = StoryComment.select(lambda x: x.author.id == author_id and not x.deleted and x.story_published)
-        comments_list = comments_list.order_by(StoryComment.id.desc())
+        comments_list = comments_list.sort_by(desc(StoryComment.id))
         data['page_title'] = gettext('Author: {author}').format(author=author.username)
         stories = list(Story.bl.select_by_author(author, for_user=current_user))
         stories.sort(key=lambda x: x.first_published_at or x.date, reverse=True)

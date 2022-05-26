@@ -1,7 +1,7 @@
 from flask import Blueprint, current_app, render_template, abort, redirect, url_for, request
 from flask_babel import gettext
 from flask_login import current_user
-from pony.orm import db_session
+from pony.orm import db_session, desc
 
 from mini_fiction.models import Author, RegistrationProfile
 from mini_fiction.utils.misc import Paginator
@@ -17,7 +17,7 @@ def index(page):
     if not current_user.is_superuser:
         abort(403)
 
-    objects = RegistrationProfile.select().order_by(RegistrationProfile.id.desc())
+    objects = RegistrationProfile.select().sort_by(desc(RegistrationProfile.id))
     page_obj = Paginator(page, objects.count(), per_page=100)
 
     return render_template(

@@ -7,7 +7,7 @@ from flask import Blueprint, Response, current_app, url_for, request, abort
 from flask_babel import gettext, ngettext
 from feedgen.feed import FeedGenerator
 from markupsafe import Markup
-from pony.orm import select, db_session
+from pony.orm import select, db_session, desc
 
 from mini_fiction.models import Story, Chapter, Author
 from mini_fiction.utils.misc import sitename
@@ -58,7 +58,7 @@ def feed_stories():
     feed.link(href=request.url, rel='self')
 
     count = current_app.config['RSS'].get('stories', 20)
-    stories = Story.select_published().order_by(Story.first_published_at.desc(), Story.id.desc())[:count]
+    stories = Story.select_published().sort_by(desc(Story.first_published_at), desc(Story.id))[:count]
     last_update = _add_stories_to_feed(feed, stories)
 
     feed.updated(pytz.UTC.fromutc(last_update))
@@ -113,7 +113,7 @@ def feed_accounts(user_id):
     feed.link(href=request.url, rel='self')
 
     count = current_app.config['RSS'].get('accounts', 10)
-    stories = Story.bl.select_by_author(author).order_by(Story.first_published_at.desc(), Story.id.desc())[:count]
+    stories = Story.bl.select_by_author(author).sort_by(desc(Story.first_published_at), desc(Story.id))[:count]
     last_update = _add_stories_to_feed(feed, stories)
 
     feed.updated(pytz.UTC.fromutc(last_update))
@@ -131,7 +131,7 @@ def feed_chapters():
     last_update = datetime(1970, 1, 1, 0)
 
     chapters = select(c for c in Chapter if not c.draft and c.story_published)
-    chapters = chapters.order_by(Chapter.first_published_at.desc(), Chapter.order.desc())
+    chapters = chapters.sort_by(desc(Chapter.first_published_at), desc(Chapter.order))
     count = current_app.config['RSS'].get('chapters', 20)
     chapters = chapters.prefetch(Chapter.story)[:count]
 

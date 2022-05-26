@@ -5,7 +5,7 @@ import json
 
 from flask import Blueprint, current_app, request, render_template, abort, redirect, url_for
 from flask_login import current_user
-from pony.orm import db_session
+from pony.orm import db_session, desc
 
 from mini_fiction.bl.migration import enrich_stories
 from mini_fiction.models import Story, Tag, StoryContributor, StoryTag
@@ -46,7 +46,7 @@ def tag_index(tag_name, page):
 
     objects = Story.bl.select_by_tag(tag, user=current_user)
     objects = objects.prefetch(Story.characters, Story.contributors, StoryContributor.user, Story.tags, StoryTag.tag, Tag.category)
-    objects = objects.order_by(Story.first_published_at.desc(), Story.id.desc())
+    objects = objects.sort_by(desc(Story.first_published_at), desc(Story.id))
 
     page_obj = Paginator(page, objects.count(), per_page=current_app.config['STORIES_COUNT']['tags'])
     objects = page_obj.slice_or_404(objects)

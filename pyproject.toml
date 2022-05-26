@@ -94,6 +94,7 @@ tox = "^3.25.0"
 tox-poetry = "^0.4.1"
 pony-stubs = "^0.5.2"
 types-pytz = "^2021.3.8"
+pyright = "^1.1.249"
 
 [tool.poetry.extras]
 full = [

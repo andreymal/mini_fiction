@@ -1144,9 +1144,9 @@ tox = {version = ">=3.7.0", markers = "python_version >= \"3\""}
 test = ["coverage", "pytest", "pycodestyle", "pylint"]
 
 [[package]]
-name = "types-pillow"
-version = "9.0.17"
-description = "Typing stubs for Pillow"
+name = "types-pytz"
+version = "2021.3.8"
+description = "Typing stubs for pytz"
 category = "dev"
 optional = false
 python-versions = "*"
@@ -1265,7 +1265,7 @@ full = ["bcrypt", "scrypt", "mysqlclient", "diff-match-patch-python", "captcha"]
 [metadata]
 lock-version = "1.1"
 python-versions = ">=3.8,<3.11.0"
-content-hash = "dd258aee640f0076c9d85b4fac3bb58487fd3135651ab66f75c0599096bf4927"
+content-hash = "e1a0a6b3e1be3253a21e0266117fb5adfb2a10dcc51363fb368d6727452b0642"
 
 [metadata.files]
 amqp = [
@@ -2010,9 +2010,9 @@ tox-poetry = [
     {file = "tox-poetry-0.4.1.tar.gz", hash = "sha256:2395808e1ce487b5894c10f2202e14702bfa6d6909c0d1e525170d14809ac7ef"},
     {file = "tox_poetry-0.4.1-py2.py3-none-any.whl", hash = "sha256:11d9cd4e51d4cd9484b3ba63f2650ab4cfb4096e5f0682ecf561ddfc3c8e8c92"},
 ]
-types-pillow = [
-    {file = "types-Pillow-9.0.17.tar.gz", hash = "sha256:d6f7a8be9ebeb930064049697820389c7944a82330f84651be620b3d12c70ea5"},
-    {file = "types_Pillow-9.0.17-py3-none-any.whl", hash = "sha256:46cc1847ada69d494de041be23c3008f551d2356c51bb7f55376f16e5281d3c0"},
+types-pytz = [
+    {file = "types-pytz-2021.3.8.tar.gz", hash = "sha256:41253a3a2bf028b6a3f17b58749a692d955af0f74e975de94f6f4d2d3cd01dbd"},
+    {file = "types_pytz-2021.3.8-py3-none-any.whl", hash = "sha256:aef4a917ab28c585d3f474bfce4f4b44b91e95d9d47d4de29dd845e0db8e3910"},
 ]
 typing-extensions = [
     {file = "typing_extensions-4.2.0-py3-none-any.whl", hash = "sha256:6657594ee297170d19f67d55c05852a874e7eb634f4f753dbd667855e07c1708"},

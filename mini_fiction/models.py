@@ -1,7 +1,7 @@
 import json
 import ipaddress
 from datetime import datetime, timedelta
-from typing import Optional
+from typing import Optional, Set
 
 from pony import orm
 from flask_babel import gettext
@@ -17,7 +17,15 @@ from mini_fiction.utils.misc import htmlcrop
 from mini_fiction.utils.random import random_string
 
 
-class Logopic(db.Entity):
+# NOTE:
+#  Using `db.Entity` directly won't work, as both MyPy and Pyright won't
+#  allow inheriting a class from a variable. For Pyright this declaration
+#  is enough misdirection for it not to complain, but MyPy needs an extra
+#  `type: ignore` comment above each model declaration to work.
+DbEntity = db.Entity
+
+
+class Logopic(DbEntity):  # type: ignore
     """ Модель картинки в шапке сайта """
 
     image_bundle = orm.Optional(orm.Json, optimistic=False)  # FIXME: Remove this workaround after migration
@@ -205,7 +213,7 @@ class Author(db.Entity, UserMixin):
         return self.image.resized
 
 
-class RegistrationProfile(db.Entity):
+class RegistrationProfile(DbEntity):  # type: ignore
     activation_key = orm.Required(str, 40, unique=True)
     email = orm.Required(str, 254)
     password = orm.Optional(str, 255)
@@ -224,7 +232,7 @@ class RegistrationProfile(db.Entity):
         return 'Registration information for {}'.format(self.username)
 
 
-class PasswordResetProfile(db.Entity):
+class PasswordResetProfile(DbEntity):  # type: ignore
     date = orm.Required(datetime, 6, default=datetime.utcnow)
     activation_key = orm.Required(str, 40, unique=True)
     user = orm.Required(Author)
@@ -234,7 +242,7 @@ class PasswordResetProfile(db.Entity):
         return 'Password reset information for {}'.format(self.user.username)
 
 
-class ChangeEmailProfile(db.Entity):
+class ChangeEmailProfile(DbEntity):  # type: ignore
     date = orm.Required(datetime, 6, default=datetime.utcnow)
     activation_key = orm.Required(str, 40, unique=True)
     user = orm.Required(Author, unique=True)
@@ -244,7 +252,7 @@ class ChangeEmailProfile(db.Entity):
         return '<Change email information for{}'.format(self.user.username)
 
 
-class Contact(db.Entity):
+class Contact(DbEntity):  # type: ignore
     """ Модель контакта пользователя """
     author = orm.Required(Author)
     name = orm.Required(str, 64)
@@ -254,8 +262,9 @@ class Contact(db.Entity):
         return '<Contact {}/{}>'.format(self.author.username, self.name)
 
 
-class CharacterGroup(db.Entity):
+class CharacterGroup(DbEntity):  # type: ignore
     """ Модель группы персонажа """
+    id: int
 
     name = orm.Required(str, 256)
     description = orm.Optional(orm.LongStr)
@@ -266,8 +275,9 @@ class CharacterGroup(db.Entity):
         return self.name
 
 
-class Character(db.Entity):
+class Character(DbEntity):  # type: ignore
     """ Модель персонажа """
+    id: int
 
     description = orm.Optional(orm.LongStr)
     name = orm.Required(str, 256)
@@ -293,7 +303,7 @@ class Character(db.Entity):
         return self.image.resized
 
 
-class Rating(db.Entity):
+class Rating(DbEntity):  # type: ignore
     """ Модель рейтинга """
 
     description = orm.Optional(orm.LongStr)
@@ -306,7 +316,7 @@ class Rating(db.Entity):
         return self.name
 
 
-class TagCategory(db.Entity):
+class TagCategory(DbEntity):  # type: ignore
     """ Модель категории тега """
 
     name = orm.Required(str, 255)
@@ -322,7 +332,7 @@ class TagCategory(db.Entity):
         return self.name
 
 
-class Tag(db.Entity):
+class Tag(DbEntity):  # type: ignore
     """ Модель тега рассказа """
 
     name = orm.Required(str, 255)  # fancy human-readable name
@@ -365,7 +375,7 @@ class Tag(db.Entity):
         return self.reason_to_blacklist != ''
 
 
-class StoryTag(db.Entity):
+class StoryTag(DbEntity):  # type: ignore
     """ Модель, хранящая действующие теги рассказа """
 
     story = orm.Required('Story')
@@ -378,7 +388,7 @@ class StoryTag(db.Entity):
         return '<StoryTag: {} for {}>'.format(self.tag.name, self.story.id)
 
 
-class StoryTagLog(db.Entity):
+class StoryTagLog(DbEntity):  # type: ignore
     """ Модель изменения действующих тегов рассказа """
 
     ADDITION = 1
@@ -392,7 +402,7 @@ class StoryTagLog(db.Entity):
     date = orm.Required(datetime, 6, default=datetime.utcnow)
 
 
-class InSeriesPermissions(db.Entity):
+class InSeriesPermissions(DbEntity):  # type: ignore
     """ Промежуточная модель хранения взаимосвязей рассказов, серий и разрешений на добавления рассказов в серии """
 
     story = orm.Optional('Story')
@@ -402,7 +412,7 @@ class InSeriesPermissions(db.Entity):
     answer = orm.Required(bool, default=False)
 
 
-class Series(db.Entity):
+class Series(DbEntity):  # type: ignore
     """ Модель серии """
 
     coauthors = orm.Set('CoAuthorsSeries')
@@ -420,7 +430,7 @@ class Series(db.Entity):
     views = orm.Required(int, default=0)
     extra = orm.Required(orm.LongStr, lazy=False, default='{}')
 
-    permissions = orm.Set(InSeriesPermissions)
+    permissions: Set[InSeriesPermissions] = orm.Set(InSeriesPermissions)
 
     def __str__(self):
         return self.title
@@ -433,14 +443,14 @@ class Series(db.Entity):
         return orm.select(x.story for x in InSeriesPermissions if x.series == self).without_distinct().order_by('x.id')
 
 
-class Story(db.Entity):
+class Story(DbEntity):  # type: ignore
     """ Модель рассказа """
 
     title = orm.Required(str, 512, autostrip=False)
     contributors = orm.Set('StoryContributor')
-    characters = orm.Set(Character)
-    tags = orm.Set(StoryTag)
-    tags_log = orm.Set(StoryTagLog)
+    characters: Set[Character] = orm.Set(Character)
+    tags: Set[StoryTag] = orm.Set(StoryTag)
+    tags_log: Set[StoryTagLog] = orm.Set(StoryTagLog)
     cover = orm.Required(bool, default=False)
     date = orm.Required(datetime, 6, default=datetime.utcnow)
     first_published_at = orm.Optional(datetime, 6, index=True)
@@ -482,7 +492,7 @@ class Story(db.Entity):
     last_comment_id = orm.Required(int, default=0, index=True, optimistic=False)  # Для сортировки списка обсуждаемого
     extra = orm.Required(orm.LongStr, lazy=False, default='{}')
 
-    in_series_permissions = orm.Set(InSeriesPermissions)
+    in_series_permissions: Set[InSeriesPermissions] = orm.Set(InSeriesPermissions)
     chapters = orm.Set('Chapter')
     edit_log = orm.Set('StoryLog')
     story_views_set = orm.Set('StoryView')
@@ -564,7 +574,7 @@ class Story(db.Entity):
         return 'unfinished'
 
 
-class Chapter(db.Entity):
+class Chapter(DbEntity):  # type: ignore
     """ Модель главы """
 
     date = orm.Required(datetime, 6, default=datetime.utcnow)
@@ -600,7 +610,7 @@ class Chapter(db.Entity):
         return url_for('chapter.view_single', story_id=self.story.id, order=self.order)
 
     def get_prev_chapter(self, allow_draft=False):
-        q = orm.select(x for x in Chapter if x.story == self.story and x.order < self.order).order_by(Chapter.order.desc())
+        q = orm.select(x for x in Chapter if x.story == self.story and x.order < self.order).sort_by(orm.desc(Chapter.order))
         if not allow_draft:
             q = q.filter(lambda x: not x.draft)
         return q.first()
@@ -698,7 +708,7 @@ class Chapter(db.Entity):
         return doc
 
 
-class StoryContributor(db.Entity):
+class StoryContributor(DbEntity):  # type: ignore
     """ Промежуточная модель хранения всех пользователей, участвовавших в написании рассказов """
 
     # is_editor, is_author:
@@ -719,7 +729,7 @@ class StoryContributor(db.Entity):
         self.updated_at = datetime.utcnow()
 
 
-class CoAuthorsSeries(db.Entity):
+class CoAuthorsSeries(DbEntity):  # type: ignore
     """ Промежуточная модель хранения взаимосвязей авторства серий (включая соавторов) """
 
     author = orm.Optional(Author)
@@ -727,7 +737,7 @@ class CoAuthorsSeries(db.Entity):
     approved = orm.Required(bool, default=False)
 
 
-class StoryComment(db.Entity):
+class StoryComment(DbEntity):  # type: ignore
     """ Модель комментария к рассказу """
 
     id = orm.PrimaryKey(int, auto=True)
@@ -784,7 +794,7 @@ class StoryComment(db.Entity):
         self.updated = datetime.utcnow()
 
 
-class StoryCommentEdit(db.Entity):
+class StoryCommentEdit(DbEntity):  # type: ignore
     """ Модель с информацией о редактировании комментария к рассказу """
 
     comment = orm.Required(StoryComment)
@@ -795,7 +805,7 @@ class StoryCommentEdit(db.Entity):
     ip = orm.Required(str, 50, default=ipaddress.ip_address('::1').exploded)
 
 
-class StoryCommentVote(db.Entity):
+class StoryCommentVote(DbEntity):  # type: ignore
     """ Модель голосования за комментарий к рассказу """
 
     comment = orm.Required(StoryComment)
@@ -804,7 +814,7 @@ class StoryCommentVote(db.Entity):
     vote_value = orm.Required(int, default=0)
 
 
-class StoryLocalThread(db.Entity):
+class StoryLocalThread(DbEntity):  # type: ignore
     """ Временный костыль из-за ограниченной гибкости комментариев """
     story = orm.Required(Story, unique=True)
     comments_count = orm.Required(int, size=16, unsigned=True, default=0)
@@ -813,7 +823,7 @@ class StoryLocalThread(db.Entity):
     bl = Resource('bl.story_local_thread')
 
 
-class StoryLocalComment(db.Entity):
+class StoryLocalComment(DbEntity):  # type: ignore
     """ Модель комментария к рассказу """
 
     id = orm.PrimaryKey(int, auto=True)
@@ -858,7 +868,7 @@ class StoryLocalComment(db.Entity):
         self.updated = datetime.utcnow()
 
 
-class StoryLocalCommentEdit(db.Entity):
+class StoryLocalCommentEdit(DbEntity):  # type: ignore
     """ Модель с информацией о редактировании комментария к рассказу """
 
     comment = orm.Required(StoryLocalComment)
@@ -869,7 +879,7 @@ class StoryLocalCommentEdit(db.Entity):
     ip = orm.Required(str, 50, default=ipaddress.ip_address('::1').exploded)
 
 
-class Vote(db.Entity):
+class Vote(DbEntity):  # type: ignore
     """ Модель голосований """
 
     author = orm.Optional(Author)
@@ -884,21 +894,21 @@ class Vote(db.Entity):
     orm.composite_key(author, story)
 
 
-class Favorites(db.Entity):
+class Favorites(DbEntity):  # type: ignore
     """ Модель избранного """
     author = orm.Required(Author)
     story = orm.Required(Story)
     date = orm.Required(datetime, 6, default=datetime.utcnow)
 
 
-class Bookmark(db.Entity):
+class Bookmark(DbEntity):  # type: ignore
     """ Модель закладок """
     author = orm.Required(Author)
     story = orm.Required(Story)
     date = orm.Required(datetime, 6, default=datetime.utcnow)
 
 
-class StoryView(db.Entity):
+class StoryView(DbEntity):  # type: ignore
     """ Модель просмотров """
     # NOTE: Будет расширена и переименована для серий
     author = orm.Optional(Author)
@@ -907,7 +917,7 @@ class StoryView(db.Entity):
     chapter = orm.Optional(Chapter)
 
 
-class Activity(db.Entity):
+class Activity(DbEntity):  # type: ignore
     """ Модель отслеживания активности """
 
     author = orm.Optional(Author)
@@ -920,7 +930,7 @@ class Activity(db.Entity):
     last_local_comment_id = orm.Required(int, default=0, optimistic=False)
 
 
-class StoryLog(db.Entity):
+class StoryLog(DbEntity):  # type: ignore
     created_at = orm.Required(datetime, 6, default=datetime.utcnow, index=True)
     user = orm.Optional(Author)
     story = orm.Required(Story)
@@ -956,7 +966,7 @@ class StoryLog(db.Entity):
         return json.loads(self.data_json)
 
 
-class NewsItem(db.Entity):
+class NewsItem(DbEntity):  # type: ignore
     """ Модель новости """
 
     name = orm.Required(str, 64, index=True, unique=True)
@@ -982,7 +992,7 @@ class NewsItem(db.Entity):
         self.updated = datetime.utcnow()
 
 
-class NewsComment(db.Entity):
+class NewsComment(DbEntity):  # type: ignore
     """ Модель комментария к новости """
 
     id = orm.PrimaryKey(int, auto=True)
@@ -1031,7 +1041,7 @@ class NewsComment(db.Entity):
         self.updated = datetime.utcnow()
 
 
-class NewsCommentEdit(db.Entity):
+class NewsCommentEdit(DbEntity):  # type: ignore
     """ Модель с информацией о редактировании комментария к новости """
 
     comment = orm.Required(NewsComment)
@@ -1042,7 +1052,7 @@ class NewsCommentEdit(db.Entity):
     ip = orm.Required(str, 50, default=ipaddress.ip_address('::1').exploded)
 
 
-class NewsCommentVote(db.Entity):
+class NewsCommentVote(DbEntity):  # type: ignore
     """ Модель голосования за комментарий к новости """
 
     comment = orm.Required(NewsComment)
@@ -1051,7 +1061,7 @@ class NewsCommentVote(db.Entity):
     vote_value = orm.Required(int, default=0)
 
 
-class StaticPage(db.Entity):
+class StaticPage(DbEntity):  # type: ignore
     name = orm.Required(str, 64)
     lang = orm.Required(str, 6, default='none')
     title = orm.Optional(str, 192)
@@ -1078,7 +1088,7 @@ class StaticPage(db.Entity):
         self.updated = datetime.utcnow()
 
 
-class HtmlBlock(db.Entity):
+class HtmlBlock(DbEntity):  # type: ignore
     name = orm.Required(str, 64)
     lang = orm.Required(str, 6, default='none')
     title = orm.Optional(orm.LongStr)
@@ -1099,7 +1109,7 @@ class HtmlBlock(db.Entity):
         self.updated = datetime.utcnow()
 
 
-class Notification(db.Entity):
+class Notification(DbEntity):  # type: ignore
     """Модель уведомления о каком-то событии на сайте.
 
     Шпаргалка по ныне существующим событиям (в скобках тип, на который
@@ -1125,7 +1135,7 @@ class Notification(db.Entity):
     extra = orm.Required(orm.LongStr, lazy=False, default='{}')
 
 
-class Subscription(db.Entity):
+class Subscription(DbEntity):  # type: ignore
     """Модель с информацией о подписке на уведомления.
 
     Куда указывает target_id:
@@ -1144,7 +1154,7 @@ class Subscription(db.Entity):
     orm.composite_index(type, target_id)
 
 
-class AbuseReport(db.Entity):
+class AbuseReport(DbEntity):  # type: ignore
     """Жалоба на какой-либо объект:
 
     - story: на рассказ
@@ -1198,7 +1208,7 @@ class AbuseReport(db.Entity):
         return 'Жалоба от {} на {}'.format(username, target)
 
 
-class AdminLogType(db.Entity):
+class AdminLogType(DbEntity):  # type: ignore
     """Типы моделей, используемых в истории изменений в админке. Используется
     для составления соответствия id-модель.
     """
@@ -1209,9 +1219,10 @@ class AdminLogType(db.Entity):
     log = orm.Set('AdminLog')
 
 
-class AdminLog(db.Entity):
+class AdminLog(DbEntity):  # type: ignore
     """Лог изменений в админке"""
     # ported from django
+    id: int
 
     action_time = orm.Required(datetime, 6, default=datetime.utcnow)
     user = orm.Optional(Author)

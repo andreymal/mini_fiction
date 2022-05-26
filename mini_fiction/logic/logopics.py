@@ -76,12 +76,12 @@ def delete(logopic: Logopic, author: Author) -> None:
 
 
 def get_all() -> List[PreparedLogopic]:
-    result = get_cache().get("logopics")
+    result: Optional[List[PreparedLogopic]] = get_cache().get("logopics")
     if result is not None:
         return result
 
     result = []
-    for lp in Logopic.select(lambda x: x.visible):  # type: Logopic
+    for lp in Logopic.select(lambda x: x.visible):
 
         original_link_label = {"": ""}
         for line in lp.original_link_label.split("\n"):

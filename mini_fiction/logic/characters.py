@@ -71,7 +71,7 @@ def update(character: Character, author: Author, data: RawData) -> None:
 
     for key, value in data.items():
         if key == "group":
-            if character.group.id != value:
+            if character.group is not None and character.group.id != value:
                 setattr(character, key, value)
                 changed_fields |= {key}
         elif getattr(character, key) != value:

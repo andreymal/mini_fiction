@@ -7,7 +7,7 @@ from uuid import uuid4
 from flask import current_app
 from PIL.Image import Image, Resampling, UnidentifiedImageError
 from PIL.Image import open as open_image
-from pydantic import BaseModel  # pylint: disable=no-name-in-module
+from pydantic import BaseModel
 
 IMAGE_QUALITY = 85  # It's enough
 

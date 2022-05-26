@@ -172,12 +172,11 @@ def sitedescription():
     return current_app.config['SITE_DESCRIPTION'].get(g.locale.language) or current_app.config['SITE_DESCRIPTION'].get('default', '')
 
 
-def call_after_request(f, *args, **kwargs):
+def call_after_request(f, *args, **kwargs) -> None:
     # FIXME: не будет лишней опция отмены вызова при ошибке 500
     if not hasattr(g, 'after_request_callbacks'):
         g.after_request_callbacks = []
     g.after_request_callbacks.append((f, args, kwargs))
-    return f
 
 
 def calc_maxdepth(user=None):

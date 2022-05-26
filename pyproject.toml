@@ -92,6 +92,7 @@ pytest-metadata = "^2.0.1"
 pytest = ">=6.2,<7.0"
 tox = "^3.25.0"
 tox-poetry = "^0.4.1"
+pony-stubs = "^0.5.2"
 
 [tool.poetry.extras]
 full = [
@@ -124,14 +125,9 @@ multi_line_output = 3
 
 [tool.mypy]
 ignore_missing_imports = true
-no_implicit_reexport = true
-check_untyped_defs = true
-disallow_any_generics = true
-disallow_untyped_defs = true
-follow_imports = "silent"
+follow_imports = "normal"
 strict_optional = true
-warn_redundant_casts = true
-warn_unused_ignores = true
+strict = true
 files = ["mini_fiction/logic/*.py"]
 plugins = ["pydantic.mypy"]
 
@@ -144,6 +140,7 @@ warn_untyped_fields = true
 [tool.pylint.MASTER]
 jobs = 0
 [tool.pylint."MESSAGES CONTROL"]
+extension-pkg-whitelist = "pydantic"
 disable = [
     "invalid-name",
     "missing-module-docstring",

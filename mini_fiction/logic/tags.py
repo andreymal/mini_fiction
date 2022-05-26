@@ -2,7 +2,7 @@ from collections import defaultdict
 from dataclasses import dataclass
 from itertools import chain, islice
 from operator import attrgetter
-from typing import List, Tuple
+from typing import List, Optional, Set, Tuple
 
 from mini_fiction.models import Story, StoryTag, Tag, TagCategory
 
@@ -17,7 +17,7 @@ class PreparedTags:
     spoiler: List[Tag]
 
 
-def _group_key(tag: Tag) -> TagCategory:
+def _group_key(tag: Tag) -> Optional[TagCategory]:
     return tag.category
 
 
@@ -46,7 +46,7 @@ def _group_tags(tags: List[Tag]) -> Tuple[List[Tag], List[Tag]]:
     return primary, secondary
 
 
-def _get_prepared_tags(story_tags: List[StoryTag]) -> PreparedTags:
+def _get_prepared_tags(story_tags: Set[StoryTag]) -> PreparedTags:
     sorted_tags: List[Tag] = sorted(
         (st.tag for st in story_tags), key=attrgetter("category", "iname")
     )

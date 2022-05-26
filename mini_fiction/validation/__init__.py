@@ -1,10 +1,7 @@
-#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
-
 import re
 import copy
 from collections.abc import Iterable
-from typing import Any, Dict
+from typing import Any, Dict, List
 
 import cerberus
 from werkzeug.datastructures import FileStorage
@@ -20,10 +17,11 @@ DYNREGEX_MISMATCH = cerberus.errors.ErrorDefinition(0x4141, 'dynregex')
 file_type = cerberus.TypeDefinition('file', (FileStorage,), ())
 
 RawData = Dict[str, Any]
+ValidatedData = Dict[str, Any]
 
 
 class ValidationError(ValueError):
-    def __init__(self, errors):
+    def __init__(self, errors: Dict[str, List[str]]):
         super().__init__()
         self.errors = errors
         if not isinstance(errors, dict):
@@ -148,7 +146,7 @@ class Validator(cerberus.Validator):
     types_mapping = cerberus.Validator.types_mapping.copy()
     types_mapping['file'] = file_type
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, *args, **kwargs) -> None:
         if args:
             if 'schema' in kwargs:  # pragma: no cover
                 raise TypeError("got multiple values for argument 'schema'")
@@ -181,7 +179,7 @@ class Validator(cerberus.Validator):
                     msgs[k] = {}
                     queue.append((v, msgs[k]))
 
-    def validated(self, *args, **kwargs):
+    def validated(self, *args, **kwargs) -> ValidatedData:
         throw_exception = kwargs.pop('throw_exception', True)
         result = super().validated(*args, **kwargs)
         if result is None and throw_exception:

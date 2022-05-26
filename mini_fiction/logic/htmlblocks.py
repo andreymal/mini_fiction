@@ -1,9 +1,9 @@
-from dataclasses import dataclass
 from typing import Optional, TypedDict, Union
 
 from flask import current_app, render_template
 from flask_babel import lazy_gettext
 from markupsafe import Markup
+from pydantic import BaseModel
 
 from mini_fiction.logic.adminlog import log_addition, log_changed_fields, log_deletion
 from mini_fiction.logic.caching import get_cache
@@ -19,12 +19,11 @@ class HtmlBlockContext(TypedDict):
     current_user: Optional[Union[AnonymousUser, Author]]
 
 
-@dataclass
-class RenderedHtmlBlock:
-    name: str = ""
-    lang: str = "none"
-    title: str = ""
-    content: str = ""
+class RenderedHtmlBlock(BaseModel):
+    name: str
+    lang: str
+    title: str
+    content: str
 
     def __html__(self) -> Markup:
         return Markup(self.content)
@@ -33,10 +32,12 @@ class RenderedHtmlBlock:
         return self.content
 
 
-EMPTY_BLOCK = RenderedHtmlBlock()
+EMPTY_BLOCK = RenderedHtmlBlock(name="", lang="none", title="", content="")
 
-ERROR_BLOCK = RenderedHtmlBlock(
-    content='<span style="color: red; font-size: 1.5em; display: inline-block;">[ERROR]</span>'
+ERROR_BLOCK = EMPTY_BLOCK.copy(
+    update=dict(
+        content='<span style="color: red; font-size: 1.5em; display: inline-block;">[ERROR]</span>'
+    )
 )
 
 
@@ -174,8 +175,8 @@ def render_block(
     rendered_block = RenderedHtmlBlock(
         name=htmlblock.name,
         lang=htmlblock.lang,
-        title=htmlblock.title,
-        content=htmlblock.content,
+        title=htmlblock.title or "",
+        content=htmlblock.content or "",
     )
     if not htmlblock.is_template:
         return rendered_block
@@ -195,7 +196,7 @@ def _render_context(
     user: Union[Author, AnonymousUser],
 ) -> HtmlBlockContext:
     return {
-        "htmlblock_name": htmlblock.name if htmlblock else "",
-        "htmlblock_title": htmlblock.title if htmlblock else "",
+        "htmlblock_name": str(htmlblock.name) if htmlblock else "",
+        "htmlblock_title": str(htmlblock.title) if htmlblock else "",
         "current_user": user,
     }

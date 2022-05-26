@@ -93,6 +93,7 @@ pytest = ">=6.2,<7.0"
 tox = "^3.25.0"
 tox-poetry = "^0.4.1"
 pony-stubs = "^0.5.2"
+types-Pillow = "^9.0.17"
 
 [tool.poetry.extras]
 full = [
@@ -156,6 +157,13 @@ disable = [
 ]
 [tool.pylint.TYPECHECK]
 generated-members = "flush"
+
+[tool.pyright]
+include = ["mini_fiction/logic/**/*"]
+typeCheckingMode = "basic"
+reportMissingImports = true
+reportMissingTypeStubs = false
+
 
 [tool.tox]
 # See: https://github.com/tox-dev/tox/issues/999

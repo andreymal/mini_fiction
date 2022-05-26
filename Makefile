@@ -57,6 +57,7 @@ lint:
 	pylint mini_fiction/logic
 	mypy
 	flake8 mini_fiction/logic
+	pyright
 
 format:
 	isort mini_fiction/logic

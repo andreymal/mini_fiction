@@ -181,7 +181,7 @@ def render_block(
     if not htmlblock.is_template:
         return rendered_block
 
-    template = current_app.jinja_env.from_string(htmlblock.content)
+    template = current_app.jinja_env.from_string(htmlblock.content or "")
     template.name = f"db/htmlblocks/{htmlblock.name}.html"
     rendered_block.content = render_template(
         template,

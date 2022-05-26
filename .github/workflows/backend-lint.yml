@@ -27,11 +27,9 @@ jobs:
         run: |
           poetry env use ${{ matrix.python-version }}
           poetry run pylint mini_fiction/logic
+          poetry run flake8 mini_fiction/logic
       - name: Type checks
         run: |
           poetry env use ${{ matrix.python-version }}
           poetry run mypy
-      - name: Style checks
-        run: |
-          poetry env use ${{ matrix.python-version }}
-          poetry run flake8 mini_fiction/logic
+          poetry run pyright

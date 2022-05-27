@@ -8,3 +8,4 @@ format-greedy=0
 
 banned-modules =
     typing.Any = What good is typing if it is explicitly violated?.
+    flask.current_app = Use typed getters instead

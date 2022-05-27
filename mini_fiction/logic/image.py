@@ -184,7 +184,8 @@ def save_image(
     original = _save_original_image(
         relative_path=relative_path,
         raw_data=raw_data,
-        extension=image.format.lower(),  # noqa: FS002
+        # SAFETY: Proved negative type narrowing due to early return on top of function
+        extension=image.format.lower(),  # pyright: reportOptionalMemberAccess=false
     )
     resized = _save_resized_image(
         relative_path=relative_path, bundle=bundle, image=image

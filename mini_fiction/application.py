@@ -56,6 +56,8 @@ def create_app():
         static_folder=config_obj.STATIC_ROOT,
         static_url_path=config_obj.STATIC_URL,
     )
+    # NOTE: Use typed configuration as transitional layer
+    app.settings = config_obj
     app.config.from_object(config_obj)
 
     default_handler.setLevel(app.config['LOGLEVEL'])

@@ -1,6 +1,6 @@
 from typing import Literal
 
-from flask import current_app, g
+from flask import current_app, g  # noqa: I251
 
 RegisteredTask = Literal[
     "sendmail",

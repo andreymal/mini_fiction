@@ -4,12 +4,12 @@ from pathlib import Path
 from typing import ClassVar, Dict, Literal, Optional, Set, Type, Union
 from uuid import uuid4
 
-from flask import current_app
-
 # NOTE: Typing skipped due to outdated types-Pillow
 from PIL.Image import Image, Resampling, UnidentifiedImageError  # type: ignore
 from PIL.Image import open as open_image
 from pydantic import BaseModel
+
+from mini_fiction.logic.environment import get_settings
 
 IMAGE_QUALITY = 85  # It's enough
 
@@ -113,7 +113,7 @@ def _save_resized_image(
     bundle: Type[ImageBundle],
     image: Image,
 ) -> ImageBundle:
-    media_root: Path = current_app.config["MEDIA_ROOT"]
+    media_root: Path = get_settings().MEDIA_ROOT
     dimensions = {
         (width, (width if bundle in SQUARE_IMAGES else None))
         for width in _extract_width_dimension(bundle=bundle)
@@ -145,7 +145,7 @@ def _save_resized_image(
 def _save_original_image(
     *, relative_path: Path, raw_data: bytes, extension: str
 ) -> str:
-    media_root: Path = current_app.config["MEDIA_ROOT"]
+    media_root: Path = get_settings().MEDIA_ROOT
     save_path = relative_path.with_suffix(f".orig.{extension}")
     (media_root / save_path).write_bytes(raw_data)
     return save_path.as_posix()
@@ -179,7 +179,7 @@ def save_image(
         / name
     )
 
-    media_root: Path = current_app.config["MEDIA_ROOT"]
+    media_root: Path = get_settings().MEDIA_ROOT
     (media_root / relative_path).parent.mkdir(parents=True, exist_ok=True)
 
     original = _save_original_image(
@@ -199,7 +199,7 @@ def cleanup_image(saved_image: SavedImage) -> None:
     if saved_image is None:
         return
 
-    media_root: Path = current_app.config["MEDIA_ROOT"]
+    media_root: Path = get_settings().MEDIA_ROOT
 
     for name, meta in saved_image.resized:
         if name.startswith("x"):

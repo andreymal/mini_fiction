@@ -5,7 +5,7 @@ from datetime import datetime
 from typing import Dict, List, Optional
 
 from mini_fiction.logic.adminlog import log_addition, log_changed_fields, log_deletion
-from mini_fiction.logic.caching import get_cache
+from mini_fiction.logic.environment import get_cache
 from mini_fiction.logic.image import LogopicBundle, cleanup_image, save_image
 from mini_fiction.models import Author, Logopic
 from mini_fiction.utils.misc import call_after_request as later

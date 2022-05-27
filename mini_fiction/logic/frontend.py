@@ -5,10 +5,11 @@ from itertools import chain
 from pathlib import Path
 from typing import Dict, List, Optional, Tuple
 
-from flask import current_app, g, url_for
+from flask import g, url_for
 from pydantic import BaseModel, parse_file_as
 from werkzeug.datastructures import MultiDict
 
+from mini_fiction.logic.environment import get_settings
 from mini_fiction.settings import FaviconBundle
 
 PLAIN_STYLESHEET = re.compile(r".*\.css$")
@@ -54,15 +55,16 @@ def get_manifest(*, bundle_type: str, path: Path) -> ResolvedAssets:
 
 # pylint: disable=unsubscriptable-object
 def _get_assets() -> MultiDict[str, ResolvedAsset]:
-    static_root = Path(current_app.config["STATIC_ROOT"])
+    static_root = Path(get_settings().STATIC_ROOT)
     bundled_manifests = chain(
         *(
             get_manifest(bundle_type="static", path=manifest_path)
             for manifest_path in static_root.glob("*/manifest.json")
         )
     )
-    if current_app.config["LOCALSTATIC_ROOT"] is not None:
-        localstatic_root = Path(current_app.config["LOCALSTATIC_ROOT"])
+    localstatic_root_path = get_settings().LOCALSTATIC_ROOT
+    if localstatic_root_path is not None:
+        localstatic_root = Path(localstatic_root_path)
         localstatic_manifests = chain(
             *(
                 get_manifest(bundle_type="localstatic", path=manifest_path)
@@ -77,7 +79,7 @@ def _get_assets() -> MultiDict[str, ResolvedAsset]:
 
 # pylint: disable=unsubscriptable-object
 def get_assets() -> MultiDict[str, ResolvedAsset]:
-    if current_app.config["FRONTEND_MANIFESTS_AUTO_RELOAD"]:
+    if get_settings().FRONTEND_MANIFESTS_AUTO_RELOAD:
         # Always serve assets from fresh manifests
         return _get_assets()
 
@@ -106,7 +108,7 @@ def scripts(*, entrypoint: bool = False) -> List[ResolvedAsset]:
 
 
 def favicon_bundle() -> FaviconBundle:
-    config_favicons: Optional[FaviconBundle] = current_app.config.get("FAVICONS")
+    config_favicons: Optional[FaviconBundle] = get_settings().FAVICONS
     if config_favicons is not None:
         return config_favicons
 

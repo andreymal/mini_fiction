@@ -1,12 +1,12 @@
 from typing import Optional, TypedDict, Union
 
-from flask import current_app, render_template
+from flask import render_template
 from flask_babel import lazy_gettext
 from markupsafe import Markup
 from pydantic import BaseModel
 
 from mini_fiction.logic.adminlog import log_addition, log_changed_fields, log_deletion
-from mini_fiction.logic.caching import get_cache
+from mini_fiction.logic.environment import get_cache, get_jinja, get_settings
 from mini_fiction.models import ANON, AnonymousUser, Author, HtmlBlock
 from mini_fiction.utils.misc import call_after_request as later
 from mini_fiction.validation import RawData, ValidationError, Validator
@@ -113,7 +113,7 @@ def delete(htmlblock: HtmlBlock, author: Author) -> None:
 
 
 def clear_cache(name: str) -> None:
-    for lang in current_app.config["LOCALES"]:
+    for lang in get_settings().LOCALES:
         cache_key = f"block_{lang}_{name}"
         get_cache().set(cache_key, None, 1)
 
@@ -126,7 +126,7 @@ def check_renderability(
     htmlblock: Optional[HtmlBlock] = None,
 ) -> None:
     try:
-        template = current_app.jinja_env.from_string(content)
+        template = get_jinja().from_string(content)
         template.name = f"db/htmlblocks/{name}.html"
     except Exception as exc:
         raise ValidationError(
@@ -181,7 +181,7 @@ def render_block(
     if not htmlblock.is_template:
         return rendered_block
 
-    template = current_app.jinja_env.from_string(htmlblock.content or "")
+    template = get_jinja().from_string(htmlblock.content or "")
     template.name = f"db/htmlblocks/{htmlblock.name}.html"
     rendered_block.content = render_template(
         template,

@@ -169,7 +169,7 @@ class Config(object):
     STATIC_ROOT = os.path.join(os.path.dirname(__file__), 'static')
     STATIC_URL = '/static'
 
-    LOCALSTATIC_ROOT = None
+    LOCALSTATIC_ROOT: Optional[str] = None
     LOCALSTATIC_URL = '/localstatic'
 
     MEDIA_ROOT = Path.cwd() / 'media'

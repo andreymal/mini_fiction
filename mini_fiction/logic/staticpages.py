@@ -1,7 +1,8 @@
-from flask import current_app, render_template
+from flask import render_template
 from flask_babel import lazy_gettext
 
 from mini_fiction.logic.adminlog import log_addition, log_changed_fields, log_deletion
+from mini_fiction.logic.environment import get_jinja
 from mini_fiction.models import ANON, Author, StaticPage
 from mini_fiction.validation import RawData, ValidationError, Validator
 from mini_fiction.validation.staticpages import STATIC_PAGE
@@ -78,7 +79,7 @@ def delete(static_page: StaticPage, author: Author) -> None:
 
 def check_renderability(author: Author, name: str, content: str) -> None:
     try:
-        template = current_app.jinja_env.from_string(content)
+        template = get_jinja().from_string(content)
         template.name = f"db/staticpages/{name}.html"
     except Exception as exc:
         raise ValidationError(

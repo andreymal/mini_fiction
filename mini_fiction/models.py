@@ -31,8 +31,8 @@ class Logopic(DbEntity):  # type: ignore
     image_bundle = orm.Optional(orm.Json, optimistic=False)  # FIXME: Remove this workaround after migration
     visible = orm.Required(bool, default=True)
     description = orm.Optional(orm.LongStr)
-    original_link = orm.Optional(str, 255)
-    original_link_label = orm.Optional(orm.LongStr, lazy=False)
+    original_link = orm.Required(str, 255)
+    original_link_label = orm.Required(orm.LongStr, lazy=False)
     created_at = orm.Required(datetime, 6, default=datetime.utcnow)
     updated_at = orm.Required(datetime, 6, default=datetime.utcnow)
 

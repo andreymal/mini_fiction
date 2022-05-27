@@ -26,7 +26,7 @@ LOGOPIC = {
     'original_link': {
         'type': 'string',
         'coerce': safe_string_coerce,
-        'required': False,
+        'required': True,
         'default': '',
         'minlength': 0,
         'maxlength': 255,
@@ -34,7 +34,7 @@ LOGOPIC = {
     'original_link_label': {
         'type': 'string',
         'coerce': safe_string_multiline_coerce,
-        'required': False,
+        'required': True,
         'default': '',
         'minlength': 0,
         'maxlength': 4096,

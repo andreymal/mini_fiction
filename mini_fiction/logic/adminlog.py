@@ -4,8 +4,8 @@ from enum import IntEnum
 from typing import Collection, Dict, List, Optional, Tuple, TypedDict, Union
 
 from flask import url_for
-from pony.orm.core import Entity
 from pony.orm import desc
+from pony.orm.core import Entity
 
 from mini_fiction.models import AdminLog, AdminLogType, Author
 

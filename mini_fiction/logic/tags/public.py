@@ -1,11 +1,13 @@
 from datetime import datetime
 from operator import attrgetter
-from typing import Collection, Dict, List, Literal, Optional, Tuple, TypedDict, Union
+from typing import Collection, Dict, List, Literal, Optional, Tuple, Union
 
 from flask_babel import lazy_gettext
+from pony.orm import desc
+from pydantic import BaseModel
 
 from mini_fiction.logic.adminlog import log_addition, log_changed_fields
-from mini_fiction.logic.caching import get_cache
+from mini_fiction.logic.environment import get_cache
 from mini_fiction.models import Author, Story, StoryTag, Tag, TagCategory
 from mini_fiction.validation import RawData, ValidationError, Validator
 from mini_fiction.validation.tags import TAG
@@ -22,50 +24,40 @@ from .private import (
     validate_tag_name,
 )
 
-TAG_SORTING = {
+TagsSortType = Literal["stories", "date", "name"]
+
+TAG_SORTING: Dict[TagsSortType, Tuple[str, bool]] = {
     "stories": ("published_stories_count", True),
     "date": ("created_at", True),
     "name": ("iname", False),
 }
 
-TagsSortType = Union[Literal["stories"], Literal["date"], Literal["name"]]
 TagsCreationRequest = Tuple[int, str, str]
 
 
-class CategorizedTag(TypedDict):
-    category: Optional[TagCategory]
-    tags: List[Tag]
+class CategorizedTag(BaseModel):
+    category: Optional[TagCategory] = None
+    tags: List[Tag] = []
 
 
-class TagsResponse(TypedDict):
-    """
-    success
-        True, если всё хорошо (в списке tags гарантированно отсутствуют None);
-    tags
-        список из объектов Tag, которые были успешно найдены (соответствует порядку исходному списку tags, вместо
-        ненайденных тегов стоит None);
-    aliases
-        список тегов, оказавшихся алиасами и заменённых на каноничные теги;
-    blacklisted
-        список заблокированных тегов, не попавших в tags;
-    invalid
-        список строк, которые не являются синтаксически корректными тегами (например, пустая строка), и причин
-        некорректности (кортежи из двух элементов);
-    created
-        список свежесозданных тегов, если они создавались (при create=True);
-    nonexisting
-        список из строк, для которых тегов не нашлось (при create=False).
-    """
-
+class TagsResponse(BaseModel):
     success: bool
+    """All requested tags were found"""
     tags: List[Optional[Tag]]
+    """Found tags in initial order of requested strings"""
     aliases: List[Tag]
+    """Aliased tags that were replaced with canonical ones"""
     blacklisted: List[Tag]
-    invalid: List[Union[Tag, str]]
+    """Blocked tags"""
+    invalid: List[Tuple[str, str]]
+    """List of invalid tags alongside with reasons"""
     created: List[Tag]
+    """Created tags, if specified to do so"""
     nonexisting: List[str]
+    """Strings without corresponding tags, when specified to not create tags"""
 
 
+# pylint: disable=too-many-statements
 def get_tags_objects(
     tags: Collection[Union[Tag, str]],
     should_create: bool = False,
@@ -93,21 +85,20 @@ def get_tags_objects(
             }
         )
 
-    result = {
-        "success": True,
-        "tags": [None] * len(tags),
-        "aliases": [],
-        "blacklisted": [],
-        "invalid": [],
-        "created": [],
-        "nonexisting": [],
-    }
+    result = TagsResponse(
+        success=True,
+        tags=[None] * len(tags),
+        aliases=[],
+        blacklisted=[],
+        invalid=[],
+        created=[],
+        nonexisting=[],
+    )
 
     create_tags: List[TagsCreationRequest] = []  # [(index, name, iname), ...]
 
     # Анализируем каждый запрошенный тег
     for i, possible_tag in enumerate(tags):
-        tag: Optional[Tag]
         if isinstance(possible_tag, Tag):
             name = possible_tag.name
             iname = possible_tag.iname
@@ -117,21 +108,22 @@ def get_tags_objects(
             iname = normalize_tag(name)
             tag = None
             if iname:
+                # Check, if such tag even exists
                 tag = tags_db.get(iname)
                 assert iname == normalize_tag(possible_tag)
 
-        if tag:
+        if tag is not None:
             # Если тег существует, проверяем, что его можно использовать
             if tag.is_alias_for:
                 if tag.is_alias_for.is_alias_for:
                     raise RuntimeError(
                         f"Tag alias {tag.id} refers to another alias {tag.is_alias_for.id}!"
                     )
-                result["aliases"].append(tag)
+                result.aliases.append(tag)
                 tag = tag.is_alias_for
             if tag.is_blacklisted:
-                result["blacklisted"].append(tag)
-                result["success"] = False
+                result.blacklisted.append(tag)
+                result.success = False
                 tag = None
 
         elif should_create:
@@ -140,33 +132,35 @@ def get_tags_objects(
                 raise ValueError("Not authenticated")
             reason = validate_tag_name(name)
             if reason is not None:
-                result["invalid"].append((possible_tag, reason))
-                result["success"] = False
+                result.invalid.append((name, reason))
+                result.success = False
             else:
-                create_tags.append((i, name, iname))  # Отложенное создание тегов
-
+                if iname is not None:
+                    create_tags.append((i, name, iname))  # Отложенное создание тегов
+                else:
+                    result.invalid.append((name, lazy_gettext("No such tag")))
         else:
-            result["nonexisting"].append(possible_tag)
-            result["success"] = False
+            result.nonexisting.append(name)
+            result.success = False
 
         if tag:
-            result["tags"][i] = tag
+            result.tags[i] = tag
 
     # Если нужно создать теги, то создаём их только при отсутствии других
     # ошибок, чтобы зазря не мусорить в базу данных
-    if create_tags and result["success"]:
+    if create_tags and result.success:
         for i, name, iname in create_tags:
             if iname in tags_db:
                 # На случай, если пользователь пропихнул дублирующиеся теги
-                result["tags"][i] = tags_db[iname]
+                result.tags[i] = tags_db[iname]
                 continue
             tag = Tag(name=name, iname=iname, created_by=user)
             tag.flush()  # получаем id у базы данных
             tags_db[
                 tag.iname
             ] = tag  # На случай, если у следующего тега в цикле совпадёт iname
-            result["created"].append(tag)
-            result["tags"][i] = tag
+            result.created.append(tag)
+            result.tags[i] = tag
 
         get_cache().delete("tags_autocomplete_default")
 
@@ -188,20 +182,19 @@ def get_tags_with_categories(sort: TagsSortType = "name") -> List[CategorizedTag
     tags = get_all_tags(sort=sort)
 
     categories_dict: Dict[int, CategorizedTag] = {}
-    others: CategorizedTag = {"category": None, "tags": []}
+    others = CategorizedTag()
     for tag in tags:
         if not tag.category:
-            others["tags"].append(tag)
+            others.tags.append(tag)
             continue
         if tag.category.id not in categories_dict:
-            categories_dict[tag.category.id] = {
-                "category": tag.category,
-                "tags": [],
-            }
-        categories_dict[tag.category.id]["tags"].append(tag)
+            categories_dict[tag.category.id] = CategorizedTag(
+                category=tag.category, tags=[]
+            )
+        categories_dict[tag.category.id].tags.append(tag)
 
     result = sorted(
-        categories_dict.values(), key=lambda x: x["category"].id if x else 0
+        categories_dict.values(), key=lambda x: x.category.id if x.category else 0
     )
     result.append(others)
     return result
@@ -212,7 +205,7 @@ def get_tags_with_categories(sort: TagsSortType = "name") -> List[CategorizedTag
 
 def search_by_prefix(name: str, limit: int = 20) -> List[Tag]:
     iname = normalize_tag(name)
-    if not iname or limit < 1:
+    if iname is None or limit < 1:
         return []
     limit = min(limit, 100)
     result = []
@@ -230,15 +223,15 @@ def search_by_prefix(name: str, limit: int = 20) -> List[Tag]:
     if len(result) < limit:
         tags = set(
             Tag.select(
-                lambda x: x.iname.startswith(iname)
+                lambda x: x.iname.startswith(iname)  # type: ignore
                 and not x.is_alias
                 and not x.is_blacklisted
-            ).order_by(Tag.published_stories_count.desc())[: limit + len(result)]
+            ).sort_by(desc(Tag.published_stories_count))[: limit + len(result)]
         )
         # Подключаем синонимы отдельным запросом, чтоб были по порядку ниже несинонимов)
         tags = tags | set(
             Tag.select(
-                lambda x: x.iname.startswith(iname)
+                lambda x: x.iname.startswith(iname)  # type: ignore
                 and x.is_alias
                 and not x.is_blacklisted
             )
@@ -263,7 +256,8 @@ def get_aliases_for(
     if not hidden:
         query = query.filter(lambda x: not x.is_hidden_alias)
     for ts in query:
-        result[ts.is_alias_for.id].append(ts)
+        # SAFETY: Selected only tags with aliases
+        result[ts.is_alias_for.id].append(ts)  # type: ignore
     return result
 
 
@@ -378,7 +372,7 @@ def update(tag: Tag, user: Optional[Author], data: RawData) -> None:
         )
 
 
-def _get_prepared_tags(story_tags: List[StoryTag]) -> PreparedTags:
+def _get_prepared_tags(story_tags: Collection[StoryTag]) -> PreparedTags:
     sorted_tags: List[Tag] = sorted(
         (st.tag for st in story_tags), key=attrgetter("category", "iname")
     )

@@ -3,15 +3,15 @@ from collections import defaultdict
 from dataclasses import dataclass
 from datetime import datetime
 from itertools import chain, islice
-from typing import Collection, List, Optional, Tuple
+from typing import List, Optional, Tuple
 
-from flask import current_app
 from flask_babel import lazy_gettext
 from pony import orm
 
 from mini_fiction.logic.adminlog import log_changed_fields, log_changed_generic
+from mini_fiction.logic.environment import get_settings
+from mini_fiction.logic.tasks import schedule_task
 from mini_fiction.models import Author, StoryTag, StoryTagLog, Tag
-from mini_fiction.utils.misc import call_after_request as later
 from mini_fiction.validation.utils import safe_string_coerce
 
 MAX_TAGS = 5
@@ -25,18 +25,13 @@ class PreparedTags:
     spoiler: List[Tag]
 
 
-def normalize_tag(
-    tag_name: Optional[str],
-    whitelist: Collection[str] = None,
-    delimiters: Collection[str] = None,
-) -> Optional[str]:
+def normalize_tag(tag_name: Optional[str]) -> Optional[str]:
     if not tag_name:
         return None
 
-    if whitelist is None:
-        whitelist = current_app.config["NORMALIZED_TAGS_WHITELIST"]
-    if delimiters is None:
-        delimiters = current_app.config["NORMALIZED_TAGS_DELIMETERS"]
+    whitelist = get_settings().NORMALIZED_TAGS_WHITELIST
+    delimiters = get_settings().NORMALIZED_TAGS_DELIMETERS
+
     tag_name = "".join(
         (
             x if x in whitelist else ("_" if x in delimiters else "")
@@ -111,8 +106,8 @@ def make_alias_for(
                     canonical_tag.published_stories_count += 1
             else:
                 st.delete()
-            later(
-                current_app.tasks["sphinx_update_story"].delay,
+            schedule_task(
+                "sphinx_update_story",
                 st.story.id,
                 ("tag",),
             )
@@ -160,8 +155,8 @@ def set_blacklist(tag: Tag, user: Optional[Author], reason: Optional[str]) -> No
                 modified_by=user,
                 date=tm,
             ).flush()
-            later(
-                current_app.tasks["sphinx_update_story"].delay,
+            schedule_task(
+                "sphinx_update_story",
                 st.story.id,
                 ("tag",),
             )
@@ -189,9 +184,9 @@ def validate_tag_name(raw_tag_name: str) -> Optional[str]:
     if not iname:
         return lazy_gettext("Empty tag")
 
-    for regex, reason in current_app.config["TAGS_BLACKLIST_REGEX"].items():
+    for regex, reason in get_settings().TAGS_BLACKLIST_REGEX.items():
         if re.search(regex, iname, flags=re.IGNORECASE):
-            return reason
+            return str(reason)
 
     return None
 

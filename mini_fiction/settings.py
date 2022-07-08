@@ -438,6 +438,10 @@ class Config(object):
     RECAPTCHA_PRIVATE_KEY = ''
     RECAPTCHA_OPTIONS = {'hl': 'ru'}
 
+    # hCaptcha config
+    HCAPTCHA_PUBLIC_KEY = ''
+    HCAPTCHA_PRIVATE_KEY = ''
+
     # Sitemap
     SITEMAP_STORIES_PER_FILE = 1000
     SITEMAP_PING_URLS = []  # ['http://google.com/ping?sitemap={url}', ...]

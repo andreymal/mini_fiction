@@ -226,6 +226,42 @@ class ReCaptcha(BaseCaptcha):
         return bool(answer.get('success'))
 
 
+class HCaptcha(BaseCaptcha):
+    def __init__(self, app):
+        super().__init__(app)
+        if 'HCAPTCHA_PUBLIC_KEY' not in app.config or 'HCAPTCHA_PRIVATE_KEY' not in app.config:
+            raise ValueError('HCAPTCHA_PUBLIC_KEY and HCAPTCHA_PRIVATE_KEY configs are required')
+        self.key = app.config['HCAPTCHA_PUBLIC_KEY']
+        self.private_key = app.config['HCAPTCHA_PRIVATE_KEY']
+        self.user_agent = app.user_agent
+
+    def generate(self, lazy=True):
+        return {'cls': 'mini_fiction.captcha.HCaptcha', 'hcaptcha_key': self.key}
+
+    def get_fields(self):
+        return ('h-captcha-response',)
+
+    def check(self, form):
+        resp = form.get('h-captcha-response')
+        if not resp or not isinstance(resp, str) or len(resp) > 8192:
+            return False
+
+        req = Request('https://hcaptcha.com/siteverify')
+        req.add_header('Content-Type', 'application/x-www-form-urlencoded')
+        req.add_header('User-Agent', self.user_agent)
+        req.data = 'secret={}&response={}'.format(
+            quote(self.private_key), quote(resp)
+        ).encode('utf-8')
+
+        try:
+            answer = urlopen(req, timeout=20).read()
+            answer = dict(json.loads(answer.decode('utf-8')))
+        except Exception:
+            return False
+
+        return bool(answer.get('success'))
+
+
 class CaptchaError(ValueError):
     # TODO: refactor exceptions
     pass

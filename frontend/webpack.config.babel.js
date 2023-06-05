@@ -6,7 +6,9 @@ import TerserPlugin from 'terser-webpack-plugin';
 import { CleanWebpackPlugin } from 'clean-webpack-plugin';
 import CompressionPlugin from 'compression-webpack-plugin';
 
+import postcss from 'postcss';
 import postCSSAutoPrefixer from 'autoprefixer';
+import postCSSGlobalData from '@csstools/postcss-global-data';
 import postCSSNesting from 'postcss-nesting';
 import postCSSMixins from 'postcss-mixins';
 import postCSSNano from 'cssnano';
@@ -32,10 +34,12 @@ const postCSSOptions = {
     postCSSMixins(),
     postCSSNesting(),
     postCSSMoveProps({
-      computeCustomProps: postCSSCustomProperties({
-        preserve: false,
-        importFrom: path.resolve(__dirname, 'src', 'css', 'variables.css'),
-      }).Once,
+      computeCustomProps: root => postcss([
+        postCSSGlobalData({
+          files: [path.resolve(__dirname, 'src', 'css', 'variables.css')],
+        }),
+        postCSSCustomProperties({preserve: false}),
+      ]).process(root),
     }),
     postCSSNano({
       preset: ['default', {
@@ -164,6 +168,7 @@ module.exports = {
           'svg-url-loader', // or file-loader or svg-url-loader
           'svg-transform-loader',
         ],
+        type: 'javascript/auto', // https://github.com/bhovhannes/svg-url-loader/issues/524
       },
       {
         test: /\.(png|webp|jpg|gif|eot|ttf|woff|woff2)$/,

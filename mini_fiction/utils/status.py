@@ -39,7 +39,6 @@ class SystemStatus(Status):
     title = 'System information'
     labels = {
         'python': 'Python',
-        'env': 'Flask environment',
         'config': 'Configuration',
         'db': 'DB Provider',
         'sysencoding': 'Default encoding',
@@ -48,9 +47,6 @@ class SystemStatus(Status):
 
     def python(self):
         return self._ok('python', sys.version.replace('\n', ' '))
-
-    def env(self):
-        return self._ok('env', self.app.config['ENV'])
 
     def config(self):
         return self._ok('config', os.environ.get('MINIFICTION_SETTINGS'))
@@ -73,7 +69,6 @@ class SystemStatus(Status):
 
     def generate(self):
         yield self.python()
-        yield self.env()
         yield self.config()
         yield self.db()
         yield self.sysencoding()

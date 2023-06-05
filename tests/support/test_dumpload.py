@@ -6,6 +6,7 @@
 import os
 import json
 import zipfile
+from pathlib import Path
 
 from mini_fiction import models, dumpload
 from mini_fiction.database import db
@@ -28,7 +29,7 @@ def test_zip_dump_complex(app, factories):
     db.commit()
 
     try:
-        dumpload.zip_dump(zip_path)
+        dumpload.zip_dump(Path(zip_path))
 
         assert os.path.isfile(zip_path)
 

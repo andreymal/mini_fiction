@@ -25,7 +25,7 @@ from flask_login import LoginManager, current_user
 from flask.logging import default_handler
 from flask_wtf.csrf import CSRFProtect, CSRFError
 from flask_cors import CORS
-from pony.flask import Pony
+from pony import orm
 
 from mini_fiction import models  # pylint: disable=unused-import
 from mini_fiction import database, tasks, context_processors, ratelimit
@@ -48,7 +48,11 @@ class LazySecureCookieSessionInterface(flask_sessions.SecureCookieSessionInterfa
 
 
 def create_app():
-    select_default_settings()
+    if os.path.isfile(os.path.join(os.getcwd(), 'local_settings.py')):
+        os.environ.setdefault('MINIFICTION_SETTINGS', 'local_settings.Local')
+    else:
+        os.environ.setdefault('MINIFICTION_SETTINGS', 'mini_fiction.settings.Config')
+
     config_obj = import_string(os.environ.get('MINIFICTION_SETTINGS'))
 
     app = Flask(
@@ -81,7 +85,21 @@ def create_app():
     # outside of the db_session context (after commit), so attach it before Pony ORM
     configure_after_request_callbacks(app)
 
-    Pony(app)  # binds db_session to before_request/teardown_request
+
+    @app.before_request
+    def pony_enter_session():
+        session = orm.db_session()
+        request.pony_session = session
+        session.__enter__()
+
+    @app.teardown_request
+    def pony_exit_session(exception):
+        # pony.flask.Pony is broken, so we have to implement a fixed version here
+        # https://github.com/ponyorm/pony/pull/660
+        session = getattr(request, 'pony_session', None)
+        if session is not None:
+            session.__exit__(exc=exception)
+            del request.pony_session  # this line is the fix
 
     init_bl()
 
@@ -115,26 +133,6 @@ def create_app():
     CORS(app, resources={r"/static/*": {"origins": "*"}})
 
     return app
-
-
-def select_default_settings():
-    if os.environ.get('MINIFICTION_SETTINGS'):
-        return
-
-    if os.path.isfile(os.path.join(os.getcwd(), 'local_settings.py')):
-        os.environ.setdefault(
-            'MINIFICTION_SETTINGS',
-            'local_settings.Test' if os.environ.get('FLASK_ENV') == 'test' else 'local_settings.Local'
-        )
-
-    elif os.environ.get('FLASK_ENV') == 'test':  # see tests/conftest.py
-        os.environ.setdefault('MINIFICTION_SETTINGS', 'mini_fiction.settings.Test')
-
-    elif os.environ.get('FLASK_ENV') == 'development':  # uses .env file if started by mini_fiction command
-        os.environ.setdefault('MINIFICTION_SETTINGS', 'mini_fiction.settings.Development')
-
-    else:
-        os.environ.setdefault('MINIFICTION_SETTINGS', 'mini_fiction.settings.Config')
 
 
 def configure_after_request_callbacks(app):
@@ -191,9 +189,6 @@ def configure_user_agent(app):
 
 
 def configure_i18n(app):
-    babel = flask_babel.Babel(app)
-
-    @babel.localeselector
     def get_locale():
         if not request:
             if hasattr(g, 'locale'):
@@ -205,13 +200,14 @@ def configure_i18n(app):
             return locale
         return request.accept_languages.best_match(locales)
 
-    @babel.timezoneselector
     def get_timezone():
         if not request:
             if hasattr(g, 'timezone'):
                 return g.timezone
             raise RuntimeError('Babel is used outside of request context, please set g.timezone')
         return current_user.timezone or None
+
+    babel = flask_babel.Babel(app, locale_selector=get_locale, timezone_selector=get_timezone)
 
     @app.before_request
     def before_request():

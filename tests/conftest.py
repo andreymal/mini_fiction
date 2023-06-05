@@ -20,7 +20,9 @@ flask_app = None
 @pytest.fixture(scope="session", autouse=True)
 def app():
     global flask_app
-    os.environ.setdefault('FLASK_ENV', 'test')
+
+    os.environ.setdefault('MINIFICTION_SETTINGS', 'mini_fiction.settings.Test')
+
     flask_app = create_app()
     if not flask_app.config['TESTING']:
         raise RuntimeError('This is not testing configuration')

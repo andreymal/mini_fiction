@@ -7,7 +7,9 @@ import sys
 import select
 
 import click
+from babel import Locale
 from flask import current_app, g
+from flask_babel import get_babel
 from pony.orm import db_session
 
 from mini_fiction.management.manager import cli
@@ -21,7 +23,7 @@ def shell(command):
     from mini_fiction import models
 
     with db_session:
-        g.locale = current_app.extensions['babel'].default_locale
+        g.locale = Locale.parse(get_babel().default_locale)
 
         local = {
             'mini_fiction': mini_fiction,

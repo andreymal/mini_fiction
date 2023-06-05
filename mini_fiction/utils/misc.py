@@ -10,9 +10,11 @@ from urllib.request import Request, urlopen
 from urllib.parse import quote, urljoin
 from typing import AnyStr, List, Optional
 
+import pytz
 from werkzeug.urls import url_parse
+from babel import Locale
 from flask import current_app, g, render_template, abort, url_for, request, has_request_context
-from flask_babel import pgettext, ngettext
+from flask_babel import get_babel, pgettext, ngettext
 
 from mini_fiction.utils import diff as utils_diff
 
@@ -318,9 +320,9 @@ def render_nonrequest_template(*args, **kwargs):
     чтобы отцепиться от запроса.
     '''
     if not hasattr(g, 'locale'):
-        g.locale = current_app.extensions['babel'].default_locale
+        g.locale = Locale.parse(get_babel().default_locale)
     if not hasattr(g, 'timezone'):
-        g.timezone = current_app.extensions['babel'].default_timezone
+        g.timezone = pytz.timezone(get_babel().default_timezone)
     if not hasattr(g, 'is_ajax'):
         g.is_ajax = False
     if not hasattr(g, 'current_user'):

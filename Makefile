@@ -2,6 +2,7 @@
 
 PYTHON?=python3
 PIP?=pip3
+POETRY?=poetry
 FIND?=find
 YARN?=yarn
 
@@ -65,15 +66,14 @@ format:
 
 test:
 	pybabel compile -d mini_fiction/translations
-	$(PYTHON) setup.py test
+	pytest
 
 test-all:
 	pybabel compile -d mini_fiction/translations
 	tox
 
 coverage:
-	$(PIP) install -r test-requirements.txt
-	py.test --cov=mini_fiction --cov-report=html --cov-branch tests
+	pytest --cov=mini_fiction --cov-report=html --cov-branch tests
 	ls -lh htmlcov/index.html
 
 release: dist
@@ -89,18 +89,16 @@ release-sign-test: dist
 	twine upload --sign --sign-with gpg --repository-url https://test.pypi.org/legacy/ dist/*
 
 dist: clean
-	$(PYTHON) setup.py sdist
 	pybabel compile -d mini_fiction/translations
 	cd frontend && $(YARN) build
-	$(PYTHON) setup.py bdist_wheel
+	$(POETRY) build -f wheel
 	ls -lh dist
 
 install: clean
-	$(PYTHON) setup.py install
+	$(PIP) install .
 
 develop:
-	$(PIP) install -r requirements.txt -r optional-requirements.txt -r dev-requirements.txt -r test-requirements.txt
-	$(PIP) install -e .
+	$(POETRY) install
 	pybabel compile -d mini_fiction/translations
 	cd frontend && $(YARN)
 	cd frontend && $(YARN) webpack

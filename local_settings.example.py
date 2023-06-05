@@ -1,9 +1,6 @@
-#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
-
 import logging
 
-from mini_fiction.settings import Development, Test as BaseTest
+from mini_fiction.settings import Development
 
 
 class Local(Development):
@@ -83,8 +80,3 @@ class Local(Development):
     # CACHE_PARAMS = {
     #     'cache_dir': os.path.join(os.getcwd(), 'cache'),
     # }
-
-
-class Test(BaseTest):
-    # This config will be used with `python setup.py test` command
-    pass

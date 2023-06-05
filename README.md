@@ -7,7 +7,7 @@ Library CMS on Python for fanfics
 
 ## Features
 
-* fanfics with genres, characters and events
+* fanfics with characters and tags
 * comments with trees
 * search (powered by [Manticore])
 * user profiles with contacts
@@ -22,10 +22,21 @@ CMS currently in Russian, and we would be grateful for the translation of all ph
 
 ## Quick start
 
-Install [lxml]. Then:
+mini_fiction is available on PyPI, but it's recommended to use the latest version from GitHub since it's
+more up-to-date. Install Python 3.8, 3.9 or 3.10 and the development tools ([Git], GNU Make, [Poetry],
+[Node.js] and [Yarn]), then run the following commands:
 
 ```bash
-pip install mini_fiction
+git clone https://github.com/andreymal/mini_fiction
+cd mini_fiction
+make install
+```
+
+This project is managed by Poetry; use `poetry shell` the activate the virtual environment.
+
+Then:
+
+```bash
 mkdir media
 mini_fiction seed
 mini_fiction createsuperuser
@@ -34,34 +45,23 @@ mini_fiction run
 
 CMS will be available at `http://localhost:5000/`, administration page is `http://localhost:5000/admin/`.
 
-Flask uses production environment by default. If you want to use a development server, create `.env` file in your
-working directory and put some settings here:
+Use `mini_fiction --debug run` to enable the reloader and debugger (see the Flask documentation for details).
 
-```dotenv
-FLASK_ENV=development
-```
-
-You can override this file using native environment variables (example for bash):
-
-```bash
-export FLASK_ENV=production
-mini_fiction run
-```
+Use `make dist` to create a `.whl` file for use in production.
 
 ## Configuration
 
 Just copy `local_settings.example.py` to `local_settings.py` and edit it.
 Then run `mini_fiction run` in the same directory with this file: settings will be loaded automatically.
-Ensure that `MINIFICTION_SETTINGS` is **not** used in `.env` file.
 
-Alternatively you can put `MINIFICTION_SETTINGS=local_settings.Local` to `.env` file if you think that explicit is
-better than implicit.
-
-If mini_fiction can't import module `local_settings`, try to set environment variable `PYTHONPATH=.`
+If mini_fiction can't import the `local_settings` module, try to set environment variable `PYTHONPATH=.`
 Don't forget `export PYTHONPATH` for unix shells.
 
+You can use the `MINIFICTION_SETTINGS` environment variable to load another settings module, for example
+`MINIFICTION_SETTINGS=my_settings.SuperProd`.
+
 If you want to change domain (e.g. `127.0.0.1:5000` or `example.com` instead of default `localhost:5000`),
-change `SERVER_NAME` option.
+change the `SERVER_NAME` option.
 
 You can run `mini_fiction status` to check some configuration variables.
 
@@ -69,10 +69,16 @@ You can run `mini_fiction status` to check some configuration variables.
 
 Don't forget to change the `SECRET_KEY` option before using mini_fiction on production!
 
-Search, avatars and captcha are disabled by default.
+Search and captcha are disabled by default.
 
 For more information see `INSTALL.md` (in Russian).
 
 [Manticore]: https://manticoresearch.com/
 
-[lxml]: https://lxml.de/installation.html
+[Git]: https://git-scm.com/
+
+[Poetry]: https://python-poetry.org/
+
+[Node.js]: https://nodejs.org/en
+
+[Yarn]: https://yarnpkg.com/

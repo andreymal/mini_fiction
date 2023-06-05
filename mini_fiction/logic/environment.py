@@ -17,4 +17,4 @@ def get_cache() -> BaseCache:
 
 def get_jinja() -> Environment:
     # SAFETY: Assigned by Flask itself
-    return current_app.jinja_env  # type: ignore
+    return current_app.jinja_env

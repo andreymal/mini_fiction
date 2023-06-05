@@ -35,9 +35,9 @@ class RenderedHtmlBlock(BaseModel):
 EMPTY_BLOCK = RenderedHtmlBlock(name="", lang="none", title="", content="")
 
 ERROR_BLOCK = EMPTY_BLOCK.copy(
-    update=dict(
-        content='<span style="color: red; font-size: 1.5em; display: inline-block;">[ERROR]</span>'
-    )
+    update={
+        "content": '<span style="color: red; font-size: 1.5em; display: inline-block;">[ERROR]</span>',
+    }
 )
 
 

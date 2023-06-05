@@ -1,11 +1,12 @@
 import re
 import copy
 from collections.abc import Iterable
-from typing import Any, Dict, List
+from typing import Any, Dict, List, Union
 
 import cerberus
 from werkzeug.datastructures import FileStorage
 from flask_babel import gettext, lazy_gettext
+from flask_babel.speaklater import LazyString
 
 # when https://github.com/nicolaiarocci/cerberus/issues/174 will be solved, it can be rewritten
 
@@ -21,7 +22,7 @@ ValidatedData = Dict[str, Any]
 
 
 class ValidationError(ValueError):
-    def __init__(self, errors: Dict[str, List[str]]):
+    def __init__(self, errors: Dict[str, List[Union[str, LazyString]]]):
         super().__init__()
         self.errors = errors
         if not isinstance(errors, dict):

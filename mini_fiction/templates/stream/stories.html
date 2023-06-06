@@ -1,7 +1,16 @@
 {% extends "stories_list_common.html" %}
 {% set buttons='common' %}
 
+{% from 'macro.html' import atom_feed with context %}
 {% from 'macro.html' import paginator with context %}
+
+{% block feeds %}
+    {{ atom_feed(url_for('feeds.stories'), _('New stories'), False) }}
+{% endblock %}
+
+{% block feeds_footer %}
+    <li>{{ atom_feed(url_for('feeds.stories'), _('New stories'), True) }}</li>
+{% endblock %}
 
 {% block after_list %}
     {% if stories %}{{ paginator(page_obj) }}{% endif %}

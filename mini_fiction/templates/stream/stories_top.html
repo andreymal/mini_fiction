@@ -9,7 +9,7 @@
 {% endblock %}
 
 {% block feeds_footer %}
-    <li>{{ atom_feed(url_for('feeds.top', period=period or None), 'Топ рассказов', False) }}</li>
+    <li>{{ atom_feed(url_for('feeds.top', period=period or None), 'Топ рассказов', True) }}</li>
 {% endblock %}
 
 {% block before_list %}

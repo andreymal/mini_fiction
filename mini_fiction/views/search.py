@@ -46,7 +46,7 @@ def search_action(postform):
     except Exception:
         page_current = 1
 
-    query = postform.data['q']
+    query = postform.data['q'] or ''
     limit = ((page_current - 1) * current_app.config['SPHINX_CONFIG']['limit'], current_app.config['SPHINX_CONFIG']['limit'])
     search_type = postform.data['type']
     sort_type = postform.data['sort']

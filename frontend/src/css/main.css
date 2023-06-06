@@ -29,6 +29,8 @@ a {
 }
 
 .page-header {
+    display: flex;
+    align-items: center;
     background: #1D2A4F no-repeat 0 0;
     height: 80px;
     font-family: Georgia, Times, serif;
@@ -1886,6 +1888,7 @@ a.btn {
 .main-menu .logolink {
     font-size: 38px;
     padding: 0 23px 0 0;
+    line-height: 1;
 }
 
 .main-menu .logolink a {

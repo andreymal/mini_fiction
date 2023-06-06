@@ -1852,16 +1852,23 @@ a.btn {
     margin-top: 20px;
 }
 
-.page-faq h2,.page-terms h2,.page-help h2 {
+.staticpage::after {
+    /* clearfix for bootstrap */
+    display: table;
+    content: '';
+    clear: both;
+}
+
+.staticpage-content {
+    width: 70%;
+}
+
+.staticpage-content h2 {
     margin-top: 24px;
 }
 
-.page-faq li,.page-terms li,.page-help li {
+.staticpage-content li {
     margin-bottom: 8px;
-}
-
-.text-faq, .text-terms, .text-help {
-    width: 70%;
 }
 
 .main-menu {
@@ -2486,7 +2493,7 @@ ul.editlog .editlog-item:nth-child(2n+1) {
     #content {
         padding: 0 0 0 20px;
     }
-    .span12 {
+    .span12, .staticpage-content {
         width: 96%;
     }
     .span8 {

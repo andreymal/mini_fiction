@@ -8,6 +8,7 @@ export default (node) => {
   let paused = false;
 
   const loop = () => setInterval(() => {
+    if (inputs.length === 0) return;
     inputs[current % inputs.length].checked = true;
     current += 1;
   }, DURATION_MS);

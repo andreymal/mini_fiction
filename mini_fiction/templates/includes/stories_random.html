@@ -2,6 +2,8 @@
 {% from 'macro/story.html' import characters_block %}
 {% from 'includes/story_buttons.html' import common_buttons with context %}
 
+{% if random_stories %}
+<div data-bazooka="StoriesCarousel" id="slides">
 {% for story in random_stories %}
     <input type="radio" id="slide-trigger-{{ loop.index }}" name="slider" {% if loop.index == 1 %}checked autofocus{% endif %}>
     <label for="slide-trigger-{{ loop.index }}"></label>
@@ -17,3 +19,5 @@
         </p>
     </div>
 {% endfor %}
+</div>
+{% endif %}

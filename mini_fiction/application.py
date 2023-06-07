@@ -437,7 +437,7 @@ def configure_errorpages(app):
 
 def configure_templates(app):
     from mini_fiction.templatetags import random_stories, logopic, submitted_stories_count
-    from mini_fiction.templatetags import story_comments_delta, html_block, hook, shown_newsitem
+    from mini_fiction.templatetags import html_block, hook, shown_newsitem
     from mini_fiction.templatetags import get_comment_threshold, notifications, misc
     from mini_fiction.templatetags import i18n, generate_captcha, unread_abuse_reports_count
     from mini_fiction.templatetags import registry

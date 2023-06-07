@@ -6,7 +6,7 @@
     <div class="span12">
         <h1>{{ page_title }}</h1>
 
-        <ul>
+        <ul class="admin-items-list">
         {% for logopic in logopics %}
             <li style="margin: 4px 0;">
                 <a href="{{ url_for('admin_logopics.update', pk=logopic.id) }}"><img src="{{ url_for('media', filename=logopic.bundle.x1194.webp) }}" alt="" style="height: 96px;" /></a>

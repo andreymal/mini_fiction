@@ -356,7 +356,6 @@ ul.nav-profile-menu-content {
     position: absolute;
     background-color: #1D2A4F;
     list-style: none;
-    margin: 5px 0 0 0;
     padding: 0;
     min-width: 100%;
     text-align: left;
@@ -1248,7 +1247,7 @@ select.select-size {
 
 .story-formatting-window select {
     margin: 0 -5px 4px -5px;
-    padding: 2px 0;
+    padding: 5px;
     width: calc(100% + 10px);
     box-sizing: border-box;
     font-family: inherit;
@@ -2091,7 +2090,7 @@ ul.editlog .editlog-item:nth-child(2n+1) {
     margin-bottom: 0;
 }
 
-.newsitem-listitem:nth-child(2n+1) {
+.news-list .newsitem-listitem:nth-child(2n+1) {
     background-color: #fefefe;
 }
 
@@ -2421,6 +2420,10 @@ ul.editlog .editlog-item:nth-child(2n+1) {
 .admin-log-item .log-item-meta,
 .admin-log-item .log-item-meta a {
     color: #999;
+}
+
+.admin-items-list > li {
+    margin: 4px 0;
 }
 
 @media (max-width: 840px) {

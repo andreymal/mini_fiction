@@ -6,7 +6,7 @@
     <div class="span12">
         <h1>{{ page_title }}</h1>
 
-        <ul>
+        <ul class="admin-items-list">
         {% for group in charactergroups %}
             <li>
                 <a href="{{ url_for('admin_charactergroups.update', pk=group.id) }}">{{ group.name }}</a>

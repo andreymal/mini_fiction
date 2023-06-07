@@ -7,7 +7,7 @@
     <div class="span12">
         <h1>{{ page_title }}</h1>
 
-        <ul>
+        <ul class="admin-items-list">
         {% for character in characters %}
             <li>
                 <a href="{{ url_for('admin_characters.update', pk=character.id) }}">{{ character_picture(character) }} {{ character.name }}</a>

@@ -22,6 +22,10 @@
     &.disabled {
         opacity: 0.2;
         cursor: default;
+
+        &.active {
+            opacity: 1;
+        }
     }
 
 }

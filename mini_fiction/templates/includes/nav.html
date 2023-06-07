@@ -62,7 +62,7 @@
 </div><!-- /nav-main-profile -->
 
 <ul id="nav-main-links" class="nav-items nav-main-links">
-    {{ nav_item(pgettext('best_stories', 'Best'), url_for('object_lists.top'), 'object_lists.') }}
+    {{ nav_item(pgettext('best_stories', 'Best'), url_for('object_lists.top'), 'object_lists.top') }}
     {{ nav_item(_('Search'), url_for('search.main'), 'search.') }}
     {{ nav_item(_('Tags'), url_for('tags.index'), 'tags.index') }}
 

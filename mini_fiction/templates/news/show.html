@@ -5,7 +5,13 @@
         <div class="newsitem newsitem-listitem" id="newsitem_{{ newsitem.id }}">
             <span class="newsitem-title-link">{{ newsitem.title }}</span>
             {% if current_user.is_staff -%}
-                <a class="btn btn-warning btn-mini" href="{{ url_for('admin_news.update', pk=newsitem.id) }}">{{ _('Edit') }}</a>
+                <div class="icon-group">
+                    <a title="{{ _('Edit') }}"
+                       aria-label="{{ _('Edit') }}"
+                       role="button"
+                       class="scon entity-edit"
+                       href="{{ url_for('admin_news.update', pk=newsitem.id) }}"></a>
+                </div>
             {%- endif %}
             <br/>
             <time datetime="{{ newsitem.date.strftime('%Y-%m-%dT%H:%M:%SZ') }}" class="newsitem-date">

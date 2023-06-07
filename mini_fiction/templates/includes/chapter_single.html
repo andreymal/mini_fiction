@@ -4,11 +4,25 @@
             {% if chapter_edit_mode %}<a href="{{ url_for('chapter.view', story_id=story.id, chapter_order=chapter.order) }}">{% endif %}{{ chapter.autotitle }}{% if chapter_edit_mode %}</a>{% endif %}
             {% if chapter.draft %}<sup class="story-mark draft">{{ pgettext('story_mark', 'draft') }}</sup>{% endif %}
             {% if not chapter_edit_mode and story.bl.editable_by(current_user) %}
-                <a class="btn btn-warning btn-mini" href="{{ url_for('chapter.edit', pk=chapter.id) }}">{{ _('Edit chapter') }}</a>
+                <div class="icon-group">
+                    <a title="{{ _('Edit chapter') }}"
+                       aria-label="{{ _('Edit chapter') }}"
+                       role="button"
+                       class="scon entity-edit"
+                       href="{{ url_for('chapter.edit', pk=chapter.id) }}"></a>
+                </div>
             {% endif %}
         </h2>
     {%- elif not chapter_edit_mode and story.bl.editable_by(current_user) -%}
-        <h2><a class="btn btn-warning btn-mini" href="{{ url_for('chapter.edit', pk=chapter.id) }}">{{ _('Edit chapter') }}</a></h2>
+        <h2>
+            <div class="icon-group">
+                <a title="{{ _('Edit chapter') }}"
+                   aria-label="{{ _('Edit chapter') }}"
+                   role="button"
+                   class="scon entity-edit"
+                   href="{{ url_for('chapter.edit', pk=chapter.id) }}"></a>
+            </div>
+        </h2>
     {%- endif %}
     {%- set notes = chapter.notes_as_html -%}
     {% if notes %}

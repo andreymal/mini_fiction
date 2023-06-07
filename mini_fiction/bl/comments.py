@@ -417,7 +417,7 @@ class StoryCommentBL(BaseCommentBL):
 
     def create(self, target, author, ip, data):
         try:
-            if author and not author.is_staff:
+            if author and author.is_authenticated and not author.is_staff:
                 current_app.rate_limiter.limit(
                     'comment_newuser' if author.bl.is_new_user() else 'comment',
                     target=author.id,
@@ -427,7 +427,7 @@ class StoryCommentBL(BaseCommentBL):
         except RateLimitExceeded as exc:
             current_app.logger.warning(
                 'User %s reached comment limit (%s)',
-                author.username if author else 'N/A',
+                author.username if author and author.is_authenticated else 'N/A',
                 exc.summary(),
             )
             raise

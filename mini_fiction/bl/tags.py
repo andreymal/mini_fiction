@@ -171,7 +171,7 @@ class TagBL(BaseBL):
 
         categories_dict = {}
 
-        tags = list(Tag.select(lambda x: not x.is_blacklisted and not x.is_alias).prefetch(Tag.category))
+        tags = list(Tag.select(lambda x: not x.is_blacklisted and not x.is_alias).prefetch(Tag.category, Tag.description))
         if sort == 'stories':
             tags.sort(key=lambda tag: tag.published_stories_count, reverse=True)
         elif sort == 'date':

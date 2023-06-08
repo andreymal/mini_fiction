@@ -1514,12 +1514,6 @@ blockquote > p {
     margin-bottom: 6px;
 }
 
-.collapse {
-    font-size: 12px;
-}
-.collapse-normal {
-    font-size: 14px!important;
-}
 .story-page .collapse {
     background-color: #fff;
 }

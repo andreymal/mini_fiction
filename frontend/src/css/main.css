@@ -6,6 +6,7 @@
 body {
     background-color: #dde;
     word-wrap: break-word;
+    text-size-adjust: 100%; /* for iPhone */
 }
 
 a {

@@ -5,7 +5,7 @@
 }
 
 @define-mixin tag-box {
-  min-height: 2.5em;
+  min-height: 2.3em;
   max-height: 15em;
   overflow-y: auto;
   background-color: var(--background);
@@ -23,7 +23,14 @@
 
   padding: 0.3em 0.5em;
 
-  width: 80%
+  width: 80%;
+
+  transition: border linear 0.2s, box-shadow linear 0.2s;
+}
+
+.react-tagsinput--focused > .tags-container {
+  border-color: rgba(82, 168, 236, 0.8);
+  box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075), 0 0 8px rgba(82, 168, 236, .6);
 }
 
 .tags-input-container {
@@ -69,6 +76,27 @@
   margin: 0.25em 0.5em;
 }
 
+.react-autosuggest__container {
+  flex-grow: 1;
+
+  & .dropdown-input {
+    margin-left: 0;
+    margin-right: 0;
+    width: 100%;
+    height: 28px;
+    box-sizing: border-box;
+
+    /* disable default bootstrap styles */
+    border: 0;
+    box-shadow: none;
+    background-color: transparent;
+
+    &:focus {
+      box-shadow: none;
+    }
+  }
+}
+
 .react-autosuggest__suggestions-container {
   @mixin tag-box;
   margin: 0.15em;
@@ -88,6 +116,10 @@
   flex-wrap: wrap;
   list-style: none;
   margin: 0;
+}
+
+.react-autosuggest__suggestion {
+  cursor: pointer;
 }
 
 .react-autosuggest__suggestion--highlighted {

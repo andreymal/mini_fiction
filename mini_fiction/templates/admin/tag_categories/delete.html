@@ -11,6 +11,7 @@
           <div class="control-group">
             <div class="controls">
                 <input type="submit" class="btn btn-danger" value="{{ _('Delete') }}">
+                <a href="{{ url_for('admin_tag_categories.update', pk=tag_category.id) }}">Назад</a>
             </div>
         </div>
     </form>

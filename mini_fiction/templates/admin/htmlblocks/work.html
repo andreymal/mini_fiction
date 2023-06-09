@@ -16,7 +16,9 @@
             {% if edit %}<a href="{{ url_for('admin_htmlblocks.delete', name=htmlblock.name, lang=htmlblock.lang) }}" class="btn">{{ _('Delete') }}</a>{% endif %}
             {% else %}
             {{ _("You don't have access to edit this Jinja2 template.") }}
+            <br/>
             {% endif %}
+            <a href="{{ url_for('admin_htmlblocks.index') }}">Вернуться к списку HTML-блоков</a>
         </div>
         </form>
     </div>

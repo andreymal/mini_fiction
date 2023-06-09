@@ -18,7 +18,9 @@
             {% if edit %}<a href="{{ url_for('admin_staticpages.delete', name=staticpage.name, lang=staticpage.lang) }}" class="btn">{{ _('Delete') }}</a>{% endif %}
             {% else %}
             {{ _("You don't have access to edit this Jinja2 template.") }}
+            <br/>
             {% endif %}
+            <a href="{{ url_for('admin_staticpages.index') }}">Вернуться к списку статических страниц</a>
         </div>
         </form>
     </div>

@@ -5,7 +5,7 @@
         {% if not chapter -%}
             {{ html_block('chapter_add') }}
         {%- else -%}
-            <h1>{{ page_title }}</h1>
+            <h1>Редактирование главы в рассказе <a class="invisible-link" href="{{ url_for('story.view', pk=story.id, _external=True) }}">«{{ story.title }}»</a></h1>
         {%- endif %}
         <form method="POST" enctype="multipart/form-data" name="search" id="chapter-form" class="form-horizontal">
             <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
@@ -138,6 +138,7 @@
 
                 <button type="submit" name="act" value="preview" class="btn" id="chapter-preview-btn">{{ _('Preview') }}</button>
 {#                <button disabled type="submit" name="act" value="preview" class="btn" id="chapter-preview-selected-btn">{{ _('Preview selected') }}</button>#}
+                <a href="{{ url_for('story.edit_chapters', pk=story.id) }}">Вернуться к списку глав</a>
                 </div>
             </fieldset>
         </form>

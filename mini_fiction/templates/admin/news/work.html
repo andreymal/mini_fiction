@@ -18,7 +18,9 @@
             {% if edit %}<a href="{{ url_for('admin_news.delete', pk=newsitem.id) }}" class="btn">{{ _('Delete') }}</a>{% endif %}
             {% else %}
             {{ _("You don't have access to edit this Jinja2 template.") }}
+            <br/>
             {% endif %}
+            <a href="{{ url_for('admin_news.index') }}">Вернуться к списку новостей</a>
         </div>
         </form>
     </div>

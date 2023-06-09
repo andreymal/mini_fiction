@@ -14,7 +14,7 @@
         <h3>
             <a href="{{ url_for('story.view', pk=story.id) }}">{{ story.title }}</a>
             {% if story.pinned -%}
-                <div class="story-pin"></div>
+                <span class="scon small story-pinned" title="Рассказ закреплён"></span>
             {%- endif %}
             {{- story.bl.vote_view_html(user=current_user, full=False)|safe }}
             {% include 'includes/story_marks.html' with context %}

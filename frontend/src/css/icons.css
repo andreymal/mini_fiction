@@ -59,6 +59,11 @@ a.scon {
     }
 }
 
+.story-pinned {
+    background-image: url(../images/assets/pin.svg);
+    -svg-mixer-fill: rgba(0, 0, 0, 0.15);
+}
+
 .favorite {
     background-image: url(../images/assets/favorite.svg);
     -svg-mixer-fill: var(--color-yellow);

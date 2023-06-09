@@ -829,7 +829,10 @@ var story = {
     /**
      * Переключает видимость окна форматирования текста глав.
      */
-    toggleFormattingFormVisibility: function() {
+    toggleFormattingFormVisibility: function(event) {
+        if (event) {
+            event.preventDefault();
+        }
         if (!this._formatting.form) {
             return;
         }
@@ -838,6 +841,7 @@ var story = {
         } else {
             this.showFormattingForm();
         }
+        return false;
     },
 
     /**

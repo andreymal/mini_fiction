@@ -399,6 +399,7 @@ var comments = {
                 }
                 if (data.success) {
                     voteArea.innerHTML = data.html;
+                    comments.bindLinksFor(voteArea);
                     notify('Ваш голос учтён');
                 } else {
                     notifyError(data.error || 'Не удалось проголосовать');

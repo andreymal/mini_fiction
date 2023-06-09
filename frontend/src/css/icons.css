@@ -6,6 +6,11 @@
     width: 1.25rem;
     height: 1.25rem;
 
+    &.small {
+        width: 1rem;
+        height: 1rem;
+    }
+
     &.inactive {
         filter: saturate(0) brightness(85%) drop-shadow(0 0 .05em rgba(0, 0, 0, .4));
     }

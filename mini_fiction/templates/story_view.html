@@ -118,6 +118,13 @@
                 <p title="Число пользователей, подписавшихся на новые главы">{{ ngettext("%(num)d user waiting for the continuation", "%(num)d users are waiting for the continuation", chapter_subscriptions_count) }}</p>
             {%- endif %}
 
+            <p>
+                Скачать:
+                {% for d in story.list_downloads() -%}
+                    <a href="{{ d.url }}" data-noajax="1">{{ d.format.name }}</a>{% if not loop.last %}, {% endif %}
+                {%- endfor -%}
+            </p>
+
             {% if current_user.is_authenticated -%}
             <form method="POST" action="{{ url_for('story.subscribe', pk=story.id) }}" class="subscription-form js-subscription-form">
                 <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />

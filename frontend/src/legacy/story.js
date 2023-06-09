@@ -250,16 +250,19 @@ var story = {
         if (btn) {
             let message;
             if (published) {
-                btn.classList.remove('entity-publish');
-                btn.classList.add('entity-draft');
+                // btn.classList.remove('entity-publish');
+                // btn.classList.add('entity-draft');
+                btn.classList.remove('btn-primary');
                 message = 'В черновики';
             } else {
-                btn.classList.remove('entity-draft');
-                btn.classList.add('entity-publish');
+                // btn.classList.remove('entity-draft');
+                // btn.classList.add('entity-publish');
+                btn.classList.add('btn-primary');
                 message = 'Опубликовать';
             }
-            btn.title = message;
-            btn.ariaLabel = message;
+            // btn.title = message;
+            // btn.ariaLabel = message;
+            btn.textContent = message;
             return true;
         } else {
             return false;
@@ -291,15 +294,18 @@ var story = {
             let message;
             if (approved) {
                 message = 'Отозвать';
-                btn.classList.remove('entity-approve');
-                btn.classList.add('entity-revoke');
+                btn.classList.remove('btn-success');
+                // btn.classList.remove('entity-approve');
+                // btn.classList.add('entity-revoke');
             } else {
                 message = 'Одобрить';
-                btn.classList.remove('entity-revoke');
-                btn.classList.add('entity-approve');
+                btn.classList.add('btn-success');
+                // btn.classList.remove('entity-revoke');
+                // btn.classList.add('entity-approve');
             }
-            btn.title = message;
-            btn.ariaLabel = message;
+            // btn.title = message;
+            // btn.ariaLabel = message;
+            btn.textContent = message;
             return true;
         } else {
             return false;

@@ -591,6 +591,24 @@ a.authorlink:hover,a.edit-link:hover {
     font-size: 12px;
 }
 
+.story-control-btn {
+    margin-top: 6px;
+    float: right;
+    font-family: 'Trebuchet MS', Arial, sans-serif;
+    font-weight: normal;
+}
+
+.story-control-btn a {
+    text-decoration: none;
+}
+
+.story-control-btn .story-approve-btn.loading,
+.story-control-btn .story-publish-btn.loading,
+.publish-chapter-btn.loading {
+    opacity: 0.5;
+    cursor: default;
+}
+
 /* Vote-buttons */
 
 .vote-area-1 {

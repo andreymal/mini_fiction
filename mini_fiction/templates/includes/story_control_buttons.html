@@ -1,0 +1,28 @@
+<div class="story-control-btn btn-group">
+    {% if current_user.is_staff %}
+        <a class="btn {{ '' if story.approved else 'btn-success' }} btn-mini story-approve-btn js-story-approve-btn" href="{{ url_for('story.approve', pk=story.id) }}">
+            {{ 'Отозвать' if story.approved else 'Одобрить' }}
+        </a>
+    {% endif %}
+    {% if story.bl.publishable_by(current_user) %}
+        <a class="btn btn-mini story-publish-btn js-story-publish-btn{% if story.bl.is_publishable() and story.draft %} btn-primary{% endif %}" href="{{ url_for('story.publish', pk=story.id) }}">
+            {{ 'Опубликовать' if story.draft else 'В черновики' }}
+        </a>
+    {% endif %}
+
+    <button class="btn btn-mini dropdown-toggle" type="button" id="storyDropdownMenu{{ story.id }}" data-toggle="dropdown" aria-expanded="true">
+        <span class="caret"></span>
+    </button>
+
+    <ul class="dropdown-menu btn-mini" role="menu">
+    {% if current_user.is_staff -%}
+        <li><a href="{{ url_for('story.pin', pk=story.id) }}" class="js-story-pin-btn">{{ 'Открепить' if story.pinned else 'Закрепить на главной' }}</a></li>
+    {% endif -%}
+    {% if story.bl.deletable_by(current_user) -%}
+        <li><a class="story_delete" href="{{ url_for('story.delete', pk=story.id) }}">{{ pgettext('delete_story', 'Delete') }}</a></li>
+    {% endif -%}
+    {% if story.bl.can_view_editlog(current_user) -%}
+        <li><a href="{{ url_for('story.edit_log', pk=story.id) }}">{{ _('Edit log') }}</a></li>
+    {% endif %}
+    </ul>
+</div>

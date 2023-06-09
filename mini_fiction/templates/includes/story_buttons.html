@@ -16,6 +16,8 @@
                    class="story_bookmark js-story-bookmark-{{ story.id }} scon bookmark {% if bookmarked %}active{% else %}inactive{% endif %}"></a>
             {% endif %}
         {% endif %}
+
+        {# TODO: can we make these icons more obvious and flexible?
         {% if with_downloads %}
             {%- for d in story.list_downloads() -%}
                 <a title="Скачать в {{ d.format.name }}"
@@ -24,6 +26,8 @@
                    class="scon {{ d.cls }}" data-noajax="1"></a>
             {%- endfor -%}
         {% endif %}
+        #}
+
         {%- if with_abuse and current_user.is_authenticated and not is_editor -%}
             <a title="Пожаловаться на рассказ"
                aria-label="Пожаловаться на рассказ"
@@ -44,6 +48,7 @@
                href="{{ url_for('story.edit', pk=story.id) }}"></a>
         {% endif %}
 
+        {# TODO: can we make these icons more obvious?
         {% if story.bl.publishable_by(current_user) %}
             {% set publish_title = 'Опубликовать' if story.draft else 'В черновики' %}
             <a title="{{ publish_title }}"
@@ -60,8 +65,10 @@
                class="scon entity-journal"
                href="{{ url_for('story.edit_log', pk=story.id) }}"></a>
         {% endif %}
+        #}
     </div>
 
+    {# TODO: can we make these icons more obvious?
     {% if current_user.is_staff -%}
         <div class="icon-group">
             {% set approve_title = 'Отозвать' if story.approved else 'Одобрить' %}
@@ -79,6 +86,7 @@
                href="{{ url_for('story.pin', pk=story.id) }}"></a>
         </div>
     {% endif -%}
+    #}
 {% endmacro %}
 
 

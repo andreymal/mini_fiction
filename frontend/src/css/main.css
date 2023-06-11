@@ -2686,6 +2686,10 @@ ul.editlog .editlog-item:nth-child(2n+1) {
     .nav-tabs>li,.nav-pills>li {
         padding: 0 0 0;
     }
+    h1 {
+        font-size: 22px;
+        line-height: 28px;
+    }
     .chapter-text-block {
         width: calc(100% - 12px);
         margin: 0;
@@ -2718,9 +2722,6 @@ ul.editlog .editlog-item:nth-child(2n+1) {
         font-size: 12px;
         line-height: 14px;
         padding: 4px 5px;
-    }
-    h1 {
-        font-size: 22px;
     }
     .login-form .input-small {
         width: 56px;

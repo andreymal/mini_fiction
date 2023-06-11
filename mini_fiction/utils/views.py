@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 
 from functools import wraps
+from typing import Any, Collection, Dict
 
 from pony import orm
 from flask import request, render_template, abort
@@ -43,22 +44,31 @@ def paginate_view(template, objlist, page=None, objlistname='objects', endpoint=
     return render_template(template, **data)
 
 
-def cached_lists(story_ids):
-    data = {}
+def cached_lists(
+    story_ids: Collection[int],
+    *,
+    unread_chapters_count: bool = True,
+    unread_comments_count: bool = True,
+) -> Dict[str, Any]:
+    data: Dict[str, Any] = {}
     if not current_user.is_authenticated:
         data.update({
             'favorited_ids': [],
             'bookmarked_ids': [],
-            'unread_chapters_count': {x: 0 for x in story_ids},
-            'unread_comments_count': {x: 0 for x in story_ids},
         })
+        if unread_chapters_count:
+            data['unread_chapters_count'] = {x: 0 for x in story_ids}
+        if unread_comments_count:
+            data['unread_comments_count'] = {x: 0 for x in story_ids}
     else:
         data.update({
             'favorited_ids': list(orm.select(x.story.id for x in models.Favorites if x.author == current_user and x.story.id in story_ids)),
             'bookmarked_ids': list(orm.select(x.story.id for x in models.Bookmark if x.author == current_user and x.story.id in story_ids)),
-            'unread_chapters_count': models.Story.bl.get_unread_chapters_count(current_user, story_ids),
-            'unread_comments_count': models.Story.bl.get_unread_comments_count(current_user, story_ids),
         })
+        if unread_chapters_count:
+            data['unread_chapters_count'] = models.Story.bl.get_unread_chapters_count(current_user, story_ids)
+        if unread_comments_count:
+            data['unread_comments_count'] = models.Story.bl.get_unread_comments_count(current_user, story_ids)
     return data
 
 

@@ -32,8 +32,8 @@ def normalize_html(doc, block_elements=default_block_elements, **kw):
         elif prev_e is None:
             # use case: "<body>foo\n\n<p>bar</p>\n\nbaz</body>"
             parent = e.getparent()
-            if parent is not None and parent.tail:
-                parent.tail = re.sub(r'\n\s*$', '', parent.tail)
+            if parent is not None and parent.text:
+                parent.text = re.sub(r'\n\s*$', '', parent.text)
 
         # inside block elements
         if e.text:

@@ -35,7 +35,6 @@
     {% set url = url_for('admin_tags.update', pk=tag.id) if admin else url_for('tags.tag_index', tag_name=tag.iname) %}
     <a class="story-tag{% if tag.is_extreme_tag %} extreme-tag{% endif %}{% if secondary %} secondary-tag{% endif %}{% if spoiler %} spoiler-tag{% endif %}{% if admin and tag.is_blacklisted %} blacklisted-tag{% endif %}"
        data-category-id="{{ tag.category.id if tag.category else 0 }}"
-       title="{{ tag.description }}"
        href="{{ url }}">
        {{- tag.name -}}
     </a>

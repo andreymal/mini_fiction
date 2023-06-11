@@ -44,7 +44,7 @@
 </xsl:template>
 
 <xsl:template match="blockquote" mode="paragraphs">
-    <cite><p><xsl:apply-templates select="node()" mode="body"/></p></cite>
+    <cite><xsl:apply-templates select="node()" mode="paragraphs"/></cite>
 </xsl:template>
 
 <xsl:template match="h3|h4|h5" mode="paragraphs">

@@ -5,6 +5,8 @@ import re
 
 from lxml import etree
 import lxml.html.defs
+
+from mini_fiction.utils.misc import make_absolute_url
 from ..base import xslt_transform_loader, html_doc_transform
 
 xslt_transform_function = xslt_transform_loader(__file__)
@@ -61,6 +63,9 @@ def normalize_html(doc, block_elements=default_block_elements, **kw):
         if not img.get('alt'):
             img.set('alt', '')
 
+    # Make all links absolute (required for downloaded files)
+    make_html_links_absolute(doc)
+
     return doc
 
 
@@ -116,3 +121,12 @@ def squash_paragraph_attributes(doc):
         for np in p.xpath('.//p'):
             p.attrib.update(dict(np.attrib))
     return doc
+
+
+def make_html_links_absolute(doc):
+    for img in doc.xpath('.//img'):
+        if img.get('src'):
+            img.set('src', make_absolute_url(img.get('src')))
+    for a in doc.xpath('.//a'):
+        if a.get('href'):
+            a.set('href', make_absolute_url(a.get('href')))

@@ -750,3 +750,15 @@ def safe_str_cmp(a: AnyStr, b: AnyStr) -> bool:
         a.encode("utf-8") if isinstance(a, str) else a,
         b.encode("utf-8") if isinstance(b, str) else b,
     )
+
+
+def make_absolute_url(url: str) -> str:
+    """Превращает относительную ссылку в абсолютную, основываясь на настройках
+    SERVER_NAME и PREFERRED_URL_SCHEME."""
+    if url.startswith("//"):
+        return f"https:{url}"
+    if url.startswith("/"):
+        scheme = current_app.config["PREFERRED_URL_SCHEME"]
+        host = current_app.config["SERVER_NAME"]
+        return f"{scheme}://{host}{url}"
+    return url

@@ -59,6 +59,12 @@ def normalize_html(doc, block_elements=default_block_elements, **kw):
     squash_paragraph_attributes(doc)
     doc = post_normalize_html(doc, **kw)
 
+    # Add newline characters between block elements for easier debugging
+    for e in doc.xpath('//p|//' + '|//'.join(block_elements)):
+        prev_e = e.getprevious()
+        if prev_e is not None and (prev_e.tag == 'p' or prev_e.tag in block_elements) and not prev_e.tail:
+            prev_e.tail = '\n'
+
     for img in doc.xpath('//img'):
         if not img.get('alt'):
             img.set('alt', '')

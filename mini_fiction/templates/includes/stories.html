@@ -53,7 +53,7 @@
                             <a class="chapter-title" href="{{ url_for('chapter.view', story_id=story.id, chapter_order=chapter.order) }}">
                                 {{- chapter.autotitle -}}
                             </a>
-                            {%- set viewed_at = chapter.bl.is_viewed_by(current_user) -%}
+                            {%- set viewed_at = chapter_view_dates.get(chapter.id) if chapter_view_dates is defined else chapter.bl.is_viewed_by(current_user) -%}
                             {%- if viewed_at %} <i class="chapter-viewed-icon" title="Вы просматривали эту главу {{ viewed_at|datetimeformat(DEFAULT_DATETIME_FORMAT) }}"></i>{% endif %}
                             {%- if chapter.draft %} <sup class="draft">{{ _('Draft') }}</sup>{% endif %}
                             {% if story.bl.editable_by(current_user) -%}

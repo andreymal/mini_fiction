@@ -44,7 +44,7 @@ def favorites(user_id, page):
         page_title=page_title,
         author=user,
     )
-    data.update(cached_lists([x.id for x in stories]))
+    data.update(cached_lists([x.id for x in stories], chapter_view_dates=current_user.detail_view))
 
     return render_template('favorites.html', **data)
 
@@ -66,7 +66,7 @@ def submitted(page):
         page_obj=page_obj,
         page_title='Новые поступления',
     )
-    data.update(cached_lists([x.id for x in stories]))
+    data.update(cached_lists([x.id for x in stories], chapter_view_dates=current_user.detail_view))
 
     return render_template('submitted.html', **data)
 
@@ -87,7 +87,7 @@ def bookmarks(page):
         page_obj=page_obj,
         page_title='Прочитать позже',
     )
-    data.update(cached_lists([x.id for x in stories]))
+    data.update(cached_lists([x.id for x in stories], chapter_view_dates=current_user.detail_view))
 
     return render_template('bookmarks.html', **data)
 
@@ -115,7 +115,7 @@ def viewed(page):
         page_obj=page_obj,
         page_title='Просмотренные рассказы',
         stories_detail_view=True,
-        **cached_lists([x.id for x in stories])
+        **cached_lists([x.id for x in stories], chapter_view_dates=current_user.detail_view)
     )
 
 
@@ -161,6 +161,6 @@ def top(page):
         page_title=page_title,
         period=period,
     )
-    data.update(cached_lists([x.id for x in stories]))
+    data.update(cached_lists([x.id for x in stories], chapter_view_dates=current_user.detail_view))
 
     return render_template('stream/stories_top.html', **data)

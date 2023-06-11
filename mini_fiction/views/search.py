@@ -140,7 +140,7 @@ def search_action(postform):
         data['chapter_weights'] = [(x['id'], x['weight']) for x in chapter_results.matches]
 
     if search_type == 0:
-        data.update(cached_lists([x.id for x in story_results.stories]))
+        data.update(cached_lists([x.id for x in story_results.stories], chapter_view_dates=current_user.detail_view))
     else:
         data.update(cached_lists([x[0].story.id for x in chapter_results.chapters]))
 

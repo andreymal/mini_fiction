@@ -61,7 +61,7 @@ def tag_index(tag_name, page):
         category=tag.category,
         stories=objects,
         page_obj=page_obj,
-        **cached_lists([x.id for x in objects])
+        **cached_lists([x.id for x in objects], chapter_view_dates=current_user.detail_view)
     )
 
 

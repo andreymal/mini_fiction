@@ -52,7 +52,7 @@ def stories(page):
         stories=objects,
         page_obj=page_obj,
         robots_noindex=True,
-        **cached_lists([x.id for x in objects])
+        **cached_lists([x.id for x in objects], chapter_view_dates=current_user.detail_view)
     )
 
 

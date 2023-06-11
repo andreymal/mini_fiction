@@ -56,6 +56,7 @@ class AnonymousUser(AnonymousUserMixin):
     is_active = False
     is_staff = False
     is_superuser = False
+    detail_view = False
     nsfw = False
     comments_per_page = None
     comments_maxdepth = None

@@ -3,6 +3,7 @@
 
 from flask import Blueprint, current_app, render_template
 from flask_babel import gettext
+from flask_login import current_user
 from pony.orm import db_session, desc
 
 from mini_fiction.bl.migration import enrich_stories
@@ -57,6 +58,6 @@ def index():
         'site_description': sitedescription(),
         'sidebar_blocks': sidebar_blocks,
     }
-    data.update(cached_lists([x.id for x in stories]))
+    data.update(cached_lists([x.id for x in stories], chapter_view_dates=current_user.detail_view))
 
     return render_template('index.html', **data)

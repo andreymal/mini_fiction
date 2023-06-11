@@ -49,6 +49,7 @@ def cached_lists(
     *,
     unread_chapters_count: bool = True,
     unread_comments_count: bool = True,
+    chapter_view_dates: bool = False,
 ) -> Dict[str, Any]:
     data: Dict[str, Any] = {}
     if not current_user.is_authenticated:
@@ -60,6 +61,8 @@ def cached_lists(
             data['unread_chapters_count'] = {x: 0 for x in story_ids}
         if unread_comments_count:
             data['unread_comments_count'] = {x: 0 for x in story_ids}
+        if chapter_view_dates:
+            data['chapter_view_dates'] = {}
     else:
         data.update({
             'favorited_ids': list(orm.select(x.story.id for x in models.Favorites if x.author == current_user and x.story.id in story_ids)),
@@ -69,6 +72,9 @@ def cached_lists(
             data['unread_chapters_count'] = models.Story.bl.get_unread_chapters_count(current_user, story_ids)
         if unread_comments_count:
             data['unread_comments_count'] = models.Story.bl.get_unread_comments_count(current_user, story_ids)
+        if chapter_view_dates:
+            viewed_chapters = models.StoryView.select(lambda x: x.author == current_user and x.story.id in story_ids)
+            data['chapter_view_dates'] = {x.chapter.id: x.date for x in viewed_chapters if x.chapter}
     return data
 
 

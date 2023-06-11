@@ -213,11 +213,11 @@ class Config(object):
         'listen': '/tmp/sphinx_fanfics.socket:mysql41',
         'log': '{sphinxroot}/searchd.log',
         'query_log': '{sphinxroot}/query.log',
-        'read_timeout': 5,
-        'max_children': 20,
         'pid_file': '{sphinxroot}/sphinx.pid',
         'binlog_path': '{sphinxroot}/binlog',
-        'workers': 'threads',
+        'telemetry': 0,
+        'secondary_indexes': 0,
+        'auto_schema': 0,
     }
     SPHINX_COMMON = {
         # 'lemmatizer_base': '/path/to/dicts'

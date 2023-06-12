@@ -102,7 +102,7 @@ def info(user_id=None, comments_page=1):
     if not comments and comments_page != 1:
         abort(404)
 
-    enrich_stories(stories)
+    enrich_stories(stories + (contributing_stories or []))
 
     data.update({
         'author': author,

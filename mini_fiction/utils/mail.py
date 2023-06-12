@@ -3,7 +3,7 @@
 
 import smtplib
 from email.header import Header
-from email.utils import formataddr
+from email.utils import formataddr, formatdate
 from email.mime.base import MIMEBase
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
@@ -186,7 +186,10 @@ def sendmail(to, subject, body, fro=None, headers=None, config=None, conn=None):
     msg['From'] = fro
     msg['Subject'] = Header(subject, 'utf-8').encode()
 
-    prep_headers = {'X-Postmaster-Msgtype': config['EMAIL_MSGTYPES']['default']}
+    prep_headers = {
+        'X-Postmaster-Msgtype': config['EMAIL_MSGTYPES']['default'],
+        'Date': formatdate(localtime=False, usegmt=True),  # required by some mail servers
+    }
     if headers:
         prep_headers.update(headers)
 

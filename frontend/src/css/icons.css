@@ -20,19 +20,21 @@
         cursor: default;
 
         &.active {
-            opacity: 1;
+            opacity: 0.7;
         }
     }
 }
 
 a.scon {
-    cursor: pointer;
+    &:not(.disabled) {
+        cursor: pointer;
+    }
 
     &, &.active, &.inactive:hover {
         filter: drop-shadow(0 0 .05em rgba(0, 0, 0, .4));
     }
 
-    &:hover {
+    &:hover:not(.disabled) {
         filter: saturate(105%) brightness(110%) drop-shadow(0 0 .05em rgba(0, 0, 0, .2));;
     }
 }

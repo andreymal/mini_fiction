@@ -1,9 +1,17 @@
 {%- extends 'email/base.txt' -%}
+{%- import 'email/macro.html' as macro with context -%}
 
 {%- block content -%}
 {%- autoescape false -%}
-Пользователь {{ author.username }} на сайте {{ url_for('index.index', _external=True) }} опубликовал рассказ «{{ story.title }}» без премодерации.
+Пользователь {{ author.username }} на сайте {{ url_for('index.index', _external=True) }} опубликовал рассказ без премодерации:
 
-{{ url_for('story.view', pk=story.id, _external=True) }}
+{{ macro.story_info_plain(story) }}
+
+{%- if story.notes %}
+
+Заметки к рассказу:
+
+{{ story.notes|striptags }}
+{%- endif %}
 {%- endautoescape -%}
 {%- endblock -%}

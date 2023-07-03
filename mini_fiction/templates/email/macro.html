@@ -30,7 +30,18 @@
 
 {% macro story_info_plain(story) -%}
 {%- autoescape false -%}
-«{{ story.title }}» ({{ ngettext("%(num)d word", "%(num)d words", story.words) }})
+«{{ story.title }}»
+{{ ngettext("%(num)d word", "%(num)d words", story.words) }} {{ pgettext('story_by', 'by') }} {% for author in story.authors -%}
+  {{- author.username -}}
+  {%- if loop.first %}
+    {%- if not loop.last %} ({{ pgettext('story_in_collaboration_with', 'in collaboration with') }} {% endif -%}
+  {% else %}
+    {%- if loop.revindex0 > 1 %}, {% endif -%}
+    {%- if loop.revindex0 == 1 %}{{ pgettext('story_in_collaboration_with', ' and') }} {% endif -%}
+    {%- if loop.last %}){% endif -%}
+  {%- endif -%}
+{% endfor %}
+
 {{ url_for('story.view', pk=story.id, _external=True) }}
 
 {{ story.summary|striptags }}
@@ -56,14 +67,26 @@
 </h3>
 
 <p style="color: #999;">
-{%- for tag in story.prepared_tags.primary  -%}
+{%- for tag in story.prepared_tags.primary -%}
     <a
         style="margin: 0 4px 2px 0; padding: 2px 7px; color: #fff; background-color: #999; display: inline-block; line-height: 16px; text-decoration: none; border-radius: 5px;"
         href="{{ url_for('tags.tag_index', tag_name=tag.iname, _external=True) }}">
             {{- tag.name -}}
     </a>
 {% endfor -%}
-{{ ngettext("%(num)d word", "%(num)d words", story.words) }}
+<br/>
+{{ ngettext("%(num)d word", "%(num)d words", story.words) }} {{ pgettext('story_by', 'by') }} {% for author in story.authors -%}
+  <a href="{{ url_for('author.info', user_id=author.id, _external=True) }}" style="color: #999; font-weight: 700;">
+    {{- author.username -}}
+  </a>
+  {%- if loop.first %}
+    {%- if not loop.last %} ({{ pgettext('story_in_collaboration_with', 'in collaboration with') }} {% endif -%}
+  {% else %}
+    {%- if loop.revindex0 > 1 %}, {% endif -%}
+    {%- if loop.revindex0 == 1 %}{{ pgettext('story_in_collaboration_with', ' and') }} {% endif -%}
+    {%- if loop.last %}){% endif -%}
+  {%- endif -%}
+{% endfor -%}
 </p>
 
 <p>{{ story.summary|striptags }}</p>

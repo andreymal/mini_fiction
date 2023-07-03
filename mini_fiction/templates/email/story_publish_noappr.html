@@ -2,5 +2,12 @@
 {% import 'email/macro.html' as macro with context %}
 
 {% block body %}
-Пользователь {{ macro.userlink(author.id, author.username) }} опубликовал рассказ {{ macro.storylink(story.id, story.title) }} без премодерации.
+Пользователь {{ macro.userlink(author.id, author.username) }} опубликовал рассказ без премодерации:
+<br>
+<br>
+{{ macro.story_info_html(story) }}
+{% if story.notes %}
+<p>Заметки к рассказу:</p>
+{{ story.notes_as_html }}
+{% endif %}
 {% endblock %}

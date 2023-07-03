@@ -1095,6 +1095,10 @@ hr {
     padding-top: 1rem;
 }
 
+.chapter-navigation {
+    text-align: center;
+}
+
 .spoiler-gray {
     background-color: #ccc;
     color: #ccc;

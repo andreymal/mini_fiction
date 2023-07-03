@@ -9,6 +9,7 @@ from pony import orm
 from pony.orm import db_session
 
 from mini_fiction import models
+from mini_fiction.bl.migration import enrich_story
 from mini_fiction.models import Story, Chapter
 from mini_fiction.utils.misc import render_nonrequest_template, ping_sitemap
 
@@ -171,6 +172,8 @@ def notify_story_pubrequest(story_id, author_id):
     if not author:
         return
 
+    enrich_story(story)
+
     ctx = {
         'story': story,
         'author': author,
@@ -193,6 +196,8 @@ def notify_story_publish_noappr(story_id, author_id):
     author = models.Author.get(id=author_id)
     if not author:
         return
+
+    enrich_story(story)
 
     staff = models.Author.select(lambda x: x.is_staff)
     recipients = [u.email for u in staff if u.email and 'story_publish_noappr' not in u.silent_email_list]
@@ -236,6 +241,8 @@ def notify_story_publish_draft(story_id, staff_id, draft, fast=False):
     if not author or not staff:
         return
 
+    enrich_story(story)
+
     typ = 'story_draft' if draft else 'story_publish'
 
     if typ not in author.silent_tracker_list:
@@ -251,6 +258,8 @@ def notify_author_story(story_id, publisher_user_id=None):
     story = models.Story.get(id=story_id)
     if not story:
         return
+
+    enrich_story(story)
 
     # Получаем авторов и соавторов
     author_ids = [x.id for x in story.bl.get_authors()]

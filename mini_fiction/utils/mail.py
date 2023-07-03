@@ -3,7 +3,7 @@
 
 import smtplib
 from email.header import Header
-from email.utils import formataddr, formatdate
+from email.utils import formataddr, formatdate, make_msgid
 from email.mime.base import MIMEBase
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
@@ -190,6 +190,11 @@ def sendmail(to, subject, body, fro=None, headers=None, config=None, conn=None):
         'X-Postmaster-Msgtype': config['EMAIL_MSGTYPES']['default'],
         'Date': formatdate(localtime=False, usegmt=True),  # required by some mail servers
     }
+
+    if config.get("EMAIL_GENERATE_MESSAGE_ID"):
+        msgid_domain = config.get("EMAIL_MESSAGE_ID_DOMAIN") or fro.rsplit("@", 1)[-1].rstrip(">")
+        prep_headers["Message-ID"] = make_msgid(domain=msgid_domain)
+
     if headers:
         prep_headers.update(headers)
 

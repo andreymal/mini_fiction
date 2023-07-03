@@ -270,6 +270,8 @@ class Config(object):
     DEFAULT_FROM_EMAIL = ('Библиотека', 'minifiction@localhost.com')
     EMAIL_REDIRECT_TO = None
     EMAIL_DONT_EDIT_SUBJECT_ON_REDIRECT = False
+    EMAIL_GENERATE_MESSAGE_ID = False
+    EMAIL_MESSAGE_ID_DOMAIN: Optional[str] = None
 
     ACCOUNT_ACTIVATION_DAYS = 5
     REGISTRATION_AUTO_LOGIN = True

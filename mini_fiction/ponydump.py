@@ -8,6 +8,7 @@ import gzip
 import json
 import uuid
 from datetime import datetime
+from pathlib import Path
 
 from pony import orm
 
@@ -568,7 +569,7 @@ class PonyDump(object):
         значит закончили с текущей моделью, если 'entity': None, значит
         закончили совсем.
 
-        :param str path: путь к каталогу, в который дампить
+        :param Path path: путь к каталогу, в который дампить
         :param list entites: список моделей для дампа (если пусто, то все),
           строки в lowercase
         :param dict chunk_sizes: по сколько штук за раз брать объектов из базы
@@ -592,17 +593,16 @@ class PonyDump(object):
         else:
             entities = [x[0] for x in self.depmap]
 
-        path = os.path.abspath(path)
-        if not os.path.isdir(path):
-            os.makedirs(path)
+        path = Path(path).resolve()
+        path.mkdir(parents=True, exist_ok=True)
 
         for entity in entities:
-            file_path = os.path.join(path, '{}_dump.jsonl'.format(entity))
+            file_path = path / '{}_dump.jsonl'.format(entity)
             if gzip_compression > 0:
-                file_path += '.gz'
+                file_path = file_path.with_suffix(file_path.suffix + '.gz')
                 fp = gzip.open(file_path, 'wt', encoding='utf-8')
             else:
-                fp = open(file_path, 'w', encoding='utf-8')
+                fp = file_path.open('w', encoding='utf-8')
 
             with fp:
                 chunk_size = max(1, chunk_sizes.get(entity, self.default_chunk_size))
@@ -1024,18 +1024,17 @@ class PonyDump(object):
             filelist = self.walk_all_paths(paths)
 
         # Сортируем список файлов в порядке зависимостей
-        filelist = list(filelist)
-        filelist.sort(key=lambda x: idx[x[0]])
+        filelist = sorted(filelist, key=lambda x: idx[x[0]])
 
         # Предзагружаем число записей в каждом файле
         counts = {}  # {file_path: count}
         if calc_count:
             for _, file_path in filelist:
                 cnt = 0
-                if file_path.lower().endswith('.gz'):
+                if file_path.name.lower().endswith('.gz'):
                     fp = gzip.open(file_path, 'rt', encoding='utf-8-sig')
                 else:
-                    fp = open(file_path, 'r', encoding='utf-8-sig')
+                    fp = file_path.open('r', encoding='utf-8-sig')
                 with fp:
                     for line in fp:
                         if line.strip():
@@ -1045,10 +1044,10 @@ class PonyDump(object):
 
         for _, file_path in filelist:
             count = counts.get(file_path)
-            if file_path.lower().endswith('.gz'):
+            if file_path.name.lower().endswith('.gz'):
                 fp = gzip.open(file_path, 'rt', encoding='utf-8-sig')
             else:
-                fp = open(file_path, 'r', encoding='utf-8-sig')
+                fp = file_path.open('r', encoding='utf-8-sig')
             with fp:
                 for results in self.load_entities(fp, chunk_sizes=chunk_sizes, only_create=only_create):
                     for result in results:
@@ -1067,25 +1066,26 @@ class PonyDump(object):
 
         filelist = set()  # [(entity_name or '', path)]
 
-        for path in paths:
-            path = os.path.abspath(path)
+        queue = [Path(path) for path in paths]
+        queue.reverse()
 
-            if os.path.isdir(path):
-                walk = os.walk(path)
-            else:
-                walk = ([os.path.dirname(path), [], [os.path.split(path)[-1]]],)
+        while queue:
+            path = queue.pop()
 
-            for subpath, _, files in walk:
-                for f in files:
-                    if not f.lower().endswith('_dump.jsonl') and not f.lower().endswith('_dump.jsonl.gz'):
-                        continue
+            if path.is_dir():
+                queue.extend(sorted(path.iterdir(), reverse=True))
+                continue
 
-                    # Парсим имя файла как имя сущности, чтобы загружать в порядке зависимостей
-                    entity = f.lower().rsplit('_', 1)[0]
-                    if entity not in self.entities:
-                        entity = ''
+            lname = path.name.lower()
+            if not lname.endswith('_dump.jsonl') and not lname.endswith('_dump.jsonl.gz'):
+                continue
 
-                    filelist.add((entity, os.path.join(subpath, f)))
+            # Парсим имя файла как имя сущности, чтобы загружать в порядке зависимостей
+            entity = lname.rsplit('_', 1)[0]
+            if entity not in self.entities:
+                entity = ''
+
+            filelist.add((entity, path))
 
         return filelist
 

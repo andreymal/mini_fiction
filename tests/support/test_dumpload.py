@@ -13,8 +13,8 @@ from mini_fiction.database import db
 
 
 def test_zip_dump_complex(app, factories):
-    zip_path = os.path.join(app.config['TESTING_DIRECTORY'], 'dump.zip')
-    assert not os.path.isfile(zip_path)  # prepare
+    zip_path = Path(app.config['TESTING_DIRECTORY']) / 'dump.zip'
+    assert not zip_path.is_file()  # prepare
 
     # Этот пользователь не должен попасть в дамп
     author = factories.AuthorFactory()
@@ -29,9 +29,9 @@ def test_zip_dump_complex(app, factories):
     db.commit()
 
     try:
-        dumpload.zip_dump(Path(zip_path))
+        dumpload.zip_dump(zip_path)
 
-        assert os.path.isfile(zip_path)
+        assert zip_path.is_file()
 
         author_dump = None
         namelist = None
@@ -70,5 +70,4 @@ def test_zip_dump_complex(app, factories):
         # TODO: проверить всё остальное
 
     finally:
-        if os.path.isfile(zip_path):
-            os.remove(zip_path)
+        zip_path.unlink(missing_ok=True)

@@ -9,6 +9,7 @@ import gzip
 import uuid
 import shutil
 from datetime import datetime
+from pathlib import Path
 
 import pytest
 from pony import orm
@@ -84,14 +85,14 @@ def use_testdb():
 
 @pytest.fixture(scope="function")
 def dumpdir(app):
-    path1 = os.path.join(app.config['TESTING_DIRECTORY'], 'dumpfoo')
-    assert not os.path.exists(path1)
-    path = os.path.join(path1, 'dump')
+    path1 = Path(app.config['TESTING_DIRECTORY']) / 'dumpfoo'
+    assert not path1.exists()
+    path = path1 / 'dump'
 
     try:
         yield path
     finally:
-        if os.path.exists(path1):
+        if path1.exists():
             shutil.rmtree(path1)
 
 
@@ -150,11 +151,11 @@ def _fill_testdb():
 
 
 def _opendump(dumpdir, name):
-    path = os.path.join(dumpdir, name)
-    if not os.path.isfile(path):
-        path += '.gz'
+    path = dumpdir / name
+    if not path.is_file():
+        path = path.with_suffix(path.suffix + '.gz')
         return gzip.open(path, 'rt', encoding='utf-8')
-    return open(path, 'r', encoding='utf-8')
+    return path.open('r', encoding='utf-8')
 
 
 def _check_dump_content(dumpdir, name, data):
@@ -219,8 +220,8 @@ def test_dump_to_directory_full(use_testdb, dumpdir, gzip_compression):
         path = status.pop('path')
 
         if path is not None:
-            assert os.path.split(path)[1] in filenames
-            assert os.path.isfile(path)
+            assert path.name in filenames
+            assert path.is_file()
         else:
             status['path'] = path  # Для проверки последнего элемента
 
@@ -232,7 +233,7 @@ def test_dump_to_directory_full(use_testdb, dumpdir, gzip_compression):
 
     assert not dump_statuses
 
-    assert set(os.listdir(dumpdir)) == filenames
+    assert {x.name for x in dumpdir.iterdir()} == filenames
 
     # Проверка содержимого дампов:
     # - ключи у JSON отсортированы
@@ -289,8 +290,8 @@ def test_dump_to_directory_one_entity(use_testdb, dumpdir):
         path = status.pop('path')
 
         if path is not None:
-            assert os.path.split(path)[1] in filenames
-            assert os.path.isfile(path)
+            assert path.name in filenames
+            assert path.is_file()
         else:
             status['path'] = path  # Для проверки последнего элемента
 
@@ -326,22 +327,22 @@ def test_dump_to_directory_exclude_attrs(use_testdb, dumpdir):
 @pytest.mark.nodbcleaner
 @orm.db_session
 def test_load_from_files_full(use_testdb, dumpdir):
-    os.makedirs(dumpdir)
+    dumpdir.mkdir(parents=True)
 
-    with open(os.path.join(dumpdir, 'pdtest1_dump.jsonl'), 'w', encoding='utf-8') as fp:
+    with (dumpdir / 'pdtest1_dump.jsonl').open('w', encoding='utf-8') as fp:
         fp.write('{"_entity": "pdtest1", "k1": 1, "k2": 2, "k3": 3, "test2": 1, "test3": [17]}\n')
 
-    with gzip.open(os.path.join(dumpdir, 'pdtest2_dump.jsonl.gz'), 'wt', encoding='utf-8') as fp:
+    with gzip.open(dumpdir / 'pdtest2_dump.jsonl.gz', 'wt', encoding='utf-8') as fp:
         fp.write('{"_entity": "pdtest2", "id": 1, "test1": [1, 2, 3]}\n')
 
-    with open(os.path.join(dumpdir, 'pdtest3_dump.jsonl'), 'w', encoding='utf-8') as fp:
+    with (dumpdir / 'pdtest3_dump.jsonl').open('w', encoding='utf-8') as fp:
         fp.write('{"_entity": "pdtest3", "foo_bool": true, "foo_datetime": "2017-06-01T01:02:03.999987Z", "foo_float": 0.30000000000000004, "foo_int": -4, "foo_longstr": "longstr", "foo_string": "foo\\u0000😊bar", "foo_uuid": "8e8cdc11-0785-43a8-8203-66c148c3f57c", "id": 17, "test1": [1, 2, 3]}\n')
 
-    with open(os.path.join(dumpdir, 'many1_dump.jsonl'), 'w', encoding='utf-8') as fp:
+    with (dumpdir / 'many1_dump.jsonl').open('w', encoding='utf-8') as fp:
         fp.write('{"_entity": "many1", "id": 1, "many2": [1, 2]}\n')
         fp.write('{"_entity": "many1", "id": 2, "many2": [1, 2]}\n')
 
-    with open(os.path.join(dumpdir, 'many2_dump.jsonl'), 'w', encoding='utf-8') as fp:
+    with (dumpdir / 'many2_dump.jsonl').open('w', encoding='utf-8') as fp:
         fp.write('{"_entity": "many2", "id": 1, "many1": [1, 2]}\n')
         fp.write('{"_entity": "many2", "id": 2, "many1": [1, 2]}\n')
 
@@ -350,18 +351,18 @@ def test_load_from_files_full(use_testdb, dumpdir):
     # create test
 
     load_statuses = [
-        {'created': True, 'updated': True, 'entity': 'many1', 'pk': 1, 'lineno': 1, 'current': 1, 'path': os.path.join(dumpdir, 'many1_dump.jsonl'), 'count': 2, 'all_count': 7},
-        {'created': True, 'updated': True, 'entity': 'many1', 'pk': 2, 'lineno': 2, 'current': 2, 'path': os.path.join(dumpdir, 'many1_dump.jsonl'), 'count': 2, 'all_count': 7},
-        {'entity': None, 'updated': None, 'created': None, 'pk': None, 'lineno': 2, 'current': 2, 'path': os.path.join(dumpdir, 'many1_dump.jsonl'), 'count': 2, 'all_count': 7},
-        {'created': True, 'updated': True, 'entity': 'many2', 'pk': 1, 'lineno': 1, 'current': 1, 'path': os.path.join(dumpdir, 'many2_dump.jsonl'), 'count': 2, 'all_count': 7},
-        {'created': True, 'updated': True, 'entity': 'many2', 'pk': 2, 'lineno': 2, 'current': 2, 'path': os.path.join(dumpdir, 'many2_dump.jsonl'), 'count': 2, 'all_count': 7},
-        {'entity': None, 'updated': None, 'created': None, 'pk': None, 'lineno': 2, 'current': 2, 'path': os.path.join(dumpdir, 'many2_dump.jsonl'), 'count': 2, 'all_count': 7},
-        {'created': True, 'updated': True, 'entity': 'pdtest1', 'pk': (1, 2, 3), 'lineno': 1, 'current': 1, 'path': os.path.join(dumpdir, 'pdtest1_dump.jsonl'), 'count': 1, 'all_count': 7},
-        {'entity': None, 'updated': None, 'created': None, 'pk': None, 'lineno': 1, 'current': 1, 'path': os.path.join(dumpdir, 'pdtest1_dump.jsonl'), 'count': 1, 'all_count': 7},
-        {'created': True, 'updated': True, 'entity': 'pdtest3', 'pk': 17, 'lineno': 1, 'current': 1, 'path': os.path.join(dumpdir, 'pdtest3_dump.jsonl'), 'count': 1, 'all_count': 7},
-        {'entity': None, 'updated': None, 'created': None, 'pk': None, 'lineno': 1, 'current': 1, 'path': os.path.join(dumpdir, 'pdtest3_dump.jsonl'), 'count': 1, 'all_count': 7},
-        {'created': True, 'updated': True, 'entity': 'pdtest2', 'pk': 1, 'lineno': 1, 'current': 1, 'path': os.path.join(dumpdir, 'pdtest2_dump.jsonl.gz'), 'count': 1, 'all_count': 7},
-        {'entity': None, 'updated': None, 'created': None, 'pk': None, 'lineno': 1, 'current': 1, 'path': os.path.join(dumpdir, 'pdtest2_dump.jsonl.gz'), 'count': 1, 'all_count': 7},
+        {'created': True, 'updated': True, 'entity': 'many1', 'pk': 1, 'lineno': 1, 'current': 1, 'path': dumpdir / 'many1_dump.jsonl', 'count': 2, 'all_count': 7},
+        {'created': True, 'updated': True, 'entity': 'many1', 'pk': 2, 'lineno': 2, 'current': 2, 'path': dumpdir / 'many1_dump.jsonl', 'count': 2, 'all_count': 7},
+        {'entity': None, 'updated': None, 'created': None, 'pk': None, 'lineno': 2, 'current': 2, 'path': dumpdir / 'many1_dump.jsonl', 'count': 2, 'all_count': 7},
+        {'created': True, 'updated': True, 'entity': 'many2', 'pk': 1, 'lineno': 1, 'current': 1, 'path': dumpdir / 'many2_dump.jsonl', 'count': 2, 'all_count': 7},
+        {'created': True, 'updated': True, 'entity': 'many2', 'pk': 2, 'lineno': 2, 'current': 2, 'path': dumpdir / 'many2_dump.jsonl', 'count': 2, 'all_count': 7},
+        {'entity': None, 'updated': None, 'created': None, 'pk': None, 'lineno': 2, 'current': 2, 'path': dumpdir / 'many2_dump.jsonl', 'count': 2, 'all_count': 7},
+        {'created': True, 'updated': True, 'entity': 'pdtest1', 'pk': (1, 2, 3), 'lineno': 1, 'current': 1, 'path': dumpdir / 'pdtest1_dump.jsonl', 'count': 1, 'all_count': 7},
+        {'entity': None, 'updated': None, 'created': None, 'pk': None, 'lineno': 1, 'current': 1, 'path': dumpdir / 'pdtest1_dump.jsonl', 'count': 1, 'all_count': 7},
+        {'created': True, 'updated': True, 'entity': 'pdtest3', 'pk': 17, 'lineno': 1, 'current': 1, 'path': dumpdir / 'pdtest3_dump.jsonl', 'count': 1, 'all_count': 7},
+        {'entity': None, 'updated': None, 'created': None, 'pk': None, 'lineno': 1, 'current': 1, 'path': dumpdir / 'pdtest3_dump.jsonl', 'count': 1, 'all_count': 7},
+        {'created': True, 'updated': True, 'entity': 'pdtest2', 'pk': 1, 'lineno': 1, 'current': 1, 'path': dumpdir / 'pdtest2_dump.jsonl.gz', 'count': 1, 'all_count': 7},
+        {'entity': None, 'updated': None, 'created': None, 'pk': None, 'lineno': 1, 'current': 1, 'path': dumpdir / 'pdtest2_dump.jsonl.gz', 'count': 1, 'all_count': 7},
         {'path': None, 'entity': None, 'pk': None, 'updated': None, 'created': None, 'count': 7, 'all_count': 7},
     ]
 
@@ -379,20 +380,20 @@ def test_load_from_files_full(use_testdb, dumpdir):
 
     load_statuses = [
         # updated=False, потому что зависимость Many2(2) ещё отсутствует в базе
-        {'created': False, 'updated': False, 'entity': 'many1', 'pk': 1, 'lineno': 1, 'current': 1, 'path': os.path.join(dumpdir, 'many1_dump.jsonl'), 'count': 2, 'all_count': 7},
-        {'created': False, 'updated': False, 'entity': 'many1', 'pk': 2, 'lineno': 2, 'current': 2, 'path': os.path.join(dumpdir, 'many1_dump.jsonl'), 'count': 2, 'all_count': 7},
-        {'entity': None, 'updated': None, 'created': None, 'pk': None, 'lineno': 2, 'current': 2, 'path': os.path.join(dumpdir, 'many1_dump.jsonl'), 'count': 2, 'all_count': 7},
-        {'created': False, 'updated': False, 'entity': 'many2', 'pk': 1, 'lineno': 1, 'current': 1, 'path': os.path.join(dumpdir, 'many2_dump.jsonl'), 'count': 2, 'all_count': 7},
+        {'created': False, 'updated': False, 'entity': 'many1', 'pk': 1, 'lineno': 1, 'current': 1, 'path': dumpdir / 'many1_dump.jsonl', 'count': 2, 'all_count': 7},
+        {'created': False, 'updated': False, 'entity': 'many1', 'pk': 2, 'lineno': 2, 'current': 2, 'path': dumpdir / 'many1_dump.jsonl', 'count': 2, 'all_count': 7},
+        {'entity': None, 'updated': None, 'created': None, 'pk': None, 'lineno': 2, 'current': 2, 'path': dumpdir / 'many1_dump.jsonl', 'count': 2, 'all_count': 7},
+        {'created': False, 'updated': False, 'entity': 'many2', 'pk': 1, 'lineno': 1, 'current': 1, 'path': dumpdir / 'many2_dump.jsonl', 'count': 2, 'all_count': 7},
         # ...и создаётся только сейчас
-        {'created': True, 'updated': True, 'entity': 'many2', 'pk': 2, 'lineno': 2, 'current': 2, 'path': os.path.join(dumpdir, 'many2_dump.jsonl'), 'count': 2, 'all_count': 7},
-        {'entity': None, 'updated': None, 'created': None, 'pk': None, 'lineno': 2, 'current': 2, 'path': os.path.join(dumpdir, 'many2_dump.jsonl'), 'count': 2, 'all_count': 7},
-        {'created': False, 'updated': False, 'entity': 'pdtest1', 'pk': (1, 2, 3), 'lineno': 1, 'current': 1, 'path': os.path.join(dumpdir, 'pdtest1_dump.jsonl'), 'count': 1, 'all_count': 7},
-        {'entity': None, 'updated': None, 'created': None, 'pk': None, 'lineno': 1, 'current': 1, 'path': os.path.join(dumpdir, 'pdtest1_dump.jsonl'), 'count': 1, 'all_count': 7},
+        {'created': True, 'updated': True, 'entity': 'many2', 'pk': 2, 'lineno': 2, 'current': 2, 'path': dumpdir / 'many2_dump.jsonl', 'count': 2, 'all_count': 7},
+        {'entity': None, 'updated': None, 'created': None, 'pk': None, 'lineno': 2, 'current': 2, 'path': dumpdir / 'many2_dump.jsonl', 'count': 2, 'all_count': 7},
+        {'created': False, 'updated': False, 'entity': 'pdtest1', 'pk': (1, 2, 3), 'lineno': 1, 'current': 1, 'path': dumpdir / 'pdtest1_dump.jsonl', 'count': 1, 'all_count': 7},
+        {'entity': None, 'updated': None, 'created': None, 'pk': None, 'lineno': 1, 'current': 1, 'path': dumpdir / 'pdtest1_dump.jsonl', 'count': 1, 'all_count': 7},
         # Ещё вот тут мы меняли атрибут
-        {'created': False, 'updated': True, 'entity': 'pdtest3', 'pk': 17, 'lineno': 1, 'current': 1, 'path': os.path.join(dumpdir, 'pdtest3_dump.jsonl'), 'count': 1, 'all_count': 7},
-        {'entity': None, 'updated': None, 'created': None, 'pk': None, 'lineno': 1, 'current': 1, 'path': os.path.join(dumpdir, 'pdtest3_dump.jsonl'), 'count': 1, 'all_count': 7},
-        {'created': False, 'updated': False, 'entity': 'pdtest2', 'pk': 1, 'lineno': 1, 'current': 1, 'path': os.path.join(dumpdir, 'pdtest2_dump.jsonl.gz'), 'count': 1, 'all_count': 7},
-        {'entity': None, 'updated': None, 'created': None, 'pk': None, 'lineno': 1, 'current': 1, 'path': os.path.join(dumpdir, 'pdtest2_dump.jsonl.gz'), 'count': 1, 'all_count': 7},
+        {'created': False, 'updated': True, 'entity': 'pdtest3', 'pk': 17, 'lineno': 1, 'current': 1, 'path': dumpdir / 'pdtest3_dump.jsonl', 'count': 1, 'all_count': 7},
+        {'entity': None, 'updated': None, 'created': None, 'pk': None, 'lineno': 1, 'current': 1, 'path': dumpdir / 'pdtest3_dump.jsonl', 'count': 1, 'all_count': 7},
+        {'created': False, 'updated': False, 'entity': 'pdtest2', 'pk': 1, 'lineno': 1, 'current': 1, 'path': dumpdir / 'pdtest2_dump.jsonl.gz', 'count': 1, 'all_count': 7},
+        {'entity': None, 'updated': None, 'created': None, 'pk': None, 'lineno': 1, 'current': 1, 'path': dumpdir / 'pdtest2_dump.jsonl.gz', 'count': 1, 'all_count': 7},
         {'path': None, 'entity': None, 'pk': None, 'updated': None, 'created': None, 'count': 7, 'all_count': 7},
     ]
 
@@ -447,22 +448,22 @@ def test_load_from_files_full(use_testdb, dumpdir):
 @pytest.mark.nodbcleaner
 @orm.db_session
 def test_load_from_files_partial(use_testdb, dumpdir):
-    os.makedirs(dumpdir)
+    dumpdir.mkdir(parents=True)
 
-    with open(os.path.join(dumpdir, 'pdtest1_dump.jsonl'), 'w', encoding='utf-8') as fp:
+    with (dumpdir / 'pdtest1_dump.jsonl').open('w', encoding='utf-8') as fp:
         fp.write('{"_entity": "pdtest1", "k1": 1, "k2": 2, "k3": 3, "test3": [17]}\n')
 
-    with gzip.open(os.path.join(dumpdir, 'pdtest2_dump.jsonl.gz'), 'wt', encoding='utf-8') as fp:
+    with gzip.open(dumpdir / 'pdtest2_dump.jsonl.gz', 'wt', encoding='utf-8') as fp:
         fp.write('{"_entity": "pdtest2", "id": 1, "test1": [1, 2, 3]}\n')
 
-    with open(os.path.join(dumpdir, 'pdtest3_dump.jsonl'), 'w', encoding='utf-8') as fp:
+    with (dumpdir / 'pdtest3_dump.jsonl').open('w', encoding='utf-8') as fp:
         fp.write('{"_entity": "pdtest3", "foo_bool": true, "foo_datetime": "2017-06-01T01:02:03.999987Z", "foo_float": 0.30000000000000004, "foo_int": -4, "foo_longstr": "longstr", "foo_string": "foo\\u0000😊bar", "foo_uuid": "8e8cdc11-0785-43a8-8203-66c148c3f57c", "id": 17}\n')
 
-    with open(os.path.join(dumpdir, 'many1_dump.jsonl'), 'w', encoding='utf-8') as fp:
+    with (dumpdir / 'many1_dump.jsonl').open('w', encoding='utf-8') as fp:
         fp.write('{"_entity": "many1", "id": 1, "many2": [1, 2]}\n')
         fp.write('{"_entity": "many1", "id": 2}\n')
 
-    with open(os.path.join(dumpdir, 'many2_dump.jsonl'), 'w', encoding='utf-8') as fp:
+    with (dumpdir / 'many2_dump.jsonl').open('w', encoding='utf-8') as fp:
         fp.write('{"_entity": "many2", "id": 1, "many1": [1, 2]}\n')
         fp.write('{"_entity": "many2", "id": 2, "many1": [1, 2]}\n')
 
@@ -503,9 +504,9 @@ def test_load_from_files_partial(use_testdb, dumpdir):
 @pytest.mark.nodbcleaner
 @orm.db_session
 def test_load_from_files_notfull(use_testdb, dumpdir):
-    os.makedirs(dumpdir)
+    dumpdir.mkdir(parents=True)
 
-    with open(os.path.join(dumpdir, 'pdtest1_dump.jsonl'), 'w', encoding='utf-8') as fp:
+    with (dumpdir / 'pdtest1_dump.jsonl').open('w', encoding='utf-8') as fp:
         fp.write('{"_entity": "pdtest1", "k1": 1, "k2": 2, "k3": 3, "test2": 12, "test3": [17, 19]}\n')
 
     pd = PonyDump(testdb)
@@ -563,9 +564,9 @@ def test_load_from_files_notfull(use_testdb, dumpdir):
 ])
 @orm.db_session
 def test_load_from_files_relations_all_orders(use_testdb, dumpdir, lines):
-    os.makedirs(dumpdir)
+    dumpdir.mkdir(parents=True)
 
-    with open(os.path.join(dumpdir, 'some_dump.jsonl'), 'w', encoding='utf-8') as fp:
+    with (dumpdir / 'some_dump.jsonl').open('w', encoding='utf-8') as fp:
         for line in lines:
             fp.write(line + '\n')
 

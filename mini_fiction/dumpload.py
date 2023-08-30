@@ -192,7 +192,7 @@ def dumpdb_console(dirpath, entities_list=None, gzip_compression=0, verbosity=2)
     ljust_cnt = max(len(x) for x in mfd.entities) + 2
 
     drawer = None
-    current = None
+    current_entity = None
     for status in mfd.dump_to_directory(dirpath, entities_list, gzip_compression=gzip_compression):
         if not status['entity']:
             # Закончилось всё
@@ -200,14 +200,14 @@ def dumpdb_console(dirpath, entities_list=None, gzip_compression=0, verbosity=2)
                 print()
             continue
 
-        if current != status['entity']:
-            current = status['entity']
+        if current_entity != status['entity']:
+            current_entity = status['entity']
             if verbosity == 1:
-                print(current, end='... ')
+                print(current_entity, end='... ')
                 sys.stdout.flush()
 
         if verbosity >= 2 and not drawer:
-            print(current.ljust(ljust_cnt), end='')
+            print(current_entity.ljust(ljust_cnt), end='')
             drawer = progress_drawer(status['count'], show_count=True)
             drawer.send(None)
             drawer.send(status['current'])
@@ -238,14 +238,14 @@ def loaddb_console(paths, verbosity=2, only_create=False):
     filelist = mfd.walk_all_paths(paths)
     if not filelist:
         raise OSError('Cannot find dump files')
-    ljust_cnt = max(len(os.path.split(x[1])[-1]) for x in filelist) + 2
+    ljust_cnt = max(len(path.name) for _, path in filelist) + 2
 
     created = 0
     updated = 0
     not_changed = 0
 
     drawer = None
-    current = None
+    current_path = None
     for statuses in mfd.load_from_files(filelist=filelist, only_create=only_create):
         for status in statuses:
             if status['pk'] is None:
@@ -264,14 +264,14 @@ def loaddb_console(paths, verbosity=2, only_create=False):
                 print()
             continue
 
-        if current != status['path']:
-            current = status['path']
+        if current_path != status['path']:
+            current_path = status['path']
             if verbosity == 1:
-                print(os.path.split(status['path'])[-1], end='... ')
+                print(current_path.name, end='... ')
                 sys.stdout.flush()
 
         if verbosity >= 2 and not drawer:
-            print(os.path.split(status['path'])[-1].ljust(ljust_cnt), end='')
+            print(current_path.name.ljust(ljust_cnt), end='')
             drawer = progress_drawer(status['count'] or 0, show_count=bool(status['count']))
             drawer.send(None)
             drawer.send(status['current'])

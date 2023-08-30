@@ -33,8 +33,7 @@ dumpdb_params = {
         'created_notifications', 'published_stories', 'approvals',
         'registration_profiles',
         'change_email_profiles', 'password_reset_profiles',
-        'abuse_reports', 'admin_log', 'tags_created', 'tags_aliases',
-        'tags_blacklist', 'tags_log',
+        'abuse_reports', 'admin_log', 'tags_created', 'tags_log',
     )},
     'chapter': {'exclude': (
         'edit_log', 'chapter_views_set',

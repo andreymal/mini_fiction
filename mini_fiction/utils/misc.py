@@ -767,3 +767,4 @@ def make_absolute_url(url: str) -> str:
 def call_after_request_callbacks() -> None:
     for f, args, kwargs in getattr(g, "after_request_callbacks", ()):
         f(*args, **kwargs)
+    g.after_request_callbacks = []

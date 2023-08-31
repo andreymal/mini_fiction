@@ -158,15 +158,23 @@ class ProjectStatus(Status):
 
 
     def email(self):
-        if not self.app.config['ERROR_EMAIL_HANDLER_PARAMS'] and not self.app.config['EMAIL_HOST']:
+        host = self.app.config.get('EMAIL_HOST')
+        port = self.app.config.get('EMAIL_PORT')
+
+        if not self.app.config['ERROR_EMAIL_HANDLER_PARAMS'] and not host:
             return self._ok('email', 'not configured')
 
         if self.app.config['ERROR_EMAIL_HANDLER_PARAMS'] is not None:
             if not isinstance(self.app.config['ERROR_EMAIL_HANDLER_PARAMS'], dict):
                 return self._fail('email', 'not configured: ERROR_EMAIL_HANDLER_PARAMS must be dict {"mailhost": host}')
 
-            if self.app.config['ERROR_EMAIL_HANDLER_PARAMS'].get('mailhost') != self.app.config['EMAIL_HOST']:
-                return self._fail('email', 'ERROR_EMAIL_HANDLER_PARAMS["mailhost"] must be equal to EMAIL_HOST')
+            error_email_mailhost = self.app.config['ERROR_EMAIL_HANDLER_PARAMS'].get('mailhost')
+
+            if error_email_mailhost not in (host, (host, port)):
+                return self._fail(
+                    'email',
+                    'ERROR_EMAIL_HANDLER_PARAMS["mailhost"] must be equal to EMAIL_HOST or (EMAIL_HOST, EMAIL_PORT)',
+                )
 
         from mini_fiction.utils.mail import smtp_connect
 

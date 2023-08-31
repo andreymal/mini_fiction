@@ -93,6 +93,8 @@ def show(editlog_id):
 def load_users_for_editlog(edit_log):
     user_ids = set()
     for item in edit_log:
+        if item.user is None:
+            continue
         user_ids.add(item.user.id)
         item_data = item.data
         if 'contributors' in item_data:

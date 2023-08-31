@@ -29,10 +29,12 @@
             </td>
 
             <td class="col-user-name">
+                {% if vote.author %}
                 {{- user_avatar(vote.author) }}
                 <a href="{{ url_for('admin_authors.update', pk=vote.author.id) }}">
                     {{- vote.author.username -}}
                 </a>
+                {% else %}N/A{% endif %}
             </td>
 
             <td>{{ vote.vote_value }}</td>

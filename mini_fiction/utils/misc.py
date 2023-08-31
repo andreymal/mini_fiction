@@ -762,3 +762,8 @@ def make_absolute_url(url: str) -> str:
         host = current_app.config["SERVER_NAME"]
         return f"{scheme}://{host}{url}"
     return url
+
+
+def call_after_request_callbacks() -> None:
+    for f, args, kwargs in getattr(g, "after_request_callbacks", ()):
+        f(*args, **kwargs)

@@ -136,13 +136,13 @@ def create_app():
 
 
 def configure_after_request_callbacks(app):
+    from mini_fiction.utils import misc
+
     # We have to use teardown_request instead of after_request because Pony ORM uses it
     @app.teardown_request
     def call_after_request_callbacks(exc=None):
-        if exc is not None:
-            return
-        for f, args, kwargs in getattr(g, 'after_request_callbacks', ()):
-            f(*args, **kwargs)
+        if exc is None:
+            misc.call_after_request_callbacks()
 
 
 def configure_user_agent(app):

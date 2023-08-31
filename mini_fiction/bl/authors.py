@@ -233,6 +233,36 @@ class AuthorBL(BaseBL):
 
         return changed_fields
 
+    def delete(self):
+        # Некоторые объекты (контакты, избранное, новости и т.п.) удалятся полностью
+        # В некоторых (просмотры, голоса, комментарии и т.п.) просто пропадёт автор
+        # В целом, на момент написания этого комментария выполнять особые действия не требуется
+        from mini_fiction.models import Author, StoryContributor, StoryLog
+
+        user = self.model
+        system_user = Author.get(id=current_app.config["SYSTEM_USER_ID"])
+
+        # Разве что удалить файлы аватарки
+        old_saved_image = user.image
+        later(lambda: cleanup_image(old_saved_image))
+
+        # И записать факт удаления автора в историю рассказа
+        stories = orm.select(x.story for x in StoryContributor if x.user == user).without_distinct()
+        for story in stories:
+            contributors = {
+                x.user.id: {
+                    'visible': x.visible,
+                    'is_editor': x.is_editor,
+                    'is_author': x.is_author,
+                }
+                for x in story.bl.get_contributors()
+                if x.user.id != user.id
+            }
+            contributors[user.id] = None
+            story.bl.edit_contributors(system_user, contributors)
+
+        user.delete()
+
     def update_email_subscriptions(self, subs, modified_by_user=None, fill_admin_log=False):
         user = self.model
 

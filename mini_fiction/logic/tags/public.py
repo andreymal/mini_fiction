@@ -108,10 +108,11 @@ def get_tags_objects(
     # Анализируем каждый запрошенный тег
     for i, possible_tag in enumerate(tags):
         if isinstance(possible_tag, Tag):
-            name = possible_tag.name
+            raw_name = name = possible_tag.name
             iname = possible_tag.iname
             tag = possible_tag
         else:
+            raw_name = possible_tag
             name = safe_string_coerce(possible_tag.strip())
             iname = normalize_tag(name)
             tag = None
@@ -140,7 +141,7 @@ def get_tags_objects(
                 raise ValueError("Not authenticated")
             reason = validate_tag_name(name)
             if reason is not None:
-                result.invalid.append((name, reason))
+                result.invalid.append((raw_name, reason))
                 result.success = False
             else:
                 if iname is not None:
@@ -148,7 +149,7 @@ def get_tags_objects(
                 else:
                     result.invalid.append((name, lazy_gettext("No such tag")))
         else:
-            result.nonexisting.append(name)
+            result.nonexisting.append(raw_name)
             result.success = False
 
         if tag:
@@ -222,10 +223,12 @@ def search_by_prefix(name: str, limit: int = 20) -> List[Tag]:
     exact_tag = Tag.get(iname=iname, is_alias_for=None, reason_to_blacklist="")
     if exact_tag:
         result.append(exact_tag)
-    tag_alias = Tag.get(iname=iname, reason_to_blacklist="")
-    if tag_alias:
-        exact_tag = tag_alias.is_alias_for
-        result.append(exact_tag)
+    else:
+        tag_alias = Tag.get(iname=iname, reason_to_blacklist="")
+        if tag_alias:
+            exact_tag = tag_alias.is_alias_for
+            assert exact_tag is not None
+            result.append(exact_tag)
 
     # Ищем остальные теги по префиксу
     if len(result) < limit:
@@ -298,7 +301,6 @@ def create(user: Optional[Author], data: RawData) -> Tag:
         name=data["name"],
         iname=iname,
         category=data.get("category"),
-        color=data.get("color") or "",
         description=data.get("description") or "",
         is_spoiler=data.get("is_spoiler", False),
         created_by=user,
@@ -345,7 +347,7 @@ def update(tag: Tag, user: Optional[Author], data: RawData) -> None:
         if old_category_id != data["category"]:
             changes["category"] = data["category"]
 
-    for key in ("color", "description", "is_spoiler", "is_extreme_tag"):
+    for key in ("description", "is_spoiler", "is_extreme_tag"):
         if key in data and data[key] != getattr(tag, key):
             changes[key] = data[key]
 

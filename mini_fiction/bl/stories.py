@@ -1390,7 +1390,7 @@ class StoryBL(BaseBL, Commentable):
 
         # Собираем список тегов, которые нужно удалить
         for tag in old_tags:
-            if tag not in tags and tag not in rm_tags:
+            if tag not in updated_tags and tag not in rm_tags:
                 rm_tags.append(tag)
 
         # И применяем собранные изменения

@@ -6,9 +6,10 @@ from typing import Collection, Dict, List, Literal, Optional, Tuple, Union
 from flask_babel import lazy_gettext
 from pony.orm import desc
 
-from mini_fiction.logic.adminlog import log_addition, log_changed_fields
+from mini_fiction.logic.adminlog import log_addition, log_changed_fields, log_deletion
 from mini_fiction.logic.environment import get_cache
-from mini_fiction.models import Author, Story, StoryTag, Tag, TagCategory
+from mini_fiction.logic.tasks import schedule_task
+from mini_fiction.models import Author, Story, StoryTag, StoryTagLog, Tag, TagCategory
 from mini_fiction.validation import RawData, ValidationError, Validator
 from mini_fiction.validation.tags import TAG
 from mini_fiction.validation.utils import safe_string_coerce
@@ -377,6 +378,36 @@ def update(tag: Tag, user: Optional[Author], data: RawData) -> None:
         make_alias_for(
             tag, user, canonical_tag, data.get("is_hidden_alias", tag.is_hidden_alias)
         )
+
+
+def delete(tag: Tag, user: Optional[Author]) -> None:
+    if not user or not user.is_staff:
+        raise ValueError("Not authorized")
+
+    tm = datetime.utcnow()
+
+    story_tags = list(StoryTag.select(lambda x: x.tag == tag).prefetch(StoryTag.story))
+    for st in story_tags:
+        StoryTagLog(
+            story=st.story.id,
+            tag=tag,
+            tag_name=tag.name,
+            action_flag=StoryTagLog.DELETION,
+            modified_by=user,
+            date=tm,
+        ).flush()
+        schedule_task(
+            "sphinx_update_story",
+            st.story.id,
+            ("tag",),
+        )
+        st.delete()
+        tag.stories_count -= 1
+        if st.story.published:
+            tag.published_stories_count -= 1
+
+    log_deletion(by=user, what=tag)
+    tag.delete()
 
 
 def _get_prepared_tags(story_tags: Collection[StoryTag]) -> PreparedTags:

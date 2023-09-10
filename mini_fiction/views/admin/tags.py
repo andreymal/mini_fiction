@@ -183,7 +183,7 @@ def delete(pk):
 
     if request.method == 'POST':
         try:
-            tag.bl.delete(current_user)
+            tags.delete(tag, current_user)
         except ValidationError:
             abort(403)
         else:

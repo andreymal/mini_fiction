@@ -9,4 +9,5 @@ from .public import (
     get_tags_with_categories,
     search_by_prefix,
     update,
+    delete,
 )

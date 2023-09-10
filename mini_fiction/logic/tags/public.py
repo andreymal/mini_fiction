@@ -78,14 +78,19 @@ def get_tags_objects(
     inames = [normalize_tag(x) for x in tags_search]
     inames = [x for x in inames if x]
     if inames:
-        tags_db.update(
-            {
-                x.iname: x
-                for x in Tag.select(lambda t: t.iname in inames).prefetch(
-                    Tag.is_alias_for
-                )
-            }
-        )
+        # Алгоритм сравнения строк в БД может отличаться от такового в Python,
+        # из-за чего при запросе всех тегов одним запросом будет проблематично
+        # сопоставить теги из базы с исходными iname — например, MySQL/MariaDB
+        # с utf8mb4_general_ci считает буквы «е» и «ё» одинаковыми.
+        # Поэтому запрашиваем теги из базы поштучно, чтобы обойтись
+        # без сравнения строк в этом коде.
+        # См. также https://github.com/ponyorm/pony/issues/452
+        for iname in inames:
+            existing_tag = Tag.get(iname=iname)
+            if existing_tag:
+                tags_db[iname] = existing_tag
+                # iname из базы может отличаться от исходного iname
+                tags_db[existing_tag.iname] = existing_tag
 
     result = TagsResponse(
         success=True,

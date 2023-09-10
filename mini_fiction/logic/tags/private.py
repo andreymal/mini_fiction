@@ -3,9 +3,9 @@ from collections import defaultdict
 from dataclasses import dataclass
 from datetime import datetime
 from itertools import chain, islice
-from typing import List, Optional, Tuple
+from typing import List, Optional, Tuple, Union
 
-from flask_babel import lazy_gettext
+from flask_babel import LazyString, lazy_gettext
 from pony import orm
 
 from mini_fiction.logic.adminlog import log_changed_fields, log_changed_generic
@@ -179,7 +179,7 @@ def set_blacklist(tag: Tag, user: Optional[Author], reason: Optional[str]) -> No
     log_changed_generic(by=user, what=tag, message=log_message)
 
 
-def validate_tag_name(raw_tag_name: str) -> Optional[str]:
+def validate_tag_name(raw_tag_name: str) -> Optional[Union[str, LazyString]]:
     iname = normalize_tag(raw_tag_name)
     if not iname:
         return lazy_gettext("Empty tag")

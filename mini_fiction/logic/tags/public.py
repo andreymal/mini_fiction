@@ -3,7 +3,7 @@ from datetime import datetime
 from operator import attrgetter
 from typing import Collection, Dict, List, Literal, Optional, Tuple, Union
 
-from flask_babel import lazy_gettext
+from flask_babel import LazyString, lazy_gettext
 from pony.orm import desc
 
 from mini_fiction.logic.adminlog import log_addition, log_changed_fields, log_deletion
@@ -52,7 +52,7 @@ class TagsResponse:
     """Aliased tags that were replaced with canonical ones"""
     blacklisted: List[Tag]
     """Blocked tags"""
-    invalid: List[Tuple[str, str]]
+    invalid: List[Tuple[str, Union[str, LazyString]]]
     """List of invalid tags alongside with reasons"""
     created: List[Tag]
     """Created tags, if specified to do so"""
@@ -76,8 +76,8 @@ def get_tags_objects(
     tags_db = {x.iname: x for x in tags if isinstance(x, Tag)}
 
     # Ищем недостающие теги в базе
-    inames = [normalize_tag(x) for x in tags_search]
-    inames = [x for x in inames if x]
+    inames_opt = [normalize_tag(x) for x in tags_search]
+    inames = [x for x in inames_opt if x]
     if inames:
         # Алгоритм сравнения строк в БД может отличаться от такового в Python,
         # из-за чего при запросе всех тегов одним запросом будет проблематично
@@ -177,12 +177,12 @@ def get_tags_objects(
 
 
 def get_all_tags(*, sort: TagsSortType) -> List[Tag]:
-    field, reverse = TAG_SORTING[sort]
+    sorting_field, reverse = TAG_SORTING[sort]
     return sorted(
         Tag.select()
         .filter(lambda x: not x.is_blacklisted and not x.is_alias)
         .prefetch(Tag.category),
-        key=attrgetter(field),
+        key=attrgetter(sorting_field),
         reverse=reverse,
     )
 

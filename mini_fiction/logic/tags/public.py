@@ -1,10 +1,10 @@
+from dataclasses import dataclass, field
 from datetime import datetime
 from operator import attrgetter
 from typing import Collection, Dict, List, Literal, Optional, Tuple, Union
 
 from flask_babel import lazy_gettext
 from pony.orm import desc
-from pydantic import BaseModel
 
 from mini_fiction.logic.adminlog import log_addition, log_changed_fields
 from mini_fiction.logic.environment import get_cache
@@ -35,12 +35,14 @@ TAG_SORTING: Dict[TagsSortType, Tuple[str, bool]] = {
 TagsCreationRequest = Tuple[int, str, str]
 
 
-class CategorizedTag(BaseModel):
+@dataclass
+class CategorizedTag:
     category: Optional[TagCategory] = None
-    tags: List[Tag] = []
+    tags: List[Tag] = field(default_factory=list)
 
 
-class TagsResponse(BaseModel):
+@dataclass
+class TagsResponse:
     success: bool
     """All requested tags were found"""
     tags: List[Optional[Tag]]

@@ -319,6 +319,7 @@ class Rating(DbEntity):  # type: ignore
 
 class TagCategory(DbEntity):  # type: ignore
     """ Модель категории тега """
+    id: int
 
     name = orm.Required(str, 255)
     description = orm.Optional(orm.LongStr)
@@ -335,6 +336,7 @@ class TagCategory(DbEntity):  # type: ignore
 
 class Tag(DbEntity):  # type: ignore
     """ Модель тега рассказа """
+    id: int
 
     name = orm.Required(str, 255)  # fancy human-readable name
     iname = orm.Required(str, 32, unique=True)  # normalized lowercase name
@@ -346,7 +348,7 @@ class Tag(DbEntity):  # type: ignore
     created_by = orm.Optional(Author)
     stories_count = orm.Required(int, unsigned=True, default=0)
     published_stories_count = orm.Required(int, unsigned=True, default=0)
-    is_alias_for = orm.Optional('Tag')
+    is_alias_for: Optional['Tag'] = orm.Optional('Tag')
     is_hidden_alias = orm.Required(bool, default=False)
     is_extreme_tag = orm.Required(bool, default=False)
     reason_to_blacklist = orm.Optional(str, 255)

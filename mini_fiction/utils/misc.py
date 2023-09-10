@@ -657,25 +657,6 @@ def timedelta_format(tm):
     return s
 
 
-def normalize_tag(s, whitelist=None, delimeters=None):
-    from mini_fiction.validation.utils import safe_string_coerce
-
-    if not s:
-        return None
-
-    if whitelist is None:
-        whitelist = current_app.config['NORMALIZED_TAGS_WHITELIST']
-    if delimeters is None:
-        delimeters = current_app.config['NORMALIZED_TAGS_DELIMETERS']
-    s = ''.join((
-        x if x in whitelist else ('_' if x in delimeters else '')
-        for x in safe_string_coerce(s.lower()).strip()
-    ))
-    while '__' in s:
-        s = s.replace('__', '_')
-    return s.strip('_')[:32] or None
-
-
 def smart_split(s, delimeter=','):
     """Допиленный split. Делит строку по разделителю, удаляя пробельные
     символы в начале и конце разделённых строк. Пустые строки удаляет; если

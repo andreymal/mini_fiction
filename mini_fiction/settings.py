@@ -2,10 +2,10 @@ import logging
 import os
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Optional
+from typing import Optional, Dict
 
 from celery.schedules import crontab
-from flask_babel import lazy_gettext
+from flask_babel import lazy_gettext, LazyString
 
 
 @dataclass
@@ -13,7 +13,6 @@ class FaviconBundle:
     legacy: Optional[str] = None
     main: Optional[str] = None
     apple: Optional[str] = None
-
 
 
 class Config(object):
@@ -123,7 +122,7 @@ class Config(object):
     PASSWORD_HASHER = 'pbkdf2'  # or 'bcrypt' or 'scrypt'
     PBKDF2_ITERATIONS = 200000
 
-    NORMALIZED_TAGS_WHITELIST = (
+    NORMALIZED_TAGS_WHITELIST: str = (
         '_-()×°'
         '0123456789'
         'abcdefghijklmnopqrstuvwxyz'
@@ -131,10 +130,10 @@ class Config(object):
         'абвгдеёжзийклмнопрстуфхцчшщъыьэюя'
         'ґєії'
     )
-    NORMALIZED_TAGS_DELIMETERS = (
+    NORMALIZED_TAGS_DELIMETERS: str = (
         ' \u00a0/\\—–[]<>:;?!%&@*+=«»|'
     )
-    TAGS_BLACKLIST_REGEX = {
+    TAGS_BLACKLIST_REGEX: Dict[str, LazyString] = {
         r'^[_\-()×°]+$': lazy_gettext('Empty tag'),
     }
 

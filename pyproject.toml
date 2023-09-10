@@ -157,6 +157,8 @@ disable = [
 ]
 [tool.pylint.TYPECHECK]
 generated-members = "flush"
+[tool.pylint.imports]
+allow-reexport-from-package = true
 
 [tool.pyright]
 include = ["mini_fiction/logic/**/*"]

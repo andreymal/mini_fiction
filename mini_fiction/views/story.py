@@ -636,7 +636,7 @@ def download(story_id, filename):
 
     if (
         not storage_path.exists() or
-        datetime.fromtimestamp(storage_path.stat().st_mtime) < story.updated or
+        datetime.utcfromtimestamp(storage_path.stat().st_mtime) < story.updated or
         debug
     ):
         data = fmt.render(

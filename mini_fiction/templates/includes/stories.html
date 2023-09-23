@@ -11,14 +11,21 @@
                 {{ edit_buttons(story) }}
             {% endif %}
         </div>
-        <h3>
-            <a href="{{ url_for('story.view', pk=story.id) }}">{{ story.title }}</a>
+
+        <div class="story-item-header">
+            <h3 class="story-title">
+                <a href="{{ url_for('story.view', pk=story.id) }}">{{ story.title }}</a>
+            </h3>
+
             {% if story.pinned -%}
                 <span class="scon small story-pinned" title="Рассказ закреплён"></span>
             {%- endif %}
+
             {{- story.bl.vote_view_html(user=current_user, full=False)|safe }}
-            {% include 'includes/story_marks.html' with context %}
-        </h3>
+
+            {% include 'includes/story_marks.html' %}
+        </div>
+
         <p class="meta">
             {{ tags_block(story.prepared_tags, story.id) }}
                 {{ ngettext("%(num)d word", "%(num)d words", story.words) }} {{ pgettext('story_by', 'by') }} {% include 'includes/story_authors_list.html' %}

@@ -1,3 +1,4 @@
+<span class="story-marks">
 {% if story.draft -%}
     <sup class="story-mark draft">{{ pgettext('story_mark', 'draft') }}</sup>
 {% elif not story.approved -%}
@@ -14,3 +15,4 @@
 {%- else -%}
     <sup class="story-mark incomplete">{{ pgettext('story_mark', 'incomplete') }}</sup>
 {% endif %}
+</span>

@@ -37,19 +37,26 @@
             {{ common_buttons(story, with_abuse=True) }}
             {{ edit_buttons(story) }}
         </div>
-        <h1 id="story_title">
-            <span itemprop="name"><a itemprop="url" class="invisible-link" href="{{ url_for('story.view', pk=story.id, _external=True) }}">{{ story.title }}</a></span>
+
+        <div class="story-info-header">
+            <h1 id="story_title" class="story-title" itemprop="name">
+                <a itemprop="url" class="invisible-link" href="{{ url_for('story.view', pk=story.id, _external=True) }}">{{ story.title }}</a>
+            </h1>
+
             <span class="vote-area-1 js-vote-area-1-{{ story.id }}">
                 {{- story.bl.vote_area_1_html(user=current_user, user_vote=vote)|safe -}}
             </span>{#
             #}<span class="js-vote-view-{{ story.id }}" style="display: inline;">
                 {{- story.bl.vote_view_html(user=current_user, full=True)|safe -}}
             </span>
+
             {% include 'includes/story_marks.html' %}
-        </h1>
+        </div>
+
         <div class="vote-area-2 js-vote-area-2-{{ story.id }}">
             {{- story.bl.vote_area_2_html(user=current_user, user_vote=vote)|safe -}}
         </div>
+
             <p>
                 {{ tags_block(story.prepared_tags, story.id) }}
             </p>

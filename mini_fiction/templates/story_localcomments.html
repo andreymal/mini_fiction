@@ -9,10 +9,13 @@
         <div class="icon-metagroup">
             {{ edit_buttons(story, with_edit=False) }}
         </div>
-        <h1 id="story_title">
-            <a class="invisible-link" href="{{ url_for('story.view', pk=story.id, _external=True) }}">{{ story.title }}</a>
+
+        <div class="story-info-header">
+            <h1 id="story_title" class="story-title">
+                <a class="invisible-link" href="{{ url_for('story.view', pk=story.id, _external=True) }}">{{ story.title }}</a>
+            </h1>
             {% include 'includes/story_marks.html' %}
-        </h1>
+        </div>
 
         <!-- Вывод комментариев: начало -->
         <div id="comments">

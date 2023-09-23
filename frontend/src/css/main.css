@@ -856,6 +856,30 @@ input.show-spoiler-trigger {
     margin-bottom: 60px;
 }
 
+.story-item-header,
+.story-info-header {
+  font-family: 'Trebuchet MS', Arial, sans-serif;
+  font-weight: 400;
+  text-rendering: optimizelegibility;
+}
+
+.story-item-header {
+    font-size: 20px;
+    line-height: 20px;
+    margin-bottom: 5px;
+}
+
+.story-info-header {
+    font-size: 32px;
+    line-height: 42px;
+    margin: 6px 0;
+}
+
+.story-title {
+    display: inline;
+    margin: 0;
+}
+
 .green {
     color: green;
 }
@@ -883,6 +907,14 @@ input.show-spoiler-trigger {
 
 .story-mark.translation {
     color: #999;
+}
+
+.story-item-header .story-mark {
+    font-size: 12px;
+}
+
+.story-info-header .story-mark {
+    font-size: 17px;
 }
 
 .story-info img,
@@ -2691,6 +2723,10 @@ ul.editlog .editlog-item:nth-child(2n+1) {
         padding: 0 0 0;
     }
     h1 {
+        font-size: 22px;
+        line-height: 28px;
+    }
+    .story-info-header {
         font-size: 22px;
         line-height: 28px;
     }

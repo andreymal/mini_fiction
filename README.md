@@ -23,8 +23,8 @@ CMS currently in Russian, and we would be grateful for the translation of all ph
 ## Quick start
 
 mini_fiction is available on PyPI, but it's recommended to use the latest version from GitHub since it's
-more up-to-date. Install Python 3.8, 3.9 or 3.10 and the development tools ([Git], GNU Make, [Poetry],
-[Node.js] and [Yarn]), then run the following commands:
+more up-to-date. Install Python 3.8-3.11 and the development tools ([Git], GNU Make, [Poetry], [Node.js]
+and [Yarn]), then run the following commands:
 
 ```bash
 git clone https://github.com/andreymal/mini_fiction

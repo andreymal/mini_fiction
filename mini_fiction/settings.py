@@ -403,6 +403,7 @@ class Config(object):
 
     CELERY_CONFIG = {
         'broker_url': 'redis://localhost:6379/0',
+        'broker_connection_retry_on_startup': True,
         'task_always_eager': False,
         'task_serializer': 'json',
         'accept_content': {'json', 'msgpack', 'yaml'},

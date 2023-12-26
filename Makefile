@@ -99,7 +99,7 @@ install: clean
 
 develop:
 	$(POETRY) install
-	pybabel compile -d mini_fiction/translations
+	$(POETRY) run pybabel compile -d mini_fiction/translations
 	cd frontend && $(YARN)
 	cd frontend && $(YARN) webpack
 

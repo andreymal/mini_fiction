@@ -24,12 +24,12 @@ CMS currently in Russian, and we would be grateful for the translation of all ph
 
 mini_fiction is available on PyPI, but it's recommended to use the latest version from GitHub since it's
 more up-to-date. Install Python 3.8-3.11 and the development tools ([Git], GNU Make, [Poetry], [Node.js]
-and [Yarn]), then run the following commands:
+and [Yarn]), then run the following commands to set up the development environment:
 
 ```bash
 git clone https://github.com/andreymal/mini_fiction
 cd mini_fiction
-make install
+make develop
 ```
 
 This project is managed by Poetry; use `poetry shell` the activate the virtual environment.

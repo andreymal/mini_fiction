@@ -2,7 +2,7 @@
 {% import 'email/macro.html' as macro with context %}
 
 {% block body %}
-В новости <a href="{{ url_for('news.show', name=newsitem.name) }}" target="_blank"><b>{{ newsitem.title }}</b></a> добавлен новый комментарий:<br/>
+В новости <a href="{{ url_for('news.show', name=newsitem.name, _external=True) }}" target="_blank"><b>{{ newsitem.title }}</b></a> добавлен новый комментарий:<br/>
 
 {% call macro.comment(comment) %}
     <a href="{{ comment.bl.get_permalink(_external=True) }}" target="_blank">#{{ comment.local_id }}</a>

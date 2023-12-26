@@ -7,11 +7,10 @@ import time
 from datetime import timedelta
 from html import escape
 from urllib.request import Request, urlopen
-from urllib.parse import quote, urljoin
+from urllib.parse import quote, urljoin, urlsplit
 from typing import AnyStr, List, Optional
 
 import pytz
-from werkzeug.urls import url_parse
 from babel import Locale
 from flask import current_app, g, render_template, abort, url_for, request, has_request_context
 from flask_babel import get_babel, pgettext, ngettext
@@ -315,9 +314,6 @@ def diff2html(s, diff, show_newlines=False):
 def render_nonrequest_template(*args, **kwargs):
     '''Обёртка над flask.request_template, просто добавляет некоторые нужные
     переменные в ``flask.g``.
-
-    Если запускается в контексте текущего запроса, то патчит url_adapter,
-    чтобы отцепиться от запроса.
     '''
     if not hasattr(g, 'locale'):
         g.locale = Locale.parse(get_babel().default_locale)
@@ -329,23 +325,15 @@ def render_nonrequest_template(*args, **kwargs):
         from mini_fiction.models import ANON
         g.current_user = ANON
 
-    # Некоторые сволочи типа Flask-Script запускают код в контексте фейкового
-    # запроса, что меняет поведение url_for, а это нам нафиг не надо.
-    # Костыляем контекст, возвращая нужное поведение. Ну а ещё это позволяет
-    # рисовать шаблоны для почты в контексте настоящего запроса, тоже полезно
-    from flask.globals import _request_ctx_stack, _app_ctx_stack
-    appctx = _app_ctx_stack.top
-    reqctx = _request_ctx_stack.top
-    old_adapter = None
-    if reqctx and reqctx.url_adapter:
-        old_adapter = reqctx.url_adapter
-        reqctx.url_adapter = appctx.url_adapter
-
-    try:
+    if has_request_context():
+        # Эта строка выполняется, когда есть контекст запроса
         return render_template(*args, **kwargs)
-    finally:
-        if old_adapter is not None:
-            reqctx.url_adapter = old_adapter
+
+    # Похоже, Flask 3+ не позволяет временно убрать контекст запроса, поэтому,
+    # когда настоящего запроса нет, создаём фейковый запрос для единообразия
+    # со строчкой выше и для более предсказуемого поведения url_for, например
+    with current_app.test_request_context("/"):
+        return render_template(*args, **kwargs)
 
 
 def progress_drawer(
@@ -719,7 +707,7 @@ def check_own_url(url: Optional[str]) -> Optional[str]:
     base_url = f"{base_scheme}://{base_host}/"
 
     url_abs = urljoin(base_url, url)
-    url_info = url_parse(url_abs)
+    url_info = urlsplit(url_abs)
 
     if url_info.scheme in ("http", "https") and url_info.netloc == base_host:
         return url_abs

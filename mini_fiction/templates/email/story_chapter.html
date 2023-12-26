@@ -10,7 +10,7 @@
 <br/>
 <ul>
 {% for chapter in chapters -%}
-  <li><a href="{{ url_for('chapter.view', story_id=story.id, chapter_order=chapter.order) }}" target="_blank"><b>{{ chapter.autotitle }}</b></a> ({{ ngettext("%(num)d word", "%(num)d words", chapter.words) }})</li>
+  <li><a href="{{ url_for('chapter.view', story_id=story.id, chapter_order=chapter.order, _external=True) }}" target="_blank"><b>{{ chapter.autotitle }}</b></a> ({{ ngettext("%(num)d word", "%(num)d words", chapter.words) }})</li>
 {% endfor %}
 </ul>
 {% endblock %}

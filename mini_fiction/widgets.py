@@ -86,7 +86,7 @@ class StoriesButtons(Select):
         btn_container = []
         input_container = []
         output = []
-        for (option_value, option_label, selected) in field.iter_choices():
+        for (option_value, option_label, selected, _render_kw) in field.iter_choices():
             btn = ButtonWidget()
             rendered_btn = btn(field, text=option_label, value=option_value, **btn_attrs)
             btn_container.append(rendered_btn)

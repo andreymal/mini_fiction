@@ -6,7 +6,7 @@
 
 {%- if abuse.target_type == 'story' %} рассказ
 {%- elif abuse.target_type == 'storycomment' %} комментарий к рассказу {{ macro.storylink(target.id, target.story.title) }}
-{%- elif abuse.target_type == 'newscomment' %} комментарий к новости <a href="{{ url_for('news.show', name=target.name) }}" target="_blank"><b>{{ target.newsitem.title }}</b></a>
+{%- elif abuse.target_type == 'newscomment' %} комментарий к новости <a href="{{ url_for('news.show', name=target.name, _external=True) }}" target="_blank"><b>{{ target.newsitem.title }}</b></a>
 {%- else %} что-то
 {%- endif -%}
 :<br/>

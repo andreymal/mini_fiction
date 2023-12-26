@@ -46,7 +46,7 @@ def dumpstory(
             if gzip_compression:
                 story_dump_path = story_dump_path.with_suffix(story_dump_path.suffix + ".gz")
 
-            story.bl.dump_to_file_full(story_dump_path, gzip_compression)
+            story.bl.dump_to_file_full(story_dump_path, gzip_compression=gzip_compression)
 
         if verbosity > 0:
             print("Done.")

@@ -704,7 +704,7 @@ def download_json_full(story_id):
     je = JSONEncoder(ensure_ascii=False, sort_keys=True)
     result = StringIO()
 
-    for x in story.bl.dump_full(dump_collections=False):
+    for x in story.bl.dump_full():
         result.write(je.encode(x) + '\n')
 
     response = Response(result.getvalue(), mimetype='application/json-l')

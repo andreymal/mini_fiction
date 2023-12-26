@@ -7,7 +7,8 @@ import traceback
 from hashlib import md5
 from dataclasses import dataclass, field
 from datetime import datetime, timedelta
-from typing import TYPE_CHECKING, Any, Union, Optional, Dict, Tuple, List, Iterable
+from pathlib import Path
+from typing import TYPE_CHECKING, Any, Union, Optional, Dict, Tuple, List, Iterable, Iterator
 
 import lxml.html
 import lxml.etree
@@ -1039,22 +1040,23 @@ class StoryBL(BaseBL, Commentable):
             stories=stories,
         )
 
-    def dump_to_file_full(self, path, gzip_compression=0, dump_collections=False):
-        path = os.path.abspath(path)
+    def dump_to_file_full(self, path: Union[str, Path], *, gzip_compression: int = 0) -> None:
+        from mini_fiction.ponydump import JSONEncoder
+
+        path = Path(path).resolve()
 
         if gzip_compression:
             import gzip
-            fp = gzip.open(path, 'wt', encoding='utf-8')
+            fp = gzip.open(path, "wt", encoding="utf-8")
         else:
-            fp = open(path, 'w', encoding='utf-8')
+            fp = path.open("w", encoding="utf-8")
 
-        from mini_fiction.ponydump import JSONEncoder
         je = JSONEncoder(ensure_ascii=False, sort_keys=True)
         with fp:
-            for x in self.dump_full(dump_collections=dump_collections):
-                fp.write(je.encode(x) + '\n')
+            for x in self.dump_full():
+                fp.write(je.encode(x) + "\n")
 
-    def dump_full(self, dump_collections=False):
+    def dump_full(self) -> Iterator[Dict[str, object]]:
         from mini_fiction import dumpload
         from mini_fiction.models import StoryCommentEdit, StoryCommentVote
         from mini_fiction.models import StoryLocalComment, StoryLocalCommentEdit
@@ -1068,11 +1070,10 @@ class StoryBL(BaseBL, Commentable):
         # Сначала всё, что не зависит от глав
         for x in sorted(story.contributors, key=lambda c: c.id):
             yield mdf.obj2json(x, 'storycontributor')
-        if dump_collections:
-            for x in sorted(story.characters, key=lambda c: c.id):
-                yield mdf.obj2json(x, 'character')
-            for x in sorted(self.get_tags_list(), key=lambda c: c.id):
-                yield mdf.obj2json(x, 'storytag')
+        for x in sorted(self.get_tags_list(), key=lambda c: c.id):
+            yield mdf.obj2json(x, 'storytag')
+        for x in sorted(story.tags_log, key=lambda c: c.id):
+            yield mdf.obj2json(x, 'storytaglog')
         for x in sorted(story.favorites, key=lambda c: c.id):
             yield mdf.obj2json(x, 'favorites')
         for x in sorted(story.bookmarks, key=lambda c: c.id):
@@ -1145,14 +1146,22 @@ class StoryBL(BaseBL, Commentable):
         ):
             yield mdf.obj2json(x, 'subscription')
 
-    def dump_to_file_only_public(self, path, gzip_compression=0, with_chapters=True, with_favorites=False, with_comments=False):
-        path = os.path.abspath(path)
+    def dump_to_file_only_public(
+        self,
+        path: Union[str, Path],
+        *,
+        gzip_compression: int = 0,
+        with_chapters: bool = True,
+        with_favorites: bool = False,
+        with_comments: bool = False,
+    ) -> None:
+        path = Path(path).resolve()
 
         if gzip_compression:
             import gzip
-            fp = gzip.open(path, 'wt', encoding='utf-8')
+            fp = gzip.open(path, "wt", encoding="utf-8")
         else:
-            fp = open(path, 'w', encoding='utf-8')
+            fp = path.open("w", encoding="utf-8")
 
         from mini_fiction.ponydump import JSONEncoder
         je = JSONEncoder(ensure_ascii=False, sort_keys=True)
@@ -1162,9 +1171,15 @@ class StoryBL(BaseBL, Commentable):
                 with_favorites=with_favorites,
                 with_comments=with_comments
             ):
-                fp.write(je.encode(x) + '\n')
+                fp.write(je.encode(x) + "\n")
 
-    def dump_only_public(self, with_chapters=True, with_favorites=False, with_comments=False):
+    def dump_only_public(
+        self,
+        *,
+        with_chapters: bool = True,
+        with_favorites: bool = False,
+        with_comments: bool = False,
+    ) -> Iterator[Dict[str, object]]:
         from mini_fiction import dumpload
 
         story = self.model

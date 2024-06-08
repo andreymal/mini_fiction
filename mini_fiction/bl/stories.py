@@ -1031,12 +1031,16 @@ class StoryBL(BaseBL, Commentable):
         stories = [stories_dict[i] for i in ids if i in stories_dict]
         enrich_stories(stories)
 
+        max_matches = int(result_orig.meta["max_matches"])
+        total_found = int(result_orig.meta["total_found"])
+        total = min(max_matches, total_found)
+
         return StorySearchResult(
             matches=result_orig.matches,
             meta=result_orig.meta,
             sql=result_orig.sql,
-            total=int(result_orig.meta["total"]),
-            total_found=int(result_orig.meta["total_found"]),
+            total=total,
+            total_found=total_found,
             stories=stories,
         )
 
@@ -2292,11 +2296,15 @@ class ChapterBL(BaseBL):
                 )
                 chapters.append((chapters_dict[i], excerpt[0] if excerpt else ""))
 
+        max_matches = int(result_orig.meta["max_matches"])
+        total_found = int(result_orig.meta["total_found"])
+        total = min(max_matches, total_found)
+
         return ChapterSearchResult(
             matches=result_orig.matches,
             meta=result_orig.meta,
             sql=result_orig.sql,
-            total=int(result_orig.meta["total"]),
-            total_found=int(result_orig.meta["total_found"]),
+            total=total,
+            total_found=total_found,
             chapters=chapters,
         )

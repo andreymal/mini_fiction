@@ -179,7 +179,7 @@ class Config(object):
     SPHINX_ROOT = os.path.join(os.getcwd(), 'sphinx')
     SPHINX_CONFIG = {
         'connection_params': {'unix_socket': '/tmp/sphinx_fanfics.socket', 'charset': 'utf8mb4'},
-        'excerpts_opts': {'chunk_separator': '…', 'limit': 2048, 'around': 10, 'html_strip_mode': 'strip'},
+        'excerpts_opts': {'chunk_separator': '…', 'limit': 2048, 'around': 20, 'html_strip_mode': 'strip'},
 
         'stories_rt_mem_limit': '128M',
         'chapters_rt_mem_limit': '256M',
@@ -187,10 +187,10 @@ class Config(object):
         'weights_stories': {'title': 100, 'summary': 50, 'notes': 25, 'username': 150},
         'weights_chapters': {'text': 100, 'title': 50, 'notes': 25},
 
-        'limit': 10,
+        'limit': 20,
         'select_options': {
             'ranker': 'sph04',
-            'max_matches': 1000,
+            'max_matches': 5000,
             'retry_count': 5,
             'retry_delay': 1,
             'max_query_time': 10000,  # in milliseconds

@@ -150,7 +150,7 @@ class SphinxConnection:
 
         return s
 
-    def build_search_sql(
+    def _build_search_sql(
         self,
         index: str,
         query: str,
@@ -226,7 +226,10 @@ class SphinxConnection:
     ) -> SphinxSearchResult:
         from MySQLdb import ProgrammingError
 
-        sql, args = self.build_search_sql(
+        options = dict(options) or {}
+        options.setdefault("max_matches", 1000)
+
+        sql, args = self._build_search_sql(
             index, query, fields, raw_fields, sort_by, limit, options, weights, extended_syntax, **filters
         )
 
@@ -244,6 +247,7 @@ class SphinxConnection:
         if meta:
             cur.execute("show meta")
             meta_result = dict(cur.fetchall())
+            meta_result["max_matches"] = int(options["max_matches"])
 
         result = SphinxSearchResult(
             matches=matches,

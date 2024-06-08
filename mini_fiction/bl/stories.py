@@ -1800,6 +1800,12 @@ class ChapterBL(BaseBL):
                 flags=flags,
             )
 
+        # TODO: перенести всё кэширование из models куда-то сюда
+        if 'notes' in edited_data:
+            current_app.cache.delete(f"chapter_notes_html_{chapter.id}")
+        if chapter_text_diff:
+            current_app.cache.delete(f"chapter_text_html_{chapter.id}")
+
         later(current_app.tasks['sphinx_update_chapter'].delay, chapter.id)
         return chapter
 

@@ -32,7 +32,7 @@ const postCSSOptions = {
   plugins: [
     postCSSAutoPrefixer(),
     postCSSMixins(),
-    postCSSNesting(),
+    postCSSNesting({ edition: '2024-02' }),
     postCSSMoveProps({
       computeCustomProps: root => postcss([
         postCSSGlobalData({

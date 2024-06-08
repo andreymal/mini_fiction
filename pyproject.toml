@@ -84,6 +84,7 @@ isort = "^5.13"
 pony-stubs = "^0.5.2"
 types-pytz = "*"
 pyright = "^1.1"
+setuptools = "*"  # for pybabel extract https://stackoverflow.com/questions/78123222
 
 [tool.poetry.group.test.dependencies]
 factory-boy = "^3.3"

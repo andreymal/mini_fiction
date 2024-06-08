@@ -90,7 +90,7 @@ class ProjectStatus(Status):
         'localtemplates': 'Custom templates directory',
         'sphinx': 'Sphinx search',
         'celery': 'Celery',
-        'diff': 'google-diff-match-patch',
+        'diff': 'fast-diff-match-patch',
         'linter': 'Chapter linter',
         'captcha': 'Captcha',
         'tags': 'Tags count',
@@ -301,9 +301,9 @@ class ProjectStatus(Status):
 
     def diff(self):
         try:
-            import diff_match_patch  # pylint: disable=W0612
+            import fast_diff_match_patch  # pylint: disable=unused-variable
         except ImportError:
-            return self._ok('diff', 'not installed (we recommend install it: pip install diff_match_patch_python)')
+            return self._ok('diff', 'not installed (we recommend installing it: pip install fast-diff-match-patch)')
 
         from mini_fiction.utils.diff import get_diff_google
 

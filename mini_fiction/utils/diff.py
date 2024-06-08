@@ -108,18 +108,18 @@ def get_diff_google(a, b):
 
     - ``('-', 'кусок')`` — этот кусок удалён из старого текста
 
-    Используется ``google-diff-match-patch``, который быстрый, но даёт
+    Используется ``fast-diff-match-patch``, который быстрый, но даёт
     не самые красивые диффы.
     '''
 
-    import diff_match_patch
+    import fast_diff_match_patch
 
     ia = 0
     ib = 0
 
     result = []
 
-    for op, l in diff_match_patch.diff(a, b, timelimit=20, checklines=False):
+    for op, l in fast_diff_match_patch.diff(a, b, timelimit=20, checklines=False):
         if op == '=':
             assert a[ia:ia + l] == b[ib:ib + l]
             result.append(('=', l))

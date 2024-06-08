@@ -4,8 +4,8 @@ from pathlib import Path
 from typing import ClassVar, Dict, Literal, Optional, Set, Type, Union
 from uuid import uuid4
 
-# NOTE: Typing skipped due to outdated types-Pillow
-from PIL.Image import Image, Resampling, UnidentifiedImageError  # type: ignore
+from PIL import UnidentifiedImageError
+from PIL.Image import Image, Resampling
 from PIL.Image import open as open_image
 from pydantic import BaseModel
 
@@ -154,7 +154,7 @@ def _save_original_image(
 def _validate_image(raw_data: bytes) -> Optional[Image]:
     try:
         image: Image = open_image(BytesIO(raw_data))
-        image.load()
+        image.load()  # type: ignore[no-untyped-call]
         return image
     except UnidentifiedImageError:
         return None

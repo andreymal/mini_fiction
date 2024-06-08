@@ -1772,7 +1772,7 @@ class ChapterBL(BaseBL):
             else:
                 try:
                     # Для больших текстов используем библиотеку на C++, которая даёт диффы быстро, но не очень красиво
-                    import diff_match_patch  # pylint: disable=W0612
+                    import fast_diff_match_patch  # pylint: disable=unused-variable
                 except ImportError:
                     # Если библиотеки нет, то и дифф не получился
                     chapter_text_diff = [('-', chapter.text), ('+', text)]
@@ -2042,7 +2042,7 @@ class ChapterBL(BaseBL):
         else:
             try:
                 # Для больших текстов используем библиотеку на C++, которая даёт диффы быстро, но не очень красиво
-                import diff_match_patch  # pylint: disable=W0612
+                import fast_diff_match_patch  # pylint: disable=unused-variable
             except ImportError:
                 # Если библиотеки нет, то и дифф не получился
                 chapter_text_diff = [('-', older_text), ('+', chapter.text)]

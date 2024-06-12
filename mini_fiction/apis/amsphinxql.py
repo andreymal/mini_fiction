@@ -226,7 +226,7 @@ class SphinxConnection:
     ) -> SphinxSearchResult:
         from MySQLdb import ProgrammingError
 
-        options = dict(options) or {}
+        options = dict(options or {})
         options.setdefault("max_matches", 1000)
 
         sql, args = self._build_search_sql(

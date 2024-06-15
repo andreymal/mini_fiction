@@ -1,8 +1,6 @@
 import core from './core';
 import { post, get } from '../utils/ajax';
 
-'use strict';
-
 var bell = {
     _storageEventBind: null,
     _updaterInterval: null,

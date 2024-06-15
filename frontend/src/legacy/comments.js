@@ -5,9 +5,6 @@ import common from './common';
 import { post, get } from '../utils/ajax';
 import { notify, notifyError } from '../utils/notifications';
 
-
-'use strict';
-
 /* global amajaxify: false, core: false, captcha: false, common: false */
 
 

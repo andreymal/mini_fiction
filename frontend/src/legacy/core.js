@@ -2,9 +2,6 @@ import amajaxify from './lib/amajaxify';
 import { get, setCsrfToken } from '../utils/ajax';
 import { notifyError } from '../utils/notifications';
 
-'use strict';
-
-
 var core = {
     csrftoken: null,
     nav: null,

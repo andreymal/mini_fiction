@@ -1,4 +1,5 @@
 import path from 'path';
+import { fileURLToPath } from 'url';
 import zlib from 'zlib';
 import AssetsManifestPlugin from 'webpack-assets-manifest';
 import MiniCssExtractPlugin from 'mini-css-extract-plugin';
@@ -15,12 +16,13 @@ import postCSSNano from 'cssnano';
 import postCSSCustomProperties from 'postcss-custom-properties';
 import postCSSMoveProps from 'postcss-move-props-to-bg-image-query';
 
-const { BundleAnalyzerPlugin } = require('webpack-bundle-analyzer');
+import { BundleAnalyzerPlugin } from 'webpack-bundle-analyzer';
 
 const ENV = process.env.NODE_ENV || 'development';
 const isDev = ENV !== 'production';
 
-const outputPath = path.resolve(__dirname, '..', 'mini_fiction', 'static', 'build');
+const frontendRoot = path.dirname(fileURLToPath(import.meta.url));
+const outputPath = path.resolve(frontendRoot, '..', 'mini_fiction', 'static', 'build');
 const outputName = `[name].${isDev ? 'dev' : '[contenthash]'}`;
 
 const reactAliases = {
@@ -36,7 +38,7 @@ const postCSSOptions = {
     postCSSMoveProps({
       computeCustomProps: root => postcss([
         postCSSGlobalData({
-          files: [path.resolve(__dirname, 'src', 'css', 'variables.css')],
+          files: [path.resolve(frontendRoot, 'src', 'css', 'variables.css')],
         }),
         postCSSCustomProperties({preserve: false}),
       ]).process(root),
@@ -99,9 +101,9 @@ const productionPlugins = [
   }),
 ];
 
-module.exports = {
+export default {
   mode: ENV,
-  context: path.resolve(__dirname, 'src'),
+  context: path.resolve(frontendRoot, 'src'),
   entry: {
     index: ['./index.js', './index.css'],
   },
@@ -113,10 +115,10 @@ module.exports = {
   },
 
   resolve: {
-    extensions: ['.jsx', '.js', '.json', 'png', '.jpg', '.gif', '.svg', '.eot', '.ttf', '.woff', '.woff2'],
+    extensions: ['.jsx', '.js', '.json', '.png', '.jpg', '.gif', '.svg', '.eot', '.ttf', '.woff', '.woff2'],
     modules: [
-      path.resolve(__dirname, 'src'),
-      path.resolve(__dirname, 'node_modules'),
+      path.resolve(frontendRoot, 'src'),
+      path.resolve(frontendRoot, 'node_modules'),
       'node_modules',
     ],
     alias: reactAliases,
@@ -126,13 +128,16 @@ module.exports = {
     rules: [
       {
         test: /\.jsx?$/,
-        exclude: path.resolve(__dirname, 'src'),
+        exclude: path.resolve(frontendRoot, 'src'),
         enforce: 'pre',
         use: 'source-map-loader',
       },
       {
         test: /\.jsx?$/,
         exclude: /node_modules/,
+        resolve: {
+          fullySpecified: false,
+        },
         use: [
           { loader: 'babel-loader' },
           {

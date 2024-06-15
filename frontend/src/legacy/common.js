@@ -3,8 +3,6 @@ import HTMLSanitizer from './lib/htmlsanitizer';
 import { post } from '../utils/ajax';
 import { notify, notifyError } from '../utils/notifications';
 
-'use strict';
-
 /* global core: false, $: false, mySettings: false, HTMLSanitizer: false */
 
 

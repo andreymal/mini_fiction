@@ -1,3 +1,7 @@
+/* devblock:start */
+import 'preact/debug';
+/* devblock:end */
+
 import Baz from 'bazooka';
 
 import core from './legacy/core';
@@ -18,10 +22,6 @@ import {
   tab,
   transition,
 } from './legacy/lib/bootstrap.min';
-
-/* devblock:start */
-require('preact/debug');
-/* devblock:end */
 
 core.oninit(common.init.bind(common));
 core.onload(common.load.bind(common));

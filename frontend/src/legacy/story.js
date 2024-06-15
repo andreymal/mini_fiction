@@ -1,5 +1,3 @@
-'use strict';
-
 import Hypher from 'hypher';
 import ruHyphenation from 'hyphenation.ru';
 

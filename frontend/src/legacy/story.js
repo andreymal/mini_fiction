@@ -40,7 +40,6 @@ var story = {
     _contributorsSendEventBinded: null,
     _contributorsChangeEventBinded: null,
     _hashChangeEventBinded: null,
-    _moreTagsLinks: [],
 
     _lsFormattingKey: 'formatting',
     _preview: {
@@ -1075,7 +1074,7 @@ var story = {
     },
 
     /**
-     * Обновляет указанный параметр форматированияи, применяет форматирование
+     * Обновляет указанный параметр форматирования, применяет форматирование
      * ко всем js-story-formatting и сохраняет это всё дело в localStorage.
      */
     setFormattingProperty: function(name, value) {

@@ -75,6 +75,7 @@ a {
 /* Footer */
 
 .footer {
+    min-height: 30px;
     padding: 10px 20px;
     background: #1D2A4F no-repeat 0 0;
     color: #FAFAE8;
@@ -96,6 +97,7 @@ a {
 
 @media (max-width: 660px) {
     .footer {
+        min-height: 0;
         flex-flow: column-reverse;
         gap: 0.25em;
 
